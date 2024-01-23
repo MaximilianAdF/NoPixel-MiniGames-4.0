@@ -1,6 +1,7 @@
 body {
     color: aliceblue;
     background-color: rgb(3, 3, 39);
+    overflow: hidden;
 }
 
 /* Top Rectangle */
@@ -8,7 +9,7 @@ body {
     display: flex;
     outline: 1px rgb(118, 118, 118) solid;
     width: 1000px;
-    margin: 10% auto 0 ;
+    margin: 5% auto 0 ;
     height: 10%;
 }
 
