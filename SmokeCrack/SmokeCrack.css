@@ -1,0 +1,349 @@
+body {
+    color: aliceblue;
+    background-color: rgb(3, 3, 39);
+}
+
+/* Top Rectangle */
+.topRectangle {
+    display: flex;
+    outline: 1px rgb(118, 118, 118) solid;
+    width: 1000px;
+    margin: 10% auto 0 ;
+    height: 10%;
+}
+
+.topRectangle img {
+    margin: auto 15px;
+    width: 8%;
+}
+
+.app {
+    height: 100%;
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.application {
+    font-weight: 100;
+    margin-bottom: 0;
+}
+
+.title {
+    margin-top: 0;
+}
+
+.topRectangle p {
+    color: rgb(183, 183, 183);
+    margin: auto;
+    margin-left: 30px;
+
+}
+
+/* Container for MAC & IP */
+.row-container {
+    gap: 20px;
+    display: flex;
+    flex-direction: row;
+    width: 1000px;
+    margin: 1% auto;
+    height: 80%;
+}
+
+
+/* MAC & IP Squares */
+.mac-info-square,
+.mac-input-square,
+.ip-info-square,
+.ip-input-square {
+    background-color: rgba(153, 153, 153, 0.319);
+    width: 300px;
+    height: 100px;
+    border-radius: 5px;
+}
+
+.mac-info-square h2,
+.ip-info-square h2 {
+    margin: 0;
+    padding: 0 15px;
+    font-size: 25px;
+    padding-top: 10px;
+}
+
+.mac-info-square p,
+.ip-info-square p {
+    margin: 0;
+    padding: 0 15px;
+    font-size: 21px;
+    color: rgba(208, 208, 208, 0.834);
+}
+
+.mac-input-square,
+.ip-input-square {
+    font-size: 20px;
+    color: gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 200px;
+    /* Add any additional styles specific to these squares */
+}
+
+.mac-input-square input,
+.ip-input-square input {
+    text-align: center;
+    width: 90%;
+    padding: 5px;
+    border-radius: 3px;
+    box-sizing: border-box;
+    font-size: inherit;
+    color: inherit;
+    background: transparent;
+    outline: none;
+    border: none;
+}
+
+
+.mac-input-square input::placeholder,
+.ip-input-square input::placeholder {
+    color: gray;
+}
+
+/* Crack Button */
+.crack-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 1000px;
+    margin: 0 auto;
+    height: 100px;
+}
+.crack-button {
+    width: 100%;
+}
+
+.crack-container button {
+    width: 100%;
+    height: 100px;
+    border-radius: 5px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    background-color: rgba(33, 158, 114, 0.581);
+    color: white;
+    cursor: pointer;
+}
+
+.crack-button h1,
+.crack-button p {
+    margin: 0;
+}
+
+.crack-button h1 {
+    font-weight: 500;
+    color: rgb(84, 255, 164);
+    text-shadow: 0 0 2px rgb(127, 255, 191);
+    font-size: 30px;
+    padding: 0 15px;
+}
+
+.crack-button p {
+    color: rgba(208, 208, 208, 0.834);
+}
+
+
+/* Mini-game section */
+.minigame-container {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 1000px;
+    margin: -80px auto;
+    height: 300px;
+}
+
+.minigame-header {
+    margin: -100px 0 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.minigame-header h2, 
+.minigame-header p {
+    margin: 0;
+}
+
+.minigame-header h2 {
+    font-size: 30px;
+    color: rgb(84, 255, 164);
+    text-shadow: 0 0 2px rgb(127, 255, 191);
+}
+
+.minigame-header p {
+    margin-bottom: 20px;
+    color: rgba(208, 208, 208, 0.834);
+}
+
+
+
+/* Letters (JS generated) */
+
+.letter-container {
+    border-radius: 5px;
+    background-color: rgba(153, 153, 153, 0.319);
+    padding: 3px;
+    padding-bottom: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.letter-square {
+    width: 40px;
+    height: 40px;
+    background-color: #ffffff;
+    color: #000000cb;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 5px 0 0 rgb(182, 182, 182);
+    align-items: center;
+    margin: 5px;
+}
+
+
+/* Feedback container */
+.feedback-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 3px;
+}
+
+.feedback-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    outline: 3px solid rgba(153, 153, 153, 0.319);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+}
+
+.feedback-line {
+    flex: 1;
+    width: 24px;
+    height: 2px;
+    background-color: rgba(153, 153, 153, 0.319); /* Adjust the color of the line */
+}
+
+
+    /* Check mark styling */
+    .feedback-circle .fa-check {
+        color: rgb(84, 255, 164);
+        text-shadow: 0 0 2px rgb(127, 255, 191);
+    }
+
+    .check-mark {
+        outline: 3px solid rgb(84, 255, 164);
+        background-color:  rgba(84, 255, 164, 0.285);
+    }
+
+    /* X mark styling */
+    .feedback-circle .fa-times {
+        color: rgb(255, 84, 84);
+        text-shadow: 0 0 2px rgb(255, 127, 127);
+    }
+
+    .x-mark {
+        outline: 3px solid  rgb(255, 84, 84);
+        background-color: rgba(255, 127, 127, 0.285);
+    }
+
+
+/* Timer container */
+.timer-container {
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.timer-progress {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(153, 153, 153, 0.319);
+    border-radius: 2px;
+    height: 100%;
+    width: calc(100% - 80px);
+}
+
+.timer-progress-bar {
+    height: 30%;
+    width: 95%;
+    background-color: rgba(84, 255, 164, 0.285);
+    border-radius: 4px;
+}
+
+.timer-progress-bar-fill {
+    height: 100%;
+    width: 100%;
+    background-color: rgb(84, 255, 164);
+    border-radius: 4px;
+    transition: width 1s ease-in-out;
+}
+
+.timer-seconds {
+    background-color: rgba(153, 153, 153, 0.319);
+    border-radius: 2px;
+    height: 100%;
+    width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    color: gray;
+}
+
+
+/* End game container */
+.minigame-over {
+    background-color: rgba(255, 127, 127, 0.285);
+    border-radius: 5px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 250px;
+    width: 1000px;
+    height: 100px;
+    position: fixed;
+}
+
+.minigame-over h2,
+.minigame-over p {
+    margin: 0;
+}
+
+.minigame-over h2 {
+    font-weight: 500;
+    color: rgb(255, 84, 84);
+    text-shadow: 0 0 2px rgb(255, 127, 127);
+    font-size: 25px;
+    padding: 0 15px;
+}
+
+.minigame-over p {
+    color: rgba(208, 208, 208, 0.834);
+}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SmokeCrack</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="SmokeCrack.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <script src="SmokeCrack.js"></script>
+</head>
+<body>
+    <!-- Smoke Crack App, Top Rectangle -->
+    <div class="topRectangle">
+        <img src="SmokeCrack.png" alt="Smoke Crack Logo" class="logo">
+        <div class="app">
+            <h2 class="application">Application</h2>
+            <h1 class="title">SmokeCrack</h1>
+        </div>
+        <p>Enter details and hack specific Wi-Fi networks</p>
+    </div>
+
+    <div class="row-container">
+        <div class="mac-info-square">
+            <h2>MAC Adress</h2>
+            <p>Insert the MAC Adress of the Wi-Fi you want to hack.</p>
+        </div>
+        <div class="mac-input-square">
+            <input id="mac-input" type="text" placeholder="MAC Address">
+        </div>
+        <div class="ip-info-square">
+            <h2>IP Adress</h2>
+            <p>Insert the IP Adress of the Wi-Fi you want to hack.</p>
+        </div>
+        <div class="ip-input-square">
+            <input id=ip-input type="text" placeholder="IP Address">
+        </div>
+    </div>
+
+    <div class="crack-container">
+        <div class="crack-button" id="crackButton">
+            <button type="button" onclick="startCracking()"><h1>Crack</h1><p>Crack the Wi-Fi to connect</p></button>
+        </div>
+    </div>
+
+    <div class="minigame-container">
+        <div class="minigame-header">
+            <h2>Press these buttons as fast as you can</h2>
+            <p>Hacking...</p>
+        </div>
+        <div class="letter-container">
+            <!-- Letter squares will be dynamically added here -->
+        </div>
+        <div class="feedback-container">
+            <!-- Feedback circles/lines will be dynamically added here -->
+        </div>
+        <div class="timer-container">
+            <div class="timer-progress">
+                <div class="timer-progress-bar">
+                    <div class="timer-progress-bar-fill"></div>
+                </div>
+            </div>
+            <span class="timer-seconds"></span>
+        </div>
+        <div class="minigame-over">
+            <h2>Hacking failed!</h2>
+            <p>You failed to hack the Wi-Fi</p>
+        </div>
+    </div>
+</body>
+</html>
