@@ -6,29 +6,42 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <link rel="stylesheet" type="text/css" href="LockPick.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,400i,700&display=swap">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
         <script src="LockPick.js"></script>
     </head>
     <body>
         <div class="hack-box-container">
-            <div class="info-container">
-                <div><i class="fas fa-gamepad"></i></div>
-                <h2>Lockpick</h2>
-                <p>Unlock each lock</p>
-            </div>
             <div class="outer-container">
-                <div class="hack-box">
-                    <div id="line" class="line1"></div>
-                    <div id="line" class="line2"></div>
-                    <div id="line" class="line3"></div>
-                    <div id="line" class="line4"></div>
-                    <div id="line" class="line5"></div>
-                    <div id="line" class="line6"></div>
+                <div class="info-container">
+                    <div><i class="fas fa-gamepad"></i></div>
+                    <h2>Lockpick</h2>
+                    <p>Unlock each lock</p>
                 </div>
-                <!-- Buttons/Text etc -->
+                <div class="lose-message">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                    <p>The lockpick bent out of shape.</p>
+                </div>
+                <div class="win-message">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <p>The lock was picked successfully.</p>
+                </div>
+                <div class="hack-box"> 
+                    <div class="position-container">
+                        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%"></svg>
+                    </div>
+                    <!--Static degree indicator lines are generated here-->
+                    <div class="lock-container">
+                        <!--Lock Circles and Balls are generated here-->
+                    </div>
+                </div>
+                <div class="rotate-buttons-container">
+                    <button id="rotate-left" class="rotate-button" onclick="rotateBalls('Left')"><i class="fa-solid fa-arrow-rotate-left"></i>Rotate Left</button>
+                    <button id="rotate-right" class="rotate-button" onclick="rotateBalls('Right')">Rotate Right<i class="fa-solid fa-arrow-rotate-right"></i></button>
+                </div>
+                <div class="submit-button-container"><button class="submit-button" onclick="nextLock()">Unlock</button></div>
             </div>
             <div class="timer-container">
-
+                <div class="timer-progress-bar"></div>
             </div>
         </div>
     </body>

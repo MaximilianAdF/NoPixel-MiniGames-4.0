@@ -1,8 +1,8 @@
 body {
     font-family: 'Roboto', sans-serif;
-    background-image: url('bgImage.png');
+    background-image: url(CompanyBG.webp);
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size:auto;
     overflow: hidden;
 }
 
@@ -18,16 +18,12 @@ body {
     height: 800px;
 }
 
-.info-container{
-    left: 670px;
-    top: 77px;
-    position: absolute;
+.info-container {
     display: flex;
     align-items: center;
-    width: 100%;
     gap: 15px;
-    margin-top: 5px;
-
+    margin-top: -20px;
+    margin-left: -280px;
 }
 
 .fa-gamepad {
@@ -36,7 +32,7 @@ body {
 }
 
 .info-container h2 {
-    font-size: 25 px;
+    font-size: 25px;
     color: rgb(84, 255, 164);
     text-shadow: 0 0 2px rgb(127, 255, 191);
 }
@@ -48,11 +44,12 @@ body {
 
 .outer-container {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
     height: 100%;
-    background-color:rgb(15, 27, 33);
+    background-color: rgb(15, 27, 33);
 }
 
 .hack-box {
@@ -63,37 +60,190 @@ body {
     justify-content: center;
     width: 580px;
     height: 580px;
-    margin-bottom: 40px;
+    margin-top: 20px; /* Adjusted this line */
     background-color: rgb(22, 40, 52);
-
 }
 
-#line {
+
+
+/* Static lines (Turn line1.... into ts code) */ 
+.line {
     width: 70%;
     outline: 1.2px solid rgb(142, 142, 142);
 }
-.line1{
-    transform: rotateZ(0deg);
-}
-.line2{
-    transform: rotateZ(90deg);
-}
-.line3{
-    transform: rotateZ(30deg);
-}
-.line4{
-    transform: rotateZ(60deg);
-}
-.line5{
-    transform: rotateZ(120deg);
-}
-.line6{
-    transform: rotateZ(150deg);
+
+
+
+/* Lock Circles (turn lock-circle1.... into ts code) */
+.lock-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute; 
+    width: 580px;
+    height: 580px;
 }
 
+.lock-circle {
+    outline: 3px solid rgb(173, 173, 173);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+
+/* Balls attached to the lock-circles */
+.ball {
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background-color: rgb(255, 255, 255);
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Only account for 30/60deg and then change the ball's position based on the rotation of the lock-circle */
+/* cos(30deg) = sqrt(3)/2 */
+/* sin(30deg) = 1/2 */
+/* cos(60deg) = 1/2 */
+/* sin(60deg) = sqrt(3)/2 */
+
+/* Buttons */
+/* Rotate Buttons */
+.rotate-buttons-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.rotate-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 287px;
+    height: 50px;
+    background-color: rgb(49, 37, 76);
+    color: rgb(147, 62, 171);
+    border-radius: 5px;
+    border: none;
+    font-size: 20px;
+    font-weight: 500;
+    cursor: pointer;
+    gap: 10px; /* Space between arrow and text */
+    transition: background-color 0.1s ease-in-out;
+}
+
+.rotate-button:hover {
+    background-color: rgb(83, 39, 107);
+}
+
+.submit-button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.submit-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 579px;
+    height: 50px;
+    background-color: rgb(23, 95, 88);
+    color: rgb(48, 221, 189);
+    border-radius: 5px;
+    border: none;
+    font-size: 20px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.1s ease-in-out;
+}
+
+.submit-button:hover {
+    background-color: rgb(23, 109, 93);
+}
+
+
+/* Timer */
 .timer-container {
-    background-color: red;
+    background-color: rgb(15, 27, 33);
     display: flex;
     width: 100%;
     height: 10px;
 }
+
+.timer-progress-bar {
+    background-color: orangered;
+    width: 100%;
+    height: 100%;
+    transition: width 1s linear;
+}
+
+/* The semi-circles that indicate where ball color is supposed to be */
+.position-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    width: 580px;
+    height: 580px;
+}
+
+
+/* r = 55, r = 105, r = 155, r = 205, */
+.position-circle {
+    fill: none;
+    stroke-width: 5px;
+    transform-origin: 50% 50%;
+}
+
+.lose-message {
+    gap: 10px;
+    margin-top: -40px;
+    margin-left: 340px;
+    display: none;
+    color: white;
+    padding: 0px 18px;
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(56, 13, 23);
+}
+
+.win-message {
+    gap: 10px;
+    margin-top: -40px;
+    margin-left: 340px;
+    display: none;
+    color: white;
+    padding: 0px 10px;
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(23, 95, 88);
+}
+
+.lose-message p, .win-message p{
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.fa-circle-check {
+    font-size: 25px;
+    color: rgb(84, 255, 164);
+}
+
+.fa-circle-xmark {
+    font-size: 25px;
+    color: rgb(255, 84, 84);
+}
+

@@ -1,9 +1,13 @@
 body {
     color: aliceblue;
-    background-color: rgb(3, 3, 39);
+    background-color: blakc; /* Set background-color to transparent */
     overflow: hidden;
+    position: relative; /* Set position to relative to allow positioning of pseudo-element */
+    background: linear-gradient(rgba(21, 27, 48, 0.97), rgba(21, 27, 48, 0.97)), url(CompanyBG.webp);
+    background-size: cover;
 }
 
+    
 /* Top Rectangle */
 .topRectangle {
     display: flex;
