@@ -1,9 +1,9 @@
 body {
     font-family: 'Roboto', sans-serif;
-    background-image: url(CompanyBG.webp);
-    background-repeat: no-repeat;
-    background-size:auto;
     overflow: hidden;
+    position: relative; /* Set position to relative to allow positioning of pseudo-element */
+    background: linear-gradient(rgba(21, 27, 48, 0.97), rgba(21, 27, 48, 0.97)), url(https://i.pinimg.com/originals/05/9c/6f/059c6f6f28f86e82367da81344f89206.png);
+    background-size: cover;
 }
 
 .hack-box-container {
