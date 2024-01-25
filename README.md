@@ -2,7 +2,7 @@
  A web-based project designed to replicate/build similar "hacking" challenges that can be found on the NoPixel 4.0 FiveM Server. 
  > Developed using HTML, CSS, TS (Compiled to JS).
 
-- ## SmokeCrack v.1.0.0 
+- ## [SmokeCrack v.1.0.0](https://maximilianadf.github.io/NoPixel-Hacking-Simulator/SmokeCrack/SmokeCrack.html)
   ### Description
   SmokeCrack is the **new** 'Wi-Fi Hacking' app that can be found on the NoPixel 4.0 computer, It's price is 3BUTCOIN. The app seemed to be malfunctioning upon it's initial release, for instance, the Timer visually stopping but never actually stopping (causing all attempts to result in 'Hacking failed!'). Thankfully the minor bugs were quickly patched. here's some examples of it's __functionality__:
   - [The first group to experiment with the app](https://www.youtube.com/watch?v=n9G7aPbJMT4&ab_channel=NoPixelClips)
