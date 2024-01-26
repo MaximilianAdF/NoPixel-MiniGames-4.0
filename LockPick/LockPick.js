@@ -224,6 +224,21 @@ function rotateBalls(dir) {
         ball.style.transform = "translate(-50%, -50%) rotateZ(".concat(newRotateZ, "deg) translate(").concat(-10 + 50 * currentCircle, "px, 0px)");
     });
 }
+function handleKeyPress(event) {
+    if (event.key === "ArrowLeft") {
+        rotateBalls('Left');
+    }
+    else if (event.key === "ArrowRight") {
+        rotateBalls('Right');
+    }
+    else if (event.key === "Enter") {
+        nextLock();
+    }
+    else {
+        return;
+    }
+}
 document.addEventListener('DOMContentLoaded', function (event) {
     resetGame("init");
 });
+document.addEventListener('keydown', handleKeyPress);

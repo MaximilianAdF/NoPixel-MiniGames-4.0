@@ -22,7 +22,6 @@ function runTimer(): void {
     }, 1000);
 }
 
-
 function resetGame(status: "win" | "lose" | "init"): void {
     // Remove existing lock circles and SVG elements
     const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
@@ -258,6 +257,20 @@ function rotateBalls(dir: Direction): void {
     })
 }
 
+function handleKeyPress(event: KeyboardEvent) {
+    if (event.key === "ArrowLeft") {
+        rotateBalls('Left');
+    } else if (event.key === "ArrowRight") {
+        rotateBalls('Right');
+    } else if (event.key === "Enter") {
+        nextLock();
+    } else {
+        return;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', (event) => {
     resetGame("init");
 })
+
+document.addEventListener('keydown', handleKeyPress);
