@@ -1,4 +1,3 @@
-"use strict";
 var timerInterval = null;
 var secondsRemaining = 20;
 var currentCircle = 1;
@@ -22,12 +21,18 @@ function resetGame(status) {
     // Remove existing lock circles and SVG elements
     var timerProgress = document.querySelector(".timer-progress-bar");
     var lockContainer = document.querySelector('.lock-container');
-    lockContainer.innerHTML = '';
     var svgCircle = document.querySelector('.position-container svg');
-    currentCircle = 1;
-    if (svgCircle) {
-        svgCircle.innerHTML = '';
-    }
+    setTimeout(function () {
+        lockContainer.innerHTML = '';
+        currentCircle = 1;
+        if (svgCircle) {
+            svgCircle.innerHTML = '';
+        }
+        generateLines();
+        generateHack();
+        shuffleLock();
+        runTimer();
+    }, 2000);
     if (timerInterval) {
         clearInterval(timerInterval);
         timerProgress.style.display = "none";
@@ -47,15 +52,38 @@ function resetGame(status) {
     else if (status === "lose") {
         var loseMsg_1 = document.querySelector(".lose-message");
         loseMsg_1.style.display = "flex";
+        indicateFailed(currentCircle);
         setTimeout(function () {
             loseMsg_1.style.display = "none";
         }, 2000);
     }
     // Generate a new game
-    generateLines();
-    generateHack();
-    shuffleLock();
-    runTimer();
+}
+function indicateFailed(circleNum) {
+    var lockCircle = document.getElementById("lock-circle".concat(circleNum));
+    if (lockCircle) {
+        var balls = lockCircle.querySelectorAll('.ball');
+        var svgCircle = document.querySelector('.position-container svg');
+        if (svgCircle) {
+            var semiCircles = svgCircle.querySelectorAll('.position-circle');
+            semiCircles.forEach(function (semiCircle) {
+                if (semiCircle.id.includes("circle".concat(circleNum))) {
+                    var svgElement = semiCircle;
+                    svgElement.style.stroke = 'rgb(255, 84, 84)';
+                }
+            });
+        }
+        else {
+            console.log('SVG element not found in indicateCompleted');
+        }
+        lockCircle.style.outlineColor = 'rgb(255, 84, 84)';
+        balls.forEach(function (ball) {
+            ball.style.backgroundColor = 'rgb(255, 84, 84)';
+        });
+    }
+    else {
+        console.log("Lock circle ".concat(circleNum, " not found in indicateCompleted"));
+    }
 }
 function nextLock() {
     var cracked = checkLockStatus(currentCircle);

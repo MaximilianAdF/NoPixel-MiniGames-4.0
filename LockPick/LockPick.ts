@@ -26,13 +26,20 @@ function resetGame(status: "win" | "lose" | "init"): void {
     // Remove existing lock circles and SVG elements
     const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
     const lockContainer = document.querySelector('.lock-container') as HTMLElement;
-    lockContainer.innerHTML = '';
     const svgCircle = document.querySelector('.position-container svg');
     
-    currentCircle = 1;
-    if (svgCircle) {
-        svgCircle.innerHTML = '';
-    }
+    setTimeout(() => { 
+        lockContainer.innerHTML = '';
+        currentCircle = 1;
+        if (svgCircle) {
+            svgCircle.innerHTML = '';
+        }
+        generateLines();
+        generateHack();
+        shuffleLock();
+        runTimer();
+    }, 2000);
+    
     if (timerInterval) {
         clearInterval(timerInterval);
         timerProgress.style.display = "none";
@@ -52,16 +59,44 @@ function resetGame(status: "win" | "lose" | "init"): void {
     } else if (status === "lose") {
         const loseMsg = document.querySelector(".lose-message") as HTMLElement;
         loseMsg.style.display = "flex";
+        indicateFailed(currentCircle);
         setTimeout (() => {
             loseMsg.style.display = "none";
         }, 2000);
     }
 
     // Generate a new game
-    generateLines();
-    generateHack();
-    shuffleLock();
-    runTimer();
+
+}
+
+function indicateFailed(circleNum: number): void {
+    const lockCircle = document.getElementById(`lock-circle${circleNum}`) as HTMLElement;
+
+    if (lockCircle) {
+        const balls = lockCircle.querySelectorAll('.ball');
+        const svgCircle = document.querySelector('.position-container svg');
+
+        if (svgCircle) {
+            const semiCircles = svgCircle.querySelectorAll('.position-circle');
+
+            semiCircles.forEach((semiCircle) => {
+                if (semiCircle.id.includes(`circle${circleNum}`)) {
+                    const svgElement = semiCircle as SVGElement;
+                    svgElement.style.stroke = 'rgb(255, 84, 84)';
+                }
+            });
+        } else {
+            console.log('SVG element not found in indicateCompleted');
+        }
+
+        lockCircle.style.outlineColor = 'rgb(255, 84, 84)';
+
+        balls.forEach((ball) => {
+            (ball as HTMLElement).style.backgroundColor = 'rgb(255, 84, 84)';
+        });
+    } else {
+        console.log(`Lock circle ${circleNum} not found in indicateCompleted`);
+    }
 }
 
 function nextLock(): void {
