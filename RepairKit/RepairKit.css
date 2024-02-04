@@ -1,0 +1,37 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    overflow: hidden;
+    position: relative; /* Set position to relative to allow positioning of pseudo-element */
+    background: linear-gradient(rgba(21, 27, 48, 0.97), rgba(21, 27, 48, 0.97)), url(https://i.pinimg.com/originals/05/9c/6f/059c6f6f28f86e82367da81344f89206.png);
+    background-size: cover;
+}
+
+.hacking-container {
+    display: flex;
+    position: absolute;
+    outline: solid 5px lime;
+    width: 800px;
+    height: 60px;
+    margin-top: 25%;
+    margin-left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.button-press {
+    width: 60px;
+    height: 60px;
+    background-color: rgb(15, 27, 33);
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    font-size: 40px;
+    color: rgb(127, 255, 191);
+}
+
+.timeline {
+    position: absolute;
+    width: 740px;
+    height: 60px;
+    margin-left: 60px;
+    background-color: rgb(4, 171, 255);
+}
