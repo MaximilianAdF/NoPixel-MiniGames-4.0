@@ -35,7 +35,7 @@
   __Through watching some more videos it seems like the locks can also be rotated using the cursor/direction keys, will be implemented in future versions.__ If you have any input create an [issue](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator/issues)
 
   ### Instructions
-  If you want to try the hacking out for yourself I have made a replica of the program. It's almost identical to it's original on the NoPixel 4.0 server (Slight color & formatting mismatches) but overall the same functionality. Follow the instructions below to run the program locally. The continously-updated hack can also be found online at [github pages](https://maximilianadf.github.io/NoPixel-Hacking-Simulator/LockPick/LockPick.html)
+  If you want to try the hacking out for yourself I have made a replica of the program. It's almost identical to it's original on the NoPixel 4.0 server (Slight color & formatting mismatches) but overall the same functionality. Follow the instructions below to run the program locally. The continously-updated hack can also be found online at [github pages](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
   - Head to the [repository's main page](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator)
   - In the top right corner, click on the green box '<> Code'.
   - Click on 'Download ZIP'
