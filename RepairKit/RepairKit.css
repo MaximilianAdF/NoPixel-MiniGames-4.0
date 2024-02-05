@@ -8,8 +8,10 @@ body {
 
 .hacking-container {
     display: flex;
-    position: absolute;
-    outline: solid 5px lime;
+    position: relative;
+    background: linear-gradient(to right, rgb(18, 19, 20), rgb(36, 68, 90));
+    padding: 1.5%;
+    border-radius: 10px;
     width: 800px;
     height: 60px;
     margin-top: 25%;
@@ -18,20 +20,70 @@ body {
 }
 
 .button-press {
+    display: inline-block;
     width: 60px;
     height: 60px;
-    background-color: rgb(15, 27, 33);
+    border-radius: 2px;
+    background: radial-gradient(circle, rgb(0, 183, 140), rgb(0, 81, 61));
     align-items: center;
     justify-content: center;
     display: flex;
-    font-size: 40px;
-    color: rgb(127, 255, 191);
+    font-size: 30px;
+    color: white
 }
 
 .timeline {
     position: absolute;
-    width: 740px;
+    display: flex;
+    align-items: center;
+    width: 730px;
     height: 60px;
-    margin-left: 60px;
-    background-color: rgb(4, 171, 255);
+    margin-left: 70px;
+    border-radius: 5px;
+    outline: 2px solid rgba(128, 128, 128, 0.162);
+}
+
+.moving-square{
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 2px;
+    background: radial-gradient(circle, rgb(0, 255, 200), rgb(0, 174, 130));
+    box-shadow: 0 0 5px 0px rgb(16, 239, 191);
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    font-size: 30px;
+    color: white;
+    margin-left: 15%;
+}
+
+.square-slot {
+    display: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 2px;
+    outline: 1.5px solid rgba(128, 128, 128, 0.354);
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    color: white;
+    margin-left: 15%; /* Ranges from 15-94% when randomizing */
+}
+
+.square-slot::before,
+.square-slot::after {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 3px;
+  background: radial-gradient(circle, rgb(0, 255, 200), rgb(0, 174, 130));
+}
+
+.square-slot::before {
+  top: -2px; /* Adjust the margin-top as needed */
+}
+
+.square-slot::after {
+  bottom: -2px; /* Adjust the margin-bottom as needed */
 }
