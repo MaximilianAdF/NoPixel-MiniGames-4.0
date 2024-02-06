@@ -55,7 +55,8 @@ body {
     display: flex;
     font-size: 30px;
     color: white;
-    margin-left: 15%;
+    margin-left: 1%;
+    transition: margin-left 0.05s linear, scale 0.3s ease-in-out;
 }
 
 .square-slot {
