@@ -1,7 +1,7 @@
 body {
   font-family: "Roboto", sans-serif;
   overflow: hidden;
-  position: relative; /* Set position to relative to allow positioning of pseudo-element */
+  position: relative;
   background: linear-gradient(rgba(21, 27, 48, 0.97), rgba(21, 27, 48, 0.97)),
     url(https://i.pinimg.com/originals/05/9c/6f/059c6f6f28f86e82367da81344f89206.png);
   background-size: cover;
@@ -65,11 +65,6 @@ body {
   display: flex;
 }
 
-.line {
-  width: 70%;
-  outline: 1.2px solid rgb(142, 142, 142);
-}
-
 .lock-container {
   display: grid;
   grid-template-columns: repeat(5, 115px);
@@ -93,7 +88,6 @@ body {
   transition: width 1s linear;
 }
 
-/* The semi-circles that indicate where ball color is supposed to be */
 .position-container {
   display: flex;
   align-items: center;
@@ -101,13 +95,6 @@ body {
   position: absolute;
   width: 580px;
   height: 580px;
-}
-
-/* r = 55, r = 105, r = 155, r = 205, */
-.position-circle {
-  fill: none;
-  stroke-width: 5px;
-  transform-origin: 50% 50%;
 }
 
 .lose-message {
@@ -140,16 +127,6 @@ body {
 .win-message p {
   font-size: 12px;
   font-weight: 500;
-}
-
-.fa-circle-check {
-  font-size: 25px;
-  color: rgb(84, 255, 164);
-}
-
-.fa-circle-xmark {
-  font-size: 25px;
-  color: rgb(255, 84, 84);
 }
 
 .cube {
