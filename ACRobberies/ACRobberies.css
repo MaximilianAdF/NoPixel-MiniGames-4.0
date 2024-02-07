@@ -1,0 +1,172 @@
+body {
+  font-family: "Roboto", sans-serif;
+  overflow: hidden;
+  position: relative; /* Set position to relative to allow positioning of pseudo-element */
+  background: linear-gradient(rgba(21, 27, 48, 0.97), rgba(21, 27, 48, 0.97)),
+    url(https://i.pinimg.com/originals/05/9c/6f/059c6f6f28f86e82367da81344f89206.png);
+  background-size: cover;
+}
+
+.hack-box-container {
+  border-radius: 10px;
+  outline: 1px solid gray;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 2% auto;
+  width: 600px;
+  height: 750px;
+}
+
+.info-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: -50px;
+  margin-left: -100px;
+}
+
+.fa-gamepad {
+  font-size: 35px;
+  color: rgb(142, 142, 142);
+}
+
+.info-container h2 {
+  font-size: 25px;
+  color: rgb(84, 255, 164);
+  text-shadow: 0 0 2px rgb(127, 255, 191);
+}
+
+.info-container p {
+  font-size: 15px;
+  color: rgb(142, 142, 142);
+}
+
+.outer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(15, 27, 33);
+}
+
+.hack-box {
+  border-radius: 5px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 580px;
+  height: 580px;
+  margin-top: 20px;
+  background-color: rgb(22, 40, 52);
+  display: flex;
+}
+
+.line {
+  width: 70%;
+  outline: 1.2px solid rgb(142, 142, 142);
+}
+
+.lock-container {
+  display: grid;
+  grid-template-columns: repeat(5, 115px);
+  grid-template-rows: repeat(5, 115px);
+  width: 580px;
+  height: 580px;
+}
+
+.timer-container {
+  background-color: rgb(15, 27, 33);
+  display: flex;
+  width: 100%;
+  height: 10px;
+}
+
+.timer-progress-bar {
+  bottom: 100px;
+  background-color: orangered;
+  width: 100%;
+  height: 100%;
+  transition: width 1s linear;
+}
+
+/* The semi-circles that indicate where ball color is supposed to be */
+.position-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  width: 580px;
+  height: 580px;
+}
+
+/* r = 55, r = 105, r = 155, r = 205, */
+.position-circle {
+  fill: none;
+  stroke-width: 5px;
+  transform-origin: 50% 50%;
+}
+
+.lose-message {
+  gap: 10px;
+  margin-top: -40px;
+  margin-left: 340px;
+  display: none;
+  color: white;
+  padding: 0px 18px;
+  border-radius: 5px;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(56, 13, 23);
+}
+
+.win-message {
+  gap: 10px;
+  margin-top: -40px;
+  margin-left: 340px;
+  display: none;
+  color: white;
+  padding: 0px 10px;
+  border-radius: 5px;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(23, 95, 88);
+}
+
+.lose-message p,
+.win-message p {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.fa-circle-check {
+  font-size: 25px;
+  color: rgb(84, 255, 164);
+}
+
+.fa-circle-xmark {
+  font-size: 25px;
+  color: rgb(255, 84, 84);
+}
+
+.cube {
+  width: 115px;
+  height: 115px;
+  border: 1px solid #fff;
+  z-index: 2;
+}
+
+.cuber {
+  background-color: var(--cube-color-red, red);
+}
+
+.cubeg {
+  background-color: var(--cube-color-green, green);
+}
+
+.cubeb {
+  background-color: var(--cube-color-blue, blue);
+}
