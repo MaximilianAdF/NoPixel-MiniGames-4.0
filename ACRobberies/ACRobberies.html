@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ACRobberies</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="stylesheet" type="text/css" href="ACRobberies.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:400,400i,700&display=swap"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+    <script src="ACRobberies.js"></script>
+  </head>
+  <body>
+    <div class="hack-box-container">
+      <div class="outer-container">
+        <div class="info-container">
+          <div><i class="fas fa-gamepad"></i></div>
+          <h2>Same Game</h2>
+          <p>Click on matching groups of blocks</p>
+        </div>
+        <div class="lose-message">
+          <i class="fa-solid fa-circle-xmark"></i>
+          <p>Failed</p>
+        </div>
+        <div class="win-message">
+          <i class="fa-solid fa-circle-check"></i>
+          <p>Success</p>
+        </div>
+        <div class="hack-box">
+          <div class="position-container">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              version="1.1"
+              width="100%"
+              height="100%"
+            ></svg>
+          </div>
+          <div class="lock-container" id="container">
+          </div>
+        </div>
+      <div class="timer-container">
+        <div class="timer-progress-bar"></div>
+      </div>
+    </div>
+  </body>
+</html>
