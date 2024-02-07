@@ -27,7 +27,7 @@
   
   The 'MAC Address' and 'IP Adress' fields work but are not connected to anything (simply cosmetic). To begin the hacking mini-game press on the 'Crack' button. A range of characters (8-16) will appear and you need to type them in order without any interventions. If you manage to press all characters correctly on your keyboard before the timer runs out, you win. Have Fun!
 
-- ## 🔗 [Lockpick v.1.0.0](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
+- ## 🔗 [Lockpick v.1.0.1](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
    [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/1cd5cda6-9bd4-4712-ad6d-a45fe569ec83)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
   ### Description
   LockPicking played a major role in NoPixel 3.0 but was a fairly simple hack. In NoPixel 4.0 it has now transformed into a more complex yet more intuitive hack. The uses of lockpicking have not yet been fully explored nor "released" to the server. The lockpick's objective is to crack each of the 4 "locks" (circles) by aligning the balls with their corresponding color indicators. The hack is less forgiving than previous iterations and has a 20 seconds time-duration before the lockpick gets bent. Clips of the lockpick in __action__:
