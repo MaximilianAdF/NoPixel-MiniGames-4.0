@@ -69,6 +69,7 @@ body {
   grid-template-rows: repeat(5, 1fr);
   width: 580px;
   height: 580px;
+  z-index: 999;
 }
 
 .timer-container {
@@ -149,7 +150,7 @@ body {
   linear-gradient(to top, rgba(255, 255, 255, 0.525) 1px, transparent 1px) calc(100% - 2px) calc(100% - 2px);
   background-repeat: no-repeat;
   background-size: 22px 22px;
-  z-index: 2;
+  z-index: 1000;
 }
 
 .cuber {

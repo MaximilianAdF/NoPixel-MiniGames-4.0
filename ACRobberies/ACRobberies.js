@@ -1,157 +1,85 @@
-var timerInterval = null;
-var secondsRemaining = 20;
-var currentCircle = 1;
-runTimer()
-function updateTimerDisplay() {
-    var timerProgress = document.querySelector(".timer-progress-bar");
-    var percentageLeft = Math.floor(100 * secondsRemaining / 20);
-    if (timerProgress) {
-        timerProgress.style.width = "".concat(percentageLeft, "%");
+var fakeCubes = 0;
+var Cube = /** @class */ (function () {
+    function Cube() {
+        this.container = document.getElementById("container");
+        this.color = this.getRandomColorClass();
+        this.element = document.createElement("div");
+        this.element.className = "cube";
+        this.element.classList.add(this.color);
+        this.element.addEventListener("click", this.squareClick.bind(this));
     }
-}
-function runTimer() {
-    timerInterval = setInterval(function () {
-        secondsRemaining--;
-        updateTimerDisplay();
-        if (secondsRemaining <= 0) {
-            resetGame("lose");
+    Cube.prototype.addFakeCubes = function () {
+        var numFakeCubes = 25 - this.container.childNodes.length;
+        for (var i = 0; i < numFakeCubes; i++) {
+            var fakeCube = document.createElement("div");
+            fakeCube.className = "cube fake";
+            this.container.insertBefore(fakeCube, this.container.firstChild);
+            fakeCubes++;
         }
-    }, 1000);
-}
-function resetGame(status) {
-    var timerProgress = document.querySelector(".timer-progress-bar");
-    var lockContainer = document.querySelector('.lock-container');
-    var svgCircle = document.querySelector('.position-container svg');
-    setTimeout(function () {
-        lockContainer.innerHTML = '';
-        currentCircle = 1;
-        if (svgCircle) {
-            svgCircle.innerHTML = '';
-        }
-    }, 2000);
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerProgress.style.display = "none";
-        timerProgress.style.width = "100%";
-        setTimeout(function () {
-            timerProgress.style.removeProperty('display');
-        }, 1000);
-        secondsRemaining = 20;
-    }
-    if (status === "win") {
-        var winMsg_1 = document.querySelector(".win-message");
-        winMsg_1.style.display = "flex";
-        setTimeout(function () {
-            winMsg_1.style.display = "none";
-        }, 2000);
-    }
-    else if (status === "lose") {
-        var loseMsg_1 = document.querySelector(".lose-message");
-        loseMsg_1.style.display = "flex";
-        setTimeout(function () {
-            loseMsg_1.style.display = "none";
-        }, 2000);
-    }
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    const container = document.getElementById("container");
-
-    for (let i = 0; i < 25; i++) {
-        const cube = document.createElement("div");
-        cube.className = "cube";
-
-        const randomColorClass = getRandomColorClass();
-        cube.classList.add(randomColorClass);
-
-        cube.addEventListener("click", function () {
-            removeConnectedCubes(cube);
-            setTimeout(function () {
-                checkRemainingColors();
-                checkwin();
-            }, 10);
-        });
-        container.appendChild(cube);
-    }
-    function checkwin() {
-        var container = document.getElementById("container");
-        var divsInsideContainer = container.getElementsByTagName('div');
-        if (divsInsideContainer.length == 0) {
-            alert("You won!");
-        }
-    }
-    function getRandomColorClass() {
-        const colors = ["cuber", "cubeg", "cubeb"];
-        const randomIndex = Math.floor(Math.random() * colors.length);
-        return colors[randomIndex];
-    }
-
-    function checkRemainingColors() {
-        const colorCounts = {
-            "cuber": 0,
-            "cubeg": 0,
-            "cubeb": 0
-        };
-
-        container.childNodes.forEach(function (cube) {
-            const colorClass = cube.classList[1];
-            colorCounts[colorClass]++;
-        });
-
-        let remainingCubes = 0;
-
-        for (const colorClass in colorCounts) {
-            remainingCubes += colorCounts[colorClass];
-
-            if (colorCounts[colorClass] === 1) {
-                alert(`Lost! Only one ${colorClass} cube left.`);
-            }
-        }
-
-    }
-
-
-    function removeConnectedCubes(clickedCube) {
-        const colorClass = clickedCube.classList[1];
-        const connectedCubes = getConnectedCubes(clickedCube, colorClass);
-
+    };
+    Cube.prototype.getAdjacentCubes = function (cube) {
+        var idx = Array.from(this.container.childNodes).indexOf(cube);
+        var adjacentCubes = [];
+        var row = Math.floor(idx / 5);
+        var col = idx % 5;
+        if (col - 1 >= 0)
+            adjacentCubes.push(this.container.childNodes[idx - 1]);
+        if (col + 1 < 5)
+            adjacentCubes.push(this.container.childNodes[idx + 1]);
+        if (row - 1 >= 0)
+            adjacentCubes.push(this.container.childNodes[idx - 5]);
+        if (row + 1 < 5)
+            adjacentCubes.push(this.container.childNodes[idx + 5]);
+        return adjacentCubes;
+    };
+    Cube.prototype.removeConnectedCubes = function () {
+        var _this = this;
+        var connectedCubes = this.getConnectedCubes();
         if (connectedCubes.size === 1) {
-            alert("No connected cubes of the same color.");
-        } else {
+            console.log("No connectedCubes");
+        }
+        else {
             connectedCubes.forEach(function (cube) {
-                container.removeChild(cube);
+                cube.classList.remove(_this.color);
+                //this.container.removeChild(cube as Node);
             });
         }
-    }
-
-    function getConnectedCubes(cube, colorClass) {
-        const stack = [cube];
-        const connectedCubes = new Set();
-
-        while (stack.length > 0) {
-            const currentCube = stack.pop();
+    };
+    Cube.prototype.getConnectedCubes = function () {
+        var _this = this;
+        var connectedCubes = new Set();
+        var queue = [this.element];
+        while (queue.length > 0) {
+            var currentCube = queue.shift();
             connectedCubes.add(currentCube);
-
-            const neighbors = getAdjacentCubes(currentCube);
+            var neighbors = this.getAdjacentCubes(currentCube);
             neighbors.forEach(function (neighbor) {
-                if (!connectedCubes.has(neighbor) && neighbor.classList.contains(colorClass)) {
-                    stack.push(neighbor);
+                if (!connectedCubes.has(neighbor) && neighbor.classList.contains(_this.color)) {
+                    queue.push(neighbor);
+                    connectedCubes.add(neighbor);
                 }
             });
         }
-
         return connectedCubes;
+    };
+    Cube.prototype.getRandomColorClass = function () {
+        var colors = ["cuber", "cubeg", "cubeb"];
+        var randomIndex = Math.floor(Math.random() * colors.length);
+        return colors[randomIndex];
+    };
+    Cube.prototype.squareClick = function () {
+        this.removeConnectedCubes();
+        //this.addFakeCubes();
+    };
+    return Cube;
+}());
+function generateCubes() {
+    var container = document.getElementById("container");
+    for (var i = 0; i < 25; i++) {
+        var cube = new Cube();
+        container === null || container === void 0 ? void 0 : container.appendChild(cube.element);
     }
-
-    function getAdjacentCubes(cube) {
-        const adjacentCubes = [];
-        const index = Array.from(container.childNodes).indexOf(cube);
-
-        if (index - 1 >= 0) adjacentCubes.push(container.childNodes[index - 1]);
-        if (index + 1 < container.childNodes.length) adjacentCubes.push(container.childNodes[index + 1]);
-        if (index - 5 >= 0) adjacentCubes.push(container.childNodes[index - 5]);
-        if (index + 5 < container.childNodes.length) adjacentCubes.push(container.childNodes[index + 5]);
-
-        return adjacentCubes;
-    }
+}
+document.addEventListener("DOMContentLoaded", function () {
+    generateCubes();
 });
