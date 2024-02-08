@@ -1,4 +1,6 @@
-let fakeCubes = 0;
+let timerInterval: NodeJS.Timeout | null = null;
+let secondsRemaining = 20;
+
 
 class Cube { 
     container: HTMLDivElement = document.getElementById("container") as HTMLDivElement;
@@ -13,16 +15,44 @@ class Cube {
         this.element.addEventListener("click", this.squareClick.bind(this));
     }
 
-    addFakeCubes() {
-        const numFakeCubes = 25 - this.container.childNodes.length;
-        for (let i = 0; i < numFakeCubes; i++) {
-            const fakeCube = document.createElement("div");
-            fakeCube.className = "cube fake";
-    
-            this.container.insertBefore(fakeCube, this.container.firstChild);
-            
-            fakeCubes++;
+    cubeLeftShift() {
+        const containerCopy = Array.from(this.container.childNodes);
+        for (let i = 24; i >= 0; i--) {
+            const currCube = containerCopy[i] as HTMLDivElement;
+            const col = i % 5;
+            if (currCube.classList.contains("empty") && col < 4) {
+                for (let j = col; j < 4; j++) {
+                    const tempCube = containerCopy[i+(j-col)];
+                    containerCopy[i+(j-col)] = containerCopy[i + 1 + (j-col)];
+                    containerCopy[i + 1 + (j-col)] = tempCube;
+                }
+            }
         }
+        this.updateContainer(containerCopy);
+    }
+    
+
+    cubeGravity(idx: number) {
+        const containerCopy = Array.from(this.container.childNodes);
+        const row = Math.floor(idx / 5);
+
+        for (let i = 0; i < row; i++) {
+            // Swap elements in the copied array
+            [containerCopy[idx - 5 * i], containerCopy[idx - 5 * (i + 1)]] = [containerCopy[idx - 5 * (i + 1)], containerCopy[idx - 5 * i]];
+        }
+        // Update the live container with the modified copy
+        this.updateContainer(containerCopy);
+    }
+    
+    updateContainer(containerCopy: Node[]) {
+        // Clear the container
+        while (this.container.firstChild) {
+            this.container.removeChild(this.container.firstChild);
+        }
+        // Append nodes from the modified copy
+        containerCopy.forEach(node => {
+            this.container.appendChild(node);
+        });
     }
 
 
@@ -45,12 +75,15 @@ class Cube {
         const connectedCubes = this.getConnectedCubes();
 
         if (connectedCubes.size === 1) {
-            console.log("No connectedCubes")
+            console.log("No connected cubes")
         } else {
             connectedCubes.forEach(cube => {        
-                (cube as HTMLDivElement).classList.remove(this.color);  
-                //this.container.removeChild(cube as Node);
+                (cube as HTMLDivElement).classList.remove(this.color);
+                (cube as HTMLDivElement).classList.add("empty"); 
+                (cube as HTMLDivElement).removeEventListener("click", this.squareClick); 
+                this.cubeGravity(Array.from(this.container.childNodes).indexOf(cube as HTMLDivElement)); // Apply gravity to the cubes so empty cubes are at top
             });
+            this.cubeLeftShift();
         }
     }
 
@@ -79,9 +112,18 @@ class Cube {
         return colors[randomIndex];
     }
 
+    checkwin() {
+        const container = document.getElementById("container") as HTMLElement;
+        const divsInsideContainer = container.querySelectorAll('.empty');
+        console.log(divsInsideContainer.length === 25)
+        if (divsInsideContainer.length === 25) {
+            alert("You won!");
+        }
+    }
+
     squareClick() {
         this.removeConnectedCubes();
-        //this.addFakeCubes();
+        this.checkwin();
     }
 }
 
@@ -93,6 +135,25 @@ function generateCubes(): void {
     }
 }
 
+function updateTimerDisplay() {
+    const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
+    let percentageLeft = Math.floor(100 * secondsRemaining / 20);
+    if (timerProgress) {
+        timerProgress.style.width = `${percentageLeft}%`;
+    }
+}
+
+function runTimer() {
+    timerInterval = setInterval(function () {
+        secondsRemaining--;
+        updateTimerDisplay();
+        if (secondsRemaining <= 0) {
+            //resetGame("lose");
+        }
+    }, 1000);
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     generateCubes();
+    runTimer();
 })

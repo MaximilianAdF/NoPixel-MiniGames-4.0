@@ -1,4 +1,5 @@
-var fakeCubes = 0;
+var timerInterval = null;
+var secondsRemaining = 20;
 var Cube = /** @class */ (function () {
     function Cube() {
         this.container = document.getElementById("container");
@@ -8,14 +9,42 @@ var Cube = /** @class */ (function () {
         this.element.classList.add(this.color);
         this.element.addEventListener("click", this.squareClick.bind(this));
     }
-    Cube.prototype.addFakeCubes = function () {
-        var numFakeCubes = 25 - this.container.childNodes.length;
-        for (var i = 0; i < numFakeCubes; i++) {
-            var fakeCube = document.createElement("div");
-            fakeCube.className = "cube fake";
-            this.container.insertBefore(fakeCube, this.container.firstChild);
-            fakeCubes++;
+    Cube.prototype.cubeLeftShift = function () {
+        var containerCopy = Array.from(this.container.childNodes);
+        for (var i = 24; i >= 0; i--) {
+            var currCube = containerCopy[i];
+            var col = i % 5;
+            if (currCube.classList.contains("empty") && col < 4) {
+                for (var j = col; j < 4; j++) {
+                    var tempCube = containerCopy[i + (j - col)];
+                    containerCopy[i + (j - col)] = containerCopy[i + 1 + (j - col)];
+                    containerCopy[i + 1 + (j - col)] = tempCube;
+                }
+            }
         }
+        this.updateContainer(containerCopy);
+    };
+    Cube.prototype.cubeGravity = function (idx) {
+        var _a;
+        var containerCopy = Array.from(this.container.childNodes);
+        var row = Math.floor(idx / 5);
+        for (var i = 0; i < row; i++) {
+            // Swap elements in the copied array
+            _a = [containerCopy[idx - 5 * (i + 1)], containerCopy[idx - 5 * i]], containerCopy[idx - 5 * i] = _a[0], containerCopy[idx - 5 * (i + 1)] = _a[1];
+        }
+        // Update the live container with the modified copy
+        this.updateContainer(containerCopy);
+    };
+    Cube.prototype.updateContainer = function (containerCopy) {
+        var _this = this;
+        // Clear the container
+        while (this.container.firstChild) {
+            this.container.removeChild(this.container.firstChild);
+        }
+        // Append nodes from the modified copy
+        containerCopy.forEach(function (node) {
+            _this.container.appendChild(node);
+        });
     };
     Cube.prototype.getAdjacentCubes = function (cube) {
         var idx = Array.from(this.container.childNodes).indexOf(cube);
@@ -36,13 +65,16 @@ var Cube = /** @class */ (function () {
         var _this = this;
         var connectedCubes = this.getConnectedCubes();
         if (connectedCubes.size === 1) {
-            console.log("No connectedCubes");
+            console.log("No connected cubes");
         }
         else {
             connectedCubes.forEach(function (cube) {
                 cube.classList.remove(_this.color);
-                //this.container.removeChild(cube as Node);
+                cube.classList.add("empty");
+                cube.removeEventListener("click", _this.squareClick);
+                _this.cubeGravity(Array.from(_this.container.childNodes).indexOf(cube)); // Apply gravity to the cubes so empty cubes are at top
             });
+            this.cubeLeftShift();
         }
     };
     Cube.prototype.getConnectedCubes = function () {
@@ -67,9 +99,17 @@ var Cube = /** @class */ (function () {
         var randomIndex = Math.floor(Math.random() * colors.length);
         return colors[randomIndex];
     };
+    Cube.prototype.checkwin = function () {
+        var container = document.getElementById("container");
+        var divsInsideContainer = container.querySelectorAll('.empty');
+        console.log(divsInsideContainer.length === 25);
+        if (divsInsideContainer.length === 25) {
+            alert("You won!");
+        }
+    };
     Cube.prototype.squareClick = function () {
         this.removeConnectedCubes();
-        //this.addFakeCubes();
+        this.checkwin();
     };
     return Cube;
 }());
@@ -80,6 +120,23 @@ function generateCubes() {
         container === null || container === void 0 ? void 0 : container.appendChild(cube.element);
     }
 }
+function updateTimerDisplay() {
+    var timerProgress = document.querySelector(".timer-progress-bar");
+    var percentageLeft = Math.floor(100 * secondsRemaining / 20);
+    if (timerProgress) {
+        timerProgress.style.width = "".concat(percentageLeft, "%");
+    }
+}
+function runTimer() {
+    timerInterval = setInterval(function () {
+        secondsRemaining--;
+        updateTimerDisplay();
+        if (secondsRemaining <= 0) {
+            //resetGame("lose");
+        }
+    }, 1000);
+}
 document.addEventListener("DOMContentLoaded", function () {
     generateCubes();
+    runTimer();
 });

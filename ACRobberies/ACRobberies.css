@@ -112,7 +112,7 @@ body {
   border-radius: 5px;
   align-items: center;
   justify-content: center;
-  background-color: rgb(56, 13, 23);
+  background-color: rgb(91, 20, 37);
 }
 
 .win-message {
@@ -126,7 +126,7 @@ body {
   border-radius: 5px;
   align-items: center;
   justify-content: center;
-  background-color: rgb(23, 95, 88);
+  background-color: rgb(30, 125, 115);
 }
 
 .lose-message p,
@@ -137,17 +137,17 @@ body {
 
 .cube {
   width: 110px;
-  height: 105px;
+  height: 100px;
   border: 1.5px solid #fff;  
   background:
-  linear-gradient(to right, rgba(255, 255, 255, 0.525) 1px, transparent 1px) 2px 2px,
-  linear-gradient(to right, rgba(255, 255, 255, 0.525) 1px, transparent 1px) 2px calc(100% - 2px),
-  linear-gradient(to left, rgba(255, 255, 255, 0.525) 1px, transparent 1px) calc(100% - 2px) 2px,
-  linear-gradient(to left, rgba(255, 255, 255, 0.525) 1px, transparent 1px) calc(100% - 2px) calc(100% - 2px),
-  linear-gradient(to bottom, rgba(255, 255, 255, 0.525)1px, transparent 1px) 2px 2px,
-  linear-gradient(to bottom, rgba(255, 255, 255, 0.525) 1px, transparent 1px) calc(100% - 2px) 2px,
-  linear-gradient(to top, rgba(255, 255, 255, 0.525) 1px, transparent 1px) 2px calc(100% - 2px),
-  linear-gradient(to top, rgba(255, 255, 255, 0.525) 1px, transparent 1px) calc(100% - 2px) calc(100% - 2px);
+  linear-gradient(to right, rgba(255, 255, 255, 0.74) 1px, transparent 1px) 2px 2px,
+  linear-gradient(to right, rgba(255, 255, 255, 0.74) 1px, transparent 1px) 2px calc(100% - 2px),
+  linear-gradient(to left, rgba(255, 255, 255, 0.74) 1px, transparent 1px) calc(100% - 2px) 2px,
+  linear-gradient(to left, rgba(255, 255, 255, 0.74) 1px, transparent 1px) calc(100% - 2px) calc(100% - 2px),
+  linear-gradient(to bottom, rgba(255, 255, 255, 0.74) 1px, transparent 1px) 2px 2px,
+  linear-gradient(to bottom, rgba(255, 255, 255, 0.74) 1px, transparent 1px) calc(100% - 2px) 2px,
+  linear-gradient(to top, rgba(255, 255, 255, 0.74) 1px, transparent 1px) 2px calc(100% - 2px),
+  linear-gradient(to top, rgba(255, 255, 255, 0.74) 1px, transparent 1px) calc(100% - 2px) calc(100% - 2px);
   background-repeat: no-repeat;
   background-size: 22px 22px;
   z-index: 1000;
@@ -155,15 +155,15 @@ body {
 
 .cuber {
   background-color: var(--cube-color-red, rgb(222, 28, 28));
-  box-shadow: 0px 5px 0px var(--cube-color-red-shadow, rgb(96, 35, 34));
+  box-shadow: 0px 10px 0px var(--cube-color-red-shadow, rgb(96, 35, 34));
 }
 
 .cubeg {
   background-color: var(--cube-color-green, rgb(132, 186, 80));
-    box-shadow: 0px 5px 0px var(--cube-color-green-shadow, rgb(79, 122, 59));
+    box-shadow: 0px 10px 0px var(--cube-color-green-shadow, rgb(79, 122, 59));
 }
 
 .cubeb {
   background-color: var(--cube-color-blue, rgb(90, 149, 192));
-  box-shadow: 0px 5px 0px var(--cube-color-blue-shadow, rgb(40, 71, 86));
+  box-shadow: 0px 10px 0px var(--cube-color-blue-shadow, rgb(40, 71, 86));
 }
