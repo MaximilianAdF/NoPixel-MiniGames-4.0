@@ -1,6 +1,5 @@
 let timerInterval: NodeJS.Timeout | null = null;
-let secondsRemaining = 20;
-
+let secondsRemaining = 15;
 
 class Cube { 
     container: HTMLDivElement = document.getElementById("container") as HTMLDivElement;
@@ -14,7 +13,7 @@ class Cube {
         this.element.classList.add(this.color);
         this.element.addEventListener("click", this.squareClick.bind(this));
     }
-
+    
     cubeLeftShift() {
         const containerCopy = Array.from(this.container.childNodes);
         for (let i = 24; i >= 0; i--) {
@@ -115,9 +114,8 @@ class Cube {
     checkwin() {
         const container = document.getElementById("container") as HTMLElement;
         const divsInsideContainer = container.querySelectorAll('.empty');
-        console.log(divsInsideContainer.length === 25)
         if (divsInsideContainer.length === 25) {
-            alert("You won!");
+            endGame("win");
         }
     }
 
@@ -125,6 +123,41 @@ class Cube {
         this.removeConnectedCubes();
         this.checkwin();
     }
+}
+
+//Make function that checks solvability of the board
+
+function endGame(outcome: string): void {
+    const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
+    const overlay = document.querySelector(".overlay") as HTMLElement;
+    clearInterval(timerInterval as NodeJS.Timeout);
+
+    timerProgress.style.display = "none";
+    timerProgress.style.width = "100%";
+    overlay.style.display = "block";
+
+    if (outcome === "win") {
+        const winMsg = document.querySelector(".win-message") as HTMLElement;
+        winMsg.style.display = "flex";
+        setTimeout(function () {winMsg.style.display = 'none';}, 2000);
+    } else {
+        const loseMsg = document.querySelector(".lose-message") as HTMLElement;
+        loseMsg.style.display = "flex";
+        setTimeout(function () {loseMsg.style.display = 'none';}, 2000);
+    }
+    setTimeout(function () {
+        timerProgress.style.display = 'flex';
+        overlay.style.display = 'none';
+        resetGame(); 
+    }, 2000);
+}
+
+function resetGame(): void {
+    const container = document.getElementById("container") as HTMLElement;
+    container.innerHTML = "";
+    secondsRemaining = 15;
+    generateCubes();
+    runTimer();
 }
 
 function generateCubes(): void {
@@ -137,7 +170,7 @@ function generateCubes(): void {
 
 function updateTimerDisplay() {
     const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
-    let percentageLeft = Math.floor(100 * secondsRemaining / 20);
+    let percentageLeft = Math.floor(100 * secondsRemaining / 15);
     if (timerProgress) {
         timerProgress.style.width = `${percentageLeft}%`;
     }
@@ -147,13 +180,12 @@ function runTimer() {
     timerInterval = setInterval(function () {
         secondsRemaining--;
         updateTimerDisplay();
-        if (secondsRemaining <= 0) {
-            //resetGame("lose");
+        if (secondsRemaining < 0) {
+            endGame("lose");
         }
     }, 1000);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    generateCubes();
-    runTimer();
-})
+    resetGame();
+});

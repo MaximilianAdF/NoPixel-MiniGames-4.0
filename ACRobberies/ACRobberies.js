@@ -1,5 +1,5 @@
 var timerInterval = null;
-var secondsRemaining = 20;
+var secondsRemaining = 15;
 var Cube = /** @class */ (function () {
     function Cube() {
         this.container = document.getElementById("container");
@@ -102,9 +102,8 @@ var Cube = /** @class */ (function () {
     Cube.prototype.checkwin = function () {
         var container = document.getElementById("container");
         var divsInsideContainer = container.querySelectorAll('.empty');
-        console.log(divsInsideContainer.length === 25);
         if (divsInsideContainer.length === 25) {
-            alert("You won!");
+            endGame("win");
         }
     };
     Cube.prototype.squareClick = function () {
@@ -113,6 +112,37 @@ var Cube = /** @class */ (function () {
     };
     return Cube;
 }());
+//Make function that checks solvability of the board
+function endGame(outcome) {
+    var timerProgress = document.querySelector(".timer-progress-bar");
+    var overlay = document.querySelector(".overlay");
+    clearInterval(timerInterval);
+    timerProgress.style.display = "none";
+    timerProgress.style.width = "100%";
+    overlay.style.display = "block";
+    if (outcome === "win") {
+        var winMsg_1 = document.querySelector(".win-message");
+        winMsg_1.style.display = "flex";
+        setTimeout(function () { winMsg_1.style.display = 'none'; }, 2000);
+    }
+    else {
+        var loseMsg_1 = document.querySelector(".lose-message");
+        loseMsg_1.style.display = "flex";
+        setTimeout(function () { loseMsg_1.style.display = 'none'; }, 2000);
+    }
+    setTimeout(function () {
+        timerProgress.style.display = 'flex';
+        overlay.style.display = 'none';
+        resetGame();
+    }, 2000);
+}
+function resetGame() {
+    var container = document.getElementById("container");
+    container.innerHTML = "";
+    secondsRemaining = 15;
+    generateCubes();
+    runTimer();
+}
 function generateCubes() {
     var container = document.getElementById("container");
     for (var i = 0; i < 25; i++) {
@@ -122,7 +152,7 @@ function generateCubes() {
 }
 function updateTimerDisplay() {
     var timerProgress = document.querySelector(".timer-progress-bar");
-    var percentageLeft = Math.floor(100 * secondsRemaining / 20);
+    var percentageLeft = Math.floor(100 * secondsRemaining / 15);
     if (timerProgress) {
         timerProgress.style.width = "".concat(percentageLeft, "%");
     }
@@ -131,12 +161,11 @@ function runTimer() {
     timerInterval = setInterval(function () {
         secondsRemaining--;
         updateTimerDisplay();
-        if (secondsRemaining <= 0) {
-            //resetGame("lose");
+        if (secondsRemaining < 0) {
+            endGame("lose");
         }
     }, 1000);
 }
 document.addEventListener("DOMContentLoaded", function () {
-    generateCubes();
-    runTimer();
+    resetGame();
 });
