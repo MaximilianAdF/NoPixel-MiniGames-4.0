@@ -70,4 +70,4 @@
   The RepairKit game has the same functionality in 4.0 as it did in 3.0. The difference is the minigame's apperance/ui which has been revamped and turned into a more sophisticated design. It's a simple MiniGame of timing your button press correctly to align the moving square with the indicated slot. It's substantialy easier than the other MiniGames of this repository.
 
   ### Thoughts
-  The coloring can use some touches to make it more like it's NoPixel 4.0 counterpart. Furthermore adding a highsore, current score counter alongside a possible difficulty setting that alters the moving-speed of the square. Will be justified in future versions.
+  The coloring can use some touches to make it more like it's NoPixel 4.0 counterpart. Furthermore adding a highsore, current score counter alongside a possible difficulty setting that alters the moving-speed of the square. Will be justified in future versions. Problem where you can press E multiple times causing a speedup/buggy next game
