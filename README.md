@@ -15,7 +15,7 @@
    - The game not automatically failing whenever there is no solution
 
 - ## 🔗 [SmokeCrack v.1.0.0](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/SmokeCrack/SmokeCrack.html)
-   [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/c96d630d-b6ca-4fa1-94b1-01a8ffeeffd0)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/SmokeCrack/SmokeCrack.html)
+   [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7ddebeea-5734-4e44-bbbc-5f6a8e51ac59)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/SmokeCrack/SmokeCrack.html)
   <p align="center">↑ Click to play ↑</p>
 
   ### Description
