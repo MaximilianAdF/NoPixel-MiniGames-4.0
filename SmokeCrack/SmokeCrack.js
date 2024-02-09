@@ -1,5 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 var timerInterval = null;
 var secondsRemaining = 0;
 var totalSeconds = 0;
@@ -56,7 +55,6 @@ function getRandomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 function getRandomCharacter() {
-    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     var randomIdx = Math.floor(Math.random() * chars.length);
     return chars.charAt(randomIdx);
 }
@@ -173,9 +171,9 @@ function startCracking() {
             initTimer();
             runTimer();
             var handleKeyPress_1 = function (event) {
-                if (event.key === "Shift" || event.key === "CapsLock") {
+                console.log(event.key.toUpperCase());
+                if (!chars.includes(event.key.toUpperCase()))
                     return;
-                }
                 if (letterContainer && secondsRemaining) {
                     var pressedKey = event.key.toUpperCase();
                     var currentSquare = letterContainer.children[currSquareIdx_1];

@@ -1,5 +1,4 @@
-import { Keyboard } from "puppeteer";
-
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 let timerInterval: NodeJS.Timeout | null = null;
 let secondsRemaining = 0;
 let totalSeconds =  0;
@@ -64,7 +63,6 @@ function getRandomNumber(min: number, max: number): number {
 }
 
 function getRandomCharacter(): string {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     const randomIdx = Math.floor(Math.random() * chars.length);
     return chars.charAt(randomIdx);
 }
@@ -205,9 +203,7 @@ function startCracking() {
             runTimer();
 
             const handleKeyPress = function(event: KeyboardEvent) {
-                if (event.key === "Shift" || event.key === "CapsLock") {
-                    return
-                }
+                if (!chars.includes(event.key.toUpperCase())) return;
                 if (letterContainer && secondsRemaining) {
                     const pressedKey = event.key.toUpperCase();
                     const currentSquare = letterContainer.children[currSquareIdx] as HTMLDivElement;
