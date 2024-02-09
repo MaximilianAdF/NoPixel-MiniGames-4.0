@@ -1,6 +1,8 @@
+var positionCheckArray = [{}, {}, {}, {}];
 var timerInterval = null;
 var secondsRemaining = 20;
 var currentCircle = 1;
+var isLocked = false;
 function updateTimerDisplay() {
     var timerProgress = document.querySelector(".timer-progress-bar");
     var percentageLeft = Math.floor(100 * secondsRemaining / 20);
@@ -22,12 +24,20 @@ function resetGame(status) {
     var timerProgress = document.querySelector(".timer-progress-bar");
     var lockContainer = document.querySelector('.lock-container');
     var svgCircle = document.querySelector('.position-container svg');
+    var overlay = document.querySelector(".overlay");
+    // Empty positionCheckArray for new game
+    positionCheckArray = [{}, {}, {}, {}];
+    // Block new input from the user when game over
+    overlay.style.display = "block";
+    isLocked = true;
     setTimeout(function () {
         lockContainer.innerHTML = '';
         currentCircle = 1;
         if (svgCircle) {
             svgCircle.innerHTML = '';
         }
+        overlay.style.display = 'none';
+        isLocked = false;
         generateLines();
         generateHack();
         shuffleLock();
@@ -144,10 +154,11 @@ function checkLockStatus(circleNum) {
     var semiCircles = svgCircle.querySelectorAll('.position-circle');
     var balls = lockCircle.querySelectorAll('div');
     var allLocks = true;
-    var positionCheck = {};
+    var currPositionCheck = {};
+    console.log(currPositionCheck);
     balls.forEach(function (ball) {
-        var position = getRotateZValue(ball.style.transform);
-        positionCheck[position] = { color: ball.style.backgroundColor };
+        var position = getRotateZValue(ball.style.transform) % 360;
+        currPositionCheck[position] = { color: ball.style.backgroundColor };
     });
     semiCircles.forEach(function (semiCircle) {
         var _a, _b;
@@ -155,8 +166,9 @@ function checkLockStatus(circleNum) {
             var semiCircleElem = semiCircle;
             var semiCirclePos = parseInt(semiCircle.id.split('-')[1], 10);
             var semiCircleColor = semiCircleElem.style.stroke;
-            if (((_a = positionCheck[semiCirclePos]) === null || _a === void 0 ? void 0 : _a.color) !== undefined &&
-                ((_b = positionCheck[semiCirclePos]) === null || _b === void 0 ? void 0 : _b.color) !== semiCircleColor) {
+            console.log(semiCirclePos, currPositionCheck[semiCirclePos]);
+            if (((_a = currPositionCheck[semiCirclePos]) === null || _a === void 0 ? void 0 : _a.color) !== undefined &&
+                ((_b = currPositionCheck[semiCirclePos]) === null || _b === void 0 ? void 0 : _b.color) !== semiCircleColor) {
                 allLocks = false;
             }
         }
@@ -224,6 +236,7 @@ function generateHack() {
             if (j < positionChecks) {
                 generateSemiCircle(i, shuffledPositions[j], randomColor);
             }
+            positionCheckArray[i - 1][shuffledPositions[j]] = randomColor;
             ballElem.id = "C".concat(i, "ball").concat(j);
             ballElem.className = 'ball';
             ballElem.style.transform = "translate(-50%, -50%) rotateZ(".concat(shuffledPositions[j], "deg) translate(").concat(-10 + 50 * i, "px, 0px)");
@@ -232,6 +245,7 @@ function generateHack() {
         }
     }
     currentCircle = 1;
+    console.log(positionCheckArray);
 }
 function getRotateZValue(transformValue) {
     var matches = transformValue.match(/rotateZ\(([^deg)]+)deg\)/);
@@ -253,6 +267,8 @@ function rotateBalls(dir) {
     });
 }
 function handleKeyPress(event) {
+    if (isLocked)
+        return; //Game is over, key presses are ignored
     if (event.key === "ArrowLeft") {
         rotateBalls('Left');
     }

@@ -1,6 +1,7 @@
 let timerInterval: NodeJS.Timeout | null = null;
 let secondsRemaining = 20;
 let currentCircle = 1;
+let isLocked = false;
 
 function updateTimerDisplay(): void {
     const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
@@ -27,13 +28,20 @@ function resetGame(status: "win" | "lose" | "init"): void {
     const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
     const lockContainer = document.querySelector('.lock-container') as HTMLElement;
     const svgCircle = document.querySelector('.position-container svg');
-    
+    const overlay = document.querySelector(".overlay") as HTMLElement;
+
+    // Block new input from the user when game over
+    overlay.style.display = "block";
+    isLocked = true;
+
     setTimeout(() => { 
         lockContainer.innerHTML = '';
         currentCircle = 1;
         if (svgCircle) {
             svgCircle.innerHTML = '';
         }
+        overlay.style.display = 'none';
+        isLocked = false;
         generateLines();
         generateHack();
         shuffleLock();
@@ -167,19 +175,18 @@ function checkLockStatus(circleNum: number): boolean {
     interface positionColor {
         color: string;
     }
-    var positionCheck: { [id: number] : positionColor; } = {};
-
+    var currPositionCheck: { [id: number] : positionColor; } = {};
     balls.forEach((ball) => {
-        const position = getRotateZValue(ball.style.transform);
-        positionCheck[position] = { color: ball.style.backgroundColor };
+        const position = getRotateZValue(ball.style.transform)%360;
+        currPositionCheck[position] = { color: ball.style.backgroundColor };
     })
     semiCircles.forEach((semiCircle) => {
         if (semiCircle.id.includes(`circle${circleNum}`)) {
             const semiCircleElem = semiCircle as SVGElement;
             const semiCirclePos = parseInt(semiCircle.id.split('-')[1], 10);
             const semiCircleColor = semiCircleElem.style.stroke;
-            if (positionCheck[semiCirclePos]?.color !== undefined && 
-                positionCheck[semiCirclePos]?.color !== semiCircleColor) {
+            if (currPositionCheck[semiCirclePos]?.color !== undefined && 
+                currPositionCheck[semiCirclePos]?.color !== semiCircleColor) {
                 allLocks = false;
             }  
         }
@@ -258,7 +265,6 @@ function generateHack(): void {
             if (j < positionChecks) {
                 generateSemiCircle(i, shuffledPositions[j], randomColor);
             }
-
             ballElem.id = `C${i}ball${j}`;
             ballElem.className = 'ball';
             ballElem.style.transform = `translate(-50%, -50%) rotateZ(${shuffledPositions[j]}deg) translate(${-10 + 50*i}px, 0px)`;
@@ -293,6 +299,8 @@ function rotateBalls(dir: Direction): void {
 }
 
 function handleKeyPress(event: KeyboardEvent) {
+    if (isLocked) return; //Game is over, key presses are ignored
+
     if (event.key === "ArrowLeft") {
         rotateBalls('Left');
     } else if (event.key === "ArrowRight") {
