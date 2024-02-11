@@ -62,7 +62,7 @@
   - Open the 'LockPick' folder
   - Lastly, open LockPick.html in your preffered web browser
 
-- ## 🔗 [RepairKit v.1.0.0](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
+- ## 🔗 [RepairKit v.1.0.1](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
    [![Screenshot 2024-02-07 at 13 27 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/bc0b6ac8-e34d-4bb1-8d2a-6c3523ba9b40)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
   <p align="center">↑ Click to play ↑</p>
   
