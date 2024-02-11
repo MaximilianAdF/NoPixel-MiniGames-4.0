@@ -1,4 +1,5 @@
 body {
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     color: aliceblue;
     background-color: blakc; /* Set background-color to transparent */
     overflow: hidden;
@@ -352,4 +353,91 @@ body {
 
 .minigame-over p {
     color: rgba(208, 208, 208, 0.834);
+}
+
+.mac-ip-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 1000px;
+    margin: 100px auto;
+    height: 100%;
+    gap: 15px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(153, 153, 153, 0.319);
+
+}
+
+.difficulty-bars {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    gap: 7px;
+
+}
+
+.row p {
+    margin-left: 10px;
+    font-size: 20px;
+}
+
+.lvl-easy,
+.lvl-medium,
+.lvl-hard {
+    display: flex;
+    align-items: center;
+}
+
+.lvl-easy span,
+.lvl-medium span,
+.lvl-hard span {
+    font-size: 20px;
+    display: inline-block;
+    white-space: nowrap;
+    margin-left: 50px;
+    margin-right: 10px;
+}
+
+.lvl-easy span {
+    color: rgb(85, 255, 164);
+    text-shadow: 0 0 3px rgb(84, 255, 164);
+
+}
+
+.lvl-medium span {
+    color: yellow;
+    text-shadow: 0 0 3px yellow;
+}
+
+.lvl-hard span {
+    color: rgb(255, 84, 84);
+    text-shadow: 0 0 3px rgb(255, 84, 84);
+}
+
+.difficulty-bar {
+    width: 6px;
+    height: 20px;
+    background-color: rgba(153, 153, 153, 0.319);
+}
+
+.lvl-easy .difficulty-bar:nth-child(-n+2) {
+    background-color: rgb(85, 255, 164);
+}
+
+.lvl-medium .difficulty-bar:nth-child(-n+3) {
+    background-color: yellow;
+}
+
+.lvl-hard .difficulty-bar {
+    background-color: rgb(255, 84, 84);
 }

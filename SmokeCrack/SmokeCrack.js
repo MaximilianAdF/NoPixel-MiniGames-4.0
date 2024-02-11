@@ -2,7 +2,33 @@ var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 var timerInterval = null;
 var secondsRemaining = 0;
 var totalSeconds = 0;
-function stopGame(gameWin) {
+var maxChars = 0;
+var minChars = 0;
+function getInputValues() {
+    var _a;
+    var _b, _c;
+    var macInput = document.getElementById('mac-input');
+    var ipInput = document.getElementById('ip-input');
+    var macIpCombs = {
+        '7c:89:3e:c8:cc:65-192.168.0.105': [5, 16, 10], //Easy (seconds, maxChars)
+        'fb:d4:31:c:38:e8-192.168.0.205': [5, 18, 14], //Medium 
+        '71:21:e3:ea:f6:d0-192.168.0.179': [4, 20, 16], //Hard
+    };
+    var macInputValue = (_b = macInput === null || macInput === void 0 ? void 0 : macInput.value.toLowerCase()) !== null && _b !== void 0 ? _b : '';
+    var ipInputValue = (_c = ipInput === null || ipInput === void 0 ? void 0 : ipInput.value) !== null && _c !== void 0 ? _c : '';
+    if (macIpCombs["".concat(macInputValue, "-").concat(ipInputValue)]) {
+        _a = macIpCombs["".concat(macInputValue, "-").concat(ipInputValue)], secondsRemaining = _a[0], maxChars = _a[1], minChars = _a[2];
+    }
+    else {
+        console.log('Invalid MAC-IP combination, using EASY mode as default');
+        secondsRemaining = 5;
+        maxChars = 16;
+        minChars = 10;
+    }
+    totalSeconds = secondsRemaining;
+}
+function stopGame(gameWin, keyPressListener) {
+    document.removeEventListener('keydown', keyPressListener);
     if (timerInterval) {
         clearInterval(timerInterval);
         timerInterval = null;
@@ -36,9 +62,11 @@ function resetGame() {
     var macInput = document.getElementById('mac-input');
     var ipInput = document.getElementById('ip-input');
     var timerProgress = document.querySelector('.timer-progress-bar-fill');
+    var macIpContainer = document.querySelector('.mac-ip-container');
     if (minigameContainer && crackButton) {
         minigameContainer.style.display = 'none';
         crackButton.style.display = 'flex';
+        macIpContainer.style.display = 'flex';
     }
     if (macInput && ipInput) {
         macInput.disabled = false;
@@ -115,20 +143,19 @@ function updateFeedback(isCorrect, currSquareIdx) {
 function initTimer() {
     var timerContainer = document.querySelector('.timer-container');
     var letterContainer = document.querySelector('.letter-container');
-    //Defining how long timer should be
-    totalSeconds = secondsRemaining = 5;
     if (timerContainer && letterContainer) {
         var letterContainerWidth = letterContainer.clientWidth;
         timerContainer.style.width = "".concat(letterContainerWidth, "px");
     }
     updateTimerDisplay();
 }
-function runTimer() {
+function runTimer(keyPressListener) {
+    document.addEventListener('keydown', keyPressListener);
     timerInterval = setInterval(function () {
         secondsRemaining--;
         updateTimerDisplay();
         if (secondsRemaining <= 0) {
-            stopGame(false);
+            stopGame(false, keyPressListener);
         }
     }, 1000);
 }
@@ -154,9 +181,12 @@ function startCracking() {
     var minigameContainer = document.querySelector('.minigame-container');
     var letterContainer = document.querySelector('.letter-container');
     var crackButton = document.getElementById('crackButton');
-    if (crackButton && minigameContainer) {
+    var macIpContainer = document.querySelector('.mac-ip-container');
+    getInputValues();
+    if (crackButton && minigameContainer && macIpContainer) {
         crackButton.style.display = 'none'; //Remove the crack button
-        var numOfChars = getRandomNumber(8, 16);
+        macIpContainer.style.display = 'none'; //Hide the mac-ip container
+        var numOfChars = getRandomNumber(minChars, maxChars);
         var randomChars_1 = generateRandomChars(numOfChars);
         if (letterContainer) {
             letterContainer.innerHTML = ''; //Clear the container
@@ -168,10 +198,7 @@ function startCracking() {
                 letterContainer.appendChild(letterSquare); //Append the letter square to the letter container
             });
             minigameContainer.style.display = 'flex'; //Show the minigame
-            initTimer();
-            runTimer();
             var handleKeyPress_1 = function (event) {
-                console.log(event.key.toUpperCase());
                 if (!chars.includes(event.key.toUpperCase()))
                     return;
                 if (letterContainer && secondsRemaining) {
@@ -182,21 +209,18 @@ function startCracking() {
                         updateFeedback(true, currSquareIdx_1);
                         currSquareIdx_1++;
                         if (currSquareIdx_1 === randomChars_1.length) {
-                            //All squares ok
-                            document.removeEventListener('keydown', handleKeyPress_1);
-                            stopGame(true);
+                            stopGame(true, handleKeyPress_1);
                         }
                     }
                     else {
                         updateFeedback(false, currSquareIdx_1);
-                        document.removeEventListener('keydown', handleKeyPress_1);
                         currentSquare.style.backgroundColor = 'rgb(215, 73, 73)';
-                        stopGame(false);
+                        stopGame(false, handleKeyPress_1);
                     }
                 }
             };
-            //Event listener for keyboard presses
-            document.addEventListener('keydown', handleKeyPress_1);
+            initTimer();
+            runTimer(handleKeyPress_1);
             var currSquareIdx_1 = 0;
         }
         else {

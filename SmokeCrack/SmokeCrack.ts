@@ -1,9 +1,34 @@
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 let timerInterval: NodeJS.Timeout | null = null;
-let secondsRemaining = 0;
-let totalSeconds =  0;
+let secondsRemaining: number = 0;
+let totalSeconds: number =  0;
+let maxChars: number = 0;
+let minChars: number = 0;
 
-function stopGame(gameWin: boolean) {
+function getInputValues(): void {
+    const macInput: HTMLInputElement | null = document.getElementById('mac-input') as HTMLInputElement | null;
+    const ipInput: HTMLInputElement | null = document.getElementById('ip-input') as HTMLInputElement | null;
+    const macIpCombs: { [key: string]: [number, number, number] } = {
+        '7c:89:3e:c8:cc:65-192.168.0.105': [5, 16, 10], //Easy (seconds, maxChars)
+        'fb:d4:31:c:38:e8-192.168.0.205': [5, 18, 14], //Medium 
+        '71:21:e3:ea:f6:d0-192.168.0.179': [4, 20, 16], //Hard
+    };
+    const macInputValue: string = macInput?.value.toLowerCase() ?? '';
+    const ipInputValue: string = ipInput?.value ?? '';
+
+    if (macIpCombs[`${macInputValue}-${ipInputValue}`]) {
+        [secondsRemaining, maxChars, minChars] = macIpCombs[`${macInputValue}-${ipInputValue}`];
+    } else {
+        console.log('Invalid MAC-IP combination, using EASY mode as default');
+        secondsRemaining = 5;
+        maxChars = 16;
+        minChars = 10;   
+    }
+    totalSeconds = secondsRemaining;
+}
+
+function stopGame(gameWin: boolean, keyPressListener: (event: KeyboardEvent) => void) {
+    document.removeEventListener('keydown', keyPressListener);
     if (timerInterval) {
         clearInterval(timerInterval);
         timerInterval = null;
@@ -40,10 +65,12 @@ function resetGame() {
     const macInput = document.getElementById('mac-input') as HTMLInputElement | null;
     const ipInput = document.getElementById('ip-input') as HTMLInputElement | null;
     const timerProgress = document.querySelector('.timer-progress-bar-fill') as HTMLElement;
+    const macIpContainer = document.querySelector('.mac-ip-container') as HTMLElement;
 
     if (minigameContainer && crackButton) {
         minigameContainer.style.display = 'none';
         crackButton.style.display = 'flex';   
+        macIpContainer.style.display = 'flex';
     }
 
     if (macInput && ipInput) {
@@ -134,9 +161,6 @@ function updateFeedback(isCorrect: boolean, currSquareIdx: number): void {
 function initTimer() {
     const timerContainer = document.querySelector('.timer-container') as HTMLElement;
     const letterContainer = document.querySelector('.letter-container') as HTMLElement;
-    
-    //Defining how long timer should be
-    totalSeconds = secondsRemaining = 5
 
     if (timerContainer && letterContainer) {
         const letterContainerWidth = letterContainer.clientWidth;
@@ -145,13 +169,14 @@ function initTimer() {
     updateTimerDisplay();
 }
 
-function runTimer() {
+function runTimer(keyPressListener: (event: KeyboardEvent) => void) {
+    document.addEventListener('keydown', keyPressListener);
     timerInterval = setInterval(() => {
         secondsRemaining--;
         updateTimerDisplay();
 
         if (secondsRemaining <= 0) {
-            stopGame(false);
+            stopGame(false, keyPressListener);
         }
     }, 1000);
 }
@@ -181,11 +206,14 @@ function startCracking() {
     const minigameContainer = document.querySelector('.minigame-container') as HTMLElement;
     const letterContainer = document.querySelector('.letter-container');
     const crackButton = document.getElementById('crackButton');
+    const macIpContainer = document.querySelector('.mac-ip-container') as HTMLElement;
 
-    if (crackButton && minigameContainer) {
+    getInputValues();
+    if (crackButton && minigameContainer && macIpContainer) {
         crackButton.style.display = 'none'; //Remove the crack button
+        macIpContainer.style.display = 'none'; //Hide the mac-ip container
 
-        const numOfChars = getRandomNumber(8,16);
+        const numOfChars = getRandomNumber(minChars,maxChars);
         const randomChars = generateRandomChars(numOfChars);
 
         if (letterContainer) {
@@ -199,8 +227,6 @@ function startCracking() {
                 letterContainer.appendChild(letterSquare) //Append the letter square to the letter container
             })
             minigameContainer.style.display = 'flex' //Show the minigame
-            initTimer();
-            runTimer();
 
             const handleKeyPress = function(event: KeyboardEvent) {
                 if (!chars.includes(event.key.toUpperCase())) return;
@@ -214,21 +240,18 @@ function startCracking() {
                         currSquareIdx++;
 
                         if (currSquareIdx === randomChars.length) {
-                            //All squares ok
-                            document.removeEventListener('keydown', handleKeyPress);
-                            stopGame(true);
+                            stopGame(true, handleKeyPress);
                         }
                     } else {
                         updateFeedback(false, currSquareIdx);
-                        document.removeEventListener('keydown', handleKeyPress);
                         currentSquare.style.backgroundColor = 'rgb(215, 73, 73)'
-                        stopGame(false);
+                        stopGame(false, handleKeyPress);
                     }
                 }
             }
 
-            //Event listener for keyboard presses
-            document.addEventListener('keydown', handleKeyPress);
+            initTimer();
+            runTimer(handleKeyPress);
             let currSquareIdx = 0;
 
 
