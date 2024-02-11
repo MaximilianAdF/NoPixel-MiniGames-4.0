@@ -2,7 +2,8 @@ var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 var timerInterval = null;
 var secondsRemaining = 0;
 var totalSeconds = 0;
-function stopGame(gameWin) {
+function stopGame(gameWin, keyPressListener) {
+    document.removeEventListener('keydown', keyPressListener);
     if (timerInterval) {
         clearInterval(timerInterval);
         timerInterval = null;
@@ -123,12 +124,14 @@ function initTimer() {
     }
     updateTimerDisplay();
 }
-function runTimer() {
+function runTimer(keyPressListener) {
+    // Start listening to keyboard presses
+    document.addEventListener('keydown', keyPressListener);
     timerInterval = setInterval(function () {
         secondsRemaining--;
         updateTimerDisplay();
         if (secondsRemaining <= 0) {
-            stopGame(false);
+            stopGame(false, keyPressListener);
         }
     }, 1000);
 }
@@ -168,8 +171,7 @@ function startCracking() {
                 letterContainer.appendChild(letterSquare); //Append the letter square to the letter container
             });
             minigameContainer.style.display = 'flex'; //Show the minigame
-            initTimer();
-            runTimer();
+            
             var handleKeyPress_1 = function (event) {
                 console.log(event.key.toUpperCase());
                 if (!chars.includes(event.key.toUpperCase()))
@@ -183,20 +185,20 @@ function startCracking() {
                         currSquareIdx_1++;
                         if (currSquareIdx_1 === randomChars_1.length) {
                             //All squares ok
-                            document.removeEventListener('keydown', handleKeyPress_1);
-                            stopGame(true);
+                            stopGame(true, handleKeyPress_1);
                         }
                     }
                     else {
                         updateFeedback(false, currSquareIdx_1);
                         document.removeEventListener('keydown', handleKeyPress_1);
                         currentSquare.style.backgroundColor = 'rgb(215, 73, 73)';
-                        stopGame(false);
+                        stopGame(false, handleKeyPress_1);
                     }
                 }
             };
-            //Event listener for keyboard presses
-            document.addEventListener('keydown', handleKeyPress_1);
+
+            initTimer();
+            runTimer(handleKeyPress_1);
             var currSquareIdx_1 = 0;
         }
         else {
