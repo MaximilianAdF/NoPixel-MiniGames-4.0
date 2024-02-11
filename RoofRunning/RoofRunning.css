@@ -8,6 +8,7 @@ body {
 }
 
 .hack-box-container {
+  position: relative;
   border-radius: 10px;
   outline: 1px solid gray;
   display: flex;
@@ -181,4 +182,39 @@ body {
 .cubeb {
   background-color: var(--cube-color-blue, rgb(82, 156, 209));
   box-shadow: 0px 10px 0px var(--cube-color-blue-shadow, rgb(40, 71, 86));
+}
+
+.instructions-container {
+  color: rgb(84, 255, 164);
+  text-shadow: 0 0 2.1px rgb(127, 255, 191);
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 800px;
+  z-index: 0;
+}
+
+#instructions-toggle {
+  cursor: pointer;
+  transition: scale 0.2s ease-in-out;
+}
+
+#instructions-toggle:hover {
+  scale: 1.2;
+}
+
+#instructions-content {
+  position: absolute;
+  text-align: center;
+  color: white;
+  text-shadow: none;
+  display: none;
+  top: 100%;
+}
+
+#instructions-content.active {
+  display: block;
 }

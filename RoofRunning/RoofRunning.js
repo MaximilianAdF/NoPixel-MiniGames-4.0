@@ -168,4 +168,11 @@ function runTimer() {
 }
 document.addEventListener("DOMContentLoaded", function () {
     resetGame();
+    var instructionsToggle = document.getElementById('instructions-toggle');
+    var instructionsContent = document.getElementById('instructions-content');
+    if (instructionsToggle) {
+        instructionsToggle.addEventListener('click', function () {
+            instructionsContent.classList.toggle('active');
+        });
+    }
 });

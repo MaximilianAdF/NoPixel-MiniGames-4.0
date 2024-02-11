@@ -188,4 +188,12 @@ function runTimer() {
 
 document.addEventListener("DOMContentLoaded", function () {
     resetGame();
+    const instructionsToggle = document.getElementById('instructions-toggle') as HTMLElement;
+    const instructionsContent = document.getElementById('instructions-content') as HTMLElement;
+
+    if (instructionsToggle) {
+        instructionsToggle.addEventListener('click', function() {
+            instructionsContent.classList.toggle('active');
+        })
+    }
 });
