@@ -11,7 +11,7 @@ function getInputValues(): void {
     const macIpCombs: { [key: string]: [number, number, number] } = {
         '7c:89:3e:c8:cc:65-192.168.0.105': [5, 16, 10], //Easy (seconds, maxChars)
         'fb:d4:31:c:38:e8-192.168.0.205': [5, 18, 14], //Medium 
-        '71:21:e3:ea:f6:d0-192.168.0.179': [4, 20, 16], //Hard
+        '71:21:e3:ea:f6:d0-192.168.0.179': [4, 19, 16], //Hard
     };
     const macInputValue: string = macInput?.value.toLowerCase() ?? '';
     const ipInputValue: string = ipInput?.value ?? '';
