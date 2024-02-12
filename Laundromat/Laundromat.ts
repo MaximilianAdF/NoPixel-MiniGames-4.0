@@ -1,5 +1,7 @@
 let timerInterval: NodeJS.Timeout | null = null;
-let secondsRemaining = 20;
+let timerSeconds = 10;
+let secondsRemaining = timerSeconds;
+let percentageLeft = 100;
 let currentCircle = 1;
 let isLocked = false;
 
@@ -7,9 +9,15 @@ function updateTimerDisplay(): void {
   const timerProgress = document.querySelector(
     ".timer-progress-bar"
   ) as HTMLElement;
-  const percentageLeft = Math.floor((100 * secondsRemaining) / 20);
+  const timer = document.querySelector(".timer") as HTMLElement;
+  const currentIncrement = percentageLeft - Math.floor((100 * secondsRemaining) / timerSeconds);
+  percentageLeft = Math.floor((100 * secondsRemaining) / timerSeconds);
+  if (percentageLeft - currentIncrement <= 0) {
+    percentageLeft = 0;
+  }
 
   if (timerProgress) {
+    timer.textContent = `${secondsRemaining}`;
     timerProgress.style.width = `${percentageLeft}%`;
   }
 }
@@ -30,6 +38,8 @@ function resetGame(status: "win" | "lose" | "init"): void {
   const timerProgress = document.querySelector(
     ".timer-progress-bar"
   ) as HTMLElement;
+  const timer = document.querySelector(".timer") as HTMLElement;
+  const timerInput = document.querySelector(".input__field") as HTMLInputElement;
   const lockContainer = document.querySelector(
     ".lock-container"
   ) as HTMLElement;
@@ -39,6 +49,11 @@ function resetGame(status: "win" | "lose" | "init"): void {
   // Block new input from the user when game over
   overlay.style.display = "block";
   isLocked = true;
+  if (status === "init") {
+    timerSeconds = parseInt(timerInput.value as string, 10);
+    timer.textContent = `${timerSeconds}`;
+    secondsRemaining = timerSeconds;
+  }
 
   setTimeout(() => {
     lockContainer.innerHTML = "";
@@ -48,6 +63,7 @@ function resetGame(status: "win" | "lose" | "init"): void {
     }
     overlay.style.display = "none";
     isLocked = false;
+    removeLines();
     generateLines();
     generateHack();
     shuffleLock();
@@ -58,10 +74,11 @@ function resetGame(status: "win" | "lose" | "init"): void {
     clearInterval(timerInterval);
     timerProgress.style.display = "none";
     timerProgress.style.width = "100%";
+    timer.textContent = `${timerSeconds}`;
     setTimeout(() => {
       timerProgress.style.removeProperty("display");
     }, 1000);
-    secondsRemaining = 20;
+    secondsRemaining = timerSeconds;
   }
 
   if (status === "win") {
@@ -114,7 +131,7 @@ function indicateFailed(circleNum: number): void {
 
 function nextLock(): void {
   const cracked = checkLockStatus(currentCircle);
-  if (cracked && currentCircle <= 3) {
+  if (cracked && currentCircle <= 4) {
     indicateCompleted(currentCircle);
 
     currentCircle++;
@@ -122,7 +139,7 @@ function nextLock(): void {
       `lock-circle${currentCircle}`
     ) as HTMLElement;
     lockCircle.style.outlineColor = "rgb(239, 181, 17)";
-  } else if (currentCircle === 4 && cracked) {
+  } else if (currentCircle === 5 && cracked) {
     indicateCompleted(currentCircle);
     resetGame("win");
   } else {
@@ -164,7 +181,7 @@ function indicateCompleted(circleNum: number): void {
 
 //Function that runs to randomize the position of the balls compared to their original position
 function shuffleLock(): void {
-  for (let i = 1; i < 5; i++) {
+  for (let i = 1; i < 6; i++) {
     const shuffleTimes = Math.floor(Math.random() * (12 - 1) + 1);
     currentCircle = i;
     for (let j = 0; j < shuffleTimes; j++) {
@@ -215,6 +232,13 @@ function shufflePositions(array: number[]): number[] {
     [array[a], array[b]] = [array[b], array[a]];
   }
   return array;
+}
+
+function removeLines(): void {
+  const lines = document.querySelectorAll(".line");
+  lines.forEach((line) => {
+    line.remove();
+  });
 }
 
 function generateLines(): void {
@@ -283,7 +307,7 @@ function generateHack(): void {
   ]; //Available colors for the balls
 
   //Generate between 2-12 balls in different colors for each lock-circle
-  for (let i = 1; i < 5; i++) {
+  for (let i = 1; i < 6; i++) {
     const positionChecks = Math.floor(Math.random() * (8 - 4) + 4); //The semi-circles that indicate which color needs to be where
     const ballAmt = Math.floor(Math.random() * (13 - 5) + 5);
     const shuffledPositions = shufflePositions(positions);
@@ -350,6 +374,12 @@ function handleKeyPress(event: KeyboardEvent) {
 
 document.addEventListener("DOMContentLoaded", (event) => {
   resetGame("init");
+});
+
+document.addEventListener("click", (event) => {
+  if (event.target === document.querySelector(".reset-button")) {
+    resetGame("init");
+  }
 });
 
 document.addEventListener("keydown", handleKeyPress);

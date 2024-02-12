@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Laundromat</title>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <link rel="stylesheet" type="text/css" href="Laundromat.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,400i,700&display=swap">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+        <script src="Laundromat.js"></script>
+    </head>
+    <body>
+        <div class="hack-box-container">
+            <div class="outer-container">
+                <div class="info-container">
+                    <div><i class="fas fa-gamepad"></i></div>
+                    <h2>Laundromat</h2>
+                    <p>Unlock each lock</p>
+                </div>
+                <div class="lose-message">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                    <p>The lockpick bent out of shape.</p>
+                </div>
+                <div class="win-message">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <p>The lock was picked successfully.</p>
+                </div>
+                <div class="hack-box"> 
+                    <div class="position-container">
+                        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%"></svg>
+                    </div>
+                    <!--Overlay to prevent button presses when game over-->
+                    <div class="overlay" style="display: none;"></div>
+                    <!--Static degree indicator lines are generated here-->
+                    <div class="lock-container">
+                        <!--Lock Circles and Balls are generated here-->
+                    </div>
+                </div>
+                <div class="rotate-buttons-container">
+                    <button id="rotate-left" class="rotate-button" onclick="rotateBalls('Left')"><i class="fa-solid fa-arrow-rotate-left"></i>Rotate Left</button>
+                    <button id="rotate-right" class="rotate-button" onclick="rotateBalls('Right')">Rotate Right<i class="fa-solid fa-arrow-rotate-right"></i></button>
+                </div>
+                <div class="submit-button-container"><button class="submit-button" onclick="nextLock()">Unlock</button></div>
+            </div>
+            <div class="timer-container">
+                <div class="timer-progress-bar"></div>
+            </div>
+        </div>
+        <div class="set-timer-container">
+            <div class="timer">0</div>
+            <div class="input__group field">
+                <input type="number" class="input__field" value="10" required="">
+                <label for="name" class="input__label">Timer Seconds</label>
+            </div>
+            <button class="reset-button">Reset</button>
+        </div>
+    </body>
+</html>
