@@ -64,7 +64,6 @@ function resetGame(status) {
             loseMsg_1.style.display = "none";
         }, 2000);
     }
-    // Generate a new game
 }
 function indicateFailed(circleNum) {
     var lockCircle = document.getElementById("lock-circle".concat(circleNum));
@@ -100,7 +99,7 @@ function nextLock() {
         var lockCircle = document.getElementById("lock-circle".concat(currentCircle));
         lockCircle.style.outlineColor = 'rgb(239, 181, 17)';
     }
-    else if (currentCircle === 4) {
+    else if (currentCircle === 4 && cracked) {
         indicateCompleted(currentCircle);
         resetGame("win");
     }

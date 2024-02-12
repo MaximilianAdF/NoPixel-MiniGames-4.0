@@ -72,9 +72,6 @@ function resetGame(status: "win" | "lose" | "init"): void {
             loseMsg.style.display = "none";
         }, 2000);
     }
-
-    // Generate a new game
-
 }
 
 function indicateFailed(circleNum: number): void {
@@ -115,7 +112,7 @@ function nextLock(): void {
         currentCircle++;
         const lockCircle = document.getElementById(`lock-circle${currentCircle}`) as HTMLElement;
         lockCircle.style.outlineColor = 'rgb(239, 181, 17)';
-    } else if (currentCircle === 4) {
+    } else if (currentCircle === 4 && cracked) {
         indicateCompleted(currentCircle);
         resetGame("win");
     } else {
