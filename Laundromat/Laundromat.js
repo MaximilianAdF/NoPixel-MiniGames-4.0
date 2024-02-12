@@ -9,15 +9,16 @@ function updateTimerDisplay() {
     var timer = document.querySelector(".timer");
     var currentIncrement = percentageLeft - Math.floor((100 * secondsRemaining) / timerSeconds);
     percentageLeft = Math.floor((100 * secondsRemaining) / timerSeconds);
-    if (percentageLeft - currentIncrement <= 0) {
-        percentageLeft = 0;
-    }
+    // if (percentageLeft - currentIncrement <= 0) {
+    //   percentageLeft = 0;
+    // }
     if (timerProgress) {
         timer.textContent = "".concat(secondsRemaining);
-        timerProgress.style.width = "".concat(percentageLeft, "%");
+        timerProgress.style.width = "".concat(percentageLeft - 10, "%");
     }
 }
 function runTimer() {
+    updateTimerDisplay();
     timerInterval = setInterval(function () {
         secondsRemaining--;
         updateTimerDisplay();

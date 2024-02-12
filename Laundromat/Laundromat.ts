@@ -12,21 +12,21 @@ function updateTimerDisplay(): void {
   const timer = document.querySelector(".timer") as HTMLElement;
   const currentIncrement = percentageLeft - Math.floor((100 * secondsRemaining) / timerSeconds);
   percentageLeft = Math.floor((100 * secondsRemaining) / timerSeconds);
-  if (percentageLeft - currentIncrement <= 0) {
-    percentageLeft = 0;
-  }
+  // if (percentageLeft - currentIncrement <= 0) {
+  //   percentageLeft = 0;
+  // }
 
   if (timerProgress) {
     timer.textContent = `${secondsRemaining}`;
-    timerProgress.style.width = `${percentageLeft}%`;
+    timerProgress.style.width = `${percentageLeft-10}%`;
   }
 }
 
 function runTimer(): void {
+  updateTimerDisplay();
   timerInterval = setInterval(() => {
     secondsRemaining--;
     updateTimerDisplay();
-
     if (secondsRemaining <= 0) {
       resetGame("lose");
     }
