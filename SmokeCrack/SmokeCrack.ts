@@ -13,8 +13,8 @@ function getInputValues(): void {
         'fb:d4:31:c:38:e8-192.168.0.205': [5, 18, 14], //Medium 
         '71:21:e3:ea:f6:d0-192.168.0.179': [4, 19, 16], //Hard
     };
-    const macInputValue: string = macInput?.value.toLowerCase() ?? '';
-    const ipInputValue: string = ipInput?.value ?? '';
+    const macInputValue: string = macInput?.value.toLowerCase().trim() ?? '';
+    const ipInputValue: string = ipInput?.value.trim() ?? '';
 
     if (macIpCombs[`${macInputValue}-${ipInputValue}`]) {
         [secondsRemaining, maxChars, minChars] = macIpCombs[`${macInputValue}-${ipInputValue}`];
