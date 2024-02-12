@@ -360,3 +360,34 @@ body {
     color: #38caef;
     font-weight: 700;
   }
+
+  .other-container {
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .home-button {
+    background-color: #3292ec;
+    border-radius: 100px;
+    box-shadow: rgba(37, 138, 227, 0.2) 0 -25px 18px -14px inset,rgba(37, 138, 227, 0.2) 0 1px 2px,rgba(37, 138, 227, 0.2) 0 2px 4px,rgba(37, 138, 227, 0.2) 0 4px 8px,rgba(37, 138, 227, 0.2) 0 8px 16px,rgba(37, 138, 227, 0.2) 0 16px 32px;
+    color: black;
+    cursor: pointer;
+    display: inline-block;
+    font-family: CerebriSans-Regular,-apple-system,system-ui,Roboto,sans-serif;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 250ms;
+    border: 0;
+    font-size: 16px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  
+  .home-button:hover {
+    box-shadow: rgba(72, 147, 233, 0.35) 0 -25px 18px -14px inset,rgba(72, 147, 233, 0.35) 0 1px 2px,rgba(72, 147, 233, 0.35) 0 2px 4px,rgba(72, 147, 233, 0.35) 0 4px 8px,rgba(72, 147, 233, 0.35) 0 8px 16px,rgba(72, 147, 233, 0.35) 0 16px 32px;
+    transform: scale(1.05) rotate(-1deg);
+  }
