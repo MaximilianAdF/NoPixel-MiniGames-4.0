@@ -1,5 +1,12 @@
+@font-face {
+  font-family: 'Gilroy';
+  src: url('../fonts/Gilroy-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
-  font-family: "Roboto", sans-serif;
+  font-family: 'Gilroy';
   overflow: hidden;
   position: relative;
   background: linear-gradient(rgba(21, 27, 48, 0.97), rgba(21, 27, 48, 0.97)),
@@ -24,7 +31,7 @@ body {
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-left: -140px;
+  margin-left: -120px;
 }
 
 .fa-gamepad {
