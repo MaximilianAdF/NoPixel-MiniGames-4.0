@@ -1,7 +1,13 @@
+@font-face {
+    font-family: 'Gilroy';
+    src: url('fonts/Gilroy-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-family: 'Gilroy', sans-serif;
     color: aliceblue;
-    background-color: blakc; /* Set background-color to transparent */
     overflow: hidden;
     position: relative;
     background: linear-gradient(rgba(21, 27, 48, 0.97), rgba(21, 27, 48, 0.97)),
@@ -81,7 +87,7 @@ body {
 .ip-info-square p {
     margin: 0;
     padding: 0 15px;
-    font-size: 21px;
+    font-size: 15px;
     color: rgba(208, 208, 208, 0.834);
 }
 
@@ -383,7 +389,6 @@ body {
     width: 100%;
     height: 100%;
     gap: 7px;
-
 }
 
 .row p {
@@ -398,9 +403,12 @@ body {
     align-items: center;
 }
 
-.lvl-easy span,
-.lvl-medium span,
-.lvl-hard span {
+
+.easyTXT,
+.midTXT,
+.hardTXT {
+    width: 100px;
+    text-align: center;
     font-size: 20px;
     display: inline-block;
     white-space: nowrap;
@@ -408,18 +416,18 @@ body {
     margin-right: 10px;
 }
 
-.lvl-easy span {
+.easyTXT {
     color: rgb(85, 255, 164);
     text-shadow: 0 0 3px rgb(84, 255, 164);
 
 }
 
-.lvl-medium span {
+.midTXT {
     color: yellow;
     text-shadow: 0 0 3px yellow;
 }
 
-.lvl-hard span {
+.hardTXT {
     color: rgb(255, 84, 84);
     text-shadow: 0 0 3px rgb(255, 84, 84);
 }
@@ -440,6 +448,21 @@ body {
 
 .lvl-hard .difficulty-bar {
     background-color: rgb(255, 84, 84);
+}
+
+.easyMac,
+.midMac,
+.hardMac {
+    width: 400px;
+    text-align: left;
+}
+
+.easyIP,
+.midIP,
+.hardIP {
+    width: 300px;
+    text-align: left;
+    margin-right: 100px;
 }
 
 .other-container {
