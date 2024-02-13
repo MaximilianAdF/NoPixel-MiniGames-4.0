@@ -7,11 +7,7 @@ var isLocked = false;
 function updateTimerDisplay() {
     var timerProgress = document.querySelector(".timer-progress-bar");
     var timer = document.querySelector(".timer");
-    var currentIncrement = percentageLeft - Math.floor((100 * secondsRemaining) / timerSeconds);
     percentageLeft = Math.floor((100 * secondsRemaining) / timerSeconds);
-    // if (percentageLeft - currentIncrement <= 0) {
-    //   percentageLeft = 0;
-    // }
     if (timerProgress) {
         timer.textContent = "".concat(secondsRemaining);
         timerProgress.style.width = "".concat(percentageLeft - 10, "%");
@@ -292,13 +288,13 @@ function rotateBalls(dir) {
 function handleKeyPress(event) {
     if (isLocked)
         return; //Game is over, key presses are ignored
-    if (event.key === "ArrowLeft") {
+    if (event.key === "ArrowLeft" || event.key === "a") {
         rotateBalls("Left");
     }
-    else if (event.key === "ArrowRight") {
+    else if (event.key === "ArrowRight" || event.key === "d") {
         rotateBalls("Right");
     }
-    else if (event.key === "Enter") {
+    else if (event.key === "Enter" || event.key === " ") {
         nextLock();
     }
     else {

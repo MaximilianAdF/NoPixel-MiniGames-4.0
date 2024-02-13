@@ -10,12 +10,8 @@ function updateTimerDisplay(): void {
     ".timer-progress-bar"
   ) as HTMLElement;
   const timer = document.querySelector(".timer") as HTMLElement;
-  const currentIncrement = percentageLeft - Math.floor((100 * secondsRemaining) / timerSeconds);
   percentageLeft = Math.floor((100 * secondsRemaining) / timerSeconds);
-  // if (percentageLeft - currentIncrement <= 0) {
-  //   percentageLeft = 0;
-  // }
-
+  
   if (timerProgress) {
     timer.textContent = `${secondsRemaining}`;
     timerProgress.style.width = `${percentageLeft-10}%`;
@@ -361,11 +357,11 @@ function rotateBalls(dir: Direction): void {
 function handleKeyPress(event: KeyboardEvent) {
   if (isLocked) return; //Game is over, key presses are ignored
 
-  if (event.key === "ArrowLeft") {
+  if (event.key === "ArrowLeft" || event.key === "a") {
     rotateBalls("Left");
-  } else if (event.key === "ArrowRight") {
+  } else if (event.key === "ArrowRight" || event.key === "d") {
     rotateBalls("Right");
-  } else if (event.key === "Enter") {
+  } else if (event.key === "Enter" || event.key === " ") {
     nextLock();
   } else {
     return;
