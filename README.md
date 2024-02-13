@@ -15,6 +15,7 @@
    - The game not automatically failing whenever there is no solution
 
    ---
+  <br>
   
 - ## 🔗 [SmokeCrack v.1.0.3](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/SmokeCrack/SmokeCrack.html)
    [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/b89566d0-6b9c-4520-a80f-a2f03ab52b9d)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/SmokeCrack/SmokeCrack.html)
@@ -28,21 +29,8 @@
   ### Thoughts
   __If anyone has the background-image for the original SmokeCrack app, let me know through an [issue](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator/issues)__
 
-  ...
-  
-  ### Instructions
-  If you want to try the hacking out for yourself I have made a replica of the program. It's almost identical to it's original on the NoPixel 4.0 server (Slight color & formatting mismatches) but overall the same functionality. Follow the instructions below to run the program locally. The continously-updated hack can also be found online at [github pages](https://maximilianadf.github.io/NoPixel-Hacking-Simulator/SmokeCrack/SmokeCrack.html)
-  - Head to the [repository's main page](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator)
-  - In the top right corner, click on the green box '<> Code'.
-  - Click on 'Download ZIP'
-  - Extract the 'NoPixel-Hacking-Simulator-main.zip' folder
-  - Open the folder that's extracted
-  - Open the 'SmokeCrack' folder
-  - Lastly, open SmokeCrack.html in your preffered web browser
-  
-  The 'MAC Address' and 'IP Adress' fields work but are not connected to anything (simply cosmetic). To begin the hacking mini-game press on the 'Crack' button. A range of characters (8-16) will appear and you need to type them in order without any interventions. If you manage to press all characters correctly on your keyboard before the timer runs out, you win. Have Fun!
-
   ---
+  <br>
 
   <a id="LockPick"></a>
 - ## 🔗 [Lockpick v.1.0.2](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
@@ -55,19 +43,10 @@
   - 🔗 [Mr.K stunned by the lockpick's complexity](https://www.youtube.com/watch?v=rZ6XPkKDd4w&ab_channel=LordKebunClips)
  
   ### Thoughts
-  __Through watching some more videos it seems like the locks can also be rotated using the cursor/direction keys, will be implemented in future versions.__ If you have any input create an [issue](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator/issues)
-
-  ### Instructions
-  If you want to try the hacking out for yourself I have made a replica of the program. It's almost identical to it's original on the NoPixel 4.0 server (Slight color & formatting mismatches) but overall the same functionality. Follow the instructions below to run the program locally. The continously-updated hack can also be found online at [github pages](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
-  - Head to the [repository's main page](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator)
-  - In the top right corner, click on the green box '<> Code'.
-  - Click on 'Download ZIP'
-  - Extract the 'NoPixel-Hacking-Simulator-main.zip' folder
-  - Open the folder that's extracted
-  - Open the 'LockPick' folder
-  - Lastly, open LockPick.html in your preffered web browser
-
+  If you have any input create an [issue](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator/issues)
+  
   ---
+  <br>
  
 - ## 🔗 [Laundromat v.1.0.0](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/Laundromat/Laundromat.html)
    [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/485993af-8b03-4510-a1e4-a13cc9cc7434)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/Laundromat/Laundromat.html)
@@ -75,8 +54,12 @@
 
    ### Description
    A simple twist to the pre existing [LockPick](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0#LockPick) hack. This is the hack that is required to complete in order to open the money safe in the back of the Laundromat in NoPixel 4.0. The difference between this minigame and the [LockPick](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0#LockPick) is the addition of an extra lock-circle, now totaling five and a decrease in time from roughly 20 seconds down to 10. You can also easily alter the timer yourself if you'd like to practice even faster or slower lockpick variations.
+
+   ### Thoughts
+   If you have any input create an [issue](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator/issues)
   
    ---
+  <br>
 
 - ## 🔗 [RepairKit v.1.0.1](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
    [![Screenshot 2024-02-07 at 13 27 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/bc0b6ac8-e34d-4bb1-8d2a-6c3523ba9b40)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
