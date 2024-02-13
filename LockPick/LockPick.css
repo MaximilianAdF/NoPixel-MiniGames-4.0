@@ -68,7 +68,7 @@ body {
 
 /* Static lines (Turn line1.... into ts code) */ 
 .line {
-    width: 70%;
+    width: 65%;
     outline: 1.2px solid rgb(142, 142, 142);
 }
 
@@ -194,6 +194,7 @@ body {
     align-items: center;
     justify-content: center;
     position: absolute;
+    z-index: 50;
     width: 580px;
     height: 580px;
 }
