@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>LockPick</title>
+        <title>Laundromat</title>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <link rel="stylesheet" type="text/css" href="LockPick.css">
+        <link rel="stylesheet" type="text/css" href="Laundromat.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,400i,700&display=swap">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
-        <script src="LockPick.js"></script>
+        <script src="Laundromat.js"></script>
     </head>
     <body>
         <div class="other-container">
@@ -17,7 +17,7 @@
             <div class="outer-container">
                 <div class="info-container">
                     <div><i class="fas fa-gamepad"></i></div>
-                    <h2>Lockpick</h2>
+                    <h2>Laundromat</h2>
                     <p>Unlock each lock</p>
                 </div>
                 <div class="lose-message">
@@ -48,6 +48,14 @@
             <div class="timer-container">
                 <div class="timer-progress-bar"></div>
             </div>
+        </div>
+        <div class="set-timer-container">
+            <div class="timer">0</div>
+            <div class="input__group field">
+                <input type="number" class="input__field" value="10" required="">
+                <label for="name" class="input__label">Timer Seconds</label>
+            </div>
+            <button class="reset-button">Reset</button>
         </div>
     </body>
 </html>
