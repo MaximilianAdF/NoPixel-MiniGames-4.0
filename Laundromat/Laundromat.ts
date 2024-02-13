@@ -11,10 +11,13 @@ function updateTimerDisplay(): void {
   ) as HTMLElement;
   const timer = document.querySelector(".timer") as HTMLElement;
   percentageLeft = Math.floor((100 * secondsRemaining) / timerSeconds);
-  
   if (timerProgress) {
     timer.textContent = `${secondsRemaining}`;
-    timerProgress.style.width = `${percentageLeft-10}%`;
+    if (percentageLeft-(100/timerSeconds) <= 0) {
+      timerProgress.style.width = "0%";
+    } else {
+      timerProgress.style.width = `${percentageLeft-(100/timerSeconds)}%`;
+    }
   }
 }
 

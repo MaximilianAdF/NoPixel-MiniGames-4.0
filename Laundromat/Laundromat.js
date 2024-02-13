@@ -10,7 +10,12 @@ function updateTimerDisplay() {
     percentageLeft = Math.floor((100 * secondsRemaining) / timerSeconds);
     if (timerProgress) {
         timer.textContent = "".concat(secondsRemaining);
-        timerProgress.style.width = "".concat(percentageLeft - 10, "%");
+        if (percentageLeft - (100 / timerSeconds) <= 0) {
+            timerProgress.style.width = "0%";
+        }
+        else {
+            timerProgress.style.width = "".concat(percentageLeft - (100 / timerSeconds), "%");
+        }
     }
 }
 function runTimer() {
