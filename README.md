@@ -14,8 +14,9 @@
    - Instances where the generated game can not be completed
    - The game not automatically failing whenever there is no solution
 
+   ---
+  
 - ## 🔗 [SmokeCrack v.1.0.3](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/SmokeCrack/SmokeCrack.html)
-
    [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/b89566d0-6b9c-4520-a80f-a2f03ab52b9d)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/SmokeCrack/SmokeCrack.html)
   <p align="center">↑ Click to play ↑</p>
 
@@ -41,6 +42,9 @@
   
   The 'MAC Address' and 'IP Adress' fields work but are not connected to anything (simply cosmetic). To begin the hacking mini-game press on the 'Crack' button. A range of characters (8-16) will appear and you need to type them in order without any interventions. If you manage to press all characters correctly on your keyboard before the timer runs out, you win. Have Fun!
 
+  ---
+
+  <a id="LockPick"></a>
 - ## 🔗 [Lockpick v.1.0.2](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
    [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/1cd5cda6-9bd4-4712-ad6d-a45fe569ec83)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
   <p align="center">↑ Click to play ↑</p>
@@ -62,6 +66,17 @@
   - Open the folder that's extracted
   - Open the 'LockPick' folder
   - Lastly, open LockPick.html in your preffered web browser
+
+  ---
+ 
+- ## 🔗 [Laundromat v.1.0.0](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/Laundromat/Laundromat.html)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/485993af-8b03-4510-a1e4-a13cc9cc7434)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/Laundromat/Laundromat.html)
+   <p align="center">↑ Click to play ↑</p>
+
+   ### Description
+   A simple twist to the pre existing [LockPick](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0#LockPick) hack. This is the hack that is required to complete in order to open the money safe in the back of the Laundromat in NoPixel 4.0. The difference between this minigame and the [LockPick](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0#LockPick) is the addition of an extra lock-circle, now totaling five and a decrease in time from roughly 20 seconds down to 10. You can also easily alter the timer yourself if you'd like to practice even faster or slower lockpick variations.
+  
+   ---
 
 - ## 🔗 [RepairKit v.1.0.1](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
    [![Screenshot 2024-02-07 at 13 27 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/bc0b6ac8-e34d-4bb1-8d2a-6c3523ba9b40)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
