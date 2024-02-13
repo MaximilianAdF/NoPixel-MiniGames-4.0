@@ -14,7 +14,7 @@
    - Instances where the generated game can not be completed
    - The game not automatically failing whenever there is no solution
 
-- ## 🔗 [SmokeCrack v.1.0.2](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/SmokeCrack/SmokeCrack.html)
+- ## 🔗 [SmokeCrack v.1.0.3](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/SmokeCrack/SmokeCrack.html)
    [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7ddebeea-5734-4e44-bbbc-5f6a8e51ac59)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/SmokeCrack/SmokeCrack.html)
   <p align="center">↑ Click to play ↑</p>
 
@@ -24,7 +24,7 @@
   - 🔗 [Mr.K & his group realising the app is 'scuffed'](https://www.youtube.com/watch?v=TvhRpxT-XmA&ab_channel=LordKebunClips)
 
   ### Thoughts
-  __If anyone has the background-image or font for the original SmokeCrack app, let me know through an [issue](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator/issues)__
+  __If anyone has the background-image for the original SmokeCrack app, let me know through an [issue](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator/issues)__
 
   ...
   
