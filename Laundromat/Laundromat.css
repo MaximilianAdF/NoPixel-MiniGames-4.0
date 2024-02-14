@@ -20,7 +20,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 2% auto;
+    margin: 0% auto;
     width: 600px;
     height: 800px;
 }
@@ -216,11 +216,11 @@ body {
 
 .lose-message {
     gap: 10px;
-    margin-top: -40px;
-    margin-left: 340px;
+    margin-top: -36px;
+    margin-left: 475px;
     display: none;
     color: white;
-    padding: 0px 18px;
+    padding: 0px 17px;
     border-radius: 5px;
     align-items: center;
     justify-content: center;
@@ -229,8 +229,8 @@ body {
 
 .win-message {
     gap: 10px;
-    margin-top: -40px;
-    margin-left: 340px;
+    margin-top: -36px;
+    margin-left: 475px;
     display: none;
     color: white;
     padding: 0px 10px;
