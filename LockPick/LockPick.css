@@ -33,9 +33,8 @@ body {
     margin-left: -280px;
 }
 
-.fa-gamepad {
-    font-size: 35px;
-    color: rgb(142, 142, 142);
+.gamePad {
+    width: 40px;
 }
 
 .info-container h2 {
