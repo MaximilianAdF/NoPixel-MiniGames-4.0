@@ -22,7 +22,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 2% auto;
+  margin: 0 auto;
   width: 600px;
   height: 670px;
 }
@@ -113,7 +113,7 @@ body {
   gap: 10px;
   margin-top: -50px;
   margin-bottom: 15px;
-  margin-left: 440px;
+  margin-left: 475px;
   display: none;
   color: white;
   padding: 0px 18px;
@@ -127,7 +127,7 @@ body {
   gap: 10px;
   margin-top: -50px;
   margin-bottom: 15px;
-  margin-left: 440px;
+  margin-left: 475px;
   display: none;
   color: white;
   padding: 0px 10px;
