@@ -2,7 +2,7 @@
  A web-based project designed to replicate/build similar "hacking" challenges that can be found on the NoPixel 4.0 FiveM Server. Any and all **input** is appreciated greatly; create an [issue](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator/issues) regarding suggestions, improvements or questions, I will respond as soon as possible.
  > Developed using HTML, CSS, TS (Compiled to JS). 
 
-- ## 🔗 [RoofRunning v.1.0.0](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
+- ## 🔗 [RoofRunning v.1.0.1](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
    [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/4e8c7c4e-436d-4984-90cb-6e876102feda)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
   <p align="center">↑ Click to play ↑</p>
 
@@ -10,10 +10,8 @@
    The new Roof Running job that recently popped up on NoPixel 4.0 is built around stealing AC units from the roof's of buildings. Stealing the AC units require a screwdriver which through the above minigame loosens the AC unit and lets the player pick it up. The game consists of a 5x5 grid with 25 differently colored cubes (Red, Green Blue). Cubes of the same color that are connected (Meaning more than 2 cubes are next to one another) can be removed by clicking on them. The remaining cubes fall downwards and align to the left of the screen. Singular cubes of a specific color can not be removed since they're not a pair of more than 2. The game is completed succesfully if all 25 cubes have been removed within the 15 second time constraint
 
    ### Thoughts
-   There are still some problems left to fix, mainly regarding the solvability:
-   - Instances where the generated game can not be completed
-   - The game not automatically failing whenever there is no solution
-
+   There are still some stuff that could be nice to add
+   - A timer adjustment input, so the user can decide their own time remaining
    ---
   <br>
   
