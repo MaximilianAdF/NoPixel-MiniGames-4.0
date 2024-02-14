@@ -1,7 +1,17 @@
 # NoPixel-Hacking-Simulator
  A web-based project designed to replicate/build similar "hacking" challenges that can be found on the NoPixel 4.0 FiveM Server. Any and all **input** is appreciated greatly; create an [issue](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator/issues) regarding suggestions, improvements or questions, I will respond as soon as possible.
- > Developed using HTML, CSS, TS (Compiled to JS). 
+ > Developed using HTML, CSS, TS (Compiled to JS).
 
+- ## 📈 Contributions
+    The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0) is a completely free-to-use service. As long as I have time and interest I will continue to update and advance different aspects of this project. Whether that's new [MiniGames](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0#StartOfMiniGames) or general bug fixes. If you would like to contribute to this free-to-use project and me, [@MaximilianAdF](https://github.com/MaximilianAdF), in general, you can do it in the following ways:
+  
+   - 🙋 Follow me on GitHub [@MaximilianAdF](https://github.com/MaximilianAdF).
+   - 🌟 Star [this repository](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0) (Top Right Corner).
+   - 🌐 Share [this repository](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0) with friends and people interested in NoPixel.
+   - 🔧 Create [issues](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/issues) with suggestions, improvements or open [pull requests](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/pulls).
+   ---
+  <br>
+<a id="StartOfMiniGames"></a>
 - ## 🔗 [RoofRunning v.1.0.1](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
    [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/4e8c7c4e-436d-4984-90cb-6e876102feda)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
   <p align="center">↑ Click to play ↑</p>
