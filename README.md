@@ -1,19 +1,27 @@
 # NoPixel-Hacking-Simulator
  A web-based project designed to replicate/build similar "hacking" challenges that can be found on the NoPixel 4.0 FiveM Server. Any and all **input** is appreciated greatly; create an [issue](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator/issues) regarding suggestions, improvements or questions, I will respond as soon as possible.
- > Developed using HTML, CSS, TS (Compiled to JS). 
+ > Developed using HTML, CSS, TS (Compiled to JS).
 
-- ## 🔗 [RoofRunning v.1.0.0](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/4e8c7c4e-436d-4984-90cb-6e876102feda)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
+- ## 📈 Contributions
+    The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0) is a completely free-to-use service. As long as I have time and interest I will continue to update and advance different aspects of this project. Whether that's new [MiniGames](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0#StartOfMiniGames) or general bug fixes. If you would like to contribute to this free-to-use project and me, [@MaximilianAdF](https://github.com/MaximilianAdF), in general, you can do it in the following ways:
+  
+   - 🙋 Follow me on GitHub [@MaximilianAdF](https://github.com/MaximilianAdF).
+   - 🌟 Star [this repository](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0) (Top Right Corner).
+   - 🌐 Share [this repository](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0) with friends and people interested in NoPixel.
+   - 🔧 Create [issues](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/issues) with suggestions, improvements or open [pull requests](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/pulls).
+   ---
+  <br>
+<a id="StartOfMiniGames"></a>
+- ## 🔗 [RoofRunning v.1.0.1](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/dc9c5493-32ba-490b-a039-1fa369013dce)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
   <p align="center">↑ Click to play ↑</p>
 
    ### Description
    The new Roof Running job that recently popped up on NoPixel 4.0 is built around stealing AC units from the roof's of buildings. Stealing the AC units require a screwdriver which through the above minigame loosens the AC unit and lets the player pick it up. The game consists of a 5x5 grid with 25 differently colored cubes (Red, Green Blue). Cubes of the same color that are connected (Meaning more than 2 cubes are next to one another) can be removed by clicking on them. The remaining cubes fall downwards and align to the left of the screen. Singular cubes of a specific color can not be removed since they're not a pair of more than 2. The game is completed succesfully if all 25 cubes have been removed within the 15 second time constraint
 
    ### Thoughts
-   There are still some problems left to fix, mainly regarding the solvability:
-   - Instances where the generated game can not be completed
-   - The game not automatically failing whenever there is no solution
-
+   There are still some stuff that could be nice to add
+   - A timer adjustment input, so the user can decide their own time remaining
    ---
   <br>
   
@@ -34,7 +42,7 @@
 
   <a id="LockPick"></a>
 - ## 🔗 [Lockpick v.1.0.2](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
-   [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/1cd5cda6-9bd4-4712-ad6d-a45fe569ec83)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
+   [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/68723250-8984-46c0-aeef-36516529d837)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
   <p align="center">↑ Click to play ↑</p>
   
   ### Description
@@ -62,7 +70,7 @@
   <br>
 
 - ## 🔗 [RepairKit v.1.0.1](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
-   [![Screenshot 2024-02-07 at 13 27 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/bc0b6ac8-e34d-4bb1-8d2a-6c3523ba9b40)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
+   [![Screenshot 2024-02-07 at 13 27 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/f7e3eb98-57c5-4690-9dc0-3ab9a5d3c6f0)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
   <p align="center">↑ Click to play ↑</p>
   
   ### Description
