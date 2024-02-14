@@ -13,7 +13,7 @@
   <br>
 <a id="StartOfMiniGames"></a>
 - ## 🔗 [RoofRunning v.1.0.1](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/4e8c7c4e-436d-4984-90cb-6e876102feda)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/dc9c5493-32ba-490b-a039-1fa369013dce)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
   <p align="center">↑ Click to play ↑</p>
 
    ### Description
@@ -42,7 +42,7 @@
 
   <a id="LockPick"></a>
 - ## 🔗 [Lockpick v.1.0.2](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
-   [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/1cd5cda6-9bd4-4712-ad6d-a45fe569ec83)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
+   [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/68723250-8984-46c0-aeef-36516529d837)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
   <p align="center">↑ Click to play ↑</p>
   
   ### Description
@@ -70,7 +70,7 @@
   <br>
 
 - ## 🔗 [RepairKit v.1.0.1](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
-   [![Screenshot 2024-02-07 at 13 27 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/bc0b6ac8-e34d-4bb1-8d2a-6c3523ba9b40)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
+   [![Screenshot 2024-02-07 at 13 27 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/f7e3eb98-57c5-4690-9dc0-3ab9a5d3c6f0)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
   <p align="center">↑ Click to play ↑</p>
   
   ### Description
