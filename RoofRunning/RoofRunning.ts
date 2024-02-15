@@ -291,7 +291,6 @@ function resetGame(): void {
 
 function generateCubes(): void {
     do {
-        console.log(1); 
         const container: HTMLDivElement = document.getElementById("container") as HTMLDivElement;
         container.innerHTML = "";
 
