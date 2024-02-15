@@ -1,5 +1,5 @@
 var timerInterval = null;
-var timerSeconds = 10;
+var timerSeconds = 12;
 var secondsRemaining = timerSeconds;
 var percentageLeft = 100;
 var currentCircle = 1;

@@ -1,5 +1,5 @@
 let timerInterval: NodeJS.Timeout | null = null;
-let timerSeconds = 10;
+let timerSeconds = 12;
 let secondsRemaining = timerSeconds;
 let percentageLeft = 100;
 let currentCircle = 1;
