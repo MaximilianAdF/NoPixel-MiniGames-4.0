@@ -117,8 +117,11 @@ var Cube = /** @class */ (function () {
 }());
 //The functions below together checks solvability of the board
 function helpFunct(container, queue) {
-    if (getColorCount().includes(1)) {
+    if (getColorCount(container).includes(1)) {
         return false;
+    }
+    if (queue.length === 0) {
+        return true;
     }
     var c = 0;
     container.forEach(function (cube) {
@@ -129,13 +132,12 @@ function helpFunct(container, queue) {
     if (c === 25) {
         return true;
     }
+    var result = false;
     while (queue.length > 0) {
         var connectedCubes = queue.shift();
-        if (helpFunct(cubesUpdate(container, connectedCubes), updateQueue(container))) {
-            return true;
-        }
+        result = (helpFunct(cubesUpdate(container, connectedCubes), updateQueue(container)));
     }
-    return false;
+    return result;
 }
 function cubesUpdate(container, connectedCubes) {
     connectedCubes.forEach(function (cube) {
@@ -152,6 +154,7 @@ function cubesUpdate(container, connectedCubes) {
         var currCube = container[i];
         var col = i % 5;
         if (currCube.classList.contains("empty") && col < 4) {
+            //Check if col is clear to left shift:
             for (var j = col; j < 4; j++) {
                 var tempCube = container[i + (j - col)];
                 container[i + (j - col)] = container[i + 1 + (j - col)];
@@ -171,10 +174,10 @@ function updateQueue(container) {
                 var connectedCube = connectedCubes[i];
                 if (!visited.has(connectedCube)) {
                     visited.add(connectedCube);
+                    queue.push(connectedCubes);
                 }
                 else {
-                    queue.push(connectedCubes);
-                    break;
+                    continue;
                 }
             }
         }
@@ -221,13 +224,19 @@ function getAdjacentCubes(container, cube) {
         adjacentCubes.push(container[idx + 5]);
     return adjacentCubes;
 }
-function getColorCount() {
-    var container = document.getElementById("container");
+function getColorCount(container) {
     var colors = ["cuber", "cubeg", "cubeb"];
     var colorCount = [0, 0, 0];
-    colors.forEach(function (color, idx) {
-        var count = container.querySelectorAll(".".concat(color)).length;
-        colorCount[idx] = count;
+    container.forEach(function (cube) {
+        if (cube.classList.contains("cuber")) {
+            colorCount[0]++;
+        }
+        else if (cube.classList.contains("cubeg")) {
+            colorCount[1]++;
+        }
+        else if (cube.classList.contains("cubeb")) {
+            colorCount[2]++;
+        }
     });
     return colorCount;
 }
@@ -263,7 +272,6 @@ function resetGame() {
 }
 function generateCubes() {
     do {
-        console.log(1);
         var container = document.getElementById("container");
         container.innerHTML = "";
         for (var i = 0; i < 25; i++) {

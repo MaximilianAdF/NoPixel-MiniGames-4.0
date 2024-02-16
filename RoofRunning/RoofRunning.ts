@@ -129,8 +129,12 @@ class Cube {
 
 //The functions below together checks solvability of the board
 function helpFunct(container, queue): boolean {
-    if (getColorCount().includes(1)) {
+    if (getColorCount(container).includes(1)) { 
         return false;
+    }
+
+    if (queue.length === 0) {
+        return true;
     }
 
     let c = 0;
@@ -143,13 +147,12 @@ function helpFunct(container, queue): boolean {
         return true;
     } 
 
+    let result = false;
     while (queue.length > 0) {
         let connectedCubes = queue.shift();
-        if (helpFunct(cubesUpdate(container, connectedCubes), updateQueue(container))) {
-            return true;
-        }
+        result = (helpFunct(cubesUpdate(container, connectedCubes), updateQueue(container)));
     }
-    return false;
+    return result;
 }
 
 function cubesUpdate(container, connectedCubes) {
@@ -166,7 +169,9 @@ function cubesUpdate(container, connectedCubes) {
     for (let i = 24; i >= 0; i--) {
         const currCube = container[i] as HTMLDivElement;
         const col = i % 5;
+        
         if (currCube.classList.contains("empty") && col < 4) {
+            //Check if col is clear to left shift:
             for (let j = col; j < 4; j++) {
                 const tempCube = container[i+(j-col)];
                 container[i+(j-col)] = container[i + 1 + (j-col)];
@@ -188,9 +193,9 @@ function updateQueue(container): Set<unknown>[] {
                 const connectedCube = connectedCubes[i];
                 if (!visited.has(connectedCube)) {
                     visited.add(connectedCube);
-                } else {
                     queue.push(connectedCubes);
-                    break;
+                } else {
+                    continue;
                 }
             }
         }
@@ -243,14 +248,18 @@ function getAdjacentCubes(container, cube) {
     return adjacentCubes;      
 }
 
-function getColorCount(): number[] {
-    const container = document.getElementById("container") as HTMLElement;
+function getColorCount(container): number[] {
     const colors = ["cuber", "cubeg", "cubeb"];
     const colorCount = [0, 0, 0];
 
-    colors.forEach((color, idx) => {
-        const count = container.querySelectorAll(`.${color}`).length;
-        colorCount[idx] = count;
+    container.forEach(cube => {
+        if ((cube as HTMLElement).classList.contains("cuber")) {
+            colorCount[0]++;
+        } else if ((cube as HTMLElement).classList.contains("cubeg")) {
+            colorCount[1]++;
+        } else if ((cube as HTMLElement).classList.contains("cubeb")) {
+            colorCount[2]++;
+        }
     });
     return colorCount;
 }
