@@ -10,16 +10,33 @@ var Cube = /** @class */ (function () {
         this.element.addEventListener("click", this.squareClick.bind(this));
     }
     Cube.prototype.cubeLeftShift = function () {
+        var _a;
         var containerCopy = Array.from(this.container.childNodes);
-        for (var i = 24; i >= 0; i--) {
-            var currCube = containerCopy[i];
-            var col = i % 5;
-            if (currCube.classList.contains("empty") && col < 4) {
-                for (var j = col; j < 4; j++) {
-                    var tempCube = containerCopy[i + (j - col)];
-                    containerCopy[i + (j - col)] = containerCopy[i + 1 + (j - col)];
-                    containerCopy[i + 1 + (j - col)] = tempCube;
+        var isEmptyColumn = new Array(5).fill(true);
+        // Identify empty columns
+        for (var i = 0; i < 5; i++) {
+            for (var j = 0; j < 5; j++) {
+                if (!containerCopy[i * 5 + j].classList.contains("empty")) {
+                    isEmptyColumn[j] = false;
                 }
+            }
+        }
+        // Shift columns left if an entire column is empty
+        for (var col = 0; col < 5; col++) {
+            if (isEmptyColumn[col]) {
+                // Shift all columns to the right of it one position to the left
+                for (var row = 0; row < 5; row++) {
+                    for (var shiftCol = col; shiftCol < 5 - 1; shiftCol++) {
+                        var currentIndex = row * 5 + shiftCol;
+                        var nextIndex = row * 5 + shiftCol + 1;
+                        // Swap the current and next columns
+                        _a = [containerCopy[nextIndex], containerCopy[currentIndex]], containerCopy[currentIndex] = _a[0], containerCopy[nextIndex] = _a[1];
+                    }
+                }
+                // Adjust for the shift when checking subsequent columns
+                isEmptyColumn.splice(col, 1);
+                isEmptyColumn.push(false); // Assume last column is now non-empty
+                col--; // Re-check the current column index due to the shift
             }
         }
         this.updateContainer(containerCopy);
@@ -120,9 +137,6 @@ function helpFunct(container, queue) {
     if (getColorCount(container).includes(1)) {
         return false;
     }
-    if (queue.length === 0) {
-        return true;
-    }
     var c = 0;
     container.forEach(function (cube) {
         if (cube.classList.contains("empty")) {
@@ -132,10 +146,16 @@ function helpFunct(container, queue) {
     if (c === 25) {
         return true;
     }
+    else if (queue.length === 0) {
+        return false;
+    }
     var result = false;
     while (queue.length > 0) {
         var connectedCubes = queue.shift();
         result = (helpFunct(cubesUpdate(container, connectedCubes), updateQueue(container)));
+        if (result === true) {
+            return true;
+        }
     }
     return result;
 }
