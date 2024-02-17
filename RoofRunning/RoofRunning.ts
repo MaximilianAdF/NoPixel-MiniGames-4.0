@@ -141,7 +141,9 @@ function helpFunct(container, queue): boolean {
     });
     if (c === 25) {
         return true;
-    } 
+    } else if (queue.length === 0) {
+        return false:
+    }
 
     let result = false;
     while (queue.length > 0) {
