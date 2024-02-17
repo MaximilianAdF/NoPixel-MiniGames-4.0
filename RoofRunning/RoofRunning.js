@@ -133,8 +133,10 @@ var Cube = /** @class */ (function () {
     return Cube;
 }());
 //The functions below together checks solvability of the board
-function helpFunct(container, queue) {
+function helpFunct(container, queue, path) {
+    if (path === void 0) { path = []; }
     if (getColorCount(container).includes(1)) {
+        console.log("FAIL, SINGLE:", path);
         return false;
     }
     var c = 0;
@@ -144,45 +146,67 @@ function helpFunct(container, queue) {
         }
     });
     if (c === 25) {
+        console.log("SOLVE:", path); // Path is one of the sequences of clicks that solves the board
         return true;
     }
     else if (queue.length === 0) {
+        console.log("FAIL, NO QUEUE:", path);
         return false;
     }
-    var result = false;
     while (queue.length > 0) {
         var connectedCubes = queue.shift();
-        result = (helpFunct(cubesUpdate(container, connectedCubes), updateQueue(container)));
-        if (result === true) {
+        var _a = cubesUpdate(container, connectedCubes), updatedContainer = _a[0], possibleClick = _a[1]; // [container, possibleClicks
+        var updatedQueue = updateQueue(updatedContainer);
+        var newPath = path.concat(possibleClick);
+        if (helpFunct(updatedContainer, updatedQueue, newPath)) {
             return true;
         }
     }
-    return result;
+    console.log("FAIL, NO PATH:", path);
+    return false;
 }
 function cubesUpdate(container, connectedCubes) {
+    var _a;
+    var possibleClicks = -1;
     connectedCubes.forEach(function (cube) {
         var _a;
         var idx = container.indexOf(cube);
         cube.classList.remove(cube.classList.item(1));
         cube.classList.add("empty");
+        possibleClicks = idx;
         var row = Math.floor(idx / 5);
         for (var i = 0; i < row; i++) {
             _a = [container[idx - 5 * (i + 1)], container[idx - 5 * i]], container[idx - 5 * i] = _a[0], container[idx - 5 * (i + 1)] = _a[1];
         }
     });
-    for (var i = 24; i >= 0; i--) {
-        var currCube = container[i];
-        var col = i % 5;
-        if (currCube.classList.contains("empty") && col < 4) {
-            //Check if col is clear to left shift:
-            for (var j = col; j < 4; j++) {
-                var tempCube = container[i + (j - col)];
-                container[i + (j - col)] = container[i + 1 + (j - col)];
-                container[i + 1 + (j - col)] = tempCube;
+    var isEmptyColumn = new Array(5).fill(true);
+    // Identify empty columns
+    for (var i = 0; i < 5; i++) {
+        for (var j = 0; j < 5; j++) {
+            if (!container[i * 5 + j].classList.contains("empty")) {
+                isEmptyColumn[j] = false;
             }
         }
     }
-    return container;
+    // Shift columns left if an entire column is empty
+    for (var col = 0; col < 5; col++) {
+        if (isEmptyColumn[col]) {
+            // Shift all columns to the right of it one position to the left
+            for (var row = 0; row < 5; row++) {
+                for (var shiftCol = col; shiftCol < 5 - 1; shiftCol++) {
+                    var currentIndex = row * 5 + shiftCol;
+                    var nextIndex = row * 5 + shiftCol + 1;
+                    // Swap the current and next columns
+                    _a = [container[nextIndex], container[currentIndex]], container[currentIndex] = _a[0], container[nextIndex] = _a[1];
+                }
+            }
+            // Adjust for the shift when checking subsequent columns
+            isEmptyColumn.splice(col, 1);
+            isEmptyColumn.push(false); // Assume last column is now non-empty
+            col--; // Re-check the current column index due to the shift
+        }
+    }
+    return [container, possibleClicks];
 }
 function updateQueue(container) {
     var queue = [];
@@ -291,6 +315,7 @@ function resetGame() {
     runTimer();
 }
 function generateCubes() {
+    console.log("RESET");
     do {
         var container = document.getElementById("container");
         container.innerHTML = "";

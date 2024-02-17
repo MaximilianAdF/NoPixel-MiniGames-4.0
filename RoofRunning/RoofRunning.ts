@@ -146,8 +146,9 @@ class Cube {
 }
 
 //The functions below together checks solvability of the board
-function helpFunct(container, queue): boolean {
+function helpFunct(container, queue, path = []): boolean {
     if (getColorCount(container).includes(1)) { 
+        console.log("FAIL, SINGLE:", path)
         return false;
     }
 
@@ -158,47 +159,70 @@ function helpFunct(container, queue): boolean {
         }
     });
     if (c === 25) {
+        console.log("SOLVE:", path) // Path is one of the sequences of clicks that solves the board
         return true;
     } else if (queue.length === 0) {
+        console.log("FAIL, NO QUEUE:", path)
         return false;
     }
 
-    let result = false;
     while (queue.length > 0) {
         let connectedCubes = queue.shift();
-        result = (helpFunct(cubesUpdate(container, connectedCubes), updateQueue(container)));
-        if (result === true) {
+        const [updatedContainer, possibleClick] = cubesUpdate(container, connectedCubes); // [container, possibleClicks
+        const updatedQueue = updateQueue(updatedContainer);
+        const newPath = path.concat(possibleClick);
+
+        if (helpFunct(updatedContainer, updatedQueue, newPath)) {
             return true
         }
     }
-    return result;
+    console.log("FAIL, NO PATH:", path)
+    return false;
 }
 
 function cubesUpdate(container, connectedCubes) {
+    let possibleClicks: number = -1;
     connectedCubes.forEach(cube => {
         const idx = container.indexOf(cube as HTMLDivElement);
         (cube as HTMLDivElement).classList.remove((cube as HTMLDivElement).classList.item(1) as string);
         (cube as HTMLDivElement).classList.add("empty");
+        possibleClicks = idx;
             
         const row = Math.floor(idx / 5);
         for (let i = 0; i < row; i++) {
             [container[idx - 5 * i], container[idx - 5 * (i + 1)]] = [container[idx - 5 * (i + 1)], container[idx - 5 * i]];
         }
     });
-    for (let i = 24; i >= 0; i--) {
-        const currCube = container[i] as HTMLDivElement;
-        const col = i % 5;
-        
-        if (currCube.classList.contains("empty") && col < 4) {
-            //Check if col is clear to left shift:
-            for (let j = col; j < 4; j++) {
-                const tempCube = container[i+(j-col)];
-                container[i+(j-col)] = container[i + 1 + (j-col)];
-                container[i + 1 + (j-col)] = tempCube;
+    let isEmptyColumn = new Array(5).fill(true);
+
+    // Identify empty columns
+    for (let i = 0; i < 5; i++) {
+        for (let j = 0; j < 5; j++) {
+            if (!(container[i * 5 + j] as HTMLElement).classList.contains("empty")) {
+                isEmptyColumn[j] = false;
             }
         }
     }
-    return container;
+
+    // Shift columns left if an entire column is empty
+    for (let col = 0; col < 5; col++) {
+        if (isEmptyColumn[col]) {
+            // Shift all columns to the right of it one position to the left
+            for (let row = 0; row < 5; row++) {
+                for (let shiftCol = col; shiftCol < 5 - 1; shiftCol++) {
+                    let currentIndex = row * 5 + shiftCol;
+                    let nextIndex = row * 5 + shiftCol + 1;
+                    // Swap the current and next columns
+                    [container[currentIndex], container[nextIndex]] = [container[nextIndex], container[currentIndex]];
+                }
+            }
+            // Adjust for the shift when checking subsequent columns
+            isEmptyColumn.splice(col, 1);
+            isEmptyColumn.push(false); // Assume last column is now non-empty
+            col--; // Re-check the current column index due to the shift
+        }
+    }
+    return [container, possibleClicks];
 }
 
 function updateQueue(container): Set<unknown>[] {
@@ -318,6 +342,7 @@ function resetGame(): void {
 }
 
 function generateCubes(): void {
+    console.log("RESET")
     do {
         const container: HTMLDivElement = document.getElementById("container") as HTMLDivElement;
         container.innerHTML = "";
