@@ -16,15 +16,33 @@ class Cube {
     
     cubeLeftShift() {
         const containerCopy = Array.from(this.container.childNodes);
-        for (let i = 24; i >= 0; i--) {
-            const currCube = containerCopy[i] as HTMLDivElement;
-            const col = i % 5;
-            if (currCube.classList.contains("empty") && col < 4) {
-                for (let j = col; j < 4; j++) {
-                    const tempCube = containerCopy[i+(j-col)];
-                    containerCopy[i+(j-col)] = containerCopy[i + 1 + (j-col)];
-                    containerCopy[i + 1 + (j-col)] = tempCube;
+        let isEmptyColumn = new Array(5).fill(true);
+
+        // Identify empty columns
+        for (let i = 0; i < 5; i++) {
+            for (let j = 0; j < 5; j++) {
+                if (!(containerCopy[i * 5 + j] as HTMLElement).classList.contains("empty")) {
+                    isEmptyColumn[j] = false;
                 }
+            }
+        }
+
+        // Shift columns left if an entire column is empty
+        for (let col = 0; col < 5; col++) {
+            if (isEmptyColumn[col]) {
+                // Shift all columns to the right of it one position to the left
+                for (let row = 0; row < 5; row++) {
+                    for (let shiftCol = col; shiftCol < 5 - 1; shiftCol++) {
+                        let currentIndex = row * 5 + shiftCol;
+                        let nextIndex = row * 5 + shiftCol + 1;
+                        // Swap the current and next columns
+                        [containerCopy[currentIndex], containerCopy[nextIndex]] = [containerCopy[nextIndex], containerCopy[currentIndex]];
+                    }
+                }
+                // Adjust for the shift when checking subsequent columns
+                isEmptyColumn.splice(col, 1);
+                isEmptyColumn.push(false); // Assume last column is now non-empty
+                col--; // Re-check the current column index due to the shift
             }
         }
         this.updateContainer(containerCopy);
@@ -78,7 +96,7 @@ class Cube {
             connectedCubes.forEach(cube => {        
                 (cube as HTMLDivElement).classList.remove(this.color);
                 (cube as HTMLDivElement).classList.add("empty"); 
-                (cube as HTMLDivElement).removeEventListener("click", this.squareClick); 
+                (cube as HTMLDivElement).removeEventListener("click", this.squareClick);
                 this.cubeGravity(Array.from(this.container.childNodes).indexOf(cube as HTMLDivElement)); // Apply gravity to the cubes so empty cubes are at top
             });
             this.cubeLeftShift();
@@ -142,7 +160,7 @@ function helpFunct(container, queue): boolean {
     if (c === 25) {
         return true;
     } else if (queue.length === 0) {
-        return false:
+        return false;
     }
 
     let result = false;
