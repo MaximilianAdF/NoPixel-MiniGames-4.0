@@ -133,10 +133,6 @@ function helpFunct(container, queue): boolean {
         return false;
     }
 
-    if (queue.length === 0) {
-        return true;
-    }
-
     let c = 0;
     container.forEach(cube => {
         if ((cube as HTMLElement).classList.contains("empty")) {
@@ -151,6 +147,9 @@ function helpFunct(container, queue): boolean {
     while (queue.length > 0) {
         let connectedCubes = queue.shift();
         result = (helpFunct(cubesUpdate(container, connectedCubes), updateQueue(container)));
+        if (result === true) {
+            return true
+        }
     }
     return result;
 }
