@@ -1,5 +1,17 @@
 var timerInterval = null;
-var secondsRemaining = 15;
+var secondsRemaining = 25;
+var gridCols = 11;
+var gridRows = 8;
+var cssVariables = {
+    "--total-seconds": secondsRemaining,
+    "--grid-columns": gridCols,
+    "--grid-rows": gridRows
+};
+// Set the CSS variables
+for (var _i = 0, _a = Object.entries(cssVariables); _i < _a.length; _i++) {
+    var _b = _a[_i], key = _b[0], value = _b[1];
+    document.documentElement.style.setProperty(key, String(value));
+}
 var Cube = /** @class */ (function () {
     function Cube() {
         this.container = document.getElementById("container");
@@ -12,23 +24,23 @@ var Cube = /** @class */ (function () {
     Cube.prototype.cubeLeftShift = function () {
         var _a;
         var containerCopy = Array.from(this.container.childNodes);
-        var isEmptyColumn = new Array(5).fill(true);
+        var isEmptyColumn = new Array(gridCols).fill(true);
         // Identify empty columns
-        for (var i = 0; i < 5; i++) {
-            for (var j = 0; j < 5; j++) {
-                if (!containerCopy[i * 5 + j].classList.contains("empty")) {
+        for (var i = 0; i < gridRows; i++) {
+            for (var j = 0; j < gridCols; j++) {
+                if (!containerCopy[i * gridCols + j].classList.contains("empty")) {
                     isEmptyColumn[j] = false;
                 }
             }
         }
         // Shift columns left if an entire column is empty
-        for (var col = 0; col < 5; col++) {
+        for (var col = 0; col < gridCols; col++) {
             if (isEmptyColumn[col]) {
                 // Shift all columns to the right of it one position to the left
-                for (var row = 0; row < 5; row++) {
-                    for (var shiftCol = col; shiftCol < 5 - 1; shiftCol++) {
-                        var currentIndex = row * 5 + shiftCol;
-                        var nextIndex = row * 5 + shiftCol + 1;
+                for (var row = 0; row < gridRows; row++) {
+                    for (var shiftCol = col; shiftCol < gridCols - 1; shiftCol++) {
+                        var currentIndex = row * gridCols + shiftCol;
+                        var nextIndex = row * gridCols + shiftCol + 1;
                         // Swap the current and next columns
                         _a = [containerCopy[nextIndex], containerCopy[currentIndex]], containerCopy[currentIndex] = _a[0], containerCopy[nextIndex] = _a[1];
                     }
@@ -44,10 +56,10 @@ var Cube = /** @class */ (function () {
     Cube.prototype.cubeGravity = function (idx) {
         var _a;
         var containerCopy = Array.from(this.container.childNodes);
-        var row = Math.floor(idx / 5);
+        var row = Math.floor(idx / gridCols);
         for (var i = 0; i < row; i++) {
             // Swap elements in the copied array
-            _a = [containerCopy[idx - 5 * (i + 1)], containerCopy[idx - 5 * i]], containerCopy[idx - 5 * i] = _a[0], containerCopy[idx - 5 * (i + 1)] = _a[1];
+            _a = [containerCopy[idx - gridCols * (i + 1)], containerCopy[idx - gridCols * i]], containerCopy[idx - gridCols * i] = _a[0], containerCopy[idx - gridCols * (i + 1)] = _a[1];
         }
         // Update the live container with the modified copy
         this.updateContainer(containerCopy);
@@ -66,16 +78,16 @@ var Cube = /** @class */ (function () {
     Cube.prototype.getAdjacentCubes = function (cube) {
         var idx = Array.from(this.container.childNodes).indexOf(cube);
         var adjacentCubes = [];
-        var row = Math.floor(idx / 5);
-        var col = idx % 5;
+        var row = Math.floor(idx / gridCols);
+        var col = idx % gridCols;
         if (col - 1 >= 0)
             adjacentCubes.push(this.container.childNodes[idx - 1]);
-        if (col + 1 < 5)
+        if (col + 1 < gridCols)
             adjacentCubes.push(this.container.childNodes[idx + 1]);
         if (row - 1 >= 0)
-            adjacentCubes.push(this.container.childNodes[idx - 5]);
-        if (row + 1 < 5)
-            adjacentCubes.push(this.container.childNodes[idx + 5]);
+            adjacentCubes.push(this.container.childNodes[idx - gridCols]);
+        if (row + 1 < gridRows)
+            adjacentCubes.push(this.container.childNodes[idx + gridCols]);
         return adjacentCubes;
     };
     Cube.prototype.removeConnectedCubes = function () {
@@ -119,12 +131,12 @@ var Cube = /** @class */ (function () {
     Cube.prototype.checkwin = function () {
         var container = document.getElementById("container");
         var divsInsideContainer = container.querySelectorAll('.empty');
-        if (divsInsideContainer.length === 25) {
+        if (divsInsideContainer.length === gridRows * gridCols) {
             endGame("win");
         }
-        if (!checkSolvable()) {
-            endGame("lose");
-        }
+        //if (!checkSolvable()) {
+        //endGame("lose");
+        //}
     };
     Cube.prototype.squareClick = function () {
         this.removeConnectedCubes();
@@ -145,7 +157,7 @@ function helpFunct(container, queue, path) {
             c++;
         }
     });
-    if (c === 25) {
+    if (c === gridRows * gridCols) {
         console.log("SOLVE:", path); // Path is one of the sequences of clicks that solves the board
         return true;
     }
@@ -174,28 +186,28 @@ function cubesUpdate(container, connectedCubes) {
         cube.classList.remove(cube.classList.item(1));
         cube.classList.add("empty");
         possibleClicks = idx;
-        var row = Math.floor(idx / 5);
+        var row = Math.floor(idx / gridCols);
         for (var i = 0; i < row; i++) {
-            _a = [container[idx - 5 * (i + 1)], container[idx - 5 * i]], container[idx - 5 * i] = _a[0], container[idx - 5 * (i + 1)] = _a[1];
+            _a = [container[idx - gridCols * (i + 1)], container[idx - gridCols * i]], container[idx - gridCols * i] = _a[0], container[idx - gridCols * (i + 1)] = _a[1];
         }
     });
-    var isEmptyColumn = new Array(5).fill(true);
+    var isEmptyColumn = new Array(gridCols).fill(true);
     // Identify empty columns
-    for (var i = 0; i < 5; i++) {
-        for (var j = 0; j < 5; j++) {
-            if (!container[i * 5 + j].classList.contains("empty")) {
+    for (var i = 0; i < gridRows; i++) {
+        for (var j = 0; j < gridCols; j++) {
+            if (!container[i * gridCols + j].classList.contains("empty")) {
                 isEmptyColumn[j] = false;
             }
         }
     }
     // Shift columns left if an entire column is empty
-    for (var col = 0; col < 5; col++) {
+    for (var col = 0; col < gridCols; col++) {
         if (isEmptyColumn[col]) {
             // Shift all columns to the right of it one position to the left
-            for (var row = 0; row < 5; row++) {
-                for (var shiftCol = col; shiftCol < 5 - 1; shiftCol++) {
-                    var currentIndex = row * 5 + shiftCol;
-                    var nextIndex = row * 5 + shiftCol + 1;
+            for (var row = 0; row < gridRows; row++) {
+                for (var shiftCol = col; shiftCol < gridCols - 1; shiftCol++) {
+                    var currentIndex = row * gridCols + shiftCol;
+                    var nextIndex = row * gridCols + shiftCol + 1;
                     // Swap the current and next columns
                     _a = [container[nextIndex], container[currentIndex]], container[currentIndex] = _a[0], container[nextIndex] = _a[1];
                 }
@@ -256,16 +268,16 @@ function getConnectedCubes(container, cube) {
 function getAdjacentCubes(container, cube) {
     var idx = container.indexOf(cube);
     var adjacentCubes = [];
-    var row = Math.floor(idx / 5);
-    var col = idx % 5;
+    var row = Math.floor(idx / gridCols);
+    var col = idx % gridCols;
     if (col - 1 >= 0)
         adjacentCubes.push(container[idx - 1]);
-    if (col + 1 < 5)
+    if (col + 1 < gridCols)
         adjacentCubes.push(container[idx + 1]);
     if (row - 1 >= 0)
-        adjacentCubes.push(container[idx - 5]);
-    if (row + 1 < 5)
-        adjacentCubes.push(container[idx + 5]);
+        adjacentCubes.push(container[idx - gridCols]);
+    if (row + 1 < gridRows)
+        adjacentCubes.push(container[idx + gridCols]);
     return adjacentCubes;
 }
 function getColorCount(container) {
@@ -318,7 +330,7 @@ function generateCubes() {
     do {
         var container = document.getElementById("container");
         container.innerHTML = "";
-        for (var i = 0; i < 88; i++) {
+        for (var i = 0; i < gridRows * gridCols; i++) {
             var cube = new Cube();
             container === null || container === void 0 ? void 0 : container.appendChild(cube.element);
         }

@@ -1,8 +1,3 @@
-:root {
-  --grid-columns: 11;
-  --grid-rows: 8;
-}
-
 @font-face {
   font-family: 'Gilroy';
   src: url('../fonts/Gilroy-Regular.ttf') format('truetype');
@@ -106,7 +101,6 @@ body {
 .message-container{
   position: absolute;
   top: 0px;
-  outline: 5px solid red;
   width: 100%;
   height: 70px;
   display: flex;
@@ -118,7 +112,7 @@ body {
 .lose-message {
   height: 40px;
   gap: 10px;
-  display: flex;
+  display: none;
   color: white;
   padding: 0px 18px;
   border-radius: 5px;
