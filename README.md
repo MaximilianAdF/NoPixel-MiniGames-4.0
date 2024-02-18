@@ -12,12 +12,12 @@
    ---
   <br>
 <a id="StartOfMiniGames"></a>
-- ## 🔗 [RoofRunning v.1.0.1](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/dc9c5493-32ba-490b-a039-1fa369013dce)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
+- ## 🔗 [RoofRunning v.1.0.2](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/9accc119-05df-4183-967d-2b6db4948886)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
   <p align="center">↑ Click to play ↑</p>
 
    ### Description
-   The new Roof Running job that recently popped up on NoPixel 4.0 is built around stealing AC units from the roof's of buildings. Stealing the AC units require a screwdriver which through the above minigame loosens the AC unit and lets the player pick it up. The game consists of a 5x5 grid with 25 differently colored cubes (Red, Green Blue). Cubes of the same color that are connected (Meaning more than 2 cubes are next to one another) can be removed by clicking on them. The remaining cubes fall downwards and align to the left of the screen. Singular cubes of a specific color can not be removed since they're not a pair of more than 2. The game is completed succesfully if all 25 cubes have been removed within the 15 second time constraint
+   The new Roof Running job that recently popped up on NoPixel 4.0 is built around stealing AC units from the roof's of buildings. Stealing the AC units require a screwdriver which through the above minigame loosens the AC unit and lets the player pick it up. The game consists of a 11x8 grid with 88 differently colored cubes (Red, Green Blue). Cubes of the same color that are connected (Meaning more than 2 cubes are next to one another) can be removed by clicking on them. The remaining cubes fall downwards and align to the left of the screen. Singular cubes of a specific color can not be removed since they're not a pair of more than 2. The game is completed succesfully if all 25 cubes have been removed within the 15 second time constraint
 
    ### Thoughts
    There are still some stuff that could be nice to add
