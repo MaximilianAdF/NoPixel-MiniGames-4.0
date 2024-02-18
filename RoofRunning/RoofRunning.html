@@ -24,13 +24,15 @@
           <h2>Same Game</h2>
           <p>Click on matching groups of blocks</p>
         </div>
-        <div class="lose-message">
-          <i class="fa-solid fa-circle-xmark"></i>
-          <p>Failed!</p>
-        </div>
-        <div class="win-message">
-          <i class="fa-solid fa-circle-check"></i>
-          <p>Success!</p>
+        <div class="message-container">
+          <div class="lose-message">
+            <i class="fa-solid fa-circle-xmark"></i>
+            <p>Failed!</p>
+          </div>
+          <div class="win-message">
+            <i class="fa-solid fa-circle-check"></i>
+            <p>Success!</p>
+          </div>
         </div>
         <div class="hack-box">
           <div class="overlay" style="display: none;"></div>
@@ -39,12 +41,6 @@
       <div class="timer-container">
         <div class="timer-progress-bar"></div>
       </div>
-    </div>
-    <div class="instructions-container">
-      <h2 id="instructions-toggle">Instructions</h2>
-      <p id="instructions-content">
-        Click on adjacent blocks, (no diagonals), of the same color to remove them. Singular non-connected blocks can not be removed. You win by removing all 25 blocks from the 5x5 grid before the 20 second timer runs out. The game ends automatically if there are no possible solutions left. Good luck!
-      </p>
-    </div>    
+    </div>  
   </body>
 </html>

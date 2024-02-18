@@ -1,3 +1,8 @@
+:root {
+  --grid-columns: 11;
+  --grid-rows: 8;
+}
+
 @font-face {
   font-family: 'Gilroy';
   src: url('../fonts/Gilroy-Regular.ttf') format('truetype');
@@ -23,15 +28,16 @@ body {
   align-items: center;
   justify-content: center;
   margin: 0 auto;
-  width: 600px;
-  height: 670px;
+  width: calc(var(--grid-columns) * (90px + 2px) + 20px);
+  height: calc(var(--grid-rows) * (90px + 2px) + 140px);
 }
 
 .info-container {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-left: -120px;
+  margin-left: 20px;
 }
 
 .info-container h2 {
@@ -60,18 +66,20 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 580px;
-  height: 580px;
+  width: calc(var(--grid-columns) * (90px + 2px));
+  height: calc(var(--grid-rows) * (90px + 2px) + 50px);
+  max-width: fit-content;
+  max-height: fit-content;
   background-color: rgb(22, 40, 52);
   display: flex;
 }
 
 .lock-container {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(5, 1fr);
-  width: 580px;
-  height: 580px;
+  grid-template-columns: repeat(var(--grid-columns), 1fr);
+  grid-template-rows: repeat(var(--grid-rows), 1fr);
+  width: calc(var(--grid-columns) * (90px + 2px));
+  height: calc(var(--grid-rows) * (90px + 2px) + 50px);
   z-index: 999;
 }
 
@@ -95,21 +103,22 @@ body {
   transition: width 1s linear;
 }
 
-.position-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.message-container{
   position: absolute;
-  width: 580px;
-  height: 580px;
+  top: 0px;
+  outline: 5px solid red;
+  width: 100%;
+  height: 70px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 20px;
 }
 
 .lose-message {
+  height: 40px;
   gap: 10px;
-  margin-top: -50px;
-  margin-bottom: 15px;
-  margin-left: 475px;
-  display: none;
+  display: flex;
   color: white;
   padding: 0px 18px;
   border-radius: 5px;
@@ -119,10 +128,8 @@ body {
 }
 
 .win-message {
+  height: 40px;
   gap: 10px;
-  margin-top: -50px;
-  margin-bottom: 15px;
-  margin-left: 475px;
   display: none;
   color: white;
   padding: 0px 10px;
@@ -139,8 +146,8 @@ body {
 }
 
 .cube {
-  width: 110px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
   border: 1.5px solid #fff;  
   background:
   linear-gradient(to right, rgba(255, 255, 255, 0.74) 1px, transparent 1px) 2px 2px,
@@ -173,52 +180,17 @@ body {
 
 .cuber {
   background-color: var(--cube-color-red, rgb(229, 28, 28));
-  box-shadow: 0px 10px 0px var(--cube-color-red-shadow, rgb(96, 35, 34));
+  box-shadow: 0px 5px 0px var(--cube-color-red-shadow, rgb(96, 35, 34));
 }
 
 .cubeg {
   background-color: var(--cube-color-green, rgb(137, 218, 61));
-  box-shadow: 0px 10px 0px var(--cube-color-green-shadow, rgb(79, 122, 59));
+  box-shadow: 0px 5px 0px var(--cube-color-green-shadow, rgb(79, 122, 59));
 }
 
 .cubeb {
   background-color: var(--cube-color-blue, rgb(82, 156, 209));
-  box-shadow: 0px 10px 0px var(--cube-color-blue-shadow, rgb(40, 71, 86));
-}
-
-.instructions-container {
-  color: rgb(84, 255, 164);
-  text-shadow: 0 0 2.1px rgb(127, 255, 191);
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  margin-top: 800px;
-  z-index: 0;
-}
-
-#instructions-toggle {
-  cursor: pointer;
-  transition: scale 0.2s ease-in-out;
-}
-
-#instructions-toggle:hover {
-  scale: 1.2;
-}
-
-#instructions-content {
-  position: absolute;
-  text-align: center;
-  color: white;
-  text-shadow: none;
-  display: none;
-  top: 100%;
-}
-
-#instructions-content.active {
-  display: block;
+  box-shadow: 0px 5px 0px var(--cube-color-blue-shadow, rgb(40, 71, 86));
 }
 
 .other-container {

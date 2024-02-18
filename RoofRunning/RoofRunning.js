@@ -269,7 +269,6 @@ function getAdjacentCubes(container, cube) {
     return adjacentCubes;
 }
 function getColorCount(container) {
-    var colors = ["cuber", "cubeg", "cubeb"];
     var colorCount = [0, 0, 0];
     container.forEach(function (cube) {
         if (cube.classList.contains("cuber")) {
@@ -319,7 +318,7 @@ function generateCubes() {
     do {
         var container = document.getElementById("container");
         container.innerHTML = "";
-        for (var i = 0; i < 25; i++) {
+        for (var i = 0; i < 88; i++) {
             var cube = new Cube();
             container === null || container === void 0 ? void 0 : container.appendChild(cube.element);
         }

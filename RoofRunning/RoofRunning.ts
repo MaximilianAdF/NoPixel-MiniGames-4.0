@@ -292,7 +292,6 @@ function getAdjacentCubes(container, cube) {
 }
 
 function getColorCount(container): number[] {
-    const colors = ["cuber", "cubeg", "cubeb"];
     const colorCount = [0, 0, 0];
 
     container.forEach(cube => {
@@ -347,7 +346,7 @@ function generateCubes(): void {
         const container: HTMLDivElement = document.getElementById("container") as HTMLDivElement;
         container.innerHTML = "";
 
-        for (let i = 0; i < 25; i++) {
+        for (let i = 0; i < 88; i++) {
             const cube = new Cube();
             container?.appendChild(cube.element);
         }
