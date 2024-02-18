@@ -1,10 +1,9 @@
-let timerInterval: NodeJS.Timeout | null = null;
-let secondsRemaining = 25;
+const totalSeconds = 25;
 const gridCols = 11;
 const gridRows = 8;
 
 const cssVariables = {
-    "--total-seconds": secondsRemaining,
+    "--total-seconds": totalSeconds,
     "--grid-columns": gridCols,
     "--grid-rows": gridRows
 };
@@ -324,9 +323,8 @@ function getColorCount(container): number[] {
 function endGame(outcome: string): void {
     const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
     const overlay = document.querySelector(".overlay") as HTMLElement;
-    clearInterval(timerInterval as NodeJS.Timeout);
 
-    timerProgress.style.display = "none";
+    timerProgress.style.transition = "none";
     timerProgress.style.width = "100%";
     overlay.style.display = "block";
 
@@ -340,15 +338,13 @@ function endGame(outcome: string): void {
         setTimeout(function () {loseMsg.style.display = 'none';}, 2000);
     }
     setTimeout(function () {
-        timerProgress.style.display = 'flex';
+        timerProgress.style.transition = "width 25s linear";
         overlay.style.display = 'none';
         resetGame(); 
     }, 2000);
 }
 
 function resetGame(): void {
-    clearInterval(timerInterval as NodeJS.Timeout);
-    secondsRemaining = 15;
     generateCubes();
     runTimer();
 }
@@ -366,22 +362,13 @@ function generateCubes(): void {
     } while (!checkSolvable()); // Regenerate the cubes if the board is not solvable
 }
 
-function updateTimerDisplay() {
-    const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
-    let percentageLeft = Math.floor(100 * secondsRemaining / 15);
-    if (timerProgress) {
-        timerProgress.style.width = `${percentageLeft}%`;
-    }
-}
 
 function runTimer() {
-    timerInterval = setInterval(function () {
-        secondsRemaining--;
-        updateTimerDisplay();
-        if (secondsRemaining < 0) {
-            endGame("lose");
-        }
-    }, 1000);
+    const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
+    timerProgress.style.width = "0%";
+    setTimeout(function () {
+        endGame("lose");
+    }, totalSeconds*1000);
 }
 
 document.addEventListener("DOMContentLoaded", function () {

@@ -1,9 +1,8 @@
-var timerInterval = null;
-var secondsRemaining = 25;
+var totalSeconds = 25;
 var gridCols = 11;
 var gridRows = 8;
 var cssVariables = {
-    "--total-seconds": secondsRemaining,
+    "--total-seconds": totalSeconds,
     "--grid-columns": gridCols,
     "--grid-rows": gridRows
 };
@@ -299,8 +298,7 @@ function getColorCount(container) {
 function endGame(outcome) {
     var timerProgress = document.querySelector(".timer-progress-bar");
     var overlay = document.querySelector(".overlay");
-    clearInterval(timerInterval);
-    timerProgress.style.display = "none";
+    timerProgress.style.transition = "none";
     timerProgress.style.width = "100%";
     overlay.style.display = "block";
     if (outcome === "win") {
@@ -314,14 +312,12 @@ function endGame(outcome) {
         setTimeout(function () { loseMsg_1.style.display = 'none'; }, 2000);
     }
     setTimeout(function () {
-        timerProgress.style.display = 'flex';
+        timerProgress.style.transition = "width 25s linear";
         overlay.style.display = 'none';
         resetGame();
     }, 2000);
 }
 function resetGame() {
-    clearInterval(timerInterval);
-    secondsRemaining = 15;
     generateCubes();
     runTimer();
 }
@@ -336,21 +332,12 @@ function generateCubes() {
         }
     } while (!checkSolvable()); // Regenerate the cubes if the board is not solvable
 }
-function updateTimerDisplay() {
-    var timerProgress = document.querySelector(".timer-progress-bar");
-    var percentageLeft = Math.floor(100 * secondsRemaining / 15);
-    if (timerProgress) {
-        timerProgress.style.width = "".concat(percentageLeft, "%");
-    }
-}
 function runTimer() {
-    timerInterval = setInterval(function () {
-        secondsRemaining--;
-        updateTimerDisplay();
-        if (secondsRemaining < 0) {
-            endGame("lose");
-        }
-    }, 1000);
+    var timerProgress = document.querySelector(".timer-progress-bar");
+    timerProgress.style.width = "0%";
+    setTimeout(function () {
+        endGame("lose");
+    }, totalSeconds * 1000);
 }
 document.addEventListener("DOMContentLoaded", function () {
     resetGame();
