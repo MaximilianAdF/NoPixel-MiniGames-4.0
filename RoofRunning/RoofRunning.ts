@@ -3,7 +3,6 @@ const gridCols = 11;
 const gridRows = 8;
 
 const cssVariables = {
-    "--total-seconds": totalSeconds,
     "--grid-columns": gridCols,
     "--grid-rows": gridRows
 };
@@ -325,6 +324,7 @@ function endGame(outcome: string): void {
     const overlay = document.querySelector(".overlay") as HTMLElement;
 
     timerProgress.style.transition = "none";
+    timerProgress.style.display = "none";
     timerProgress.style.width = "100%";
     overlay.style.display = "block";
 
@@ -332,19 +332,22 @@ function endGame(outcome: string): void {
         const winMsg = document.querySelector(".win-message") as HTMLElement;
         winMsg.style.display = "flex";
         setTimeout(function () {winMsg.style.display = 'none';}, 2000);
-    } else {
+    } else if (outcome === "lose") {
         const loseMsg = document.querySelector(".lose-message") as HTMLElement;
         loseMsg.style.display = "flex";
         setTimeout(function () {loseMsg.style.display = 'none';}, 2000);
     }
     setTimeout(function () {
-        timerProgress.style.transition = "width 25s linear";
+
+        timerProgress.style.display = "block";
         overlay.style.display = 'none';
         resetGame(); 
     }, 2000);
 }
 
 function resetGame(): void {
+    const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
+    timerProgress.style.transition = `width ${totalSeconds}s cubic-bezier(0.6, 1, 0.7, 0.93)`;
     generateCubes();
     runTimer();
 }
@@ -365,7 +368,9 @@ function generateCubes(): void {
 
 function runTimer() {
     const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
-    timerProgress.style.width = "0%";
+    setTimeout(function () {
+        timerProgress.style.width = "0%";
+    }, 100);
     setTimeout(function () {
         endGame("lose");
     }, totalSeconds*1000);

@@ -2,7 +2,6 @@ var totalSeconds = 25;
 var gridCols = 11;
 var gridRows = 8;
 var cssVariables = {
-    "--total-seconds": totalSeconds,
     "--grid-columns": gridCols,
     "--grid-rows": gridRows
 };
@@ -299,6 +298,7 @@ function endGame(outcome) {
     var timerProgress = document.querySelector(".timer-progress-bar");
     var overlay = document.querySelector(".overlay");
     timerProgress.style.transition = "none";
+    timerProgress.style.display = "none";
     timerProgress.style.width = "100%";
     overlay.style.display = "block";
     if (outcome === "win") {
@@ -306,18 +306,20 @@ function endGame(outcome) {
         winMsg_1.style.display = "flex";
         setTimeout(function () { winMsg_1.style.display = 'none'; }, 2000);
     }
-    else {
+    else if (outcome === "lose") {
         var loseMsg_1 = document.querySelector(".lose-message");
         loseMsg_1.style.display = "flex";
         setTimeout(function () { loseMsg_1.style.display = 'none'; }, 2000);
     }
     setTimeout(function () {
-        timerProgress.style.transition = "width 25s linear";
+        timerProgress.style.display = "block";
         overlay.style.display = 'none';
         resetGame();
     }, 2000);
 }
 function resetGame() {
+    var timerProgress = document.querySelector(".timer-progress-bar");
+    timerProgress.style.transition = "width ".concat(totalSeconds, "s cubic-bezier(0.6, 1, 0.7, 0.93)");
     generateCubes();
     runTimer();
 }
@@ -334,7 +336,9 @@ function generateCubes() {
 }
 function runTimer() {
     var timerProgress = document.querySelector(".timer-progress-bar");
-    timerProgress.style.width = "0%";
+    setTimeout(function () {
+        timerProgress.style.width = "0%";
+    }, 100);
     setTimeout(function () {
         endGame("lose");
     }, totalSeconds * 1000);
