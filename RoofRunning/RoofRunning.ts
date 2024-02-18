@@ -1,6 +1,18 @@
 let timerInterval: NodeJS.Timeout | null = null;
 let secondsRemaining = 15;
 
+// Define the board width and height
+const boardWidth = 11;
+const boardHeight = 8;
+
+// Set the CSS variables for the board width and height
+const style = document.createElement('style');
+style.textContent = `:root {
+    --boardWidth: ${boardWidth};
+    --boardHeight: ${boardHeight};
+}`;
+document.head.append(style);
+
 class Cube { 
     container: HTMLDivElement = document.getElementById("container") as HTMLDivElement;
     element: HTMLDivElement
@@ -16,25 +28,25 @@ class Cube {
     
     cubeLeftShift() {
         const containerCopy = Array.from(this.container.childNodes);
-        let isEmptyColumn = new Array(5).fill(true);
+        let isEmptyColumn = new Array(boardWidth).fill(true);
 
         // Identify empty columns
-        for (let i = 0; i < 5; i++) {
-            for (let j = 0; j < 5; j++) {
-                if (!(containerCopy[i * 5 + j] as HTMLElement).classList.contains("empty")) {
+        for (let i = 0; i < boardHeight; i++) {
+            for (let j = 0; j < boardWidth; j++) {
+                if (!(containerCopy[i * boardWidth + j] as HTMLElement).classList.contains("empty")) {
                     isEmptyColumn[j] = false;
                 }
             }
         }
 
         // Shift columns left if an entire column is empty
-        for (let col = 0; col < 5; col++) {
+        for (let col = 0; col < boardWidth; col++) {
             if (isEmptyColumn[col]) {
                 // Shift all columns to the right of it one position to the left
-                for (let row = 0; row < 5; row++) {
-                    for (let shiftCol = col; shiftCol < 5 - 1; shiftCol++) {
-                        let currentIndex = row * 5 + shiftCol;
-                        let nextIndex = row * 5 + shiftCol + 1;
+                for (let row = 0; row < boardHeight; row++) {
+                    for (let shiftCol = col; shiftCol < boardWidth - 1; shiftCol++) {
+                        let currentIndex = row * boardWidth + shiftCol;
+                        let nextIndex = row * boardWidth + shiftCol + 1;
                         // Swap the current and next columns
                         [containerCopy[currentIndex], containerCopy[nextIndex]] = [containerCopy[nextIndex], containerCopy[currentIndex]];
                     }
@@ -51,11 +63,11 @@ class Cube {
 
     cubeGravity(idx: number) {
         const containerCopy = Array.from(this.container.childNodes);
-        const row = Math.floor(idx / 5);
+        const row = Math.floor(idx / boardWidth);
 
         for (let i = 0; i < row; i++) {
             // Swap elements in the copied array
-            [containerCopy[idx - 5 * i], containerCopy[idx - 5 * (i + 1)]] = [containerCopy[idx - 5 * (i + 1)], containerCopy[idx - 5 * i]];
+            [containerCopy[idx - boardWidth * i], containerCopy[idx - boardWidth * (i + 1)]] = [containerCopy[idx - boardWidth * (i + 1)], containerCopy[idx - boardWidth * i]];
         }
         // Update the live container with the modified copy
         this.updateContainer(containerCopy);
@@ -76,13 +88,13 @@ class Cube {
         const idx = Array.from(this.container.childNodes).indexOf(cube);
         const adjacentCubes: HTMLDivElement[] = [];
 
-        const row = Math.floor(idx/5);
-        const col = idx%5;
+        const row = Math.floor(idx / boardWidth);
+        const col = idx % boardWidth;
 
-        if (col - 1 >= 0) adjacentCubes.push(this.container.childNodes[idx-1] as HTMLDivElement);
-        if (col + 1 < 5) adjacentCubes.push(this.container.childNodes[idx+1] as HTMLDivElement);
-        if (row - 1 >= 0) adjacentCubes.push(this.container.childNodes[idx-5] as HTMLDivElement);
-        if (row + 1 < 5) adjacentCubes.push(this.container.childNodes[idx+5] as HTMLDivElement);
+        if (col - 1 >= 0) adjacentCubes.push(this.container.childNodes[idx - 1] as HTMLDivElement);
+        if (col + 1 < boardWidth) adjacentCubes.push(this.container.childNodes[idx + 1] as HTMLDivElement);
+        if (row - 1 >= 0) adjacentCubes.push(this.container.childNodes[idx - boardWidth] as HTMLDivElement);
+        if (row + 1 < boardHeight) adjacentCubes.push(this.container.childNodes[idx + boardWidth] as HTMLDivElement);
        
         return adjacentCubes;      
     }
@@ -131,7 +143,7 @@ class Cube {
     checkwin() {
         const container = document.getElementById("container") as HTMLElement;
         const divsInsideContainer = container.querySelectorAll('.empty');
-        if (divsInsideContainer.length === 25) {
+        if (divsInsideContainer.length === boardWidth * boardHeight) {
             endGame("win");
         }
         if (!checkSolvable()) {
@@ -158,7 +170,7 @@ function helpFunct(container, queue, path = []): boolean {
             c++;
         }
     });
-    if (c === 25) {
+    if (c === boardWidth * boardHeight) {
         console.log("SOLVE:", path) // Path is one of the sequences of clicks that solves the board
         return true;
     } else if (queue.length === 0) {
@@ -188,30 +200,30 @@ function cubesUpdate(container, connectedCubes) {
         (cube as HTMLDivElement).classList.add("empty");
         possibleClicks = idx;
             
-        const row = Math.floor(idx / 5);
+        const row = Math.floor(idx / boardWidth);
         for (let i = 0; i < row; i++) {
-            [container[idx - 5 * i], container[idx - 5 * (i + 1)]] = [container[idx - 5 * (i + 1)], container[idx - 5 * i]];
+            [container[idx - boardWidth * i], container[idx - boardWidth * (i + 1)]] = [container[idx - boardWidth * (i + 1)], container[idx - boardWidth * i]];
         }
     });
-    let isEmptyColumn = new Array(5).fill(true);
+    let isEmptyColumn = new Array(boardWidth).fill(true);
 
     // Identify empty columns
-    for (let i = 0; i < 5; i++) {
-        for (let j = 0; j < 5; j++) {
-            if (!(container[i * 5 + j] as HTMLElement).classList.contains("empty")) {
+    for (let i = 0; i < boardHeight; i++) {
+        for (let j = 0; j < boardWidth; j++) {
+            if (!(container[i * boardWidth + j] as HTMLElement).classList.contains("empty")) {
                 isEmptyColumn[j] = false;
             }
         }
     }
 
     // Shift columns left if an entire column is empty
-    for (let col = 0; col < 5; col++) {
+    for (let col = 0; col < boardWidth; col++) {
         if (isEmptyColumn[col]) {
             // Shift all columns to the right of it one position to the left
-            for (let row = 0; row < 5; row++) {
-                for (let shiftCol = col; shiftCol < 5 - 1; shiftCol++) {
-                    let currentIndex = row * 5 + shiftCol;
-                    let nextIndex = row * 5 + shiftCol + 1;
+            for (let row = 0; row < boardHeight; row++) {
+                for (let shiftCol = col; shiftCol < boardWidth - 1; shiftCol++) {
+                    let currentIndex = row * boardWidth + shiftCol;
+                    let nextIndex = row * boardWidth + shiftCol + 1;
                     // Swap the current and next columns
                     [container[currentIndex], container[nextIndex]] = [container[nextIndex], container[currentIndex]];
                 }
@@ -280,13 +292,13 @@ function getAdjacentCubes(container, cube) {
     const idx = container.indexOf(cube);
     const adjacentCubes: HTMLDivElement[] = [];
 
-    const row = Math.floor(idx/5);
-    const col = idx%5;
+    const row = Math.floor(idx / boardWidth);
+    const col = idx % boardWidth;
 
-    if (col - 1 >= 0) adjacentCubes.push(container[idx-1] as HTMLDivElement);
-    if (col + 1 < 5) adjacentCubes.push(container[idx+1] as HTMLDivElement);
-    if (row - 1 >= 0) adjacentCubes.push(container[idx-5] as HTMLDivElement);
-    if (row + 1 < 5) adjacentCubes.push(container[idx+5] as HTMLDivElement);
+    if (col - 1 >= 0) adjacentCubes.push(container[idx - 1] as HTMLDivElement);
+    if (col + 1 < boardWidth) adjacentCubes.push(container[idx + 1] as HTMLDivElement);
+    if (row - 1 >= 0) adjacentCubes.push(container[idx - boardWidth] as HTMLDivElement);
+    if (row + 1 < boardHeight) adjacentCubes.push(container[idx + boardWidth] as HTMLDivElement);
    
     return adjacentCubes;      
 }
@@ -347,7 +359,7 @@ function generateCubes(): void {
         const container: HTMLDivElement = document.getElementById("container") as HTMLDivElement;
         container.innerHTML = "";
 
-        for (let i = 0; i < 25; i++) {
+        for (let i = 0; i < boardWidth * boardHeight; i++) {
             const cube = new Cube();
             container?.appendChild(cube.element);
         }

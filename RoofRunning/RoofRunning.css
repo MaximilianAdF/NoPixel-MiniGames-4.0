@@ -68,8 +68,8 @@ body {
 
 .lock-container {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(5, 1fr);
+  grid-template-columns: repeat(var(--boardWidth), 1fr);
+  grid-template-rows: repeat(var(--boardHeight), 1fr);
   width: 580px;
   height: 580px;
   z-index: 999;
