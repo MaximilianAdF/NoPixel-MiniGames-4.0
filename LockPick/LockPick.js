@@ -268,13 +268,13 @@ function rotateBalls(dir) {
 function handleKeyPress(event) {
     if (isLocked)
         return; //Game is over, key presses are ignored
-    if (event.key === "ArrowLeft") {
+    if (event.key === "ArrowLeft" || event.key === "a") {
         rotateBalls("Left");
     }
-    else if (event.key === "ArrowRight") {
+    else if (event.key === "ArrowRight" || event.key === "d") {
         rotateBalls("Right");
     }
-    else if (event.key === "Enter") {
+    else if (event.key === "Enter" || event.key === " ") {
         nextLock();
     }
     else {
