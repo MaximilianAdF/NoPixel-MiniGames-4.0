@@ -12,7 +12,7 @@
    ---
   <br>
 <a id="StartOfMiniGames"></a>
-- ## 🔗 [RoofRunning v.1.0.2](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
+- ## 🔗 [RoofRunning v.1.0.3](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
    [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/9accc119-05df-4183-967d-2b6db4948886)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
   <p align="center">↑ Click to play ↑</p>
 
@@ -21,7 +21,7 @@
 
    ### Thoughts
    There are still some stuff that could be nice to add
-   - A timer adjustment input, so the user can decide their own time remaining
+   - Highscore, Current score interface (global?)
    ---
   <br>
   
