@@ -144,10 +144,9 @@ class Cube {
         const divsInsideContainer = container.querySelectorAll('.empty');
         if (divsInsideContainer.length === gridRows * gridCols) {
             endGame("win");
+        } else if (shouldFail()) {
+            endGame("lose");
         }
-        //if (!checkSolvable()) {
-            //endGame("lose");
-        //}
     }
 
     squareClick() {
@@ -263,6 +262,37 @@ function checkSolvable(): boolean {
 
     let queue = updateQueue(containerCopy);
     return helpFunct(containerCopy, queue);
+}
+
+function shouldFail(): boolean {
+    // This method does 2 things:
+    // 1. Fail if exactly one of any color is left
+    // 2. Fail if there are no groups of connected colors
+    //
+    // In case of a failure, return true
+
+    const container = document.getElementById("container") as HTMLElement;
+    const containerCopy = Array.from(container.childNodes).map(node => node.cloneNode(true)); //Deep copy of the container so modification of the DOM cubes does not affect the original container
+
+    // No need to check if the board is empty. This method won't be called if we won.
+
+    if (getColorCount(containerCopy).includes(1)) {
+        console.log("FAIL: Single cube of a color remaining")
+        return true;
+    }
+    // If we find a connected group, return true
+    for (let i = 0; i < containerCopy.length; i++) {
+        const cube = containerCopy[i];
+        if (!(cube as HTMLElement).classList.contains("empty")) {
+            const connectedCubes = getConnectedCubes(containerCopy, cube as HTMLDivElement)
+            if (connectedCubes.size > 1) {
+                return false;
+            }
+        }
+    }
+    // If we made it here, no connected groups were found. Fail.
+    console.log("FAIL: No connected groups found")
+    return true;
 }
 
 function getConnectedCubes(container, cube) {

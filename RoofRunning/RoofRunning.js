@@ -132,9 +132,9 @@ var Cube = /** @class */ (function () {
         if (divsInsideContainer.length === gridRows * gridCols) {
             endGame("win");
         }
-        //if (!checkSolvable()) {
-        //endGame("lose");
-        //}
+        else if (shouldFail()) {
+            endGame("lose");
+        }
     };
     Cube.prototype.squareClick = function () {
         this.removeConnectedCubes();
@@ -243,6 +243,33 @@ function checkSolvable() {
     var containerCopy = Array.from(container.childNodes).map(function (node) { return node.cloneNode(true); }); //Deep copy of the container so modification of the DOM cubes does not affect the original container
     var queue = updateQueue(containerCopy);
     return helpFunct(containerCopy, queue);
+}
+function shouldFail() {
+    // This method does 2 things:
+    // 1. Fail if exactly one of any color is left
+    // 2. Fail if there are no groups of connected colors
+    //
+    // In case of a failure, return true
+    var container = document.getElementById("container");
+    var containerCopy = Array.from(container.childNodes).map(function (node) { return node.cloneNode(true); }); //Deep copy of the container so modification of the DOM cubes does not affect the original container
+    // No need to check if the board is empty. This method won't be called if we won.
+    if (getColorCount(containerCopy).includes(1)) {
+        console.log("FAIL: Single cube of a color remaining");
+        return true;
+    }
+    // If we find a connected group, return true
+    for (var i = 0; i < containerCopy.length; i++) {
+        var cube = containerCopy[i];
+        if (!cube.classList.contains("empty")) {
+            var connectedCubes = getConnectedCubes(containerCopy, cube);
+            if (connectedCubes.size > 1) {
+                return false;
+            }
+        }
+    }
+    // If we made it here, no connected groups were found. Fail.
+    console.log("FAIL: No connected groups found");
+    return true;
 }
 function getConnectedCubes(container, cube) {
     var connectedCubes = new Set();
