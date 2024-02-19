@@ -191,7 +191,6 @@ body {
     background-color: orangered;
     width: 100%;
     height: 100%;
-    transition: width 1s linear;
 }
 
 /* The semi-circles that indicate where ball color is supposed to be */

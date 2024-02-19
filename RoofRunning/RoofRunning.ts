@@ -338,7 +338,6 @@ function endGame(outcome: string): void {
         setTimeout(function () {loseMsg.style.display = 'none';}, 2000);
     }
     setTimeout(function () {
-
         timerProgress.style.display = "block";
         overlay.style.display = 'none';
         resetGame(); 
@@ -347,7 +346,7 @@ function endGame(outcome: string): void {
 
 function resetGame(): void {
     const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
-    timerProgress.style.transition = `width ${totalSeconds}s cubic-bezier(0.6, 1, 0.7, 0.93)`;
+    timerProgress.style.transition = `width ${totalSeconds}s cubic-bezier(0.4, 1, 0.7, 0.93)`;
     generateCubes();
     runTimer();
 }

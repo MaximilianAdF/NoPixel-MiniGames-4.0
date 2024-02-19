@@ -1,22 +1,15 @@
-var timerInterval = null;
-var secondsRemaining = 20;
+var totalSeconds = 20;
 var currentCircle = 1;
 var isLocked = false;
-function updateTimerDisplay() {
-    var timerProgress = document.querySelector(".timer-progress-bar");
-    var percentageLeft = Math.floor((100 * secondsRemaining) / 20);
-    if (timerProgress) {
-        timerProgress.style.width = "".concat(percentageLeft, "%");
-    }
-}
 function runTimer() {
-    timerInterval = setInterval(function () {
-        secondsRemaining--;
-        updateTimerDisplay();
-        if (secondsRemaining <= 0) {
-            resetGame("lose");
-        }
-    }, 1000);
+    var timerProgress = document.querySelector(".timer-progress-bar");
+    setTimeout(function () {
+        timerProgress.style.transition = "width ".concat(totalSeconds, "s cubic-bezier(0.4, 1, 0.7, 0.93)");
+        timerProgress.style.width = "0%";
+    }, 100);
+    setTimeout(function () {
+        resetGame("lose");
+    }, totalSeconds * 1000);
 }
 function resetGame(status) {
     // Remove existing lock circles and SVG elements
@@ -40,15 +33,12 @@ function resetGame(status) {
         shuffleLock();
         runTimer();
     }, 2000);
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerProgress.style.display = "none";
-        timerProgress.style.width = "100%";
-        setTimeout(function () {
-            timerProgress.style.removeProperty("display");
-        }, 1000);
-        secondsRemaining = 20;
-    }
+    timerProgress.style.transition = "none";
+    timerProgress.style.display = "none";
+    timerProgress.style.width = "100%";
+    setTimeout(function () {
+        timerProgress.style.display = "block";
+    }, 2000);
     if (status === "win") {
         var winMsg_1 = document.querySelector(".win-message");
         winMsg_1.style.display = "flex";
@@ -282,6 +272,9 @@ function handleKeyPress(event) {
     }
 }
 document.addEventListener("DOMContentLoaded", function (event) {
-    resetGame("init");
+    generateLines();
+    generateHack();
+    shuffleLock();
+    runTimer();
 });
 document.addEventListener("keydown", handleKeyPress);

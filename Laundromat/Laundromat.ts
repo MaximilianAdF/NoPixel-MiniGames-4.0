@@ -1,35 +1,17 @@
-let timerInterval: NodeJS.Timeout | null = null;
-let timerSeconds = 10;
-let secondsRemaining = timerSeconds;
-let percentageLeft = 100;
+let totalSeconds = 12;
 let currentCircle = 1;
 let isLocked = false;
 
-function updateTimerDisplay(): void {
-  const timerProgress = document.querySelector(
-    ".timer-progress-bar"
-  ) as HTMLElement;
-  const timer = document.querySelector(".timer") as HTMLElement;
-  percentageLeft = Math.floor((100 * secondsRemaining) / timerSeconds);
-  if (timerProgress) {
-    timer.textContent = `${secondsRemaining}`;
-    if (percentageLeft-(100/timerSeconds) <= 0) {
-      timerProgress.style.width = "0%";
-    } else {
-      timerProgress.style.width = `${percentageLeft-(100/timerSeconds)}%`;
-    }
-  }
-}
 
 function runTimer(): void {
-  updateTimerDisplay();
-  timerInterval = setInterval(() => {
-    secondsRemaining--;
-    updateTimerDisplay();
-    if (secondsRemaining <= 0) {
-      resetGame("lose");
-    }
-  }, 1000);
+  const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
+    setTimeout(function () {
+      timerProgress.style.transition = `width ${totalSeconds}s cubic-bezier(0.4, 1, 0.7, 0.93)`;
+      timerProgress.style.width = "0%";
+    }, 100);
+  setTimeout(() => {
+    resetGame("lose");
+  }, totalSeconds * 1000);
 }
 
 function resetGame(status: "win" | "lose" | "init"): void {
@@ -37,8 +19,6 @@ function resetGame(status: "win" | "lose" | "init"): void {
   const timerProgress = document.querySelector(
     ".timer-progress-bar"
   ) as HTMLElement;
-  const timer = document.querySelector(".timer") as HTMLElement;
-  const timerInput = document.querySelector(".input__field") as HTMLInputElement;
   const lockContainer = document.querySelector(
     ".lock-container"
   ) as HTMLElement;
@@ -48,11 +28,6 @@ function resetGame(status: "win" | "lose" | "init"): void {
   // Block new input from the user when game over
   overlay.style.display = "block";
   isLocked = true;
-  if (status === "init") {
-    timerSeconds = parseInt(timerInput.value as string, 10);
-    timer.textContent = `${timerSeconds}`;
-    secondsRemaining = timerSeconds;
-  }
 
   setTimeout(() => {
     lockContainer.innerHTML = "";
@@ -69,16 +44,12 @@ function resetGame(status: "win" | "lose" | "init"): void {
     runTimer();
   }, 2000);
 
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerProgress.style.display = "none";
-    timerProgress.style.width = "100%";
-    timer.textContent = `${timerSeconds}`;
-    setTimeout(() => {
-      timerProgress.style.removeProperty("display");
-    }, 1000);
-    secondsRemaining = timerSeconds;
-  }
+  timerProgress.style.transition = "none";
+  timerProgress.style.display = "none";
+  timerProgress.style.width = "100%";
+  setTimeout(() => {
+    timerProgress.style.removeProperty("display");
+  }, 2000);
 
   if (status === "win") {
     const winMsg = document.querySelector(".win-message") as HTMLElement;
@@ -373,12 +344,6 @@ function handleKeyPress(event: KeyboardEvent) {
 
 document.addEventListener("DOMContentLoaded", (event) => {
   resetGame("init");
-});
-
-document.addEventListener("click", (event) => {
-  if (event.target === document.querySelector(".reset-button")) {
-    resetGame("init");
-  }
 });
 
 document.addEventListener("keydown", handleKeyPress);

@@ -1,49 +1,25 @@
-var timerInterval = null;
-var timerSeconds = 10;
-var secondsRemaining = timerSeconds;
-var percentageLeft = 100;
+var totalSeconds = 12;
 var currentCircle = 1;
 var isLocked = false;
-function updateTimerDisplay() {
-    var timerProgress = document.querySelector(".timer-progress-bar");
-    var timer = document.querySelector(".timer");
-    percentageLeft = Math.floor((100 * secondsRemaining) / timerSeconds);
-    if (timerProgress) {
-        timer.textContent = "".concat(secondsRemaining);
-        if (percentageLeft - (100 / timerSeconds) <= 0) {
-            timerProgress.style.width = "0%";
-        }
-        else {
-            timerProgress.style.width = "".concat(percentageLeft - (100 / timerSeconds), "%");
-        }
-    }
-}
 function runTimer() {
-    updateTimerDisplay();
-    timerInterval = setInterval(function () {
-        secondsRemaining--;
-        updateTimerDisplay();
-        if (secondsRemaining <= 0) {
-            resetGame("lose");
-        }
-    }, 1000);
+    var timerProgress = document.querySelector(".timer-progress-bar");
+    setTimeout(function () {
+        timerProgress.style.transition = "width ".concat(totalSeconds, "s cubic-bezier(0.4, 1, 0.7, 0.93)");
+        timerProgress.style.width = "0%";
+    }, 100);
+    setTimeout(function () {
+        resetGame("lose");
+    }, totalSeconds * 1000);
 }
 function resetGame(status) {
     // Remove existing lock circles and SVG elements
     var timerProgress = document.querySelector(".timer-progress-bar");
-    var timer = document.querySelector(".timer");
-    var timerInput = document.querySelector(".input__field");
     var lockContainer = document.querySelector(".lock-container");
     var svgCircle = document.querySelector(".position-container svg");
     var overlay = document.querySelector(".overlay");
     // Block new input from the user when game over
     overlay.style.display = "block";
     isLocked = true;
-    if (status === "init") {
-        timerSeconds = parseInt(timerInput.value, 10);
-        timer.textContent = "".concat(timerSeconds);
-        secondsRemaining = timerSeconds;
-    }
     setTimeout(function () {
         lockContainer.innerHTML = "";
         currentCircle = 1;
@@ -58,16 +34,12 @@ function resetGame(status) {
         shuffleLock();
         runTimer();
     }, 2000);
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerProgress.style.display = "none";
-        timerProgress.style.width = "100%";
-        timer.textContent = "".concat(timerSeconds);
-        setTimeout(function () {
-            timerProgress.style.removeProperty("display");
-        }, 1000);
-        secondsRemaining = timerSeconds;
-    }
+    timerProgress.style.transition = "none";
+    timerProgress.style.display = "none";
+    timerProgress.style.width = "100%";
+    setTimeout(function () {
+        timerProgress.style.removeProperty("display");
+    }, 2000);
     if (status === "win") {
         var winMsg_1 = document.querySelector(".win-message");
         winMsg_1.style.display = "flex";
@@ -308,10 +280,5 @@ function handleKeyPress(event) {
 }
 document.addEventListener("DOMContentLoaded", function (event) {
     resetGame("init");
-});
-document.addEventListener("click", function (event) {
-    if (event.target === document.querySelector(".reset-button")) {
-        resetGame("init");
-    }
 });
 document.addEventListener("keydown", handleKeyPress);

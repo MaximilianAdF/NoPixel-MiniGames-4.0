@@ -319,7 +319,7 @@ function endGame(outcome) {
 }
 function resetGame() {
     var timerProgress = document.querySelector(".timer-progress-bar");
-    timerProgress.style.transition = "width ".concat(totalSeconds, "s cubic-bezier(0.6, 1, 0.7, 0.93)");
+    timerProgress.style.transition = "width ".concat(totalSeconds, "s cubic-bezier(0.4, 1, 0.7, 0.93)");
     generateCubes();
     runTimer();
 }

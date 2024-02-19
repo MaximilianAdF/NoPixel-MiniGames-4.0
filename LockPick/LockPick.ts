@@ -1,28 +1,16 @@
-let timerInterval: NodeJS.Timeout | null = null;
-let secondsRemaining = 20;
+const totalSeconds = 20;
 let currentCircle = 1;
 let isLocked = false;
 
-function updateTimerDisplay(): void {
-  const timerProgress = document.querySelector(
-    ".timer-progress-bar"
-  ) as HTMLElement;
-  const percentageLeft = Math.floor((100 * secondsRemaining) / 20);
-
-  if (timerProgress) {
-    timerProgress.style.width = `${percentageLeft}%`;
-  }
-}
-
 function runTimer(): void {
-  timerInterval = setInterval(() => {
-    secondsRemaining--;
-    updateTimerDisplay();
-
-    if (secondsRemaining <= 0) {
-      resetGame("lose");
-    }
-  }, 1000);
+  const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
+    setTimeout(function () {
+      timerProgress.style.transition = `width ${totalSeconds}s cubic-bezier(0.4, 1, 0.7, 0.93)`;
+      timerProgress.style.width = "0%";
+    }, 100);
+  setTimeout(() => {
+    resetGame("lose");
+  }, totalSeconds * 1000);
 }
 
 function resetGame(status: "win" | "lose" | "init"): void {
@@ -54,15 +42,12 @@ function resetGame(status: "win" | "lose" | "init"): void {
     runTimer();
   }, 2000);
 
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerProgress.style.display = "none";
-    timerProgress.style.width = "100%";
-    setTimeout(() => {
-      timerProgress.style.removeProperty("display");
-    }, 1000);
-    secondsRemaining = 20;
-  }
+  timerProgress.style.transition = "none";
+  timerProgress.style.display = "none";
+  timerProgress.style.width = "100%";
+  setTimeout(() => {
+    timerProgress.style.display = "block";
+  }, 2000);
 
   if (status === "win") {
     const winMsg = document.querySelector(".win-message") as HTMLElement;
@@ -349,7 +334,10 @@ function handleKeyPress(event: KeyboardEvent) {
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
-  resetGame("init");
+  generateLines();
+  generateHack();
+  shuffleLock();
+  runTimer();
 });
 
 document.addEventListener("keydown", handleKeyPress);
