@@ -17,7 +17,7 @@
   <p align="center">↑ Click to play ↑</p>
 
    ### Description
-   The new Roof Running job that recently popped up on NoPixel 4.0 is built around stealing AC units from the roof's of buildings. Stealing the AC units require a screwdriver which through the above minigame loosens the AC unit and lets the player pick it up. The game consists of a 11x8 grid with 88 differently colored cubes (Red, Green Blue). Cubes of the same color that are connected (Meaning more than 2 cubes are next to one another) can be removed by clicking on them. The remaining cubes fall downwards and align to the left of the screen. Singular cubes of a specific color can not be removed since they're not a pair of more than 2. The game is completed succesfully if all 25 cubes have been removed within the 15 second time constraint
+   The new Roof Running job that recently popped up on NoPixel 4.0 is built around stealing AC units from the roof's of buildings. Stealing the AC units require a screwdriver which through the above minigame loosens the AC unit and lets the player pick it up. The game consists of a 11x8 grid with 88 differently colored cubes (Red, Green Blue). Cubes of the same color that are connected (Meaning more than 2 cubes are next to one another) can be removed by clicking on them. The remaining cubes fall downwards and align to the left of the screen. Singular cubes of a specific color can not be removed since they're not a pair of more than 2. The game is completed succesfully if all cubes have been removed within the time constraint.
 
    ### Thoughts
    There are still some stuff that could be nice to add
