@@ -16,7 +16,39 @@
   <body>
     <div class="other-container">
       <a href="https://maximilianadf.github.io/NoPixel-MiniGames-4.0/" class="home-button">Check other Mini-games</a>
-  </div>
+      <i class="fas fa-gear" id="settings-icon" onclick="toggleSettings()"></i>
+    </div>
+    <div class="settings-container">
+      <h2 class="settings-header">Settings</h2>
+      <i class="fas fa-xmark" id="settings-exit" onclick="toggleSettings('close')"></i>
+      <div class="sliders">
+        <div class="rows-container">
+          <div class="slider-value"><span>8</span></div>
+          <label for="rows-slider">Rows</label>
+          <input type="range" id="rows-slider" name="rows" min="5" max="8" value="8"/>
+        </div>
+        <div class="columns-container">
+          <div class="slider-value"><span>11</span></div>
+          <label for="columns-slider">Columns</label>
+          <input type="range" id="columns-slider" name="columns" min="5" max="15" value="11"/>
+        </div>
+      </div>
+      <div class="grid-container">
+        <div class="grid-representation">
+          <div id="columnLabel">Columns</div>
+          <div id="rowLabel">Rows</div>
+        </div>
+      </div>
+      <div class="timing-container">
+        <div class="slider-value"><span>25</span></div>
+        <label for="timing-slider">Timer</label>
+        <input type="range" id="timing-slider" name="timing" min="5" max="100" value="25"/>
+      </div>
+      <div class="button-container">
+        <button id="save-button" onclick="applySettings()">Save</button>
+        <button id="reset-button" onclick="resetSettings()">Reset</button>
+      </div> 
+    </div>
     <div class="hack-box-container">
       <div class="outer-container">
         <div class="info-container">
@@ -32,6 +64,10 @@
           <div class="win-message">
             <i class="fa-solid fa-circle-check"></i>
             <p>Success!</p>
+          </div>
+          <div class="reset-message">
+            <i class="fas fa-hourglass-start"></i>
+            <p>Reset!</p>
           </div>
         </div>
         <div class="hack-box">
