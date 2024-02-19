@@ -1,15 +1,8 @@
+var timerTimeout;
+var timerProgressBar;
 var totalSeconds = 25;
 var gridCols = 11;
 var gridRows = 8;
-var cssVariables = {
-    "--grid-columns": gridCols,
-    "--grid-rows": gridRows
-};
-// Set the CSS variables
-for (var _i = 0, _a = Object.entries(cssVariables); _i < _a.length; _i++) {
-    var _b = _a[_i], key = _b[0], value = _b[1];
-    document.documentElement.style.setProperty(key, String(value));
-}
 var Cube = /** @class */ (function () {
     function Cube() {
         this.container = document.getElementById("container");
@@ -331,27 +324,51 @@ function endGame(outcome) {
     if (outcome === "win") {
         var winMsg_1 = document.querySelector(".win-message");
         winMsg_1.style.display = "flex";
-        setTimeout(function () { winMsg_1.style.display = 'none'; }, 2000);
+        setTimeout(function () {
+            winMsg_1.style.display = 'none';
+            timerProgress.style.display = "block";
+            overlay.style.display = 'none';
+            resetGame();
+        }, 2000);
     }
     else if (outcome === "lose") {
         var loseMsg_1 = document.querySelector(".lose-message");
         loseMsg_1.style.display = "flex";
-        setTimeout(function () { loseMsg_1.style.display = 'none'; }, 2000);
+        setTimeout(function () {
+            loseMsg_1.style.display = 'none';
+            timerProgress.style.display = "block";
+            overlay.style.display = 'none';
+            resetGame();
+        }, 2000);
     }
-    setTimeout(function () {
-        timerProgress.style.display = "block";
-        overlay.style.display = 'none';
-        resetGame();
-    }, 2000);
+    else if (outcome === "reset") {
+        var resetMsg_1 = document.querySelector(".reset-message");
+        resetMsg_1.style.display = "flex";
+        setTimeout(function () {
+            resetMsg_1.style.display = 'none';
+            timerProgress.style.display = "block";
+            overlay.style.display = 'none';
+            resetGame();
+        }, 1000);
+    }
 }
 function resetGame() {
+    var cssVariables = {
+        "--grid-columns": gridCols,
+        "--grid-rows": gridRows
+    };
+    // Set the CSS variables
+    for (var _i = 0, _a = Object.entries(cssVariables); _i < _a.length; _i++) {
+        var _b = _a[_i], key = _b[0], value = _b[1];
+        document.documentElement.style.setProperty(key, String(value));
+    }
     var timerProgress = document.querySelector(".timer-progress-bar");
     timerProgress.style.transition = "width ".concat(totalSeconds, "s cubic-bezier(0.4, 1, 0.7, 0.93)");
     generateCubes();
     runTimer();
 }
 function generateCubes() {
-    console.log("RESET");
+    console.log("generating cubes...");
     var container = document.getElementById("container");
     container.innerHTML = "";
     for (var i = 0; i < gridRows * gridCols; i++) {
@@ -359,27 +376,87 @@ function generateCubes() {
         container === null || container === void 0 ? void 0 : container.appendChild(cube.element);
     }
 }
-// Initialize Timers
-var loseTimer;
-var progressTimer;
 function runTimer() {
-    clearTimeout(loseTimer);
-    clearTimeout(progressTimer);
-    loseTimer = setTimeout(function () {
-        endGame("lose");
-    }, totalSeconds * 1000);
     var timerProgress = document.querySelector(".timer-progress-bar");
-    progressTimer = setTimeout(function () {
+    clearTimeout(timerProgressBar); // We need to clear to prevent memory leak after multiple games are played.
+    timerProgressBar = setTimeout(function () {
         timerProgress.style.width = "0%";
     }, 100);
+    clearTimeout(timerTimeout); // Clear any existing timer to prevent problems with endGame("reset")
+    timerTimeout = setTimeout(function () {
+        endGame("lose");
+    }, totalSeconds * 1000);
+}
+function toggleSettings(action) {
+    if (action === void 0) { action = ""; }
+    var settingsMenu = document.querySelector(".settings-container");
+    if (action === "close" || settingsMenu.style.display === "flex") {
+        settingsMenu.style.display = "none";
+    }
+    else {
+        settingsMenu.style.display = "flex";
+    }
+}
+function applySettings() {
+    // Get the values of the sliders
+    var timingSliderValue = document.querySelector(".timing-container .slider-value span");
+    var rowsSliderValue = document.querySelector(".rows-container .slider-value span");
+    var colsSliderValue = document.querySelector(".columns-container .slider-value span");
+    totalSeconds = Number(timingSliderValue.textContent);
+    gridRows = Number(rowsSliderValue.textContent);
+    gridCols = Number(colsSliderValue.textContent);
+    // Run the game with the new settings
+    toggleSettings("close");
+    endGame("reset");
+}
+function resetSettings() {
+    var timingSliderValue = document.querySelector(".timing-container .slider-value span");
+    var rowsSliderValue = document.querySelector(".rows-container .slider-value span");
+    var colsSliderValue = document.querySelector(".columns-container .slider-value span");
+    var timingSliderInput = document.querySelector(".timing-container input[type='range']");
+    var rowsSliderInput = document.querySelector(".rows-container input[type='range']");
+    var colsSliderInput = document.querySelector(".columns-container input[type='range']");
+    timingSliderInput.value = "25";
+    rowsSliderInput.value = "8";
+    colsSliderInput.value = "11";
+    timingSliderValue.style.left = "25%";
+    rowsSliderValue.style.left = "100%";
+    colsSliderValue.style.left = "60%";
+    timingSliderValue.textContent = "25";
+    rowsSliderValue.textContent = "8";
+    colsSliderValue.textContent = "11";
+    document.documentElement.style.setProperty("--temp-grid-rows", "8");
+    document.documentElement.style.setProperty("--temp-grid-columns", "11");
 }
 document.addEventListener("DOMContentLoaded", function () {
     resetGame();
-    var instructionsToggle = document.getElementById('instructions-toggle');
-    var instructionsContent = document.getElementById('instructions-content');
-    if (instructionsToggle) {
-        instructionsToggle.addEventListener('click', function () {
-            instructionsContent.classList.toggle('active');
-        });
-    }
+    // Get references to the timing slider and its value display element
+    var timingSliderValue = document.querySelector(".timing-container .slider-value span");
+    var timingSliderInput = document.querySelector(".timing-container input[type='range']");
+    // Get references to the rows slider and its value display element
+    var rowsSliderValue = document.querySelector(".rows-container .slider-value span");
+    var rowsSliderInput = document.querySelector(".rows-container input[type='range']");
+    // Get references to the columns slider and its value display element
+    var colsSliderValue = document.querySelector(".columns-container .slider-value span");
+    var colsSliderInput = document.querySelector(".columns-container input[type='range']");
+    // Function to update the value display element when the rows slider value changes
+    rowsSliderInput.addEventListener('input', function () {
+        var value = rowsSliderInput.value;
+        rowsSliderValue.textContent = value;
+        rowsSliderValue.style.left = "".concat((Number(value) - 5) / 0.03, "%");
+        document.documentElement.style.setProperty("--temp-grid-rows", value);
+    });
+    // Function to update the value display element when the columns slider value changes
+    colsSliderInput.addEventListener('input', function () {
+        var value = colsSliderInput.value;
+        colsSliderValue.textContent = value;
+        colsSliderValue.style.left = "".concat((Number(value) - 5) / 0.1, "%");
+        document.documentElement.style.setProperty("--temp-grid-columns", value);
+    });
+    // Function to update the value display element when the timing slider value changes
+    timingSliderInput.addEventListener('input', function () {
+        var value = timingSliderInput.value;
+        timingSliderValue.textContent = value;
+        timingSliderValue.style.left = "".concat(Number(value), "%");
+    });
 });

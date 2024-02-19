@@ -271,9 +271,9 @@ body {
     margin-top: 10px;
   }
   .home-button {
-    background-color: #3292ec;
+    background-color: rgb(84, 255, 164);
     border-radius: 100px;
-    box-shadow: rgba(37, 138, 227, 0.2) 0 -25px 18px -14px inset,rgba(37, 138, 227, 0.2) 0 1px 2px,rgba(37, 138, 227, 0.2) 0 2px 4px,rgba(37, 138, 227, 0.2) 0 4px 8px,rgba(37, 138, 227, 0.2) 0 8px 16px,rgba(37, 138, 227, 0.2) 0 16px 32px;
+    box-shadow: 0 0 3px rgb(127, 255, 191);
     color: black;
     cursor: pointer;
     display: inline-block;
@@ -290,6 +290,6 @@ body {
   }
   
   .home-button:hover {
-    box-shadow: rgba(72, 147, 233, 0.35) 0 -25px 18px -14px inset,rgba(72, 147, 233, 0.35) 0 1px 2px,rgba(72, 147, 233, 0.35) 0 2px 4px,rgba(72, 147, 233, 0.35) 0 4px 8px,rgba(72, 147, 233, 0.35) 0 8px 16px,rgba(72, 147, 233, 0.35) 0 16px 32px;
+    box-shadow: rgba(127, 255, 191, 0.397) 0 -25px 18px -14px inset,rgba(127, 255, 191, 0.397) 0 1px 2px,rgba(127, 255, 191, 0.397) 0 2px 4px,rgba(127, 255, 191, 0.397) 0 4px 8px,rgba(127, 255, 191, 0.397) 0 8px 16px,rgba(127, 255, 191, 0.397) 0 16px 32px;
     transform: scale(1.05) rotate(-1deg);
   }

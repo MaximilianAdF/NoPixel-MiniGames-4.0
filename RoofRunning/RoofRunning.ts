@@ -1,16 +1,8 @@
-const totalSeconds = 25;
-const gridCols = 11;
-const gridRows = 8;
-
-const cssVariables = {
-    "--grid-columns": gridCols,
-    "--grid-rows": gridRows
-};
-
-// Set the CSS variables
-for (const [key, value] of Object.entries(cssVariables)) {
-    document.documentElement.style.setProperty(key, String(value));
-}
+let timerTimeout: NodeJS.Timeout;
+let timerProgressBar: NodeJS.Timeout;
+let totalSeconds = 25;
+let gridCols = 11;
+let gridRows = 8;
 
 class Cube { 
     container: HTMLDivElement = document.getElementById("container") as HTMLDivElement;
@@ -361,20 +353,45 @@ function endGame(outcome: string): void {
     if (outcome === "win") {
         const winMsg = document.querySelector(".win-message") as HTMLElement;
         winMsg.style.display = "flex";
-        setTimeout(function () {winMsg.style.display = 'none';}, 2000);
+        setTimeout(function () {
+            winMsg.style.display = 'none';
+            timerProgress.style.display = "block";
+            overlay.style.display = 'none';
+            resetGame();
+        }, 2000);
     } else if (outcome === "lose") {
         const loseMsg = document.querySelector(".lose-message") as HTMLElement;
         loseMsg.style.display = "flex";
-        setTimeout(function () {loseMsg.style.display = 'none';}, 2000);
+        setTimeout(function () {
+            loseMsg.style.display = 'none';
+            timerProgress.style.display = "block";
+            overlay.style.display = 'none';
+            resetGame();
+        }, 2000);
+
+    } else if (outcome === "reset") {
+        const resetMsg = document.querySelector(".reset-message") as HTMLElement;
+        resetMsg.style.display = "flex";
+        setTimeout(function () {
+            resetMsg.style.display = 'none';
+            timerProgress.style.display = "block";
+            overlay.style.display = 'none';
+            resetGame();
+        }, 1000);
     }
-    setTimeout(function () {
-        timerProgress.style.display = "block";
-        overlay.style.display = 'none';
-        resetGame(); 
-    }, 2000);
 }
 
 function resetGame(): void {
+    const cssVariables = {
+        "--grid-columns": gridCols,
+        "--grid-rows": gridRows
+    };
+
+    // Set the CSS variables
+    for (const [key, value] of Object.entries(cssVariables)) {
+        document.documentElement.style.setProperty(key, String(value));
+    }
+
     const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
     timerProgress.style.transition = `width ${totalSeconds}s cubic-bezier(0.4, 1, 0.7, 0.93)`;
     generateCubes();
@@ -382,7 +399,7 @@ function resetGame(): void {
 }
 
 function generateCubes(): void {
-    console.log("RESET")
+    console.log("generating cubes...")
 
     const container: HTMLDivElement = document.getElementById("container") as HTMLDivElement;
     container.innerHTML = "";
@@ -393,32 +410,104 @@ function generateCubes(): void {
     }
 }
 
-// Initialize Timers
-let loseTimer;
-let progressTimer;
-
 
 function runTimer() {
-    clearTimeout(loseTimer);
-    clearTimeout(progressTimer);
-    loseTimer = setTimeout(function () {
-        endGame("lose");
-    }, totalSeconds*1000);
     const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
-    progressTimer = setTimeout(function () {
+    clearTimeout(timerProgressBar);  // We need to clear to prevent memory leak after multiple games are played.
+    timerProgressBar = setTimeout(function () {
         timerProgress.style.width = "0%";
     }, 100);
+
+    clearTimeout(timerTimeout); // Clear any existing timer to prevent problems with endGame("reset")
+    timerTimeout = setTimeout(function () {
+        endGame("lose");
+    }, totalSeconds * 1000);
+}
+
+function toggleSettings(action: string = "") {
+    const settingsMenu = document.querySelector(".settings-container") as HTMLElement;
+    if (action === "close" || settingsMenu.style.display === "flex") {
+        settingsMenu.style.display = "none";
+    } else {
+        settingsMenu.style.display = "flex";
+    }
+}
+
+function applySettings() {
+    // Get the values of the sliders
+    const timingSliderValue = document.querySelector(".timing-container .slider-value span") as HTMLElement;
+    const rowsSliderValue = document.querySelector(".rows-container .slider-value span") as HTMLElement;
+    const colsSliderValue = document.querySelector(".columns-container .slider-value span") as HTMLElement;
+
+    totalSeconds = Number(timingSliderValue.textContent);
+    gridRows = Number(rowsSliderValue.textContent);
+    gridCols = Number(colsSliderValue.textContent);
+
+    // Run the game with the new settings
+    toggleSettings("close");
+    endGame("reset");
+}
+
+function resetSettings() {
+    const timingSliderValue = document.querySelector(".timing-container .slider-value span") as HTMLElement;
+    const rowsSliderValue = document.querySelector(".rows-container .slider-value span") as HTMLElement;
+    const colsSliderValue = document.querySelector(".columns-container .slider-value span") as HTMLElement;
+
+    const timingSliderInput = document.querySelector(".timing-container input[type='range']") as HTMLInputElement;
+    const rowsSliderInput = document.querySelector(".rows-container input[type='range']") as HTMLInputElement;
+    const colsSliderInput = document.querySelector(".columns-container input[type='range']") as HTMLInputElement;
+
+    timingSliderInput.value = "25";
+    rowsSliderInput.value = "8";
+    colsSliderInput.value = "11";
+
+    timingSliderValue.style.left = "25%"
+    rowsSliderValue.style.left = "100%"
+    colsSliderValue.style.left = "60%"
+
+    timingSliderValue.textContent = "25";
+    rowsSliderValue.textContent = "8";
+    colsSliderValue.textContent = "11";
+    document.documentElement.style.setProperty("--temp-grid-rows", "8");
+    document.documentElement.style.setProperty("--temp-grid-columns", "11");
 }
 
 document.addEventListener("DOMContentLoaded", function () {
     resetGame();
+    // Get references to the timing slider and its value display element
+    const timingSliderValue = document.querySelector(".timing-container .slider-value span") as HTMLElement;
+    const timingSliderInput = document.querySelector(".timing-container input[type='range']") as HTMLInputElement;
 
-    const instructionsToggle = document.getElementById('instructions-toggle') as HTMLElement;
-    const instructionsContent = document.getElementById('instructions-content') as HTMLElement;
-    
-    if (instructionsToggle) {
-        instructionsToggle.addEventListener('click', function() {
-            instructionsContent.classList.toggle('active');
-        })
-    }
+    // Get references to the rows slider and its value display element
+    const rowsSliderValue = document.querySelector(".rows-container .slider-value span") as HTMLElement;
+    const rowsSliderInput = document.querySelector(".rows-container input[type='range']") as HTMLInputElement;
+
+    // Get references to the columns slider and its value display element
+    const colsSliderValue = document.querySelector(".columns-container .slider-value span") as HTMLElement;
+    const colsSliderInput = document.querySelector(".columns-container input[type='range']") as HTMLInputElement;
+
+    // Function to update the value display element when the rows slider value changes
+    rowsSliderInput.addEventListener('input', () => {
+        const value = rowsSliderInput.value;
+        rowsSliderValue.textContent = value;
+        rowsSliderValue.style.left = `${(Number(value) - 5)/0.03}%`;
+        document.documentElement.style.setProperty("--temp-grid-rows", value);
+    });
+
+    // Function to update the value display element when the columns slider value changes
+    colsSliderInput.addEventListener('input', () => {
+        const value = colsSliderInput.value;
+        colsSliderValue.textContent = value;
+        colsSliderValue.style.left = `${(Number(value) - 5)/0.1}%`;
+        document.documentElement.style.setProperty("--temp-grid-columns", value);
+    });
+
+    // Function to update the value display element when the timing slider value changes
+    timingSliderInput.addEventListener('input', () => {
+        const value = timingSliderInput.value;
+        timingSliderValue.textContent = value;
+        timingSliderValue.style.left = `${Number(value)}%`;
+    });
+
 });
+
