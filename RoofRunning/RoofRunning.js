@@ -359,14 +359,19 @@ function generateCubes() {
         container === null || container === void 0 ? void 0 : container.appendChild(cube.element);
     }
 }
+// Initialize Timers
+var loseTimer;
+var progressTimer;
 function runTimer() {
-    var timerProgress = document.querySelector(".timer-progress-bar");
-    setTimeout(function () {
-        timerProgress.style.width = "0%";
-    }, 100);
-    setTimeout(function () {
+    clearTimeout(loseTimer);
+    clearTimeout(progressTimer);
+    loseTimer = setTimeout(function () {
         endGame("lose");
     }, totalSeconds * 1000);
+    var timerProgress = document.querySelector(".timer-progress-bar");
+    progressTimer = setTimeout(function () {
+        timerProgress.style.width = "0%";
+    }, 100);
 }
 document.addEventListener("DOMContentLoaded", function () {
     resetGame();

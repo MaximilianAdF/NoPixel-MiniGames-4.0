@@ -393,15 +393,21 @@ function generateCubes(): void {
     }
 }
 
+// Initialize Timers
+let loseTimer;
+let progressTimer;
+
 
 function runTimer() {
-    const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
-    setTimeout(function () {
-        timerProgress.style.width = "0%";
-    }, 100);
-    setTimeout(function () {
+    clearTimeout(loseTimer);
+    clearTimeout(progressTimer);
+    loseTimer = setTimeout(function () {
         endGame("lose");
     }, totalSeconds*1000);
+    const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
+    progressTimer = setTimeout(function () {
+        timerProgress.style.width = "0%";
+    }, 100);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
