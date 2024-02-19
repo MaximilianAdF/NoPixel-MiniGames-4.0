@@ -1,4 +1,5 @@
 let timerTimeout: NodeJS.Timeout;
+let timerProgressBar: NodeJS.Timeout;
 let totalSeconds = 25;
 let gridCols = 11;
 let gridRows = 8;
@@ -135,10 +136,9 @@ class Cube {
         const divsInsideContainer = container.querySelectorAll('.empty');
         if (divsInsideContainer.length === gridRows * gridCols) {
             endGame("win");
+        } else if (shouldFail()) {
+            endGame("lose");
         }
-        //if (!checkSolvable()) {
-            //endGame("lose");
-        //}
     }
 
     squareClick() {
@@ -256,6 +256,37 @@ function checkSolvable(): boolean {
     return helpFunct(containerCopy, queue);
 }
 
+function shouldFail(): boolean {
+    // This method does 2 things:
+    // 1. Fail if exactly one of any color is left
+    // 2. Fail if there are no groups of connected colors
+    //
+    // In case of a failure, return true
+
+    const container = document.getElementById("container") as HTMLElement;
+    const containerCopy = Array.from(container.childNodes).map(node => node.cloneNode(true)); //Deep copy of the container so modification of the DOM cubes does not affect the original container
+
+    // No need to check if the board is empty. This method won't be called if we won.
+
+    if (getColorCount(containerCopy).includes(1)) {
+        console.log("FAIL: Single cube of a color remaining")
+        return true;
+    }
+    // If we find a connected group, return true
+    for (let i = 0; i < containerCopy.length; i++) {
+        const cube = containerCopy[i];
+        if (!(cube as HTMLElement).classList.contains("empty")) {
+            const connectedCubes = getConnectedCubes(containerCopy, cube as HTMLDivElement)
+            if (connectedCubes.size > 1) {
+                return false;
+            }
+        }
+    }
+    // If we made it here, no connected groups were found. Fail.
+    console.log("FAIL: No connected groups found")
+    return true;
+}
+
 function getConnectedCubes(container, cube) {
     const connectedCubes = new Set();
     const queue = [cube];
@@ -326,7 +357,7 @@ function endGame(outcome: string): void {
             winMsg.style.display = 'none';
             timerProgress.style.display = "block";
             overlay.style.display = 'none';
-            resetGame(); 
+            resetGame();
         }, 2000);
     } else if (outcome === "lose") {
         const loseMsg = document.querySelector(".lose-message") as HTMLElement;
@@ -335,9 +366,9 @@ function endGame(outcome: string): void {
             loseMsg.style.display = 'none';
             timerProgress.style.display = "block";
             overlay.style.display = 'none';
-            resetGame(); 
+            resetGame();
         }, 2000);
-        
+
     } else if (outcome === "reset") {
         const resetMsg = document.querySelector(".reset-message") as HTMLElement;
         resetMsg.style.display = "flex";
@@ -355,7 +386,7 @@ function resetGame(): void {
         "--grid-columns": gridCols,
         "--grid-rows": gridRows
     };
-    
+
     // Set the CSS variables
     for (const [key, value] of Object.entries(cssVariables)) {
         document.documentElement.style.setProperty(key, String(value));
@@ -369,21 +400,21 @@ function resetGame(): void {
 
 function generateCubes(): void {
     console.log("generating cubes...")
-    do {
-        const container: HTMLDivElement = document.getElementById("container") as HTMLDivElement;
-        container.innerHTML = "";
 
-        for (let i = 0; i < gridRows * gridCols; i++) {
-            const cube = new Cube();
-            container?.appendChild(cube.element);
-        }
-    } while (!checkSolvable()); // Regenerate the cubes if the board is not solvable
+    const container: HTMLDivElement = document.getElementById("container") as HTMLDivElement;
+    container.innerHTML = "";
+
+    for (let i = 0; i < gridRows * gridCols; i++) {
+        const cube = new Cube();
+        container?.appendChild(cube.element);
+    }
 }
 
 
 function runTimer() {
     const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
-    setTimeout(function () {
+    clearTimeout(timerProgressBar);  // We need to clear to prevent memory leak after multiple games are played.
+    timerProgressBar = setTimeout(function () {
         timerProgress.style.width = "0%";
     }, 100);
 
@@ -425,7 +456,7 @@ function resetSettings() {
     const timingSliderInput = document.querySelector(".timing-container input[type='range']") as HTMLInputElement;
     const rowsSliderInput = document.querySelector(".rows-container input[type='range']") as HTMLInputElement;
     const colsSliderInput = document.querySelector(".columns-container input[type='range']") as HTMLInputElement;
-    
+
     timingSliderInput.value = "25";
     rowsSliderInput.value = "8";
     colsSliderInput.value = "11";
