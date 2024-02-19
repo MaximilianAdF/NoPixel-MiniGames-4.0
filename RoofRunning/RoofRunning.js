@@ -352,14 +352,12 @@ function resetGame() {
 }
 function generateCubes() {
     console.log("RESET");
-    do {
-        var container = document.getElementById("container");
-        container.innerHTML = "";
-        for (var i = 0; i < gridRows * gridCols; i++) {
-            var cube = new Cube();
-            container === null || container === void 0 ? void 0 : container.appendChild(cube.element);
-        }
-    } while (!checkSolvable()); // Regenerate the cubes if the board is not solvable
+    var container = document.getElementById("container");
+    container.innerHTML = "";
+    for (var i = 0; i < gridRows * gridCols; i++) {
+        var cube = new Cube();
+        container === null || container === void 0 ? void 0 : container.appendChild(cube.element);
+    }
 }
 function runTimer() {
     var timerProgress = document.querySelector(".timer-progress-bar");

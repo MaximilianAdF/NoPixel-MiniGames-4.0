@@ -383,15 +383,14 @@ function resetGame(): void {
 
 function generateCubes(): void {
     console.log("RESET")
-    do {
-        const container: HTMLDivElement = document.getElementById("container") as HTMLDivElement;
-        container.innerHTML = "";
 
-        for (let i = 0; i < gridRows * gridCols; i++) {
-            const cube = new Cube();
-            container?.appendChild(cube.element);
-        }
-    } while (!checkSolvable()); // Regenerate the cubes if the board is not solvable
+    const container: HTMLDivElement = document.getElementById("container") as HTMLDivElement;
+    container.innerHTML = "";
+
+    for (let i = 0; i < gridRows * gridCols; i++) {
+        const cube = new Cube();
+        container?.appendChild(cube.element);
+    }
 }
 
 
