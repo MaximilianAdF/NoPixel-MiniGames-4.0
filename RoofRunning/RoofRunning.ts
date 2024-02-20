@@ -4,27 +4,37 @@ let totalSeconds = 25;
 let gridCols = 11;
 let gridRows = 8;
 
-class Cube { 
-    container: HTMLDivElement = document.getElementById("container") as HTMLDivElement;
-    element: HTMLDivElement
+let container: Array<Cube>;
+let htmlContainer: HTMLElement;
+
+class Cube {
     color: string
 
-    constructor() {
-        this.color = this.getRandomColorClass();
-        this.element = document.createElement("div");
-        this.element.className = "cube";
-        this.element.classList.add(this.color);
-        this.element.addEventListener("click", this.squareClick.bind(this));
+    constructor(color = null) {
+        if (color === null)
+            color = this.getRandomColor();
+        this.color = color;
+    }
+
+    getElement() {
+        const element = document.createElement("div");
+        element.className = "cube";
+        if (this.color !== "empty") {
+            element.classList.add("cube" + this.color.substring(0,1));
+            element.addEventListener("click", this.squareClick.bind(this));
+        } else {
+            element.classList.add("empty");
+        }
+        return element;
     }
     
     cubeLeftShift() {
-        const containerCopy = Array.from(this.container.childNodes);
         let isEmptyColumn = new Array(gridCols).fill(true);
 
         // Identify empty columns
         for (let i = 0; i < gridRows; i++) {
             for (let j = 0; j < gridCols; j++) {
-                if (!(containerCopy[i * gridCols + j] as HTMLElement).classList.contains("empty")) {
+                if (!(container[i * gridCols + j].color === "empty")) {
                     isEmptyColumn[j] = false;
                 }
             }
@@ -39,7 +49,7 @@ class Cube {
                         let currentIndex = row * gridCols + shiftCol;
                         let nextIndex = row * gridCols + shiftCol + 1;
                         // Swap the current and next columns
-                        [containerCopy[currentIndex], containerCopy[nextIndex]] = [containerCopy[nextIndex], containerCopy[currentIndex]];
+                        [container[currentIndex], container[nextIndex]] = [container[nextIndex], container[currentIndex]];
                     }
                 }
                 // Adjust for the shift when checking subsequent columns
@@ -48,44 +58,44 @@ class Cube {
                 col--; // Re-check the current column index due to the shift
             }
         }
-        this.updateContainer(containerCopy);
+        this.updateContainer();
     }
     
 
     cubeGravity(idx: number) {
-        const containerCopy = Array.from(this.container.childNodes);
         const row = Math.floor(idx / gridCols);
 
         for (let i = 0; i < row; i++) {
             // Swap elements in the copied array
-            [containerCopy[idx - gridCols * i], containerCopy[idx - gridCols * (i + 1)]] = [containerCopy[idx - gridCols * (i + 1)], containerCopy[idx - gridCols * i]];
+            [container[idx - gridCols * i], container[idx - gridCols * (i + 1)]] = [container[idx - gridCols * (i + 1)], container[idx - gridCols * i]];
         }
         // Update the live container with the modified copy
-        this.updateContainer(containerCopy);
+        this.updateContainer();
     }
     
-    updateContainer(containerCopy: Node[]) {
+    updateContainer() {
         // Clear the container
-        while (this.container.firstChild) {
-            this.container.removeChild(this.container.firstChild);
+        while (htmlContainer.firstChild) {
+            htmlContainer.removeChild(htmlContainer.firstChild);
         }
         // Append nodes from the modified copy
-        containerCopy.forEach(node => {
-            this.container.appendChild(node);
+        container.forEach(cube => {
+            htmlContainer.appendChild(cube.getElement());
         });
     }
 
     getAdjacentCubes(cube) {
-        const idx = Array.from(this.container.childNodes).indexOf(cube);
-        const adjacentCubes: HTMLDivElement[] = [];
+        const idx = Array.from(container).indexOf(cube);
+        // const idx = container.indexOf(cube);
+        const adjacentCubes: Cube[] = [];
 
         const row = Math.floor(idx / gridCols);
         const col = idx % gridCols;
 
-        if (col - 1 >= 0) adjacentCubes.push(this.container.childNodes[idx - 1] as HTMLDivElement);
-        if (col + 1 < gridCols) adjacentCubes.push(this.container.childNodes[idx + 1] as HTMLDivElement);
-        if (row - 1 >= 0) adjacentCubes.push(this.container.childNodes[idx - gridCols] as HTMLDivElement);
-        if (row + 1 < gridRows) adjacentCubes.push(this.container.childNodes[idx + gridCols] as HTMLDivElement);
+        if (col - 1 >= 0) adjacentCubes.push(container[idx - 1]);
+        if (col + 1 < gridCols) adjacentCubes.push(container[idx + 1]);
+        if (row - 1 >= 0) adjacentCubes.push(container[idx - gridCols]);
+        if (row + 1 < gridRows) adjacentCubes.push(container[idx + gridCols]);
        
         return adjacentCubes;      
     }
@@ -96,25 +106,24 @@ class Cube {
         if (connectedCubes.size === 1) {
             console.log("No connected cubes")
         } else {
-            connectedCubes.forEach(cube => {        
-                (cube as HTMLDivElement).classList.remove(this.color);
-                (cube as HTMLDivElement).classList.add("empty"); 
-                (cube as HTMLDivElement).removeEventListener("click", this.squareClick);
-                this.cubeGravity(Array.from(this.container.childNodes).indexOf(cube as HTMLDivElement)); // Apply gravity to the cubes so empty cubes are at top
+            connectedCubes.forEach(cube => {
+                (cube as Cube).color = "empty";
+                this.cubeGravity(container.indexOf(cube as Cube)); // Apply gravity to the cubes so empty cubes are at top
             });
             this.cubeLeftShift();
+            // this.updateContainer(); // Already called in cubeLeftShift
         }
     }
 
-    getRandomColorClass() {
-        const colors = ["cuber", "cubeg", "cubeb"];
+    getRandomColor() {
+        const colors = ["red", "green", "blue"];
         const randomIndex = Math.floor(Math.random() * colors.length);
         return colors[randomIndex];
     }
 
     getConnectedCubes() {
         const connectedCubes = new Set();
-        const queue = [this.element];
+        const queue = [this as Cube];
 
         while (queue.length > 0) {
             const currentCube = queue.shift();
@@ -122,7 +131,7 @@ class Cube {
 
             const neighbors = this.getAdjacentCubes(currentCube);
             neighbors.forEach(neighbor => {
-                if (!connectedCubes.has(neighbor) && neighbor.classList.contains(this.color)) {
+                if (!connectedCubes.has(neighbor) && neighbor.color == this.color) {
                     queue.push(neighbor);
                     connectedCubes.add(neighbor)
                 }
@@ -132,9 +141,8 @@ class Cube {
     }
 
     checkwin() {
-        const container = document.getElementById("container") as HTMLElement;
-        const divsInsideContainer = container.querySelectorAll('.empty');
-        if (divsInsideContainer.length === gridRows * gridCols) {
+        const emptyCubes = container.filter((cube) => cube.color === "empty");
+        if (emptyCubes.length === gridRows * gridCols) {
             endGame("win");
         } else if (shouldFail()) {
             endGame("lose");
@@ -148,15 +156,15 @@ class Cube {
 }
 
 //The functions below together checks solvability of the board
-function helpFunct(container, queue, path = []): boolean {
-    if (getColorCount(container).includes(1)) { 
+function helpFunct(tempContainer, queue, path = []): boolean {
+    if (getColorCount(tempContainer).includes(1)) {
         console.log("FAIL, SINGLE:", path)
         return false;
     }
 
     let c = 0;
-    container.forEach(cube => {
-        if ((cube as HTMLElement).classList.contains("empty")) {
+    tempContainer.forEach(cube => {
+        if (cube.color === "empty") {
             c++;
         }
     });
@@ -170,7 +178,7 @@ function helpFunct(container, queue, path = []): boolean {
 
     while (queue.length > 0) {
         let connectedCubes = queue.shift();
-        const [updatedContainer, possibleClick] = cubesUpdate(container, connectedCubes); // [container, possibleClicks
+        const [updatedContainer, possibleClick] = cubesUpdate(tempContainer, connectedCubes); // [container, possibleClicks
         const updatedQueue = updateQueue(updatedContainer);
         const newPath = path.concat(possibleClick);
 
@@ -182,17 +190,16 @@ function helpFunct(container, queue, path = []): boolean {
     return false;
 }
 
-function cubesUpdate(container, connectedCubes) {
+function cubesUpdate(tempContainer, connectedCubes) {
     let possibleClicks: number = -1;
     connectedCubes.forEach(cube => {
-        const idx = container.indexOf(cube as HTMLDivElement);
-        (cube as HTMLDivElement).classList.remove((cube as HTMLDivElement).classList.item(1) as string);
-        (cube as HTMLDivElement).classList.add("empty");
+        const idx = tempContainer.indexOf(cube);
+        cube.color = "empty";
         possibleClicks = idx;
-            
+
         const row = Math.floor(idx / gridCols);
         for (let i = 0; i < row; i++) {
-            [container[idx - gridCols * i], container[idx - gridCols * (i + 1)]] = [container[idx - gridCols * (i + 1)], container[idx - gridCols * i]];
+            [tempContainer[idx - gridCols * i], tempContainer[idx - gridCols * (i + 1)]] = [tempContainer[idx - gridCols * (i + 1)], tempContainer[idx - gridCols * i]];
         }
     });
     let isEmptyColumn = new Array(gridCols).fill(true);
@@ -200,7 +207,7 @@ function cubesUpdate(container, connectedCubes) {
     // Identify empty columns
     for (let i = 0; i < gridRows; i++) {
         for (let j = 0; j < gridCols; j++) {
-            if (!(container[i * gridCols + j] as HTMLElement).classList.contains("empty")) {
+            if (!(tempContainer[i * gridCols + j].color === "empty")) {
                 isEmptyColumn[j] = false;
             }
         }
@@ -215,7 +222,7 @@ function cubesUpdate(container, connectedCubes) {
                     let currentIndex = row * gridCols + shiftCol;
                     let nextIndex = row * gridCols + shiftCol + 1;
                     // Swap the current and next columns
-                    [container[currentIndex], container[nextIndex]] = [container[nextIndex], container[currentIndex]];
+                    [tempContainer[currentIndex], tempContainer[nextIndex]] = [tempContainer[nextIndex], tempContainer[currentIndex]];
                 }
             }
             // Adjust for the shift when checking subsequent columns
@@ -224,23 +231,21 @@ function cubesUpdate(container, connectedCubes) {
             col--; // Re-check the current column index due to the shift
         }
     }
-    return [container, possibleClicks];
+    return [tempContainer, possibleClicks];
 }
 
-function updateQueue(container): Set<unknown>[] {
+function updateQueue(tempContainer): Set<unknown>[] {
     let queue: Set<unknown>[] = [];
     let visited = new Set();
 
-    container.forEach(cube => {
-        if (!(cube as HTMLElement).classList.contains("empty")) {
-            const connectedCubes = getConnectedCubes(container, cube as HTMLDivElement)
+    tempContainer.forEach(cube => {
+        if (!(cube.color === "empty")) {
+            const connectedCubes = getConnectedCubes(tempContainer, cube)
             for (let i = 0; i < connectedCubes.size; i++) {
                 const connectedCube = connectedCubes[i];
                 if (!visited.has(connectedCube)) {
                     visited.add(connectedCube);
                     queue.push(connectedCubes);
-                } else {
-                    continue;
                 }
             }
         }
@@ -249,11 +254,12 @@ function updateQueue(container): Set<unknown>[] {
 }
 
 function checkSolvable(): boolean {
-    const container = document.getElementById("container") as HTMLElement;
-    const containerCopy = Array.from(container.childNodes).map(node => node.cloneNode(true)); //Deep copy of the container so modification of the DOM cubes does not affect the original container
-
-    let queue = updateQueue(containerCopy);
-    return helpFunct(containerCopy, queue);
+    // const container = document.getElementById("container") as HTMLElement;
+    // const containerCopy = Array.from(container.childNodes).map(node => node.cloneNode(true)); //Deep copy of the container so modification of the DOM cubes does not affect the original container
+    //
+    // let queue = updateQueue(containerCopy);
+    // return helpFunct(containerCopy, queue);
+    return false;
 }
 
 function shouldFail(): boolean {
@@ -263,8 +269,7 @@ function shouldFail(): boolean {
     //
     // In case of a failure, return true
 
-    const container = document.getElementById("container") as HTMLElement;
-    const containerCopy = Array.from(container.childNodes).map(node => node.cloneNode(true)); //Deep copy of the container so modification of the DOM cubes does not affect the original container
+    const containerCopy = Array.from(container).map(cube => new Cube(cube.color));
 
     // No need to check if the board is empty. This method won't be called if we won.
 
@@ -275,8 +280,8 @@ function shouldFail(): boolean {
     // If we find a connected group, return true
     for (let i = 0; i < containerCopy.length; i++) {
         const cube = containerCopy[i];
-        if (!(cube as HTMLElement).classList.contains("empty")) {
-            const connectedCubes = getConnectedCubes(containerCopy, cube as HTMLDivElement)
+        if (!(cube.color === "empty")) {
+            const connectedCubes = getConnectedCubes(containerCopy, cube);
             if (connectedCubes.size > 1) {
                 return false;
             }
@@ -287,7 +292,7 @@ function shouldFail(): boolean {
     return true;
 }
 
-function getConnectedCubes(container, cube) {
+function getConnectedCubes(tempContainer, cube) {
     const connectedCubes = new Set();
     const queue = [cube];
 
@@ -295,9 +300,9 @@ function getConnectedCubes(container, cube) {
         const currentCube = queue.shift();
         connectedCubes.add(currentCube);
 
-        const neighbors = getAdjacentCubes(container, currentCube);
+        const neighbors = getAdjacentCubes(tempContainer, currentCube);
         neighbors.forEach(neighbor => {
-            if (!connectedCubes.has(neighbor) && neighbor.classList.contains((cube as HTMLDivElement).classList.item(1) as string)) {
+            if (!connectedCubes.has(neighbor) && neighbor.color === cube.color) {
                 connectedCubes.add(neighbor)
                 queue.push(neighbor);
             }
@@ -309,30 +314,30 @@ function getConnectedCubes(container, cube) {
     return connectedCubes;
 }
 
-function getAdjacentCubes(container, cube) {
-    const idx = container.indexOf(cube);
-    const adjacentCubes: HTMLDivElement[] = [];
+function getAdjacentCubes(tempContainer, cube) {
+    const idx = tempContainer.indexOf(cube);
+    const adjacentCubes: Cube[] = [];
 
     const row = Math.floor(idx / gridCols);
     const col = idx % gridCols;
 
-    if (col - 1 >= 0) adjacentCubes.push(container[idx - 1] as HTMLDivElement);
-    if (col + 1 < gridCols) adjacentCubes.push(container[idx + 1] as HTMLDivElement);
-    if (row - 1 >= 0) adjacentCubes.push(container[idx - gridCols] as HTMLDivElement);
-    if (row + 1 < gridRows) adjacentCubes.push(container[idx + gridCols] as HTMLDivElement);
+    if (col - 1 >= 0) adjacentCubes.push(tempContainer[idx - 1]);
+    if (col + 1 < gridCols) adjacentCubes.push(tempContainer[idx + 1]);
+    if (row - 1 >= 0) adjacentCubes.push(tempContainer[idx - gridCols]);
+    if (row + 1 < gridRows) adjacentCubes.push(tempContainer[idx + gridCols]);
    
     return adjacentCubes;      
 }
 
-function getColorCount(container): number[] {
+function getColorCount(tempContainer): number[] {
     const colorCount = [0, 0, 0];
 
-    container.forEach(cube => {
-        if ((cube as HTMLElement).classList.contains("cuber")) {
+    tempContainer.forEach(cube => {
+        if (cube.color == "red") {
             colorCount[0]++;
-        } else if ((cube as HTMLElement).classList.contains("cubeg")) {
+        } else if (cube.color == "green") {
             colorCount[1]++;
-        } else if ((cube as HTMLElement).classList.contains("cubeb")) {
+        } else if (cube.color == "blue") {
             colorCount[2]++;
         }
     });
@@ -401,13 +406,19 @@ function resetGame(): void {
 function generateCubes(): void {
     console.log("generating cubes...")
 
-    const container: HTMLDivElement = document.getElementById("container") as HTMLDivElement;
-    container.innerHTML = "";
+    // htmlContainer.innerHTML = "";
+    container = [];
 
     for (let i = 0; i < gridRows * gridCols; i++) {
         const cube = new Cube();
-        container?.appendChild(cube.element);
+        container?.push(cube);
+
+        // Last iteration only
+        if (i === gridRows * gridCols - 1) {
+            cube.updateContainer();
+        }
     }
+
 }
 
 
@@ -473,6 +484,8 @@ function resetSettings() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    htmlContainer = document.getElementById("container") as HTMLElement;
+
     resetGame();
     // Get references to the timing slider and its value display element
     const timingSliderValue = document.querySelector(".timing-container .slider-value span") as HTMLElement;
