@@ -7,8 +7,8 @@ var container;
 var htmlContainer;
 var Cube = /** @class */ (function () {
     function Cube(color) {
-        if (color === void 0) { color = null; }
-        if (color === null)
+        if (color === void 0) { color = ""; }
+        if (color === "")
             color = this.getRandomColor();
         this.color = color;
     }
@@ -118,13 +118,15 @@ var Cube = /** @class */ (function () {
         while (queue.length > 0) {
             var currentCube = queue.shift();
             connectedCubes.add(currentCube);
-            var neighbors = this.getAdjacentCubes(currentCube);
-            neighbors.forEach(function (neighbor) {
-                if (!connectedCubes.has(neighbor) && neighbor.color == _this.color) {
-                    queue.push(neighbor);
-                    connectedCubes.add(neighbor);
-                }
-            });
+            if (currentCube) {
+                var neighbors = this.getAdjacentCubes(currentCube);
+                neighbors.forEach(function (neighbor) {
+                    if (!connectedCubes.has(neighbor) && neighbor.color == _this.color) {
+                        queue.push(neighbor);
+                        connectedCubes.add(neighbor);
+                    }
+                });
+            }
         }
         return connectedCubes;
     };
@@ -166,6 +168,8 @@ function helpFunct(tempContainer, queue, path) {
     }
     while (queue.length > 0) {
         var connectedCubes = queue.shift();
+        if (!connectedCubes)
+            continue; // Skip iteration if connectedCubes is undefined
         var _a = cubesUpdate(tempContainer, connectedCubes), updatedContainer = _a[0], possibleClick = _a[1]; // [container, possibleClicks
         var updatedQueue = updateQueue(updatedContainer);
         var newPath = path.concat(possibleClick);

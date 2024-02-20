@@ -10,8 +10,8 @@ let htmlContainer: HTMLElement;
 class Cube {
     color: string
 
-    constructor(color = null) {
-        if (color === null)
+    constructor(color = "") {
+        if (color === "")
             color = this.getRandomColor();
         this.color = color;
     }
@@ -128,14 +128,16 @@ class Cube {
         while (queue.length > 0) {
             const currentCube = queue.shift();
             connectedCubes.add(currentCube);
-
-            const neighbors = this.getAdjacentCubes(currentCube);
-            neighbors.forEach(neighbor => {
-                if (!connectedCubes.has(neighbor) && neighbor.color == this.color) {
-                    queue.push(neighbor);
-                    connectedCubes.add(neighbor)
-                }
-            });
+            
+            if (currentCube) {
+                const neighbors = this.getAdjacentCubes(currentCube);
+                neighbors.forEach(neighbor => {
+                    if (!connectedCubes.has(neighbor) && neighbor.color == this.color) {
+                        queue.push(neighbor);
+                        connectedCubes.add(neighbor)
+                    }
+                });
+            }
         }
         return connectedCubes;
     }
@@ -156,7 +158,7 @@ class Cube {
 }
 
 //The functions below together checks solvability of the board
-function helpFunct(tempContainer: Cube[], queue: Set<Cube>[], path = []): boolean {
+function helpFunct(tempContainer: Cube[], queue: Set<Cube>[], path: number[] = []): boolean {
     if (getColorCount(tempContainer).includes(1)) {
         console.log("FAIL, SINGLE:", path)
         return false;
@@ -178,6 +180,7 @@ function helpFunct(tempContainer: Cube[], queue: Set<Cube>[], path = []): boolea
 
     while (queue.length > 0) {
         let connectedCubes = queue.shift();
+        if (!connectedCubes) continue; // Skip iteration if connectedCubes is undefined
         const [updatedContainer, possibleClick] = cubesUpdate(tempContainer, connectedCubes); // [container, possibleClicks
         const updatedQueue = updateQueue(updatedContainer);
         const newPath = path.concat(possibleClick);
@@ -298,9 +301,9 @@ function getConnectedCubes(tempContainer: Cube[], cube: Cube): Set<Cube> {
 
     while (queue.length > 0) {
         const currentCube = queue.shift();
-        connectedCubes.add(currentCube);
+        connectedCubes.add(currentCube as Cube);
 
-        const neighbors = getAdjacentCubes(tempContainer, currentCube);
+        const neighbors = getAdjacentCubes(tempContainer, currentCube as Cube);
         neighbors.forEach(neighbor => {
             if (!connectedCubes.has(neighbor) && neighbor.color === cube.color) {
                 connectedCubes.add(neighbor)
