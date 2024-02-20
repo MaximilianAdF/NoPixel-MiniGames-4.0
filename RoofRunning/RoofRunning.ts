@@ -4,7 +4,7 @@ let totalSeconds = 25;
 let gridCols = 11;
 let gridRows = 8;
 
-let container: Array<Cube>;
+let container: Cube[];
 let htmlContainer: HTMLElement;
 
 class Cube {
@@ -84,7 +84,7 @@ class Cube {
         });
     }
 
-    getAdjacentCubes(cube) {
+    getAdjacentCubes(cube: Cube) {
         const idx = Array.from(container).indexOf(cube);
         // const idx = container.indexOf(cube);
         const adjacentCubes: Cube[] = [];
@@ -156,14 +156,14 @@ class Cube {
 }
 
 //The functions below together checks solvability of the board
-function helpFunct(tempContainer, queue, path = []): boolean {
+function helpFunct(tempContainer: Cube[], queue: Set<Cube>[], path = []): boolean {
     if (getColorCount(tempContainer).includes(1)) {
         console.log("FAIL, SINGLE:", path)
         return false;
     }
 
     let c = 0;
-    tempContainer.forEach(cube => {
+    tempContainer.forEach((cube: Cube) => {
         if (cube.color === "empty") {
             c++;
         }
@@ -190,7 +190,7 @@ function helpFunct(tempContainer, queue, path = []): boolean {
     return false;
 }
 
-function cubesUpdate(tempContainer, connectedCubes) {
+function cubesUpdate(tempContainer: Cube[], connectedCubes: Set<Cube>): [Cube[], number] {
     let possibleClicks: number = -1;
     connectedCubes.forEach(cube => {
         const idx = tempContainer.indexOf(cube);
@@ -234,8 +234,8 @@ function cubesUpdate(tempContainer, connectedCubes) {
     return [tempContainer, possibleClicks];
 }
 
-function updateQueue(tempContainer): Set<unknown>[] {
-    let queue: Set<unknown>[] = [];
+function updateQueue(tempContainer: Cube[]): Set<Cube>[] {
+    let queue: Set<Cube>[] = [];
     let visited = new Set();
 
     tempContainer.forEach(cube => {
@@ -292,8 +292,8 @@ function shouldFail(): boolean {
     return true;
 }
 
-function getConnectedCubes(tempContainer, cube) {
-    const connectedCubes = new Set();
+function getConnectedCubes(tempContainer: Cube[], cube: Cube): Set<Cube> {
+    const connectedCubes: Set<Cube> = new Set();
     const queue = [cube];
 
     while (queue.length > 0) {
@@ -314,7 +314,7 @@ function getConnectedCubes(tempContainer, cube) {
     return connectedCubes;
 }
 
-function getAdjacentCubes(tempContainer, cube) {
+function getAdjacentCubes(tempContainer: Cube[], cube: Cube) {
     const idx = tempContainer.indexOf(cube);
     const adjacentCubes: Cube[] = [];
 
@@ -329,10 +329,10 @@ function getAdjacentCubes(tempContainer, cube) {
     return adjacentCubes;      
 }
 
-function getColorCount(tempContainer): number[] {
+function getColorCount(tempContainer: Cube[]): number[] {
     const colorCount = [0, 0, 0];
 
-    tempContainer.forEach(cube => {
+    tempContainer.forEach((cube: Cube) => {
         if (cube.color == "red") {
             colorCount[0]++;
         } else if (cube.color == "green") {
