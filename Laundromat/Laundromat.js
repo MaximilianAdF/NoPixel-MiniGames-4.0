@@ -24,6 +24,7 @@ function resetGame(status) {
     // Block new input from the user when game over
     overlay.style.display = "block";
     isLocked = true;
+    clearTimeout(timerTimeout);
     setTimeout(function () {
         lockContainer.innerHTML = "";
         currentCircle = 1;
