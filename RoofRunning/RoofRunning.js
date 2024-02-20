@@ -7,8 +7,8 @@ var container;
 var htmlContainer;
 var Cube = /** @class */ (function () {
     function Cube(color) {
-        if (color === void 0) { color = null; }
-        if (color === null)
+        if (color === void 0) { color = ""; }
+        if (color === "")
             color = this.getRandomColor();
         this.color = color;
     }
