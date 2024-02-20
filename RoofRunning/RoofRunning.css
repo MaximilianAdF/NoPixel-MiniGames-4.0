@@ -10,7 +10,7 @@
   So instead, let's calculate a custom unit to use instead.
   */
   --vw-block-size: calc(85vw / var(--grid-columns));
-  --vh-block-size: calc(70vh / var(--grid-rows));
+  --vh-block-size: calc(calc(calc(100vh - 150px) * 0.8) / var(--grid-rows));
   --block-size: min(var(--vw-block-size), var(--vh-block-size));
   --block-unit: calc(var(--block-size) / 7.5);  /* This should be approx 1vmin */
 }
