@@ -18,13 +18,17 @@ class Cube {
 
     getElement() {
         const element = document.createElement("div");
-        element.className = "cube";
+        const child = document.createElement("div");
+
+        child.className = "cube";
         if (this.color !== "empty") {
-            element.classList.add("cube" + this.color.substring(0,1));
+            element.className = "cube" + this.color.substring(0,1);
             element.addEventListener("click", this.squareClick.bind(this));
         } else {
-            element.classList.add("empty");
+            element.className = "empty";
+            child.classList.add("empty");
         }
+        element.appendChild(child)
         return element;
     }
     
@@ -123,21 +127,19 @@ class Cube {
 
     getConnectedCubes() {
         const connectedCubes = new Set();
-        const queue = [this as Cube];
+        const queue: Cube[] = [this as Cube];
 
         while (queue.length > 0) {
             const currentCube = queue.shift();
             connectedCubes.add(currentCube);
-            
-            if (currentCube) {
-                const neighbors = this.getAdjacentCubes(currentCube);
-                neighbors.forEach(neighbor => {
-                    if (!connectedCubes.has(neighbor) && neighbor.color == this.color) {
-                        queue.push(neighbor);
-                        connectedCubes.add(neighbor)
-                    }
-                });
-            }
+
+            const neighbors = this.getAdjacentCubes(currentCube as Cube);
+            neighbors.forEach(neighbor => {
+                if (!connectedCubes.has(neighbor) && neighbor.color == this.color) {
+                    queue.push(neighbor);
+                    connectedCubes.add(neighbor)
+                }
+            });
         }
         return connectedCubes;
     }
@@ -180,8 +182,7 @@ function helpFunct(tempContainer: Cube[], queue: Set<Cube>[], path: number[] = [
 
     while (queue.length > 0) {
         let connectedCubes = queue.shift();
-        if (!connectedCubes) continue; // Skip iteration if connectedCubes is undefined
-        const [updatedContainer, possibleClick] = cubesUpdate(tempContainer, connectedCubes); // [container, possibleClicks
+        const [updatedContainer, possibleClick] = cubesUpdate(tempContainer, connectedCubes as Set<Cube>); // [container, possibleClicks
         const updatedQueue = updateQueue(updatedContainer);
         const newPath = path.concat(possibleClick);
 
