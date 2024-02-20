@@ -1,8 +1,8 @@
-const totalSeconds = 20;
-let currentCircle = 1;
-let isLocked = false;
 let timerProgressBar: NodeJS.Timeout;
 let timerTimeout: NodeJS.Timeout;
+let totalSeconds = 20;
+let currentCircle = 1;
+let isLocked = false;
 
 function runTimer(): void {
   const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
@@ -18,7 +18,7 @@ function runTimer(): void {
   }, totalSeconds * 1000);
 }
 
-function resetGame(status: "win" | "lose" | "init"): void {
+function resetGame(status: "win" | "lose" | "init" | "reset"): void {
   // Remove existing lock circles and SVG elements
   const timerProgress = document.querySelector(
     ".timer-progress-bar"
@@ -67,6 +67,12 @@ function resetGame(status: "win" | "lose" | "init"): void {
     indicateFailed(currentCircle);
     setTimeout(() => {
       loseMsg.style.display = "none";
+    }, 2000);
+  } else if (status === "reset") {
+    const resetMsg = document.querySelector(".reset-message") as HTMLElement;
+    resetMsg.style.display = "flex";
+    setTimeout(() => {
+      resetMsg.style.display = "none";
     }, 2000);
   }
 }
@@ -339,7 +345,46 @@ function handleKeyPress(event: KeyboardEvent) {
   }
 }
 
+function toggleSettings(action: string = "") {
+  const settingsMenu = document.querySelector(".settings-container") as HTMLElement;
+  if (action === "close" || settingsMenu.style.display === "flex") {
+      settingsMenu.style.display = "none";
+  } else {
+      settingsMenu.style.display = "flex";
+  }
+}
+
+
+function applySettings() {
+  const timingSliderValue = document.querySelector(".timing-container .slider-value span") as HTMLElement;
+  totalSeconds = Number(timingSliderValue.textContent);
+
+  // Run the game with the new settings
+  toggleSettings("close");
+  resetGame("reset");
+}
+
+
+function resetSettings() {
+  const timingSliderValue = document.querySelector(".timing-container .slider-value span") as HTMLElement;
+  const timingSliderInput = document.querySelector(".timing-container input[type='range']") as HTMLInputElement;
+
+  timingSliderInput.value = "20";
+  timingSliderValue.style.left = "20%"
+  timingSliderValue.textContent = "20";
+}
+
+
 document.addEventListener("DOMContentLoaded", (event) => {
+  const timingSliderValue = document.querySelector(".timing-container .slider-value span") as HTMLElement;
+  const timingSliderInput = document.querySelector(".timing-container input[type='range']") as HTMLInputElement;
+
+  timingSliderInput.addEventListener('input', () => {
+    const value = timingSliderInput.value;
+    timingSliderValue.textContent = value;
+    timingSliderValue.style.left = `${Number(value)}%`;
+  });
+
   generateLines();
   generateHack();
   shuffleLock();

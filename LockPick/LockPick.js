@@ -1,8 +1,8 @@
+var timerProgressBar;
+var timerTimeout;
 var totalSeconds = 20;
 var currentCircle = 1;
 var isLocked = false;
-var timerProgressBar;
-var timerTimeout;
 function runTimer() {
     var timerProgress = document.querySelector(".timer-progress-bar");
     clearTimeout(timerProgressBar);
@@ -57,6 +57,13 @@ function resetGame(status) {
         indicateFailed(currentCircle);
         setTimeout(function () {
             loseMsg_1.style.display = "none";
+        }, 2000);
+    }
+    else if (status === "reset") {
+        var resetMsg_1 = document.querySelector(".reset-message");
+        resetMsg_1.style.display = "flex";
+        setTimeout(function () {
+            resetMsg_1.style.display = "none";
         }, 2000);
     }
 }
@@ -276,7 +283,38 @@ function handleKeyPress(event) {
         return;
     }
 }
+function toggleSettings(action) {
+    if (action === void 0) { action = ""; }
+    var settingsMenu = document.querySelector(".settings-container");
+    if (action === "close" || settingsMenu.style.display === "flex") {
+        settingsMenu.style.display = "none";
+    }
+    else {
+        settingsMenu.style.display = "flex";
+    }
+}
+function applySettings() {
+    var timingSliderValue = document.querySelector(".timing-container .slider-value span");
+    totalSeconds = Number(timingSliderValue.textContent);
+    // Run the game with the new settings
+    toggleSettings("close");
+    resetGame("reset");
+}
+function resetSettings() {
+    var timingSliderValue = document.querySelector(".timing-container .slider-value span");
+    var timingSliderInput = document.querySelector(".timing-container input[type='range']");
+    timingSliderInput.value = "20";
+    timingSliderValue.style.left = "20%";
+    timingSliderValue.textContent = "20";
+}
 document.addEventListener("DOMContentLoaded", function (event) {
+    var timingSliderValue = document.querySelector(".timing-container .slider-value span");
+    var timingSliderInput = document.querySelector(".timing-container input[type='range']");
+    timingSliderInput.addEventListener('input', function () {
+        var value = timingSliderInput.value;
+        timingSliderValue.textContent = value;
+        timingSliderValue.style.left = "".concat(Number(value), "%");
+    });
     generateLines();
     generateHack();
     shuffleLock();

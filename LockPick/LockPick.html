@@ -13,6 +13,20 @@
     <body>
         <div class="other-container">
             <a href="https://maximilianadf.github.io/NoPixel-MiniGames-4.0/" class="home-button">Check other Mini-games</a>
+            <i class="fas fa-gear" id="settings-icon" onclick="toggleSettings()"></i>
+        </div>
+        <div class="settings-container">
+            <h2 class="settings-header">Settings</h2>
+            <i class="fas fa-xmark" id="settings-exit" onclick="toggleSettings('close')"></i>
+            <div class="timing-container">
+                <div class="slider-value"><span>20</span></div>
+                <label for="timing-slider">Timer</label>
+                <input type="range" id="timing-slider" name="timing" min="5" max="100" value="20"/>
+            </div>
+            <div class="button-container">
+                <button id="save-button" onclick="applySettings()">Save</button>
+                <button id="reset-button" onclick="resetSettings()">Reset</button>
+            </div> 
         </div>
         <div class="hack-box-container">
             <div class="outer-container">
@@ -28,6 +42,10 @@
                 <div class="win-message">
                     <i class="fa-solid fa-circle-check"></i>
                     <p>The lock was picked successfully.</p>
+                </div>
+                <div class="reset-message">
+                    <i class="fas fa-hourglass-start"></i>
+                    <p>Reset!</p>
                 </div>
                 <div class="hack-box"> 
                     <div class="position-container">
