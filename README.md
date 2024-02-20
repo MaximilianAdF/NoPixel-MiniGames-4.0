@@ -12,7 +12,7 @@
    ---
   <br>
 <a id="StartOfMiniGames"></a>
-- ## 🔗 [RoofRunning v.1.0.3](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
+- ## 🔗 [RoofRunning v.1.0.3](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/RoofRunning-v.1.0.3)
    [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7d94e398-ae40-45d2-ae25-d20fa5a62301)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
   <p align="center">↑ Click to play ↑</p>
 
@@ -41,8 +41,8 @@
   <br>
 
   <a id="LockPick"></a>
-- ## 🔗 [Lockpick v.1.0.2](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
-   [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/68723250-8984-46c0-aeef-36516529d837)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
+- ## 🔗 [Lockpick v.1.0.3](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/LockPick-v.1.0.3)
+   [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/e5e00eac-ea19-46e1-944c-67c7ff8ca5cf)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
   <p align="center">↑ Click to play ↑</p>
   
   ### Description
