@@ -195,19 +195,18 @@ body {
 }
 
 .cuber {
-  background-color: var(--cube-color-red, rgb(229, 28, 28));
-  box-shadow: 0px 5px 0px var(--cube-color-red-shadow, rgb(96, 35, 34));
+  background: linear-gradient(to bottom, #f30308, #92383b);
+  box-shadow: 0px 5px 0px #5c2829;
 }
 
 .cubeg {
-  background-color: var(--cube-color-green, rgb(137, 218, 61));
-  /*background: linear-gradient(to bottom, rgb(155, 187, 105), rgb(128, 153, 54));*/
-  box-shadow: 0px 5px 0px var(--cube-color-green-shadow, rgb(79, 122, 59));
+  background: linear-gradient(to bottom, #8ab357, #668a3d);
+  box-shadow: 0px 5px 0px #48612f;
 }
 
 .cubeb {
-  background-color: var(--cube-color-blue, rgb(82, 156, 209));
-  box-shadow: 0px 5px 0px var(--cube-color-blue-shadow, rgb(40, 71, 86));
+  background: linear-gradient(to bottom, #5490b2, #3a7494);
+  box-shadow: 0px 5px 0px #345066;
 }
 
 .other-container {

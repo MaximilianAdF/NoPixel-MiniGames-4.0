@@ -18,13 +18,17 @@ class Cube {
 
     getElement() {
         const element = document.createElement("div");
-        element.className = "cube";
+        const child = document.createElement("div");
+
+        child.className = "cube";
         if (this.color !== "empty") {
-            element.classList.add("cube" + this.color.substring(0,1));
+            element.className = "cube" + this.color.substring(0,1);
             element.addEventListener("click", this.squareClick.bind(this));
         } else {
-            element.classList.add("empty");
+            element.className = "empty";
+            child.classList.add("empty");
         }
+        element.appendChild(child)
         return element;
     }
     
