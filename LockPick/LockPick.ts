@@ -1,14 +1,19 @@
 const totalSeconds = 20;
 let currentCircle = 1;
 let isLocked = false;
+let timerProgressBar: NodeJS.Timeout;
+let timerTimeout: NodeJS.Timeout;
 
 function runTimer(): void {
   const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
-    setTimeout(function () {
+  clearTimeout(timerProgressBar);
+  timerProgressBar = setTimeout(function () {
       timerProgress.style.transition = `width ${totalSeconds}s cubic-bezier(0.4, 1, 0.7, 0.93)`;
       timerProgress.style.width = "0%";
     }, 100);
-  setTimeout(() => {
+
+  clearTimeout(timerTimeout);
+  timerTimeout = setTimeout(() => {
     resetGame("lose");
   }, totalSeconds * 1000);
 }

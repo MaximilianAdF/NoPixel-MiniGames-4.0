@@ -1,13 +1,17 @@
 var totalSeconds = 20;
 var currentCircle = 1;
 var isLocked = false;
+var timerProgressBar;
+var timerTimeout;
 function runTimer() {
     var timerProgress = document.querySelector(".timer-progress-bar");
-    setTimeout(function () {
+    clearTimeout(timerProgressBar);
+    timerProgressBar = setTimeout(function () {
         timerProgress.style.transition = "width ".concat(totalSeconds, "s cubic-bezier(0.4, 1, 0.7, 0.93)");
         timerProgress.style.width = "0%";
     }, 100);
-    setTimeout(function () {
+    clearTimeout(timerTimeout);
+    timerTimeout = setTimeout(function () {
         resetGame("lose");
     }, totalSeconds * 1000);
 }
