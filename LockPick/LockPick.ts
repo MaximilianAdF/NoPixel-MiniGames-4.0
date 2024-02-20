@@ -32,6 +32,7 @@ function resetGame(status: "win" | "lose" | "init"): void {
   // Block new input from the user when game over
   overlay.style.display = "block";
   isLocked = true;
+  clearTimeout(timerTimeout);
 
   setTimeout(() => {
     lockContainer.innerHTML = "";
