@@ -64,8 +64,8 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   ---
   <br>
  
-- ## 🔗 [Laundromat v.1.0.0](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/Laundromat/Laundromat.html)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/485993af-8b03-4510-a1e4-a13cc9cc7434)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/Laundromat/Laundromat.html)
+- ## 🔗 [Laundromat v.1.0.1](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/Laundromat-v1.0.1)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7a0a6e18-a39f-45b8-b186-5d0069241ce0)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/Laundromat/Laundromat.html)
    <p align="center">↑ Click to play ↑</p>
 
    ### Description
