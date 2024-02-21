@@ -46,8 +46,10 @@ function resetGame(status: "win" | "lose" | "init" | "reset"): void {
       if (countdown === 0) {
         countdownElem.style.display = "none";
         clearInterval(countdownInterval);
+        console.log(1)
       }
     }, 900);
+    
 
   } else if (status === "win") {
     const winMsg = document.querySelector(".win-message") as HTMLElement;

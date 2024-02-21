@@ -39,6 +39,7 @@ function resetGame(status) {
             if (countdown_1 === 0) {
                 countdownElem_1.style.display = "none";
                 clearInterval(countdownInterval_1);
+                console.log(1);
             }
         }, 900);
     }
