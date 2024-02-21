@@ -18,28 +18,60 @@ function runTimer(): void {
   }, totalSeconds * 1000);
 }
 
-function resetGame(status: "win" | "lose" | "init"): void {
-  // Remove existing lock circles and SVG elements
-  const timerProgress = document.querySelector(
-    ".timer-progress-bar"
-  ) as HTMLElement;
-  const lockContainer = document.querySelector(
-    ".lock-container"
-  ) as HTMLElement;
-  const svgCircle = document.querySelector(".position-container svg");
+function resetGame(status: "win" | "lose" | "init" | "reset"): void {
+  const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
+  const lockContainer = document.querySelector(".lock-container") as HTMLElement;
+  const svgCircle = document.querySelector(".position-container svg") as HTMLElement;
   const overlay = document.querySelector(".overlay") as HTMLElement;
 
   // Block new input from the user when game over
   overlay.style.display = "block";
   isLocked = true;
+
+  // Reset the timer progress bar
   clearTimeout(timerTimeout);
+  timerProgress.style.transition = "none";
+  timerProgress.style.display = "none";
+  timerProgress.style.width = "100%";
+
+  if (status === "init") { // Initial game start, run the countdown
+    const countdownElem = document.querySelector(".countdown") as HTMLElement;
+    let countdown = 3;
+
+    countdownElem.style.display = "flex";
+    countdownElem.textContent = countdown.toString();
+    const countdownInterval = setInterval(() => {
+      countdown--;
+      countdownElem.textContent = countdown.toString();
+      if (countdown === 0) {
+        countdownElem.style.display = "none";
+        clearInterval(countdownInterval);
+      }
+    }, 900);
+
+  } else if (status === "win") {
+    const winMsg = document.querySelector(".win-message") as HTMLElement;
+    winMsg.style.display = "flex";
+    setTimeout(() => {winMsg.style.display = "none";}, 3000);
+  } else if (status === "lose") {
+    const loseMsg = document.querySelector(".lose-message") as HTMLElement;
+    loseMsg.style.display = "flex";
+    indicateFailed(currentCircle);
+    setTimeout(() => {loseMsg.style.display = "none";}, 3000);
+  } else if (status === "reset") {
+    const resetMsg = document.querySelector(".reset-message") as HTMLElement;
+    resetMsg.style.display = "flex";
+    setTimeout(() => {resetMsg.style.display = "none";}, 3000);
+  }
 
   setTimeout(() => {
+    // Remove existing lock circles and SVG elements
+    timerProgress.style.display = "block";
     lockContainer.innerHTML = "";
+    svgCircle.innerHTML = "";
     currentCircle = 1;
-    if (svgCircle) {
-      svgCircle.innerHTML = "";
-    }
+
+    // Unlock the game
     overlay.style.display = "none";
     isLocked = false;
     removeLines();
@@ -47,29 +79,7 @@ function resetGame(status: "win" | "lose" | "init"): void {
     generateHack();
     shuffleLock();
     runTimer();
-  }, 2000);
-
-  timerProgress.style.transition = "none";
-  timerProgress.style.display = "none";
-  timerProgress.style.width = "100%";
-  setTimeout(() => {
-    timerProgress.style.removeProperty("display");
-  }, 2000);
-
-  if (status === "win") {
-    const winMsg = document.querySelector(".win-message") as HTMLElement;
-    winMsg.style.display = "flex";
-    setTimeout(() => {
-      winMsg.style.display = "none";
-    }, 2000);
-  } else if (status === "lose") {
-    const loseMsg = document.querySelector(".lose-message") as HTMLElement;
-    loseMsg.style.display = "flex";
-    indicateFailed(currentCircle);
-    setTimeout(() => {
-      loseMsg.style.display = "none";
-    }, 2000);
-  }
+  }, 3000);
 }
 
 function indicateFailed(circleNum: number): void {
@@ -347,7 +357,44 @@ function handleKeyPress(event: KeyboardEvent) {
   }
 }
 
+function toggleSettings(action: string = "") {
+  const settingsMenu = document.querySelector(".settings-container") as HTMLElement;
+  if (action === "close" || settingsMenu.style.display === "flex") {
+      settingsMenu.style.display = "none";
+  } else {
+      settingsMenu.style.display = "flex";
+  }
+}
+
+function applySettings() {
+  const timingSliderValue = document.querySelector(".timing-container .slider-value span") as HTMLElement;
+  totalSeconds = Number(timingSliderValue.textContent);
+
+  // Run the game with the new settings
+  toggleSettings("close");
+  resetGame("reset");
+}
+
+function resetSettings() {
+  const timingSliderValue = document.querySelector(".timing-container .slider-value span") as HTMLElement;
+  const timingSliderInput = document.querySelector(".timing-container input[type='range']") as HTMLInputElement;
+
+  timingSliderInput.value = "12";
+  timingSliderValue.style.left = "12%"
+  timingSliderValue.textContent = "12";
+}
+
 document.addEventListener("DOMContentLoaded", (event) => {
+  //Settings timer slider
+  const timingSliderValue = document.querySelector(".timing-container .slider-value span") as HTMLElement;
+  const timingSliderInput = document.querySelector(".timing-container input[type='range']") as HTMLInputElement;
+
+  timingSliderInput.addEventListener('input', () => {
+    const value = timingSliderInput.value;
+    timingSliderValue.textContent = value;
+    timingSliderValue.style.left = `${Number(value)}%`;
+  });
+
   resetGame("init");
 });
 

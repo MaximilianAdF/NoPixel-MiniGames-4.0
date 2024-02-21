@@ -26,20 +26,43 @@ function resetGame(status: "win" | "lose" | "init" | "reset"): void {
   const lockContainer = document.querySelector(
     ".lock-container"
   ) as HTMLElement;
-  const svgCircle = document.querySelector(".position-container svg");
+  const svgCircle = document.querySelector(".position-container svg") as HTMLElement;
   const overlay = document.querySelector(".overlay") as HTMLElement;
 
   // Block new input from the user when game over
   overlay.style.display = "block";
   isLocked = true;
+
   clearTimeout(timerTimeout);
+  timerProgress.style.transition = "none";
+  timerProgress.style.display = "none";
+  timerProgress.style.width = "100%";
+
+  if (status === "init") { // Initial game start, run the countdown
+    
+  } else if (status === "win") {
+    const winMsg = document.querySelector(".win-message") as HTMLElement;
+    winMsg.style.display = "flex";
+    setTimeout(() => {winMsg.style.display = "none";}, 2000);
+  } else if (status === "lose") {
+    const loseMsg = document.querySelector(".lose-message") as HTMLElement;
+    loseMsg.style.display = "flex";
+    indicateFailed(currentCircle);
+    setTimeout(() => {loseMsg.style.display = "none";}, 2000);
+  } else if (status === "reset") {
+    const resetMsg = document.querySelector(".reset-message") as HTMLElement;
+    resetMsg.style.display = "flex";
+    setTimeout(() => {resetMsg.style.display = "none";}, 2000);
+  }
 
   setTimeout(() => {
+    // Remove existing lock circles and SVG elements
+    timerProgress.style.display = "block";
     lockContainer.innerHTML = "";
+    svgCircle.innerHTML = "";
     currentCircle = 1;
-    if (svgCircle) {
-      svgCircle.innerHTML = "";
-    }
+
+    // Unlock the game after 2 seconds
     overlay.style.display = "none";
     isLocked = false;
     generateLines();
@@ -47,34 +70,6 @@ function resetGame(status: "win" | "lose" | "init" | "reset"): void {
     shuffleLock();
     runTimer();
   }, 2000);
-
-  timerProgress.style.transition = "none";
-  timerProgress.style.display = "none";
-  timerProgress.style.width = "100%";
-  setTimeout(() => {
-    timerProgress.style.display = "block";
-  }, 2000);
-
-  if (status === "win") {
-    const winMsg = document.querySelector(".win-message") as HTMLElement;
-    winMsg.style.display = "flex";
-    setTimeout(() => {
-      winMsg.style.display = "none";
-    }, 2000);
-  } else if (status === "lose") {
-    const loseMsg = document.querySelector(".lose-message") as HTMLElement;
-    loseMsg.style.display = "flex";
-    indicateFailed(currentCircle);
-    setTimeout(() => {
-      loseMsg.style.display = "none";
-    }, 2000);
-  } else if (status === "reset") {
-    const resetMsg = document.querySelector(".reset-message") as HTMLElement;
-    resetMsg.style.display = "flex";
-    setTimeout(() => {
-      resetMsg.style.display = "none";
-    }, 2000);
-  }
 }
 
 function indicateFailed(circleNum: number): void {

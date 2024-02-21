@@ -13,6 +13,20 @@
     <body>
         <div class="other-container">
             <a href="https://maximilianadf.github.io/NoPixel-MiniGames-4.0/" class="home-button">Check other Mini-games</a>
+            <i class="fas fa-gear" id="settings-icon" onclick="toggleSettings()"></i>
+        </div>
+        <div class="settings-container">
+            <h2 class="settings-header">Settings</h2>
+            <i class="fas fa-xmark" id="settings-exit" onclick="toggleSettings('close')"></i>
+            <div class="timing-container">
+                <div class="slider-value"><span>12</span></div>
+                <label for="timing-slider">Timer</label>
+                <input type="range" id="timing-slider" name="timing" min="5" max="100" value="12"/>
+            </div>
+            <div class="button-container">
+                <button id="save-button" onclick="applySettings()">Save</button>
+                <button id="reset-button" onclick="resetSettings()">Reset</button>
+            </div> 
         </div>
         <div class="hack-box-container">
             <div class="outer-container">
@@ -29,7 +43,18 @@
                     <i class="fa-solid fa-circle-check"></i>
                     <p>Success!</p>
                 </div>
-                <div class="hack-box"> 
+                <div class="reset-message">
+                    <i class="fas fa-hourglass-start"></i>
+                    <p>Reset!</p>
+                </div>
+                <div class="hack-box">
+                    <div class="countdown-container">
+                        <div class="countdown">3</div>
+                        <div class="countdown two">3</div>
+                        <div class="countdown three">3</div>
+                        <div class="countdown four">3</div>
+                        <div class="countdown five">3</div>
+                    </div>
                     <div class="position-container">
                         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%"></svg>
                     </div>
