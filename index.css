@@ -106,3 +106,28 @@ a:hover {
     text-align: center;
     max-width: 80%;
 }
+
+.highscores {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    margin-top: 10px;
+    padding: 20px 50px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    width: 35%;
+}
+
+.highscores h2 {
+    color: white;
+    font-size: 50px;
+    margin: 0;
+}
+
+.highscores p {
+    margin-top: 5px;
+    color: white;
+    font-size: 20px;
+    text-align: center;
+}
