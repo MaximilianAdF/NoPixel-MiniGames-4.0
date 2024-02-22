@@ -78,7 +78,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   <br>
 
 - ## 🔗 [RepairKit v.1.0.1](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
-   [![Screenshot 2024-02-07 at 13 27 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/f7e3eb98-57c5-4690-9dc0-3ab9a5d3c6f0)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
+   [![Screenshot 2024-02-07 at 13 27 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/4888fd16-2b24-44c0-9952-275ddb626332)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
   <p align="center">↑ Click to play ↑</p>
   
   ### Description
