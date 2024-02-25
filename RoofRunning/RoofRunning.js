@@ -1,20 +1,19 @@
-var timerTimeout;
-var timerProgressBar;
-var totalSeconds = 25;
-var gridCols = 11;
-var gridRows = 8;
-var container;
-var htmlContainer;
-var Cube = /** @class */ (function () {
-    function Cube(color) {
-        if (color === void 0) { color = ""; }
+let timerTimeout;
+let timerProgressBar;
+let totalSecondsVar = 25;
+let gridCols = 11;
+let gridRows = 8;
+let container;
+let htmlContainer;
+class Cube {
+    constructor(color = "") {
         if (color === "")
             color = this.getRandomColor();
         this.color = color;
     }
-    Cube.prototype.getElement = function () {
-        var element = document.createElement("div");
-        var child = document.createElement("div");
+    getElement() {
+        const element = document.createElement("div");
+        const child = document.createElement("div");
         child.className = "cube";
         if (this.color !== "empty") {
             element.className = "cube" + this.color.substring(0, 1);
@@ -26,28 +25,27 @@ var Cube = /** @class */ (function () {
         }
         element.appendChild(child);
         return element;
-    };
-    Cube.prototype.cubeLeftShift = function () {
-        var _a;
-        var isEmptyColumn = new Array(gridCols).fill(true);
+    }
+    cubeLeftShift() {
+        let isEmptyColumn = new Array(gridCols).fill(true);
         // Identify empty columns
-        for (var i = 0; i < gridRows; i++) {
-            for (var j = 0; j < gridCols; j++) {
+        for (let i = 0; i < gridRows; i++) {
+            for (let j = 0; j < gridCols; j++) {
                 if (!(container[i * gridCols + j].color === "empty")) {
                     isEmptyColumn[j] = false;
                 }
             }
         }
         // Shift columns left if an entire column is empty
-        for (var col = 0; col < gridCols; col++) {
+        for (let col = 0; col < gridCols; col++) {
             if (isEmptyColumn[col]) {
                 // Shift all columns to the right of it one position to the left
-                for (var row = 0; row < gridRows; row++) {
-                    for (var shiftCol = col; shiftCol < gridCols - 1; shiftCol++) {
-                        var currentIndex = row * gridCols + shiftCol;
-                        var nextIndex = row * gridCols + shiftCol + 1;
+                for (let row = 0; row < gridRows; row++) {
+                    for (let shiftCol = col; shiftCol < gridCols - 1; shiftCol++) {
+                        let currentIndex = row * gridCols + shiftCol;
+                        let nextIndex = row * gridCols + shiftCol + 1;
                         // Swap the current and next columns
-                        _a = [container[nextIndex], container[currentIndex]], container[currentIndex] = _a[0], container[nextIndex] = _a[1];
+                        [container[currentIndex], container[nextIndex]] = [container[nextIndex], container[currentIndex]];
                     }
                 }
                 // Adjust for the shift when checking subsequent columns
@@ -57,33 +55,32 @@ var Cube = /** @class */ (function () {
             }
         }
         this.updateContainer();
-    };
-    Cube.prototype.cubeGravity = function (idx) {
-        var _a;
-        var row = Math.floor(idx / gridCols);
-        for (var i = 0; i < row; i++) {
+    }
+    cubeGravity(idx) {
+        const row = Math.floor(idx / gridCols);
+        for (let i = 0; i < row; i++) {
             // Swap elements in the copied array
-            _a = [container[idx - gridCols * (i + 1)], container[idx - gridCols * i]], container[idx - gridCols * i] = _a[0], container[idx - gridCols * (i + 1)] = _a[1];
+            [container[idx - gridCols * i], container[idx - gridCols * (i + 1)]] = [container[idx - gridCols * (i + 1)], container[idx - gridCols * i]];
         }
         // Update the live container with the modified copy
         this.updateContainer();
-    };
-    Cube.prototype.updateContainer = function () {
+    }
+    updateContainer() {
         // Clear the container
         while (htmlContainer.firstChild) {
             htmlContainer.removeChild(htmlContainer.firstChild);
         }
         // Append nodes from the modified copy
-        container.forEach(function (cube) {
+        container.forEach(cube => {
             htmlContainer.appendChild(cube.getElement());
         });
-    };
-    Cube.prototype.getAdjacentCubes = function (cube) {
-        var idx = Array.from(container).indexOf(cube);
+    }
+    getAdjacentCubes(cube) {
+        const idx = Array.from(container).indexOf(cube);
         // const idx = container.indexOf(cube);
-        var adjacentCubes = [];
-        var row = Math.floor(idx / gridCols);
-        var col = idx % gridCols;
+        const adjacentCubes = [];
+        const row = Math.floor(idx / gridCols);
+        const col = idx % gridCols;
         if (col - 1 >= 0)
             adjacentCubes.push(container[idx - 1]);
         if (col + 1 < gridCols)
@@ -93,68 +90,64 @@ var Cube = /** @class */ (function () {
         if (row + 1 < gridRows)
             adjacentCubes.push(container[idx + gridCols]);
         return adjacentCubes;
-    };
-    Cube.prototype.removeConnectedCubes = function () {
-        var _this = this;
-        var connectedCubes = this.getConnectedCubes();
+    }
+    removeConnectedCubes() {
+        const connectedCubes = this.getConnectedCubes();
         if (connectedCubes.size === 1) {
             console.log("No connected cubes");
         }
         else {
-            connectedCubes.forEach(function (cube) {
+            connectedCubes.forEach(cube => {
                 cube.color = "empty";
-                _this.cubeGravity(container.indexOf(cube)); // Apply gravity to the cubes so empty cubes are at top
+                this.cubeGravity(container.indexOf(cube)); // Apply gravity to the cubes so empty cubes are at top
             });
             this.cubeLeftShift();
             // this.updateContainer(); // Already called in cubeLeftShift
         }
-    };
-    Cube.prototype.getRandomColor = function () {
-        var colors = ["red", "green", "blue"];
-        var randomIndex = Math.floor(Math.random() * colors.length);
+    }
+    getRandomColor() {
+        const colors = ["red", "green", "blue"];
+        const randomIndex = Math.floor(Math.random() * colors.length);
         return colors[randomIndex];
-    };
-    Cube.prototype.getConnectedCubes = function () {
-        var _this = this;
-        var connectedCubes = new Set();
-        var queue = [this];
+    }
+    getConnectedCubes() {
+        const connectedCubes = new Set();
+        const queue = [this];
         while (queue.length > 0) {
-            var currentCube = queue.shift();
+            const currentCube = queue.shift();
             connectedCubes.add(currentCube);
-            var neighbors = this.getAdjacentCubes(currentCube);
-            neighbors.forEach(function (neighbor) {
-                if (!connectedCubes.has(neighbor) && neighbor.color == _this.color) {
+            const neighbors = this.getAdjacentCubes(currentCube);
+            neighbors.forEach(neighbor => {
+                if (!connectedCubes.has(neighbor) && neighbor.color == this.color) {
                     queue.push(neighbor);
                     connectedCubes.add(neighbor);
                 }
             });
         }
         return connectedCubes;
-    };
-    Cube.prototype.checkwin = function () {
-        var emptyCubes = container.filter(function (cube) { return cube.color === "empty"; });
+    }
+    checkwin() {
+        const emptyCubes = container.filter((cube) => cube.color === "empty");
         if (emptyCubes.length === gridRows * gridCols) {
             endGame("win");
         }
         else if (shouldFail()) {
             endGame("lose");
         }
-    };
-    Cube.prototype.squareClick = function () {
+    }
+    squareClick() {
         this.removeConnectedCubes();
         this.checkwin();
-    };
-    return Cube;
-}());
+    }
+}
 //The functions below together checks solvability of the board
-function helpFunct(tempContainer, queue, path) {
-    if (path === void 0) { path = []; }
+function helpFunct(tempContainer, queue, path = []) {
     if (getColorCount(tempContainer).includes(1)) {
         console.log("FAIL, SINGLE:", path);
         return false;
     }
-    var c = 0;
-    tempContainer.forEach(function (cube) {
+    let c = 0;
+    tempContainer.forEach((cube) => {
         if (cube.color === "empty") {
             c++;
         }
@@ -168,10 +161,10 @@ function helpFunct(tempContainer, queue, path) {
         return false;
     }
     while (queue.length > 0) {
-        var connectedCubes = queue.shift();
-        var _a = cubesUpdate(tempContainer, connectedCubes), updatedContainer = _a[0], possibleClick = _a[1]; // [container, possibleClicks
-        var updatedQueue = updateQueue(updatedContainer);
-        var newPath = path.concat(possibleClick);
+        let connectedCubes = queue.shift();
+        const [updatedContainer, possibleClick] = cubesUpdate(tempContainer, connectedCubes); // [container, possibleClicks
+        const updatedQueue = updateQueue(updatedContainer);
+        const newPath = path.concat(possibleClick);
         if (helpFunct(updatedContainer, updatedQueue, newPath)) {
             return true;
         }
@@ -180,37 +173,35 @@ function helpFunct(tempContainer, queue, path) {
     return false;
 }
 function cubesUpdate(tempContainer, connectedCubes) {
-    var _a;
-    var possibleClicks = -1;
-    connectedCubes.forEach(function (cube) {
-        var _a;
-        var idx = tempContainer.indexOf(cube);
+    let possibleClicks = -1;
+    connectedCubes.forEach(cube => {
+        const idx = tempContainer.indexOf(cube);
         cube.color = "empty";
         possibleClicks = idx;
-        var row = Math.floor(idx / gridCols);
-        for (var i = 0; i < row; i++) {
-            _a = [tempContainer[idx - gridCols * (i + 1)], tempContainer[idx - gridCols * i]], tempContainer[idx - gridCols * i] = _a[0], tempContainer[idx - gridCols * (i + 1)] = _a[1];
+        const row = Math.floor(idx / gridCols);
+        for (let i = 0; i < row; i++) {
+            [tempContainer[idx - gridCols * i], tempContainer[idx - gridCols * (i + 1)]] = [tempContainer[idx - gridCols * (i + 1)], tempContainer[idx - gridCols * i]];
         }
     });
-    var isEmptyColumn = new Array(gridCols).fill(true);
+    let isEmptyColumn = new Array(gridCols).fill(true);
     // Identify empty columns
-    for (var i = 0; i < gridRows; i++) {
-        for (var j = 0; j < gridCols; j++) {
+    for (let i = 0; i < gridRows; i++) {
+        for (let j = 0; j < gridCols; j++) {
             if (!(tempContainer[i * gridCols + j].color === "empty")) {
                 isEmptyColumn[j] = false;
             }
         }
     }
     // Shift columns left if an entire column is empty
-    for (var col = 0; col < gridCols; col++) {
+    for (let col = 0; col < gridCols; col++) {
         if (isEmptyColumn[col]) {
             // Shift all columns to the right of it one position to the left
-            for (var row = 0; row < gridRows; row++) {
-                for (var shiftCol = col; shiftCol < gridCols - 1; shiftCol++) {
-                    var currentIndex = row * gridCols + shiftCol;
-                    var nextIndex = row * gridCols + shiftCol + 1;
+            for (let row = 0; row < gridRows; row++) {
+                for (let shiftCol = col; shiftCol < gridCols - 1; shiftCol++) {
+                    let currentIndex = row * gridCols + shiftCol;
+                    let nextIndex = row * gridCols + shiftCol + 1;
                     // Swap the current and next columns
-                    _a = [tempContainer[nextIndex], tempContainer[currentIndex]], tempContainer[currentIndex] = _a[0], tempContainer[nextIndex] = _a[1];
+                    [tempContainer[currentIndex], tempContainer[nextIndex]] = [tempContainer[nextIndex], tempContainer[currentIndex]];
                 }
             }
             // Adjust for the shift when checking subsequent columns
@@ -222,13 +213,13 @@ function cubesUpdate(tempContainer, connectedCubes) {
     return [tempContainer, possibleClicks];
 }
 function updateQueue(tempContainer) {
-    var queue = [];
-    var visited = new Set();
-    tempContainer.forEach(function (cube) {
+    let queue = [];
+    let visited = new Set();
+    tempContainer.forEach(cube => {
         if (!(cube.color === "empty")) {
-            var connectedCubes = getConnectedCubes(tempContainer, cube);
-            for (var i = 0; i < connectedCubes.size; i++) {
-                var connectedCube = connectedCubes[i];
+            const connectedCubes = getConnectedCubes(tempContainer, cube);
+            for (let i = 0; i < connectedCubes.size; i++) {
+                const connectedCube = connectedCubes[i];
                 if (!visited.has(connectedCube)) {
                     visited.add(connectedCube);
                     queue.push(connectedCubes);
@@ -252,17 +243,17 @@ function shouldFail() {
     // 2. Fail if there are no groups of connected colors
     //
     // In case of a failure, return true
-    var containerCopy = Array.from(container).map(function (cube) { return new Cube(cube.color); });
+    const containerCopy = Array.from(container).map(cube => new Cube(cube.color));
     // No need to check if the board is empty. This method won't be called if we won.
     if (getColorCount(containerCopy).includes(1)) {
         console.log("FAIL: Single cube of a color remaining");
         return true;
     }
     // If we find a connected group, return true
-    for (var i = 0; i < containerCopy.length; i++) {
-        var cube = containerCopy[i];
+    for (let i = 0; i < containerCopy.length; i++) {
+        const cube = containerCopy[i];
         if (!(cube.color === "empty")) {
-            var connectedCubes = getConnectedCubes(containerCopy, cube);
+            const connectedCubes = getConnectedCubes(containerCopy, cube);
             if (connectedCubes.size > 1) {
                 return false;
             }
@@ -273,13 +264,13 @@ function shouldFail() {
     return true;
 }
 function getConnectedCubes(tempContainer, cube) {
-    var connectedCubes = new Set();
-    var queue = [cube];
+    const connectedCubes = new Set();
+    const queue = [cube];
     while (queue.length > 0) {
-        var currentCube = queue.shift();
+        const currentCube = queue.shift();
         connectedCubes.add(currentCube);
-        var neighbors = getAdjacentCubes(tempContainer, currentCube);
-        neighbors.forEach(function (neighbor) {
+        const neighbors = getAdjacentCubes(tempContainer, currentCube);
+        neighbors.forEach(neighbor => {
             if (!connectedCubes.has(neighbor) && neighbor.color === cube.color) {
                 connectedCubes.add(neighbor);
                 queue.push(neighbor);
@@ -292,10 +283,10 @@ function getConnectedCubes(tempContainer, cube) {
     return connectedCubes;
 }
 function getAdjacentCubes(tempContainer, cube) {
-    var idx = tempContainer.indexOf(cube);
-    var adjacentCubes = [];
-    var row = Math.floor(idx / gridCols);
-    var col = idx % gridCols;
+    const idx = tempContainer.indexOf(cube);
+    const adjacentCubes = [];
+    const row = Math.floor(idx / gridCols);
+    const col = idx % gridCols;
     if (col - 1 >= 0)
         adjacentCubes.push(tempContainer[idx - 1]);
     if (col + 1 < gridCols)
@@ -307,8 +298,8 @@ function getAdjacentCubes(tempContainer, cube) {
     return adjacentCubes;
 }
 function getColorCount(tempContainer) {
-    var colorCount = [0, 0, 0];
-    tempContainer.forEach(function (cube) {
+    const colorCount = [0, 0, 0];
+    tempContainer.forEach((cube) => {
         if (cube.color == "red") {
             colorCount[0]++;
         }
@@ -323,64 +314,63 @@ function getColorCount(tempContainer) {
 }
 // ------------------------------------------------------------^
 function endGame(outcome) {
-    var timerProgress = document.querySelector(".timer-progress-bar");
-    var overlay = document.querySelector(".overlay");
+    const timerProgress = document.querySelector(".timer-progress-bar");
+    const overlay = document.querySelector(".overlay");
     timerProgress.style.transition = "none";
     timerProgress.style.display = "none";
     timerProgress.style.width = "100%";
     overlay.style.display = "block";
     if (outcome === "win") {
-        var winMsg_1 = document.querySelector(".win-message");
-        winMsg_1.style.display = "flex";
+        const winMsg = document.querySelector(".win-message");
+        winMsg.style.display = "flex";
         setTimeout(function () {
-            winMsg_1.style.display = 'none';
+            winMsg.style.display = 'none';
             timerProgress.style.display = "block";
             overlay.style.display = 'none';
-            resetGame();
+            resetGameFunc();
         }, 2000);
     }
     else if (outcome === "lose") {
-        var loseMsg_1 = document.querySelector(".lose-message");
-        loseMsg_1.style.display = "flex";
+        const loseMsg = document.querySelector(".lose-message");
+        loseMsg.style.display = "flex";
         setTimeout(function () {
-            loseMsg_1.style.display = 'none';
+            loseMsg.style.display = 'none';
             timerProgress.style.display = "block";
             overlay.style.display = 'none';
-            resetGame();
+            resetGameFunc();
         }, 2000);
     }
     else if (outcome === "reset") {
-        var resetMsg_1 = document.querySelector(".reset-message");
-        resetMsg_1.style.display = "flex";
+        const resetMsg = document.querySelector(".reset-message");
+        resetMsg.style.display = "flex";
         setTimeout(function () {
-            resetMsg_1.style.display = 'none';
+            resetMsg.style.display = 'none';
             timerProgress.style.display = "block";
             overlay.style.display = 'none';
-            resetGame();
+            resetGameFunc();
         }, 1000);
     }
 }
-function resetGame() {
-    var cssVariables = {
+function resetGameFunc() {
+    const cssVariables = {
         "--grid-columns": gridCols,
         "--grid-rows": gridRows
     };
     // Set the CSS variables
-    for (var _i = 0, _a = Object.entries(cssVariables); _i < _a.length; _i++) {
-        var _b = _a[_i], key = _b[0], value = _b[1];
+    for (const [key, value] of Object.entries(cssVariables)) {
         document.documentElement.style.setProperty(key, String(value));
     }
-    var timerProgress = document.querySelector(".timer-progress-bar");
-    timerProgress.style.transition = "width ".concat(totalSeconds, "s cubic-bezier(0.4, 1, 0.7, 0.93)");
+    const timerProgress = document.querySelector(".timer-progress-bar");
+    timerProgress.style.transition = `width ${totalSecondsVar}s cubic-bezier(0.4, 1, 0.7, 0.93)`;
     generateCubes();
-    runTimer();
+    runTimerFunc();
 }
 function generateCubes() {
     console.log("generating cubes...");
     // htmlContainer.innerHTML = "";
     container = [];
-    for (var i = 0; i < gridRows * gridCols; i++) {
-        var cube = new Cube();
+    for (let i = 0; i < gridRows * gridCols; i++) {
+        const cube = new Cube();
         container === null || container === void 0 ? void 0 : container.push(cube);
         // Last iteration only
         if (i === gridRows * gridCols - 1) {
@@ -388,8 +378,8 @@ function generateCubes() {
         }
     }
 }
-function runTimer() {
-    var timerProgress = document.querySelector(".timer-progress-bar");
+function runTimerFunc() {
+    const timerProgress = document.querySelector(".timer-progress-bar");
     clearTimeout(timerProgressBar); // We need to clear to prevent memory leak after multiple games are played.
     timerProgressBar = setTimeout(function () {
         timerProgress.style.width = "0%";
@@ -397,11 +387,10 @@ function runTimer() {
     clearTimeout(timerTimeout); // Clear any existing timer to prevent problems with endGame("reset")
     timerTimeout = setTimeout(function () {
         endGame("lose");
-    }, totalSeconds * 1000);
+    }, totalSecondsVar * 1000);
 }
-function toggleSettings(action) {
-    if (action === void 0) { action = ""; }
-    var settingsMenu = document.querySelector(".settings-container");
+function toggleSettings(action = "") {
+    const settingsMenu = document.querySelector(".settings-container");
     if (action === "close" || settingsMenu.style.display === "flex") {
         settingsMenu.style.display = "none";
     }
@@ -411,10 +400,10 @@ function toggleSettings(action) {
 }
 function applySettings() {
     // Get the values of the sliders
-    var timingSliderValue = document.querySelector(".timing-container .slider-value span");
-    var rowsSliderValue = document.querySelector(".rows-container .slider-value span");
-    var colsSliderValue = document.querySelector(".columns-container .slider-value span");
-    totalSeconds = Number(timingSliderValue.textContent);
+    const timingSliderValue = document.querySelector(".timing-container .slider-value span");
+    const rowsSliderValue = document.querySelector(".rows-container .slider-value span");
+    const colsSliderValue = document.querySelector(".columns-container .slider-value span");
+    totalSecondsVar = Number(timingSliderValue.textContent);
     gridRows = Number(rowsSliderValue.textContent);
     gridCols = Number(colsSliderValue.textContent);
     // Run the game with the new settings
@@ -422,12 +411,12 @@ function applySettings() {
     endGame("reset");
 }
 function resetSettings() {
-    var timingSliderValue = document.querySelector(".timing-container .slider-value span");
-    var rowsSliderValue = document.querySelector(".rows-container .slider-value span");
-    var colsSliderValue = document.querySelector(".columns-container .slider-value span");
-    var timingSliderInput = document.querySelector(".timing-container input[type='range']");
-    var rowsSliderInput = document.querySelector(".rows-container input[type='range']");
-    var colsSliderInput = document.querySelector(".columns-container input[type='range']");
+    const timingSliderValue = document.querySelector(".timing-container .slider-value span");
+    const rowsSliderValue = document.querySelector(".rows-container .slider-value span");
+    const colsSliderValue = document.querySelector(".columns-container .slider-value span");
+    const timingSliderInput = document.querySelector(".timing-container input[type='range']");
+    const rowsSliderInput = document.querySelector(".rows-container input[type='range']");
+    const colsSliderInput = document.querySelector(".columns-container input[type='range']");
     timingSliderInput.value = "25";
     rowsSliderInput.value = "8";
     colsSliderInput.value = "11";
@@ -442,34 +431,34 @@ function resetSettings() {
 }
 document.addEventListener("DOMContentLoaded", function () {
     htmlContainer = document.getElementById("container");
-    resetGame();
+    resetGameFunc();
     // Get references to the timing slider and its value display element
-    var timingSliderValue = document.querySelector(".timing-container .slider-value span");
-    var timingSliderInput = document.querySelector(".timing-container input[type='range']");
+    const timingSliderValue = document.querySelector(".timing-container .slider-value span");
+    const timingSliderInput = document.querySelector(".timing-container input[type='range']");
     // Get references to the rows slider and its value display element
-    var rowsSliderValue = document.querySelector(".rows-container .slider-value span");
-    var rowsSliderInput = document.querySelector(".rows-container input[type='range']");
+    const rowsSliderValue = document.querySelector(".rows-container .slider-value span");
+    const rowsSliderInput = document.querySelector(".rows-container input[type='range']");
     // Get references to the columns slider and its value display element
-    var colsSliderValue = document.querySelector(".columns-container .slider-value span");
-    var colsSliderInput = document.querySelector(".columns-container input[type='range']");
+    const colsSliderValue = document.querySelector(".columns-container .slider-value span");
+    const colsSliderInput = document.querySelector(".columns-container input[type='range']");
     // Function to update the value display element when the rows slider value changes
-    rowsSliderInput.addEventListener('input', function () {
-        var value = rowsSliderInput.value;
+    rowsSliderInput.addEventListener('input', () => {
+        const value = rowsSliderInput.value;
         rowsSliderValue.textContent = value;
-        rowsSliderValue.style.left = "".concat((Number(value) - 5) / 0.03, "%");
+        rowsSliderValue.style.left = `${(Number(value) - 5) / 0.03}%`;
         document.documentElement.style.setProperty("--temp-grid-rows", value);
     });
     // Function to update the value display element when the columns slider value changes
-    colsSliderInput.addEventListener('input', function () {
-        var value = colsSliderInput.value;
+    colsSliderInput.addEventListener('input', () => {
+        const value = colsSliderInput.value;
         colsSliderValue.textContent = value;
-        colsSliderValue.style.left = "".concat((Number(value) - 5) / 0.1, "%");
+        colsSliderValue.style.left = `${(Number(value) - 5) / 0.1}%`;
         document.documentElement.style.setProperty("--temp-grid-columns", value);
     });
     // Function to update the value display element when the timing slider value changes
-    timingSliderInput.addEventListener('input', function () {
-        var value = timingSliderInput.value;
+    timingSliderInput.addEventListener('input', () => {
+        const value = timingSliderInput.value;
         timingSliderValue.textContent = value;
-        timingSliderValue.style.left = "".concat(Number(value), "%");
+        timingSliderValue.style.left = `${Number(value)}%`;
     });
 });

@@ -1,0 +1,16 @@
+{
+//    "compilerOptions": {
+//      "target": "es6",
+//      "module": "commonjs",
+////      "strict": true,
+////      "esModuleInterop": true,
+////      "skipLibCheck": true,
+////      "forceConsistentCasingInFileNames": true,
+//    }
+    "compilerOptions": {
+      "target": "es2015",
+      "module": "es2015",
+      "moduleResolution": "node",
+      "verbatimModuleSyntax": true,
+  }
+}

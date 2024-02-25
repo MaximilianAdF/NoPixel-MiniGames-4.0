@@ -1,6 +1,6 @@
 let timerTimeout: NodeJS.Timeout;
 let timerProgressBar: NodeJS.Timeout;
-let totalSeconds = 25;
+let totalSecondsVar = 25;
 let gridCols = 11;
 let gridRows = 8;
 
@@ -366,7 +366,7 @@ function endGame(outcome: string): void {
             winMsg.style.display = 'none';
             timerProgress.style.display = "block";
             overlay.style.display = 'none';
-            resetGame();
+            resetGameFunc();
         }, 2000);
     } else if (outcome === "lose") {
         const loseMsg = document.querySelector(".lose-message") as HTMLElement;
@@ -375,7 +375,7 @@ function endGame(outcome: string): void {
             loseMsg.style.display = 'none';
             timerProgress.style.display = "block";
             overlay.style.display = 'none';
-            resetGame();
+            resetGameFunc();
         }, 2000);
 
     } else if (outcome === "reset") {
@@ -385,12 +385,12 @@ function endGame(outcome: string): void {
             resetMsg.style.display = 'none';
             timerProgress.style.display = "block";
             overlay.style.display = 'none';
-            resetGame();
+            resetGameFunc();
         }, 1000);
     }
 }
 
-function resetGame(): void {
+function resetGameFunc(): void {
     const cssVariables = {
         "--grid-columns": gridCols,
         "--grid-rows": gridRows
@@ -402,9 +402,9 @@ function resetGame(): void {
     }
 
     const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
-    timerProgress.style.transition = `width ${totalSeconds}s cubic-bezier(0.4, 1, 0.7, 0.93)`;
+    timerProgress.style.transition = `width ${totalSecondsVar}s cubic-bezier(0.4, 1, 0.7, 0.93)`;
     generateCubes();
-    runTimer();
+    runTimerFunc();
 }
 
 function generateCubes(): void {
@@ -426,7 +426,7 @@ function generateCubes(): void {
 }
 
 
-function runTimer() {
+function runTimerFunc() {
     const timerProgress = document.querySelector(".timer-progress-bar") as HTMLElement;
     clearTimeout(timerProgressBar);  // We need to clear to prevent memory leak after multiple games are played.
     timerProgressBar = setTimeout(function () {
@@ -436,7 +436,7 @@ function runTimer() {
     clearTimeout(timerTimeout); // Clear any existing timer to prevent problems with endGame("reset")
     timerTimeout = setTimeout(function () {
         endGame("lose");
-    }, totalSeconds * 1000);
+    }, totalSecondsVar * 1000);
 }
 
 function toggleSettings(action: string = "") {
@@ -454,7 +454,7 @@ function applySettings() {
     const rowsSliderValue = document.querySelector(".rows-container .slider-value span") as HTMLElement;
     const colsSliderValue = document.querySelector(".columns-container .slider-value span") as HTMLElement;
 
-    totalSeconds = Number(timingSliderValue.textContent);
+    totalSecondsVar = Number(timingSliderValue.textContent);
     gridRows = Number(rowsSliderValue.textContent);
     gridCols = Number(colsSliderValue.textContent);
 
@@ -490,7 +490,7 @@ function resetSettings() {
 document.addEventListener("DOMContentLoaded", function () {
     htmlContainer = document.getElementById("container") as HTMLElement;
 
-    resetGame();
+    resetGameFunc();
     // Get references to the timing slider and its value display element
     const timingSliderValue = document.querySelector(".timing-container .slider-value span") as HTMLElement;
     const timingSliderInput = document.querySelector(".timing-container input[type='range']") as HTMLInputElement;

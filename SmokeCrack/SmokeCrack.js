@@ -1,23 +1,22 @@
-var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-var timerInterval = null;
-var secondsRemaining = 0;
-var totalSeconds = 0;
-var maxChars = 0;
-var minChars = 0;
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+let timerInterval = null;
+let secondsRemaining = 0;
+let totalSeconds = 0;
+let maxChars = 0;
+let minChars = 0;
 function getInputValues() {
-    var _a;
-    var _b, _c;
-    var macInput = document.getElementById('mac-input');
-    var ipInput = document.getElementById('ip-input');
-    var macIpCombs = {
+    var _a, _b;
+    const macInput = document.getElementById('mac-input');
+    const ipInput = document.getElementById('ip-input');
+    const macIpCombs = {
         '7c:89:3e:c8:cc:65-192.168.0.105': [5, 16, 10], //Easy (seconds, maxChars)
         'fb:d4:31:c:38:e8-192.168.0.205': [5, 18, 14], //Medium 
-        '71:21:e3:ea:f6:d0-192.168.0.179': [4, 20, 16], //Hard
+        '71:21:e3:ea:f6:d0-192.168.0.179': [4, 19, 16], //Hard
     };
-    var macInputValue = (_b = macInput === null || macInput === void 0 ? void 0 : macInput.value.toLowerCase()) !== null && _b !== void 0 ? _b : '';
-    var ipInputValue = (_c = ipInput === null || ipInput === void 0 ? void 0 : ipInput.value) !== null && _c !== void 0 ? _c : '';
-    if (macIpCombs["".concat(macInputValue, "-").concat(ipInputValue)]) {
-        _a = macIpCombs["".concat(macInputValue, "-").concat(ipInputValue)], secondsRemaining = _a[0], maxChars = _a[1], minChars = _a[2];
+    const macInputValue = (_a = macInput === null || macInput === void 0 ? void 0 : macInput.value.toLowerCase().trim()) !== null && _a !== void 0 ? _a : '';
+    const ipInputValue = (_b = ipInput === null || ipInput === void 0 ? void 0 : ipInput.value.trim()) !== null && _b !== void 0 ? _b : '';
+    if (macIpCombs[`${macInputValue}-${ipInputValue}`]) {
+        [secondsRemaining, maxChars, minChars] = macIpCombs[`${macInputValue}-${ipInputValue}`];
     }
     else {
         console.log('Invalid MAC-IP combination, using EASY mode as default');
@@ -33,9 +32,9 @@ function stopGame(gameWin, keyPressListener) {
         clearInterval(timerInterval);
         timerInterval = null;
     }
-    var endContainer = document.querySelector('.minigame-over');
-    var h2Elem = endContainer.querySelector('h2');
-    var pElem = endContainer.querySelector('p');
+    const endContainer = document.querySelector('.minigame-over');
+    const h2Elem = endContainer.querySelector('h2');
+    const pElem = endContainer.querySelector('p');
     if (gameWin) {
         endContainer.style.backgroundColor = 'rgba(84, 255, 164, 0.285)';
         h2Elem.textContent = "Hacking done!";
@@ -51,18 +50,18 @@ function stopGame(gameWin, keyPressListener) {
         h2Elem.style.textShadow = 'rgb(255, 127, 127)';
     }
     endContainer.style.display = 'flex';
-    setTimeout(function () {
+    setTimeout(() => {
         endContainer.style.display = 'none';
         resetGame();
     }, 2000);
 }
 function resetGame() {
-    var minigameContainer = document.querySelector('.minigame-container');
-    var crackButton = document.getElementById('crackButton');
-    var macInput = document.getElementById('mac-input');
-    var ipInput = document.getElementById('ip-input');
-    var timerProgress = document.querySelector('.timer-progress-bar-fill');
-    var macIpContainer = document.querySelector('.mac-ip-container');
+    const minigameContainer = document.querySelector('.minigame-container');
+    const crackButton = document.getElementById('crackButton');
+    const macInput = document.getElementById('mac-input');
+    const ipInput = document.getElementById('ip-input');
+    const timerProgress = document.querySelector('.timer-progress-bar-fill');
+    const macIpContainer = document.querySelector('.mac-ip-container');
     if (minigameContainer && crackButton) {
         minigameContainer.style.display = 'none';
         crackButton.style.display = 'flex';
@@ -83,25 +82,25 @@ function getRandomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 function getRandomCharacter() {
-    var randomIdx = Math.floor(Math.random() * chars.length);
+    const randomIdx = Math.floor(Math.random() * chars.length);
     return chars.charAt(randomIdx);
 }
 function generateRandomChars(length) {
-    var randomChars = [];
-    for (var i = 0; i < length; i++) {
+    const randomChars = [];
+    for (let i = 0; i < length; i++) {
         randomChars.push(getRandomCharacter());
     }
     return randomChars;
 }
 function generateFeedbackElem(numOfChars) {
-    var feedbackContainer = document.querySelector('.feedback-container');
+    const feedbackContainer = document.querySelector('.feedback-container');
     feedbackContainer.innerHTML = '';
-    for (var i = 0; i < numOfChars; i++) {
-        var feedbackCircle = document.createElement('div');
+    for (let i = 0; i < numOfChars; i++) {
+        const feedbackCircle = document.createElement('div');
         feedbackCircle.classList.add('feedback-circle');
         feedbackContainer.appendChild(feedbackCircle);
         if (i < numOfChars - 1) { //Make sure no extra line at end of circles
-            var feedbackLine = document.createElement('div');
+            const feedbackLine = document.createElement('div');
             feedbackLine.classList.add('feedback-line');
             feedbackContainer.appendChild(feedbackLine);
         }
@@ -109,16 +108,16 @@ function generateFeedbackElem(numOfChars) {
     return;
 }
 function updateFeedback(isCorrect, currSquareIdx) {
-    var feedbackContainer = document.querySelector('.feedback-container');
+    const feedbackContainer = document.querySelector('.feedback-container');
     if (currSquareIdx >= feedbackContainer.children.length) {
         console.log('Invalid square index for feedbackCircle');
         return;
     }
-    var feedbackCircle = feedbackContainer.children[2 * currSquareIdx];
-    var feedbackLine = feedbackContainer.children[2 * currSquareIdx - 1];
+    const feedbackCircle = feedbackContainer.children[2 * currSquareIdx];
+    const feedbackLine = feedbackContainer.children[2 * currSquareIdx - 1];
     if (isCorrect) {
         //Update the icon
-        var checkIcon = document.createElement('i');
+        const checkIcon = document.createElement('i');
         checkIcon.classList.add('fas', 'fa-check');
         feedbackCircle.appendChild(checkIcon);
         feedbackCircle.classList.add('check-mark'); //Styling for check-mark
@@ -129,7 +128,7 @@ function updateFeedback(isCorrect, currSquareIdx) {
     }
     else {
         //Update the icon
-        var xIcon = document.createElement('i');
+        const xIcon = document.createElement('i');
         xIcon.classList.add('fas', 'fa-times');
         feedbackCircle.appendChild(xIcon);
         feedbackCircle.classList.add('x-mark'); //Styling for x-mark
@@ -141,17 +140,17 @@ function updateFeedback(isCorrect, currSquareIdx) {
     return;
 }
 function initTimer() {
-    var timerContainer = document.querySelector('.timer-container');
-    var letterContainer = document.querySelector('.letter-container');
+    const timerContainer = document.querySelector('.timer-container');
+    const letterContainer = document.querySelector('.letter-container');
     if (timerContainer && letterContainer) {
-        var letterContainerWidth = letterContainer.clientWidth;
-        timerContainer.style.width = "".concat(letterContainerWidth, "px");
+        const letterContainerWidth = letterContainer.clientWidth;
+        timerContainer.style.width = `${letterContainerWidth}px`;
     }
     updateTimerDisplay();
 }
 function runTimer(keyPressListener) {
     document.addEventListener('keydown', keyPressListener);
-    timerInterval = setInterval(function () {
+    timerInterval = setInterval(() => {
         secondsRemaining--;
         updateTimerDisplay();
         if (secondsRemaining <= 0) {
@@ -160,17 +159,17 @@ function runTimer(keyPressListener) {
     }, 1000);
 }
 function updateTimerDisplay() {
-    var timerProgress = document.querySelector('.timer-progress-bar-fill');
-    var timerSeconds = document.querySelector('.timer-seconds');
+    const timerProgress = document.querySelector('.timer-progress-bar-fill');
+    const timerSeconds = document.querySelector('.timer-seconds');
     if (timerSeconds && timerProgress) {
-        var percentageLeft = Math.floor(100 * secondsRemaining / totalSeconds);
-        timerProgress.style.width = "".concat(percentageLeft, "%");
-        timerSeconds.textContent = "".concat(secondsRemaining, " sec left");
+        const percentageLeft = Math.floor(100 * secondsRemaining / totalSeconds);
+        timerProgress.style.width = `${percentageLeft}%`;
+        timerSeconds.textContent = `${secondsRemaining} sec left`;
     }
 }
 function startCracking() {
-    var macInput = document.getElementById('mac-input');
-    var ipInput = document.getElementById('ip-input');
+    const macInput = document.getElementById('mac-input');
+    const ipInput = document.getElementById('ip-input');
     if (macInput && ipInput) {
         macInput.disabled = true;
         ipInput.disabled = true;
@@ -178,50 +177,50 @@ function startCracking() {
     else {
         console.log('macInput or ipInput or both fields not found');
     }
-    var minigameContainer = document.querySelector('.minigame-container');
-    var letterContainer = document.querySelector('.letter-container');
-    var crackButton = document.getElementById('crackButton');
-    var macIpContainer = document.querySelector('.mac-ip-container');
+    const minigameContainer = document.querySelector('.minigame-container');
+    const letterContainer = document.querySelector('.letter-container');
+    const crackButton = document.getElementById('crackButton');
+    const macIpContainer = document.querySelector('.mac-ip-container');
     getInputValues();
     if (crackButton && minigameContainer && macIpContainer) {
         crackButton.style.display = 'none'; //Remove the crack button
         macIpContainer.style.display = 'none'; //Hide the mac-ip container
-        var numOfChars = getRandomNumber(minChars, maxChars);
-        var randomChars_1 = generateRandomChars(numOfChars);
+        const numOfChars = getRandomNumber(minChars, maxChars);
+        const randomChars = generateRandomChars(numOfChars);
         if (letterContainer) {
             letterContainer.innerHTML = ''; //Clear the container
             generateFeedbackElem(numOfChars);
-            randomChars_1.forEach(function (char) {
-                var letterSquare = document.createElement('div');
+            randomChars.forEach(char => {
+                const letterSquare = document.createElement('div');
                 letterSquare.classList.add('letter-square');
                 letterSquare.textContent = char;
                 letterContainer.appendChild(letterSquare); //Append the letter square to the letter container
             });
             minigameContainer.style.display = 'flex'; //Show the minigame
-            var handleKeyPress_1 = function (event) {
+            const handleKeyPress = function (event) {
                 if (!chars.includes(event.key.toUpperCase()))
                     return;
                 if (letterContainer && secondsRemaining) {
-                    var pressedKey = event.key.toUpperCase();
-                    var currentSquare = letterContainer.children[currSquareIdx_1];
-                    if (pressedKey === randomChars_1[currSquareIdx_1]) {
+                    const pressedKey = event.key.toUpperCase();
+                    const currentSquare = letterContainer.children[currSquareIdx];
+                    if (pressedKey === randomChars[currSquareIdx]) {
                         currentSquare.style.backgroundColor = 'rgb(84, 255, 164)';
-                        updateFeedback(true, currSquareIdx_1);
-                        currSquareIdx_1++;
-                        if (currSquareIdx_1 === randomChars_1.length) {
-                            stopGame(true, handleKeyPress_1);
+                        updateFeedback(true, currSquareIdx);
+                        currSquareIdx++;
+                        if (currSquareIdx === randomChars.length) {
+                            stopGame(true, handleKeyPress);
                         }
                     }
                     else {
-                        updateFeedback(false, currSquareIdx_1);
+                        updateFeedback(false, currSquareIdx);
                         currentSquare.style.backgroundColor = 'rgb(215, 73, 73)';
-                        stopGame(false, handleKeyPress_1);
+                        stopGame(false, handleKeyPress);
                     }
                 }
             };
             initTimer();
-            runTimer(handleKeyPress_1);
-            var currSquareIdx_1 = 0;
+            runTimer(handleKeyPress);
+            let currSquareIdx = 0;
         }
         else {
             console.log('Letter container not found!');

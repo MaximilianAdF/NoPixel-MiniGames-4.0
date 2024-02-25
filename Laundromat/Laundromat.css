@@ -168,8 +168,9 @@
 
 .lose-message {
     gap: 10px;
-    margin-top: -37px;
-    margin-left: 475px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
     display: none;
     color: white;
     padding: 0px 17px;
@@ -181,8 +182,9 @@
 
 .win-message {
     gap: 10px;
-    margin-top: -36px;
-    margin-left: 475px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
     display: none;
     color: white;
     padding: 0px 10px;
@@ -194,8 +196,9 @@
 
 .reset-message {
     gap: 10px;
-    margin-top: -40px;
-    margin-left: 500px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
     display: none;
     color: white;
     padding: 0px 10px;
