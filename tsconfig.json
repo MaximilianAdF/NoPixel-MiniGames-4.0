@@ -1,16 +1,29 @@
 {
-//    "compilerOptions": {
-//      "target": "es6",
-//      "module": "commonjs",
-////      "strict": true,
-////      "esModuleInterop": true,
-////      "skipLibCheck": true,
-////      "forceConsistentCasingInFileNames": true,
-//    }
-    "compilerOptions": {
-      "target": "es2015",
-      "module": "es2015",
-      "moduleResolution": "node",
-      "verbatimModuleSyntax": true,
-  }
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": [
+    "src/nopixel-minigames-4.0/next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": [
+    "src/nopixel-minigames-4.0/node_modules"
+  ]
 }

@@ -1,4 +1,4 @@
-import LockPickPuzzle, {toggleSettings, applySettings, resetSettings} from "../scripts/LockPickPuzzle.js";
+import LockPickPuzzle, {toggleSettings, applySettings, resetSettings} from "../scripts/LockPickPuzzle";
 
 LockPickPuzzle(4, 20);
 
