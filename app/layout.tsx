@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from 'next/font/local'
 import "./globals.css";
+import classNames from "classnames";
 
 const gilroy = localFont({
   src: [

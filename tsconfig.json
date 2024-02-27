@@ -22,8 +22,8 @@
     }
   },
   "include": [
-    "src/nopixel-minigames-4.0/next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+    "next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": [
-    "src/nopixel-minigames-4.0/node_modules"
+    "node_modules", "public/**" // TODO: Remove public once all old pages are replaced
   ]
 }

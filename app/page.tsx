@@ -1,32 +1,34 @@
 import Image from "next/image";
 
+import "./page.css";
+
 const puzzles = [
   {
-    href: "./RoofRunning/RoofRunning.html",
+    href: "RoofRunning/RoofRunning.html",
     img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7d94e398-ae40-45d2-ae25-d20fa5a62301",
     title: "Roof Running",
     description: "Replica of the Roof Running hack that is triggered when robbing AC-Units on NoPixel 4.0"
   },
   {
-    href: "./Laundromat/Laundromat.html",
+    href: "Laundromat/Laundromat.html",
     img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7a0a6e18-a39f-45b8-b186-5d0069241ce0",
     title: "Laundromat",
     description: "Replica of the Laundromat hack that is triggered when robbing the safe inside the south-side Laundromat on NoPixel 4.0"
   },
   {
-    href: "./LockPick/LockPick.html",
+    href: "LockPick/LockPick.html",
     img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/e5e00eac-ea19-46e1-944c-67c7ff8ca5cf",
     title: "LockPick",
     description: "Replica of the LockPick hack that is triggered when lockpicking vehicles, among other things, on NoPixel 4.0"
   },
   {
-    href: "./RepairKit/RepairKit.html",
+    href: "RepairKit/RepairKit.html",
     img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/4888fd16-2b24-44c0-9952-275ddb626332",
     title: "RepairKit",
     description: "Replica of the RepairKit hack that is triggered when repairing vehicles on NoPixel 4.0"
   },
   {
-    href: "./SmokeCrack/SmokeCrack.html",
+    href: "SmokeCrack/SmokeCrack.html",
     img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/3d2d218e-ec33-4b16-a981-56a16771aa64",
     title: "SmokeCrack",
     description: "Replica of the SmokeCrack hack that is triggered through the in-game PC when hacking Wi-Fi's on NoPixel 4.0"
