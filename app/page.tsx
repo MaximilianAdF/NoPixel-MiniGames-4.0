@@ -1,7 +1,5 @@
 import Image from "next/image";
 
-import "./page.css";
-
 const puzzles = [
   {
     href: "RoofRunning/RoofRunning.html",
@@ -37,18 +35,33 @@ const puzzles = [
 
 export default function Home() {
   return (
-      <main > {/* className="flex min-h-screen flex-col items-center justify-between p-24" */}
-        <div className="header w-4/5 max-w-xl my-5 mx-auto flex items-center flex-col p-5 rounded-lg shadow-[0_0_10px_0_rgba(0,0,0,0.5)]">
-          <h1 className="text-white text-5xl m-0 font-bold pb-5">NoPixel Hacking Simulator</h1>
-          <p className="text-white text-xl text-center">Hover over the below <a>images</a> to discover the minigames that are currently available. For more
-            information checkout the <a href="https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0">GitHub
-              Repository</a></p>
+      <main className="flex min-h-screen flex-col items-center p-5 gap-5 ">
+        <div className="
+          w-full max-w-2xl
+          p-5 mx-auto
+          flex items-center flex-col
+          rounded-lg
+          shadow
+
+          bg-mirage-900/50
+        ">
+          <h1 className="text-white text-5xl m-0 pb-5">NoPixel Hacking Simulator</h1>
+          <p className="
+            text-white
+            text-xl
+            text-center
+
+            *:text-spring-green-300 hover:*:text-aquamarine-300
+            ">
+            Hover over the below <a>images</a> to discover the minigames that are currently available. For more
+            information checkout the <a href="https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0">GitHub Repository</a>.
+          </p>
         </div>
-        <div className="flex flex-wrap justify-center max-w-4xl m-auto">
+        <div className="flex flex-wrap justify-center max-w-4xl mx-auto">
           {puzzles.map((puzzle, index) => {
             return (
-              <div className="flex-item m-2 p-2 rounded-lg text-center relative overflow-hidden bg-[rgb(84,255,164)] shadow-[0_0_0.5rem_0_rgb(127,255,191)]" key={index}>
-                <a href={puzzle.href}>
+              <div className="flex-item m-2 p-2 rounded-lg text-center relative overflow-hidden bg-spring-green-300 shadow" key={index}>
+                <a href={puzzle.href} className="">
                   <Image
                       src={puzzle.img}
                       alt={puzzle.title}
@@ -56,18 +69,45 @@ export default function Home() {
                       height={124}
                       className="rounded"
                   />
-                  <div className="overlay">
-                    <h2>{puzzle.title}</h2>
-                    <p>{puzzle.description}</p>
+                  <div className="
+                    absolute
+                    top-0
+                    left-0
+                    w-full h-full
+                    opacity-0
+                    flex justify-center flex-col items-center
+                    transition
+                    duration-500
+                    ease-in-out
+                    bg-black/50
+
+                    text-white
+                    text-center
+
+                    hover:opacity-100
+                  ">
+                    <h2 className="text-3xl">{puzzle.title}</h2>
+                    <p className="text-xs max-w-[80%]">{puzzle.description}</p>
                   </div>
                 </a>
               </div>
             );
           })}
         </div>
-        <div className="highscores">
-          <h2>Highscores</h2>
-          <p>Coming soon...</p>
+        <div className="
+          w-full max-w-2xl
+          p-5 mx-auto
+          flex flex-col items-center
+          shadow
+          rounded-lg
+
+          text-white
+          text-center
+
+          bg-mirage-900/50
+        ">
+          <h2 className="text-5xl pb-5">Highscores</h2>
+          <p className="text-xl max-w-[80%]">Coming soon...</p>
         </div>
       </main>
   );

@@ -1,7 +1,25 @@
 import type { Metadata } from "next";
 import localFont from 'next/font/local'
 import "./globals.css";
-import classNames from "classnames";
+import Image from 'next/image'
+import background from '../public/images/bg.png'
+
+function Background() {
+  return (
+    <div className="fixed h-screen w-screen -z-50 bg-mirage-950">
+      <Image
+        alt=""
+        src={background}
+        placeholder="blur"
+        quality={100}
+        fill
+        sizes="100vw"
+        className="opacity-10 object-cover"
+        priority
+      />
+    </div>
+  )
+}
 
 const gilroy = localFont({
   src: [
@@ -35,7 +53,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={gilroy.className}>{children}</body>
+      <body className={gilroy.className}>
+        <Background />
+        {children}
+      </body>
     </html>
   );
 }

@@ -1,4 +1,4 @@
-import "./puzzle.css";
+// import "./puzzle.css";
 import Script from "next/script";
 import RepairKit from "@/app/puzzles/repair-kit/RepairKit";
 
@@ -16,13 +16,13 @@ export default function PuzzleLayout({
                 flex items-start justify-start
                 gap-2.5
                 p-5
-                bg-slate-950
+                bg-mirage-900/50
             ">
                   <a href="/" className="
                     rounded-full
                     py-2.5 px-5
                     text-black
-                    bg-[rgb(84_255_164)]
+                    bg-spring-green-300
                     shadow-[0_0_3px_rgb(127_255_191)]
                     transition-all
                     duration-200

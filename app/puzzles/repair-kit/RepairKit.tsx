@@ -110,7 +110,7 @@ export default function RepairKit() {
     return (
         // TODO: Add a breakpoint to shrink some elements on mobile
         <div className="
-            h-24 w-full
+            h-24 w-full max-w-[800px]
             m-auto
             p-5
             flex
@@ -118,6 +118,7 @@ export default function RepairKit() {
             rounded-lg
             gap-3
             bg-gradient-to-r from-[rgb(18_19_20)] to-[rgb(36_68_90)]
+            shadow
         ">
             <div className={classNames(`
                 h-full aspect-square
@@ -132,7 +133,7 @@ export default function RepairKit() {
                 `
             )}>E</div>
             <div className="
-                h-full w-full max-w-[800px]
+                h-full w-full
                 p-2
                 rounded
                 flex items-center
