@@ -1,0 +1,133 @@
+@font-face {
+    font-family: 'Gilroy';
+    src: url('fonts/Gilroy-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Gilroy';
+    overflow: hidden;
+    background: radial-gradient(circle, rgba(25, 37, 78, 0.97), rgba(21, 27, 48, 0.97))
+}
+
+a {
+    color: rgb(84, 255, 164);
+    text-decoration: none;
+}
+
+a:link,
+a:visited {
+    color: rgb(84, 255, 164);
+}
+
+a:hover {
+    color: rgb(127, 255, 191);
+}
+
+.header {
+    margin: 0 auto;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px 50px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    width: 35%;
+}
+
+.header h1 {
+    color: white;
+    font-size: 50px;
+    margin: 0;
+}
+
+.header p {
+    color: white;
+    font-size: 20px;
+    text-align: center;
+}
+
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.flex-item  {
+    margin: 10px;
+    padding: 10px;
+    width: 25%;
+    background-color: rgb(84, 255, 164);
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0 rgb(127, 255, 191);
+    text-align: center;
+    position: relative;
+}
+
+
+.flex-item img {
+    width: 100%;
+    border-radius: 5px;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0; /* The overlay is initially hidden */
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    transition: .5s ease;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+}
+
+.flex-item:hover .overlay {
+    opacity: 1;
+}
+
+.overlay h2{
+    color: white;
+    font-size: 50px;
+    text-align: center;
+    margin: 0;
+}
+
+.overlay p {
+    color: white;
+    font-size: 20px;
+    text-align: center;
+    max-width: 80%;
+}
+
+.highscores {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    margin-top: 10px;
+    padding: 20px 50px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    width: 35%;
+}
+
+.highscores h2 {
+    color: white;
+    font-size: 50px;
+    margin: 0;
+}
+
+.highscores p {
+    margin-top: 5px;
+    color: white;
+    font-size: 20px;
+    text-align: center;
+}

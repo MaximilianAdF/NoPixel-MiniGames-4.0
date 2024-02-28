@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "target": "es5",
+      "module": "commonjs",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      "outDir": "./"
+    },
+    "include": [
+      "LockPick.ts"
+    ],
+    "exclude": ["node_modules"]
+  }
+  

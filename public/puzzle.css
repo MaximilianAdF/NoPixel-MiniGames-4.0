@@ -1,0 +1,69 @@
+@font-face {
+  font-family: 'Gilroy';
+  src: url('fonts/Gilroy-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+    font-family: 'Gilroy', sans-serif;
+    overflow: hidden;
+    position: relative; /* Set position to relative to allow positioning of pseudo-element */
+    background: linear-gradient(rgba(21, 27, 48, 0.97), rgba(21, 27, 48, 0.97)), url(bg.png);
+    background-size: cover;
+}
+
+.hack-box-container {
+  position: relative;
+  border-radius: 0.5rem;
+  outline: 0.1rem solid gray;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 2.5vh auto;
+  width: fit-content;
+  overflow: hidden;
+
+  max-height: 95vh;
+  max-width: 95vw;
+
+}
+
+.info-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-left: 20px;
+}
+
+.info-container h2 {
+  font-size: 1.5rem;
+  color: rgb(84, 255, 164);
+  text-shadow: 0 0 2.1px rgb(127, 255, 191);
+}
+
+.info-container p {
+  font-size: 1rem;
+  color: rgb(142, 142, 142);
+}
+
+.outer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(7, 19, 32);
+}
+
+.hack-box {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  margin: 0 .75rem 1rem 0.75rem;
+}
+
