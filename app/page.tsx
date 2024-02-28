@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 const puzzles = [
   {
@@ -20,7 +21,7 @@ const puzzles = [
     description: "Replica of the LockPick hack that is triggered when lockpicking vehicles, among other things, on NoPixel 4.0"
   },
   {
-    href: "RepairKit/RepairKit.html",
+    href: "/puzzles/repair-kit",
     img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/4888fd16-2b24-44c0-9952-275ddb626332",
     title: "RepairKit",
     description: "Replica of the RepairKit hack that is triggered when repairing vehicles on NoPixel 4.0"
@@ -54,14 +55,14 @@ export default function Home() {
             *:text-spring-green-300 hover:*:text-aquamarine-300
             ">
             Hover over the below <a>images</a> to discover the minigames that are currently available. For more
-            information checkout the <a href="https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0">GitHub Repository</a>.
+            information checkout the <Link href="https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0">GitHub Repository</Link>.
           </p>
         </div>
         <div className="flex flex-wrap justify-center max-w-4xl mx-auto">
           {puzzles.map((puzzle, index) => {
             return (
               <div className="flex-item m-2 p-2 rounded-lg text-center relative overflow-hidden bg-spring-green-300 shadow" key={index}>
-                <a href={puzzle.href} className="">
+                <Link href={puzzle.href} className="">
                   <Image
                       src={puzzle.img}
                       alt={puzzle.title}
@@ -89,7 +90,7 @@ export default function Home() {
                     <h2 className="text-3xl">{puzzle.title}</h2>
                     <p className="text-xs max-w-[80%]">{puzzle.description}</p>
                   </div>
-                </a>
+                </Link>
               </div>
             );
           })}

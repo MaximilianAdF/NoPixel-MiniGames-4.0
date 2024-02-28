@@ -1,6 +1,7 @@
 // import "./puzzle.css";
 import Script from "next/script";
 import RepairKit from "@/app/puzzles/repair-kit/RepairKit";
+import Link from "next/link";
 
 
 export default function PuzzleLayout({
@@ -18,7 +19,7 @@ export default function PuzzleLayout({
                 p-5
                 bg-mirage-900/50
             ">
-                  <a href="/" className="
+                  <Link href="/" className="
                     rounded-full
                     py-2.5 px-5
                     text-black
@@ -34,13 +35,12 @@ export default function PuzzleLayout({
                     ">
                       {/* TODO: Before react rewrite, this had touch-manipulation set. Is that needed? */}
                       Check other Mini-games
-                  </a>
+                  </Link>
               </nav>
               <div className="grow w-[90%] py-5 m-auto flex">
                   {children}
               </div>
           </main>
-          {/*<section>{children}</section>*/}
       </>
   );
 }
