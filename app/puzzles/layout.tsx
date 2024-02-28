@@ -3,6 +3,7 @@ import Script from "next/script";
 import RepairKit from "@/app/puzzles/repair-kit/RepairKit";
 import Link from "next/link";
 
+// import "./puzzle.css";
 
 export default function PuzzleLayout({
   children,
@@ -37,7 +38,7 @@ export default function PuzzleLayout({
                       Check other Mini-games
                   </Link>
               </nav>
-              <div className="grow w-[90%] py-5 m-auto flex">
+              <div className="grow w-[90%] py-5 m-auto flex items-center">
                   {children}
               </div>
           </main>

@@ -32,6 +32,12 @@ const puzzles = [
     title: "SmokeCrack",
     description: "Replica of the SmokeCrack hack that is triggered through the in-game PC when hacking Wi-Fi's on NoPixel 4.0"
   },
+  {
+    href: "/puzzles/word-memory",
+    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/71356958/835f82cb-a5de-43b7-ade0-6bc74285ed00",
+    title: "Word Memory",
+    description: ""
+  }
 ]
 
 export default function Home() {
