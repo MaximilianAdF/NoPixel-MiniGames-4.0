@@ -40,7 +40,8 @@ const NPButton: React.FC<NPButtonProps> = ({
                 ease-in-out
             `,
             color === "purple" ? "bg-[rgb(49_37_76)] text-[rgb(147_62_171)] hover:bg-[rgb(83_39_107)]" :
-                color === "green" ? "bg-[rgb(23_95_88)] text-[rgb(48_221_189)] hover:bg-[rgb(23_109_93)]" : "",
+            color === "green" ? "bg-[rgb(23_95_88)] text-[rgb(48_221_189)] hover:bg-[rgb(23_109_93)]" : "",
+            disabled ? "opacity-50" : "",
         ),
         'aria-label': label || children?.toString(),
         disabled: disabled,
