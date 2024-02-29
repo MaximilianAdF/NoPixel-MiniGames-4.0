@@ -10,7 +10,7 @@ interface NPButtonProps {
     color?: 'purple' | 'green';
     icon?: React.ReactElement | string;
     href?: string;
-    isDisabled?: boolean;
+    disabled?: boolean;
     onClick?: (() => MouseEventHandler | void);
     children?: string;
 }
@@ -21,7 +21,7 @@ const NPButton: React.FC<NPButtonProps> = ({
     label,
     icon,
     href,
-    isDisabled,
+    disabled,
     onClick,
     children
 }) => {
@@ -43,7 +43,7 @@ const NPButton: React.FC<NPButtonProps> = ({
                 color === "green" ? "bg-[rgb(23_95_88)] text-[rgb(48_221_189)] hover:bg-[rgb(23_109_93)]" : "",
         ),
         'aria-label': label || children?.toString(),
-        disabled: isDisabled,
+        disabled: disabled,
         onClick: onClick
     };
 

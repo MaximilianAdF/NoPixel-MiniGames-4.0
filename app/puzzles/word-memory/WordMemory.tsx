@@ -1,8 +1,25 @@
 "use client";
 
 import NPHackContainer from "@/app/components/NPHackContainer";
-import {useCallback, useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
+import useTimeout from "@/app/utils/useTimeout";
+import {useCountdown} from "@/app/utils/useCountdown";
 
+
+const getStatusMessage = (status: number) => {
+    switch (status) {
+        case 0:
+            return "Reset!";
+        case 1:
+            return "";
+        case 2:
+            return "Failed!";
+        case 3:
+            return "Succeeded!";
+        default:
+            return `Error: Unknown game status ${status}`;
+    }
+}
 
 const availableWords = [
     "alleviations",
@@ -14,16 +31,15 @@ const availableWords = [
 ];
 
 export default function WordMemory() {
+    const maxCountdown = 60000;  // TODO: Get the actual speed
     const maxRounds = 25;
+    const frameSpeed = 1000; // TODO: Theoretically, this can be as slow as maxCountdown.
 
     // Game status: 0=Stopped,1=Running,2=Failed,3=Win
     const [gameStatus, setGameStatus] = useState(0);
     const [currentRound, setCurrentRound] = useState(0);
     const [currentWord, setCurrentWord] = useState<string | null>(null);
     const [seenWords, setSeenWords] = useState<string[]>([]);
-
-    const resetTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
-
 
     const setRandomWord = useCallback(() => {
         // TODO: How should a random word be selected? Is there a % chance of getting a new word?
@@ -40,29 +56,39 @@ export default function WordMemory() {
         setSeenWords([]);
     }, [setRandomWord]);
 
+    const resetTimeout = useTimeout(() => {
+        resetGame();
+        resetCountdown();
+    }, 3000);
+    const [countdown, resetCountdown] = useCountdown(resetTimeout, maxCountdown, frameSpeed);
+
 
     const handleWin = (message: string) => {
         console.log(`Win: ${message}`);
 
         setGameStatus(3);
-        resetTimeout.current = setTimeout(resetGame, 3000);
+        resetTimeout();
     }
 
     const handleLose = (message: string) => {
         console.log(`Lose: ${message}`);
 
         setGameStatus(2);
-        resetTimeout.current = setTimeout(resetGame, 3000);
+        resetTimeout();
     }
 
-    const handleGameOver = (result: boolean) => {
-
-}
+    const nextRound = () => {
+        if (currentRound >= maxRounds) {
+            handleWin("All rounds completed");
+        } else {
+            setCurrentRound((v) => v+1);
+            setRandomWord();
+        }
+    }
 
     const handleSeen = () => {
         if (seenWords.includes(currentWord as string)) {
-            setCurrentRound((v) => v+1);
-            setRandomWord();
+            nextRound();
         } else {
             handleLose(`${currentWord} not seen yet (${seenWords})`);
         }
@@ -70,8 +96,7 @@ export default function WordMemory() {
 
     const handleNew = () => {
         if (!seenWords.includes(currentWord as string)) {
-            setCurrentRound((v) => v+1);
-            setRandomWord();
+            nextRound();
         } else {
             handleLose(`${currentWord} already seen (${seenWords})`);
         }
@@ -87,7 +112,7 @@ export default function WordMemory() {
         setSeenWords([]);
         setCurrentRound(0);
         setGameStatus(1);
-    }, [])
+    }, []);
 
     return (
         <NPHackContainer
@@ -99,25 +124,20 @@ export default function WordMemory() {
                         label: "Seen",
                         color: "purple",
                         callback: handleSeen,
+                        disabled: gameStatus !== 1,
                     },
                     {
                         label: "New",
                         color: "green",
                         callback: handleNew,
+                        disabled: gameStatus !== 1,
                     }
                 ],
             ]}
-            status={
-                gameStatus === 2 ? "lose" :
-                gameStatus === 3 ? "win" :
-                gameStatus === 0 ? "reset" : undefined
-            }
-            statusMessage={
-                gameStatus === 2 ? "Failed!" :
-                gameStatus === 3 ? "Succeeded!" :
-                gameStatus === 0 ? "Reset!" : ""
-
-            }
+            countdown={countdown}
+            frameSpeed={frameSpeed}
+            status={gameStatus}
+            statusMessage={getStatusMessage(gameStatus)}
         >
             <p className="text-white text-2xl text-center w-full">{currentRound}/{maxRounds}</p>
             <div className="

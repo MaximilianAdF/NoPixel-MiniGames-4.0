@@ -5,7 +5,8 @@ import classNames from "classnames";
 interface NPHackContainerButton {
     label: string,
     color: "purple" | "green",
-    callback?: () => void  // TODO: Make callback non-optional
+    callback?: () => void,  // TODO: Make callback non-optional
+    disabled: boolean,
 }
 
 interface NPHackContainerProps {
@@ -13,7 +14,9 @@ interface NPHackContainerProps {
     title: string,
     description?: string,
     buttons: NPHackContainerButton[][],
-    status?: "lose" | "win" | "reset",
+    countdown: number,
+    frameSpeed: number,
+    status?: number,
     statusMessage?: string,
 }
 
@@ -22,6 +25,8 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
     title,
     description,
     buttons,
+    countdown,
+    frameSpeed,
     status,
     statusMessage,
 }) => {
@@ -67,27 +72,23 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                             rounded
                             flex items-center justify-center
                         `,
-                        status === "lose" ? "bg-[rgb(56_13_23)]" :
-                        status === "win" ? "bg-[rgb(23_95_88)]" :
-                        status === "reset" ? "bg-[rgb(118_128_37)]" : ""
+                        status === 2 ? "bg-[rgb(56_13_23)]" :
+                        status === 3 ? "bg-[rgb(23_95_88)]" :
+                        status === 0 ? "bg-[rgb(118_128_37)]" : ""
                     )}>
-                        <i className="
-                            fa-solid
-                            fa-circle-xmark
+                        {/* TODO: Refactor icons, they're completely broken */}
+                        {/*{status === 2 && <i className="fa-solid text-2xl fa-circle-xmark text-[rgb(255_84_84)]"></i>}*/}
+                        {/*{status === 3 && <i className="fa-solid text-2xl fa-circle-check text-[rgb(84_255_164)]"></i>}*/}
+                        {/*{status === 0 && <i className="fa-solid text-2xl fa-hourglass-start text-[rgb(118_128_37)]"></i>}*/}
 
-                            text-2xl
-                            text-[rgb(255_84_84)]
-                            "></i>
+                        {/*<i className={classNames(*/}
+                        {/*    "fa-solid text-2xl",*/}
+                        {/*    status === 2 ? "fa-circle-xmark text-[rgb(255_84_84)]" :*/}
+                        {/*    status === 3 ? "fa-circle-check text-[rgb(84_255_164)]" :*/}
+                        {/*    status === 0 ? "fa-hourglass-start text-[rgb(118_128_37)]" : "hidden"  // TODO: Fix reset icon*/}
+                        {/*)}></i>*/}
                         <p className="text-xs font-medium">{statusMessage}</p>
                     </div>}
-                    <div className="win-message hidden">
-                        <i className="fa-solid fa-circle-check"></i>
-                        <p>The lock was picked successfully.</p>
-                    </div>
-                    <div className="reset-message hidden">
-                        <i className="fas fa-hourglass-start"></i>
-                        <p>Reset!</p>
-                    </div>
                     <div className="w-full mb-2">
                         {children}
                     </div>
@@ -101,6 +102,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                                                 onClick={button.callback}
                                                 color={button.color}
                                                 key={index}
+                                                disabled={button.disabled}
                                             >
                                                 {button.label}
                                             </NPButton>
@@ -111,8 +113,17 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                         })}
                     </div>
                 </div>
-                <div className="timer-container">
-                    <div className="timer-progress-bar"></div>
+                <div className="bg-[rgb(15_27_33)] flex w-full h-2.5">
+                    <div
+                        className={classNames(
+                            "bg-[orangered] w-full h-full [transition:width_linear]",
+                        )}
+                        style={{
+                            transitionDuration: countdown < 1 ? "0ms" : `${frameSpeed}ms`,
+                            // transitionTimingFunction: "cubic-bezier(0.4, 1, 0.7, 0.93)",
+                            width: `${100-countdown}%`,
+                        }}
+                    ></div>
                 </div>
             </div>
         </>
