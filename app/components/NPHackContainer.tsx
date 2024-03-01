@@ -1,6 +1,8 @@
-import {FC, ReactNode} from "react";
+import {FC, ReactNode, useEffect, useState} from "react";
 import NPButton from "@/app/components/NPButton";
 import classNames from "classnames";
+import {useCountdown} from "@/app/utils/useCountdown";
+import useTimeout from "@/app/utils/useTimeout";
 
 interface NPHackContainerButton {
     label: string,
@@ -14,8 +16,10 @@ interface NPHackContainerProps {
     title: string,
     description?: string,
     buttons: NPHackContainerButton[][],
-    countdown: number,
-    frameSpeed: number,
+    countdownDuration: number,
+    resetCallback: () => void,
+    resetDelay: number,
+    // frameSpeed: number,
     status?: number,
     statusMessage?: string,
 }
@@ -25,11 +29,38 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
     title,
     description,
     buttons,
-    countdown,
-    frameSpeed,
+    countdownDuration,
+    resetCallback,
+    resetDelay,
+    // frameSpeed,
     status,
     statusMessage,
 }) => {
+    // This can be decreased if you need to call a func every frame
+    // For now, 1s per frame seems reasonable
+
+    const frameSpeed = 1000;
+
+    const resetTimeout = useTimeout(() => {
+        resetCallback();
+        resetCountdown();
+    }, resetDelay);
+
+    useEffect(() => {
+        if (status !== 1 && status !== 0) {
+            resetTimeout();
+        }
+    }, [resetTimeout, status]);
+
+    // TODO: The timer bar doesn't start moving until the first tick, should probably fix this.
+    const [countdown, resetCountdown, freezeCountdown] = useCountdown(resetTimeout, countdownDuration, frameSpeed);
+
+    useEffect(() => {
+        if (status !== 1 && status !== 0) {
+            freezeCountdown();
+        }
+    }, [freezeCountdown, status]);
+
     return (
         <>
             <div className="

@@ -2,11 +2,9 @@
 
 import NPHackContainer from "@/app/components/NPHackContainer";
 import {useCallback, useEffect, useState} from "react";
-import useTimeout from "@/app/utils/useTimeout";
-import {useCountdown} from "@/app/utils/useCountdown";
 
 
-const getStatusMessage = (status: number) => {
+const getStatusMessage = (status: number | undefined) => {
     switch (status) {
         case 0:
             return "Reset!";
@@ -31,9 +29,8 @@ const availableWords = [
 ];
 
 export default function WordMemory() {
-    const maxCountdown = 60000;  // TODO: Get the actual speed
+    const countdownDuration = 60000;  // TODO: Get the actual speed
     const maxRounds = 25;
-    const frameSpeed = 1000; // TODO: Theoretically, this can be as slow as maxCountdown.
 
     // Game status: 0=Stopped,1=Running,2=Failed,3=Win
     const [gameStatus, setGameStatus] = useState(0);
@@ -56,25 +53,16 @@ export default function WordMemory() {
         setSeenWords([]);
     }, [setRandomWord]);
 
-    const resetTimeout = useTimeout(() => {
-        resetGame();
-        resetCountdown();
-    }, 3000);
-    const [countdown, resetCountdown] = useCountdown(resetTimeout, maxCountdown, frameSpeed);
-
-
     const handleWin = (message: string) => {
         console.log(`Win: ${message}`);
 
         setGameStatus(3);
-        resetTimeout();
     }
 
     const handleLose = (message: string) => {
         console.log(`Lose: ${message}`);
 
         setGameStatus(2);
-        resetTimeout();
     }
 
     const nextRound = () => {
@@ -134,8 +122,9 @@ export default function WordMemory() {
                     }
                 ],
             ]}
-            countdown={countdown}
-            frameSpeed={frameSpeed}
+            countdownDuration={countdownDuration}
+            resetCallback={resetGame}
+            resetDelay={3000}
             status={gameStatus}
             statusMessage={getStatusMessage(gameStatus)}
         >
