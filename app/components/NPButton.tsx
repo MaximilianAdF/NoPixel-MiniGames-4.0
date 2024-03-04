@@ -38,10 +38,10 @@ const NPButton: React.FC<NPButtonProps> = ({
                 transition-colors
                 duration-100
                 ease-in-out
+                disabled:opacity-50
             `,
-            color === "purple" ? "bg-[rgb(49_37_76)] text-[rgb(147_62_171)] hover:bg-[rgb(83_39_107)]" :
-            color === "green" ? "bg-[rgb(23_95_88)] text-[rgb(48_221_189)] hover:bg-[rgb(23_109_93)]" : "",
-            disabled ? "opacity-50" : "",
+            color === "purple" ? "bg-vivid-violet-600/25 text-vivid-violet-600 enabled:hover:bg-vivid-violet-600/50" :
+            color === "green" ? "bg-turquoise-400/25 text-turquoise-400 enabled:hover:bg-turquoise-400/50" : "",
         ),
         'aria-label': label || children?.toString(),
         disabled: disabled,
