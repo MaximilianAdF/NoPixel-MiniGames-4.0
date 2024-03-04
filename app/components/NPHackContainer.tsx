@@ -58,7 +58,6 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
         setStatus(2);
     }
 
-    // TODO: The timer bar doesn't start moving until the first tick, should probably fix this.
     const [countdown, resetCountdown, freezeCountdown] = useCountdown(timerReset, countdownDuration, frameSpeed);
 
     useEffect(() => {
