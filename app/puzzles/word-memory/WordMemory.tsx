@@ -28,6 +28,12 @@ const availableWords = [
     "sorbitols",
 ];
 
+const getRandomWord = () => {
+    // TODO: How should a random word be selected? Is there a % chance of getting a new word?
+    console.log("New word");
+    return availableWords[Math.floor(Math.random() * availableWords.length)];
+}
+
 export default function WordMemory() {
     const countdownDuration = 60000;  // TODO: Get the actual speed
     const maxRounds = 25;
@@ -35,14 +41,12 @@ export default function WordMemory() {
     // Game status: 0=Stopped,1=Running,2=Failed,3=Win
     const [gameStatus, setGameStatus] = useState(0);
     const [currentRound, setCurrentRound] = useState(0);
-    const [currentWord, setCurrentWord] = useState<string | null>(null);
+    const [currentWord, setCurrentWord] = useState<string>();
     const [seenWords, setSeenWords] = useState<string[]>([]);
 
     const setRandomWord = useCallback(() => {
-        // TODO: How should a random word be selected? Is there a % chance of getting a new word?
-        console.log("new word")
         setSeenWords((v) => v.concat([currentWord as string]));
-        setCurrentWord(availableWords[Math.floor(Math.random() * availableWords.length)]);
+        setCurrentWord(getRandomWord());
     }, [currentWord]);
 
     const resetGame = useCallback(() => {
@@ -91,13 +95,10 @@ export default function WordMemory() {
     }
 
     useEffect(() => {
-        if (currentWord === null) {
-            setRandomWord();
-        }
-    }, [currentWord, setRandomWord]);
+        const word = getRandomWord();
 
-    useEffect(() => {
-        setSeenWords([]);
+        setCurrentWord(word);
+        setSeenWords([word]);
         setCurrentRound(0);
         setGameStatus(1);
     }, []);
