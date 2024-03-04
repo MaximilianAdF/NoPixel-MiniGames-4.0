@@ -20,8 +20,8 @@ interface NPHackContainerProps {
     resetCallback: () => void,
     resetDelay: number,
     // frameSpeed: number,
-    status?: number,
-    statusMessage?: string,
+    status: number,
+    statusMessage: string,
 }
 
 const NPHackContainer: FC<NPHackContainerProps> = ({
