@@ -1,7 +1,8 @@
 "use client";
 
 import NPHackContainer from "@/app/components/NPHackContainer";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useState} from "react";
+import useGame from "@/app/utils/useGame";
 
 
 const getStatusMessage = (status: number | undefined) => {
@@ -38,8 +39,19 @@ export default function WordMemory() {
     const countdownDuration = 60000;  // TODO: Get the actual speed
     const maxRounds = 25;
 
-    // Game status: 0=Stopped,1=Running,2=Failed,3=Win
-    const [gameStatus, setGameStatus] = useState(0);
+    const statusUpdateHandler = (newStatus: number) => {
+        switch (newStatus) {
+            case 1:
+                console.log('Reset game');
+                setRandomWord();
+                setCurrentRound(0);
+                setSeenWords([]);
+                break;
+        }
+    }
+
+    const [gameStatus, setGameStatus] = useGame(countdownDuration, statusUpdateHandler);
+
     const [currentRound, setCurrentRound] = useState(0);
     const [currentWord, setCurrentWord] = useState<string>();
     const [seenWords, setSeenWords] = useState<string[]>([]);
@@ -49,13 +61,9 @@ export default function WordMemory() {
         setCurrentWord(getRandomWord());
     }, [currentWord]);
 
-    const resetGame = useCallback(() => {
-        console.log('Reset game');
+    const resetGame = () => {
         setGameStatus(1);
-        setRandomWord();
-        setCurrentRound(0);
-        setSeenWords([]);
-    }, [setRandomWord]);
+    };
 
     const handleWin = (message: string) => {
         console.log(`Win: ${message}`);
@@ -93,15 +101,6 @@ export default function WordMemory() {
             handleLose(`${currentWord} already seen (${seenWords})`);
         }
     }
-
-    useEffect(() => {
-        const word = getRandomWord();
-
-        setCurrentWord(word);
-        // setSeenWords([]);
-        // setCurrentRound(0);
-        setGameStatus(1);
-    }, []);
 
     return (
         <NPHackContainer
