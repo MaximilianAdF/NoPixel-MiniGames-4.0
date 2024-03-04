@@ -127,6 +127,7 @@ export default function WordMemory() {
             resetCallback={resetGame}
             resetDelay={3000}
             status={gameStatus}
+            setStatus={setGameStatus}
             statusMessage={getStatusMessage(gameStatus)}
         >
             <p className="text-white text-2xl text-center w-full">{currentRound}/{maxRounds}</p>

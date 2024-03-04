@@ -21,6 +21,7 @@ interface NPHackContainerProps {
     resetDelay: number,
     // frameSpeed: number,
     status: number,
+    setStatus: (status: number) => void,
     statusMessage: string,
 }
 
@@ -34,6 +35,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
     resetDelay,
     // frameSpeed,
     status,
+    setStatus,
     statusMessage,
 }) => {
     // This can be decreased if you need to call a func every frame
@@ -52,8 +54,12 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
         }
     }, [resetTimeout, status]);
 
+    const timerReset = () => {
+        setStatus(2);
+    }
+
     // TODO: The timer bar doesn't start moving until the first tick, should probably fix this.
-    const [countdown, resetCountdown, freezeCountdown] = useCountdown(resetTimeout, countdownDuration, frameSpeed);
+    const [countdown, resetCountdown, freezeCountdown] = useCountdown(timerReset, countdownDuration, frameSpeed);
 
     useEffect(() => {
         if (status !== 1 && status !== 0) {
