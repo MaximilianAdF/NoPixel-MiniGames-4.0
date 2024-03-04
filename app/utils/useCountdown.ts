@@ -1,7 +1,11 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useInterval} from "@/app/utils/useInterval";
 
-export const useCountdown = (callback: () => void, duration: number, delay: number = 50): [number, () => void, () => void] => {
+export const useCountdown = (
+    callback: () => void,
+    duration: number,
+    delay: number = 50
+): [number, () => void, () => void] => {
     const savedCallback = useRef<() => void>();
     const [startTime, setStartTime] = useState<number>();
 
