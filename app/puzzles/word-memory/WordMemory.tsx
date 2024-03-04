@@ -98,8 +98,8 @@ export default function WordMemory() {
         const word = getRandomWord();
 
         setCurrentWord(word);
-        setSeenWords([word]);
-        setCurrentRound(0);
+        // setSeenWords([]);
+        // setCurrentRound(0);
         setGameStatus(1);
     }, []);
 
