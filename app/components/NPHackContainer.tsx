@@ -66,6 +66,19 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
             freezeCountdown();
         }
     }, [freezeCountdown, status]);
+    
+    const calculateTimerBar = () => {
+        let width = 100
+        if (status === 1) {
+            // Only move the timer if the game is running
+            width -= countdown;
+            // We want to anticipate the next tick so the transition will start instantly
+            width -= Math.max(Math.min(frameSpeed/countdownDuration,1),0) * 100;
+            // And clamp that between 0-100
+            width = Math.max(Math.min(width, 100),0);
+        }
+        return width;
+    }
 
     return (
         <>
@@ -156,9 +169,9 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                             "bg-[orangered] w-full h-full [transition:width_linear]",
                         )}
                         style={{
-                            transitionDuration: countdown < 1 ? "0ms" : `${frameSpeed}ms`,
+                            transitionDuration: status !== 1 ? "0ms" : `${frameSpeed}ms`,
                             // transitionTimingFunction: "cubic-bezier(0.4, 1, 0.7, 0.93)",
-                            width: `${100-countdown}%`,
+                            width: `${calculateTimerBar()}%`,
                         }}
                     ></div>
                 </div>
