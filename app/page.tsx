@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const puzzles = [
   {
-    href: "RoofRunning/RoofRunning.html",
+    href: "/puzzles/roof-running",
     img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7d94e398-ae40-45d2-ae25-d20fa5a62301",
     title: "Roof Running",
     description: "Replica of the Roof Running hack that is triggered when robbing AC-Units on NoPixel 4.0"
