@@ -37,6 +37,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
     status,
     setStatus,
     statusMessage,
+    ...props
 }) => {
     // This can be decreased if you need to call a func every frame
     // For now, 1s per frame seems reasonable
@@ -80,33 +81,36 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
     }
 
     return (
-        <>
             <div className="
+                max-h-full max-w-full
                 rounded-lg
-                mx-auto
                 overflow-hidden
             ">
                 <div className="
                     relative
                     p-3
-                    flex flex-col items-center justify-center
+                    flex flex-col justify-center
                     bg-[rgb(7_19_32)]
-                    h-full w-full
                 ">
                     <div className="
-                        ml-5 mb-5
-                        w-full
+                        mb-5
+                        h-10
                         flex items-center
                         gap-4
                     ">
-                        <embed className="w-10" src="/gamePad.svg"/>
+                        <embed className="w-8 sm:w-10" src="/gamePad.svg"/>
                         <h2 className="
-                            text-2xl text-spring-green-300
+                            text-lg
+                            sm:text-2xl
+                            text-spring-green-300
                             [text-shadow:0_0_40px_rgb(127_255_191)]
                         ">{/*Originally, text shadow was 2.1px, but it looks much bigger on nopixel*/}
                             {title}
                         </h2>
-                        <p className="text-base text-[rgb(142_142_142)]">
+                        <p className="
+                            text-xs
+                            sm:text-base
+                            text-[rgb(142_142_142)]">
                             {description}
                         </p>
                     </div>
@@ -138,7 +142,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                         {/*)}></i>*/}
                         <p className="text-xs font-medium">{statusMessage}</p>
                     </div>}
-                    <div className="w-full mb-2">
+                    <div className="w-full pb-2 flex-1">
                         {children}
                     </div>
                     <div className="flex flex-col w-full gap-1">
@@ -162,6 +166,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                         })}
                     </div>
                 </div>
+                {/* TODO: Check BG color, before react rewrite was rgb(36 47 59)*/}
                 <div className="bg-[rgb(15_27_33)] flex w-full h-2.5">
                     <div
                         className={classNames(
@@ -175,7 +180,6 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                     ></div>
                 </div>
             </div>
-        </>
     )
 }
 
