@@ -23,6 +23,9 @@ interface NPHackContainerProps {
     status: number,
     setStatus: (status: number) => void,
     statusMessage: string,
+
+    // props: {[key: string]: any},
+    className?: string,
 }
 
 const NPHackContainer: FC<NPHackContainerProps> = ({
@@ -81,12 +84,16 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
     }
 
     return (
-            <div className="
-                max-h-full max-w-full
-                rounded-lg
-                overflow-hidden
-            ">
+            <div className={classNames(
+                `
+                    max-h-full max-w-full
+                    rounded-lg
+                    overflow-hidden
+                `,
+                props.className
+            )}>
                 <div className="
+                    max-h-full max-w-full
                     relative
                     p-3
                     flex flex-col justify-center
