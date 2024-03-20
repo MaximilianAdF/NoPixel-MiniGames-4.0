@@ -15,7 +15,7 @@ const puzzles = [
     description: "Replica of the Laundromat hack that is triggered when robbing the safe inside the south-side Laundromat on NoPixel 4.0"
   },
   {
-    href: "LockPick/LockPick.html",
+    href: "/puzzles/lockpick",
     img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/e5e00eac-ea19-46e1-944c-67c7ff8ca5cf",
     title: "LockPick",
     description: "Replica of the LockPick hack that is triggered when lockpicking vehicles, among other things, on NoPixel 4.0"
