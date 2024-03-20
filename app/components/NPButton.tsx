@@ -30,7 +30,6 @@ const NPButton: React.FC<NPButtonProps> = ({
         title: label || children?.toString(),
         className: classNames(
             `
-                flex-grow
                 rounded-lg
                 px-4 py-2
                 text-xl

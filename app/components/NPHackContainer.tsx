@@ -155,7 +155,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                     <div className="flex flex-col w-full gap-1">
                         {buttons.map((buttonRow, index) => {
                             return (
-                                <div className="flex gap-1" key={index}>
+                                <div className="flex gap-1 *:flex-1" key={index}>
                                     {buttonRow.map((button, index) => {
                                         return (
                                             <NPButton
