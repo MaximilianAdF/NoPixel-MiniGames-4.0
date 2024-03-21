@@ -9,7 +9,7 @@ const puzzles = [
     description: "Replica of the Roof Running hack that is triggered when robbing AC-Units on NoPixel 4.0"
   },
   {
-    href: "Laundromat/Laundromat.html",
+    href: "/puzzles/laundromat",
     img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7a0a6e18-a39f-45b8-b186-5d0069241ce0",
     title: "Laundromat",
     description: "Replica of the Laundromat hack that is triggered when robbing the safe inside the south-side Laundromat on NoPixel 4.0"
