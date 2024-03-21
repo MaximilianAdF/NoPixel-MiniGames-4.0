@@ -3,6 +3,7 @@
 import NPHackContainer from "@/app/components/NPHackContainer";
 import {useCallback, useState} from "react";
 import useGame from "@/app/utils/useGame";
+import {generate} from "random-words";
 
 
 const getStatusMessage = (status: number | undefined) => {
@@ -20,20 +21,20 @@ const getStatusMessage = (status: number | undefined) => {
     }
 }
 
-const availableWords = [
-    "alleviations",
-    "surfer",
-    "depilate",
-    "rondeaux",
-    "valencias",
-    "sorbitols",
-];
-
-const getRandomWord = () => {
-    // TODO: How should a random word be selected? Is there a % chance of getting a new word?
-    console.log("New word");
-    return availableWords[Math.floor(Math.random() * availableWords.length)];
-}
+// const availableWords = [
+//     "alleviations",
+//     "surfer",
+//     "depilate",
+//     "rondeaux",
+//     "valencias",
+//     "sorbitols",
+// ];
+//
+// const getRandomWord = () => {
+//     // TODO: How should a random word be selected? Is there a % chance of getting a new word?
+//     console.log("New word");
+//     return availableWords[Math.floor(Math.random() * availableWords.length)];
+// }
 
 export default function WordMemory() {
     const countdownDuration = 60000;  // TODO: Get the actual speed
@@ -46,8 +47,12 @@ export default function WordMemory() {
                 setRandomWord();
                 setCurrentRound(0);
                 setSeenWords([]);
+                setAvailableWords(getRandomWords());
                 break;
         }
+    }
+    const getRandomWords = () => {
+        return generate(maxRounds / 2) as string[];  // half as many words as rounds
     }
 
     const [gameStatus, setGameStatus] = useGame(countdownDuration, statusUpdateHandler);
@@ -55,11 +60,12 @@ export default function WordMemory() {
     const [currentRound, setCurrentRound] = useState(0);
     const [currentWord, setCurrentWord] = useState<string>();
     const [seenWords, setSeenWords] = useState<string[]>([]);
+    const [availableWords, setAvailableWords] = useState(getRandomWords);
 
     const setRandomWord = useCallback(() => {
         setSeenWords((v) => v.concat([currentWord as string]));
-        setCurrentWord(getRandomWord());
-    }, [currentWord]);
+        setCurrentWord(availableWords[Math.floor(Math.random() * availableWords.length)]);
+    }, [availableWords, currentWord]);
 
     const resetGame = () => {
         setGameStatus(1);
