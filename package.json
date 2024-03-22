@@ -10,6 +10,8 @@
     "serve": "npm run build && npm run start"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.2.2",
+    "@vercel/speed-insights": "^1.0.10",
     "classnames": "^2.5.1",
     "next": "14.1.0",
     "random-words": "^2.0.1",
