@@ -296,7 +296,6 @@ const NPLockpick: FC<NPLockpickProps> = ({
                 }}
             >
                 <div className="
-
                     aspect-square
                     flex items-center justify-center
                     size-full
@@ -305,23 +304,45 @@ const NPLockpick: FC<NPLockpickProps> = ({
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         version="1.1"
-                        className="size-full aspect-square"
+                        className="
+                            size-full aspect-square
+
+                            *:origin-center
+
+                            data-[stroke=gray]:*:stroke-[rgb(173_173_173)]
+                            data-[stroke=fail]:*:stroke-[rgb(255_84_84)]
+                            data-[stroke=win]:*:stroke-[rgb(48_221_189/0.816)]
+
+                            *:*:origin-center
+
+                            data-[stroke=blue]:*:*:stroke-[rgb(46_134_213)]
+                            data-[stroke=yellow]:*:*:stroke-[rgb(239_181_17)]
+                            data-[stroke=red]:*:*:stroke-[rgb(202_39_97)]
+                            data-[stroke=fail]:*:*:stroke-[rgb(255_84_84)]
+                            data-[stroke=win]:*:*:stroke-[rgb(48_221_189/0.816)]
+
+                            data-[fill=blue]:*:*:fill-[rgb(46_134_213)]
+                            data-[fill=yellow]:*:*:fill-[rgb(239_181_17)]
+                            data-[fill=red]:*:*:fill-[rgb(202_39_97)]
+                            data-[fill=fail]:*:*:fill-[rgb(255_84_84)]
+                            data-[fill=win]:*:*:fill-[rgb(48_221_189/0.816)]
+                        "
                         viewBox={`0 0 ${svgSize} ${svgSize}`}
                     >
 
-                        {[...Array(positions/2)].map((value, index) => <line
+                        <g
                             className="
-                                stroke-[1.2px] origin-center
-
-                                stroke-[rgb(142_142_142)]
-                            "
-                            key={index}
-                            x1={35} x2={svgSize-35}
-                            y1={svgSize/2} y2={svgSize/2}
-                            style={{
-                                transform: `rotateZ(${index*degInterval}deg)`,
-                            }}
-                        ></line>)}
+                                    *:stroke-[1.2px] *:origin-center
+                                    *:stroke-[rgb(142_142_142)]
+                                "
+                        >
+                            {[...Array(positions/2)].map((value, index) => <line
+                                key={index}
+                                x1={35} x2={svgSize-35}
+                                y1={svgSize/2} y2={svgSize/2}
+                                transform={`rotate(${index*degInterval})`}
+                            ></line>)}
+                        </g>
                         {rings.map((ring, ringIndex) => {
                             const radius = (ringIndex + 1) * 50 - 10;
                             const slotRadius = radius + 15;
@@ -329,15 +350,11 @@ const NPLockpick: FC<NPLockpickProps> = ({
                             return (
                                 <>
                                     <circle
-                                        key={ringIndex}
+                                        key={ringIndex*3}
                                         className="
-                                            fill-none stroke-[3px] origin-center
-
-                                            data-[color=gray]:stroke-[rgb(173_173_173)]
-                                            data-[color=fail]:stroke-[rgb(255_84_84)]
-                                            data-[color=win]:stroke-[rgb(48_221_189/0.816)]
+                                            fill-none stroke-[3px]
                                         "
-                                        data-color={
+                                        data-stroke={
                                             (level > ringIndex || gameStatus === 3) ? "win" :
                                                 (gameStatus === 2 && level == ringIndex) ? "fail" :
                                                     "gray"
@@ -345,73 +362,60 @@ const NPLockpick: FC<NPLockpickProps> = ({
                                         cx="50%"
                                         cy="50%"
                                         r={radius}
-                                    ></circle>
-                                    {ring.balls.map((ball, index) => <circle
-                                        key={index}
+                                    />
+                                    <g
+                                        key={ringIndex*3+1}
                                         className="
-                                            origin-center ease-in-out transition-transform duration-200
-
-                                            data-[color=blue]:fill-[rgb(46_134_213)]
-                                            data-[color=yellow]:fill-[rgb(239_181_17)]
-                                            data-[color=red]:fill-[rgb(202_39_97)]
-                                            data-[color=fail]:fill-[rgb(255_84_84)]
-                                            data-[color=win]:fill-[rgb(48_221_189/0.816)]
+                                            *:ease-in-out *:transition-transform *:duration-200
                                         "
-                                        style={{
-                                            transform: `rotate(${(ball + ring.rotation) * 30}deg) translateX(${radius}px)`,
-                                        }}
-                                        data-color={
-                                            (level > ringIndex || gameStatus === 3) ? "win" :
-                                                (gameStatus === 2 && level == ringIndex) ? "fail" :
-                                                    ring.color[ball]
-                                        }
-                                        cx="50%"
-                                        cy="50%"
-                                        r="8.5px"
-                                    ></circle>)}
-                                    {ring.slots.map((slot, index) => <circle
-                                        key={index}
-                                        data-r-px={slotRadius}
+                                    >
+                                        {ring.balls.map((ball, index) => <circle
+                                            key={index}
+                                            style={{
+                                                transform: `rotate(${(ball + ring.rotation) * 30}deg) translateX(${radius}px)`,
+                                            }}
+                                            data-fill={
+                                                (level > ringIndex || gameStatus === 3) ? "win" :
+                                                    (gameStatus === 2 && level == ringIndex) ? "fail" :
+                                                        ring.color[ball]
+                                            }
+                                            cx="50%"
+                                            cy="50%"
+                                            r="8.5px"
+                                        />)}
+                                    </g>
+                                    <g
+                                        key={ringIndex*3+2}
                                         className="
-                                            fill-none stroke-[5px] origin-center
-
-                                            data-[color=blue]:stroke-[rgb(46_134_213)]
-                                            data-[color=yellow]:stroke-[rgb(239_181_17)]
-                                            data-[color=red]:stroke-[rgb(202_39_97)]
-                                            data-[color=fail]:stroke-[rgb(255_84_84)]
-                                            data-[color=win]:stroke-[rgb(48_221_189/0.816)]
+                                            *:fill-none *:stroke-[5px]
                                         "
-                                        cx="50%"
-                                        cy="50%"
-                                        r={slotRadius}
-                                        data-color={
-                                            (level > ringIndex || gameStatus === 3) ? "win" :
-                                                (gameStatus === 2 && level == ringIndex) ? "fail" :
-                                                    ring.color[slot]
-                                        }
-                                        style={{
-                                            transform: `rotate(${-15 + (slot * 30)}deg)`,
-                                            strokeDasharray: `${2 * slotRadius * Math.PI}`,
-                                            strokeDashoffset: `${(11 * (2 * slotRadius * Math.PI)) / 12}`,
-                                        }}
-                                    ></circle>)}
+                                    >
+                                        {ring.slots.map((slot, index) => <circle
+                                            key={index}
+                                            data-r-px={slotRadius}
+                                            cx="50%"
+                                            cy="50%"
+                                            r={slotRadius}
+                                            data-stroke={
+                                                (level > ringIndex || gameStatus === 3) ? "win" :
+                                                    (gameStatus === 2 && level == ringIndex) ? "fail" :
+                                                        ring.color[slot]
+                                            }
+                                            style={{
+                                                transform: `rotate(${-15 + (slot * 30)}deg)`,
+                                                strokeDasharray: `${2 * slotRadius * Math.PI}`,
+                                                strokeDashoffset: `${(11 * (2 * slotRadius * Math.PI)) / 12}`,
+                                            }}
+                                        />)}
+                                    </g>
                                 </>
                             )
                         })}
                     </svg>
                 </div>
-                <div className="overlay hidden absolute"></div>
-                <div className="lock-container absolute">
-                </div>
-                {/*{[...Array(positions/2)].map((value, index) => <div*/}
-                {/*    className="w-[65%]"*/}
-                {/*    key={index}*/}
-                {/*    style={{*/}
-                {/*        transform: `rotateZ(${index*degInterval}deg)`,*/}
-                {/*        outline: "1.2px solid rgb(142, 142, 142)", // TODO: Rewrite this in tailwind*/}
-                {/*    }}*/}
-                {/*></div>)}*/}
-
+                {/*<div className="overlay hidden absolute"></div>*/}
+                {/*<div className="lock-container absolute">*/}
+                {/*</div>*/}
             </div>
         </NPHackContainer>
     );
