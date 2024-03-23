@@ -1,4 +1,4 @@
-let timerInterval: NodeJS.Timeout | null = null;
+let timerIntervalVar: NodeJS.Timeout | null = null;
 let eKeyPressed = false;
 let slotPosition = 0;
 let currPosition = 1;
@@ -22,7 +22,7 @@ function checkWin(): boolean {
     const movingSquare = document.querySelector('.moving-square') as HTMLElement;
     const squareSlot = document.querySelector('.square-slot') as HTMLElement
     const buttonPress = document.querySelector('.button-press') as HTMLElement;
-    if (timerInterval) {clearInterval(timerInterval);}
+    if (timerIntervalVar) {clearInterval(timerIntervalVar);}
     if (slotPosition-2 <= currPosition && currPosition <= slotPosition+2) {
         movingSquare.style.scale = '1.2';
         setTimeout(() => {
@@ -40,12 +40,12 @@ function checkWin(): boolean {
 
 function tick(): void {
     const movingSquare = document.querySelector('.moving-square') as HTMLElement;
-    timerInterval = setInterval(() => {
+    timerIntervalVar = setInterval(() => {
         movingSquare.style.marginLeft = `${currPosition}%`;
         currPosition+=1;
         
         if (currPosition > Math.min(slotPosition+7,94)) {
-            if (timerInterval) {clearInterval(timerInterval);}
+            if (timerIntervalVar) {clearInterval(timerIntervalVar);}
             handleKeyPress(new KeyboardEvent('keydown', { key: 'E' }));
         }
     }, 50);
