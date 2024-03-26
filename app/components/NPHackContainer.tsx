@@ -1,14 +1,23 @@
-import {FC, ReactNode, useEffect, useState} from "react";
+import React, {FC, ReactNode, useEffect, useState} from "react";
 import NPButton from "@/app/components/NPButton";
 import classNames from "classnames";
 import {useCountdown} from "@/app/utils/useCountdown";
 import useTimeout from "@/app/utils/useTimeout";
+import NPSettings from "@/app/components/NPSettings";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faGear} from "@fortawesome/free-solid-svg-icons";
 
 interface NPHackContainerButton {
     label: string,
     color: "purple" | "green",
     callback?: () => void,  // TODO: Make callback non-optional
     disabled: boolean,
+}
+
+interface NPHackContainerSettings {
+    handleSave: () => void,
+    handleReset: () => void,
+    children: ReactNode,
 }
 
 interface NPHackContainerProps {
@@ -23,6 +32,7 @@ interface NPHackContainerProps {
     status: number,
     setStatus: (status: number) => void,
     statusMessage: string,
+    settings?: NPHackContainerSettings,
 
     // props: {[key: string]: any},
     className?: string,
@@ -40,6 +50,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
     status,
     setStatus,
     statusMessage,
+    settings,
     ...props
 }) => {
     // This can be decreased if you need to call a func every frame
@@ -83,7 +94,20 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
         return width;
     }
 
+
+    const [settingsVisible, setSettingsVisible] = useState(false);
+
+
     return (
+        <>
+            {settings && <NPSettings
+                handleReset={settings.handleReset}
+                handleSave={settings.handleSave}
+                visible={settingsVisible}
+                setVisible={setSettingsVisible}
+            >
+                {settings.children}
+            </NPSettings>}
             <div className={classNames(
                 `
                     max-h-full max-w-full
@@ -99,27 +123,45 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                     flex flex-col justify-center
                     bg-[rgb(7_19_32)]
                 ">
+                    {/* Header */}
                     <div className="
                         mb-5
                         h-10
-                        flex items-center
-                        gap-4
+                        flex justify-between items-center
                     ">
-                        <embed className="w-8 sm:w-10" src="/gamePad.svg"/>
-                        <h2 className="
-                            text-lg
-                            sm:text-2xl
-                            text-spring-green-300
-                            [text-shadow:0_0_40px_rgb(127_255_191)]
-                        ">{/*Originally, text shadow was 2.1px, but it looks much bigger on nopixel*/}
-                            {title}
-                        </h2>
-                        <p className="
-                            text-xs
-                            sm:text-base
-                            text-[rgb(142_142_142)]">
-                            {description}
-                        </p>
+                        <div className="
+                            flex items-center
+                            gap-4
+                        ">
+                            <embed className="w-8 sm:w-10" src="/gamePad.svg"/>
+                            <h2 className="
+                                text-lg
+                                sm:text-2xl
+                                text-spring-green-300
+                                [text-shadow:0_0_40px_rgb(127_255_191)]
+                            ">{/*Originally, text shadow was 2.1px, but it looks much bigger on nopixel*/}
+                                {title}
+                            </h2>
+                            <p className="
+                                text-xs
+                                sm:text-base
+                                text-[rgb(142_142_142)]">
+                                {description}
+                            </p>
+                        </div>
+                        {settings && <div className="h-full aspect-square justify-center items-center flex p-1">
+                            <FontAwesomeIcon
+                                icon={faGear}
+                                className="
+                                    size-full
+                                    text-gray-500
+                                    hover:rotate-90 hover:scale-110 hover:cursor-pointer
+                                    transition-transform
+                                "
+                                onClick={() => setSettingsVisible(true)}
+                                title={"Open Settings"}
+                            />
+                        </div>}
                     </div>
                     {status !== undefined && <div className={classNames(
                         `
@@ -134,7 +176,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                         `,
                         status === 2 ? "bg-[rgb(56_13_23)]" :
                         status === 3 ? "bg-[rgb(23_95_88)]" :
-                        status === 0 ? "bg-[rgb(118_128_37)]" : ""
+                        status === 4 ? "bg-[rgb(118_128_37)]" : "hidden"
                     )}>
                         {/* TODO: Refactor icons, they're completely broken */}
                         {/*{status === 2 && <i className="fa-solid text-2xl fa-circle-xmark text-[rgb(255_84_84)]"></i>}*/}
@@ -149,9 +191,11 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                         {/*)}></i>*/}
                         <p className="text-xs font-medium">{statusMessage}</p>
                     </div>}
+                    {/* Main puzzle */}
                     <div className="w-full pb-2 flex-1">
                         {children}
                     </div>
+                    {/* Buttons */}
                     <div className="flex flex-col w-full gap-1">
                         {buttons.map((buttonRow, index) => {
                             return (
@@ -173,6 +217,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                         })}
                     </div>
                 </div>
+                {/* Timer bar */}
                 {/* TODO: Check BG color, before react rewrite was rgb(36 47 59)*/}
                 <div className="bg-[rgb(15_27_33)] flex w-full h-2.5">
                     <div
@@ -187,7 +232,8 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                     ></div>
                 </div>
             </div>
-    )
+        </>
+    );
 }
 
 export default NPHackContainer;
