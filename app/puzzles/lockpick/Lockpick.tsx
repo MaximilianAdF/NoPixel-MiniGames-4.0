@@ -4,7 +4,7 @@ import {FC} from "react";
 const Lockpick: FC = () => {
     return (
         <NPLockpick
-            countdownDuration={20000}
+            countdownDuration={20}
             maxLevels={4}
             title={"Lockpick"}
         />

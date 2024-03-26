@@ -4,7 +4,7 @@ import {FC} from "react";
 const Laundromat: FC = () => {
     return (
         <NPLockpick
-            countdownDuration={12000}
+            countdownDuration={12}
             maxLevels={5}
             title={"Laundromat"}
         />

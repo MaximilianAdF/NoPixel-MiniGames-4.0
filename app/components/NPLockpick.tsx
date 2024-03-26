@@ -1,9 +1,12 @@
 "use client";
 
 import NPHackContainer from "@/app/components/NPHackContainer";
-import {FC, useState} from "react";
+import React, {FC, useEffect, useState} from "react";
 import useGame from "@/app/utils/useGame";
 import {useKeyDown} from "@/app/utils/useKeyDown";
+import {NPSettingsRange} from "@/app/components/NPSettings";
+import usePersistantState from "@/app/utils/usePersistentState";
+import classNames from "classnames";
 
 type RingColor = "red" | "yellow" | "blue";
 
@@ -21,13 +24,15 @@ const colors: RingColor[] = [
 const getStatusMessage = (status: number | undefined) => {
     switch (status) {
         case 0:
-            return "Reset!";
+            return "";
         case 1:
             return "";
         case 2:
             return "The lockpick bent out of shape.";
         case 3:
             return "The lock was picked successfully.";
+        case 4:
+            return "Reset!";
         default:
             return `Error: Unknown game status ${status}`;
     }
@@ -141,6 +146,8 @@ const NPLockpick: FC<NPLockpickProps> = ({
     title,
     // description,
 }) => {
+    const [levels, setLevels] = usePersistantState(`np-lockpick-${title}-levels`, maxLevels);
+    const [timer, setTimer] = usePersistantState(`np-lockpick-${title}-timer`, countdownDuration);
     const [rings, setRings] = useState<Ring[]>([]);
     const [rotation, setRotation] = useState<number>(0);
     const [level, setLevel] = useState<number>(0);
@@ -150,7 +157,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
             case 1:
                 console.log('Reset game');
                 const newRings: Ring[] = [];
-                for (let i = 0; i < maxLevels; i++) {
+                for (let i = 0; i < levels; i++) {
                     // TODO: Add config for difficulty
                     newRings.push(generateRing());
                 }
@@ -161,7 +168,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
         }
     }
 
-    const [gameStatus, setGameStatus] = useGame(countdownDuration, statusUpdateHandler);
+    const [gameStatus, setGameStatus] = useGame(timer*1000, statusUpdateHandler);
 
     const resetGame = () => {
         setGameStatus(1);
@@ -180,7 +187,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
     }
 
     const nextLevel = () => {
-        if (level >= maxLevels - 1) {
+        if (level >= levels - 1) {
             handleWin("All levels completed");
         } else {
             const newLevel = level + 1;
@@ -237,7 +244,42 @@ const NPLockpick: FC<NPLockpickProps> = ({
     useKeyDown(handleKeyDown(handleRight), ["ArrowRight", "d", "D"]);
     useKeyDown(handleKeyDown(handleUnlock), ["Enter", " "]);
 
-    const svgSize = 50 * (maxLevels * 2 + 1);
+    const svgSize = 50 * (levels * 2 + 1);
+
+    const [settingsLevels, setSettingsLevels] = useState(levels);
+    const [settingsTimer, setSettingsTimer] = useState(timer);
+
+    useEffect(() => {
+        setSettingsLevels(levels);
+        setSettingsTimer(timer);
+
+        // I don't want to re-run the useEffect if this updates. My IDE wants me to put this in the dependencies, but
+        // that isn't what I want to do. I think it should be fine if it is left out?
+        if (gameStatus !== 4) {
+            resetGame();
+        }
+    }, [levels, timer]);
+
+    const settings = {
+        handleSave: () => {
+            setLevels(settingsLevels);
+            setTimer(settingsTimer);
+            setGameStatus(4);
+        },
+        handleReset: () => {
+            setLevels(maxLevels);
+            setTimer(countdownDuration);
+            setGameStatus(4);
+        },
+        children: (
+            <>
+                <div className={"flex w-full gap-2 *:flex-1 flex-col sm:flex-row"}>
+                    <NPSettingsRange title={"Levels"} value={settingsLevels} setValue={setSettingsLevels} min={2} max={10} />
+                    <NPSettingsRange title={"Timer"} value={settingsTimer} setValue={setSettingsTimer} min={5} max={100} />
+                </div>
+            </>
+        ),
+    };
 
     return (
         <NPHackContainer
@@ -267,23 +309,26 @@ const NPLockpick: FC<NPLockpickProps> = ({
                     }
                 ]
             ]}
-            countdownDuration={countdownDuration}
+            countdownDuration={timer*1000}
             resetCallback={resetGame}
             resetDelay={3000}
             status={gameStatus}
             setStatus={setGameStatus}
             statusMessage={getStatusMessage(gameStatus)}
+            settings={settings}
             // className="h-full"
         >
-            <div className="
-
-                aspect-square
-                max-h-full max-w-full
-                rounded-lg
-                bg-[rgb(22_40_52)]
-                flex items-center justify-center
-                relative
-            "
+            <div className={classNames(
+                `
+                    aspect-square
+                    max-h-full max-w-full
+                    rounded-lg
+                    bg-[rgb(22_40_52)]
+                    flex items-center justify-center
+                    relative
+                `,
+                gameStatus === 0 || gameStatus === 4 ? "blur" : "",
+            )}
                  style={{
                     // TODO: Refactor the responsive sizing so it doesn't use hardcoded values.
 
