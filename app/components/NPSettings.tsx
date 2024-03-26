@@ -6,7 +6,7 @@ import NPButton from "@/app/components/NPButton";
 
 const handleRange = (callback: (v: any) => void): ChangeEventHandler<HTMLInputElement> => {
     return (event) => {
-        callback(event.target.value);
+        callback(+event.target.value);
     }
 }
 
