@@ -1,22 +1,26 @@
 "use client";
 
 import NPHackContainer from "@/app/components/NPHackContainer";
-import {FC, useCallback, useState} from "react";
+import React, {FC, useCallback, useEffect, useState} from "react";
 import useGame from "@/app/utils/useGame";
 import classNames from "classnames";
 import {getCluster, handleGravity, handleLeftShift, SquareColor, squareColors, SquareValue} from "@/app/puzzles/roof-running/utils";
+import {NPSettingsRange} from "@/app/components/NPSettings";
+import usePersistantState from "@/app/utils/usePersistentState";
 
 
 const getStatusMessage = (status: number | undefined) => {
     switch (status) {
         case 0:
-            return "Reset!";
+            return "";
         case 1:
             return "";
         case 2:
             return "Failed!";
         case 3:
             return "Success!";
+        case 4:
+            return "Reset!";
         default:
             return `Error: Unknown game status ${status}`;
     }
@@ -27,17 +31,22 @@ const getRandomColor = (): SquareColor => {
     return squareColors[Math.floor(Math.random() * squareColors.length)];
 }
 
+const defaultRows = 8;
+const defaultColumns = 11;
+const defaultDuration = 25;
+
 
 const RoofRunning: FC = () => {
-    const countdownDuration = 25000;  // TODO: Get the actual speed
-    const [rows, setRows] = useState(8);
-    const [columns, setColumns] = useState(11);
+    const [timer, setTimer] = usePersistantState("np-roofrunning-timer", defaultDuration);  // TODO: Get the actual speed
+    const [rows, setRows] = usePersistantState("np-roofrunning-rows", defaultRows);
+    const [columns, setColumns] = usePersistantState("np-roofrunning-columns", defaultColumns);
 
     const [board, setBoard] = useState<SquareValue[]>(new Array(rows*columns).fill("empty"));
 
 
     const resetBoard = () => {
         const newBoard: SquareColor[] = [];
+        console.log(`generating new ${rows}x${columns} board`)
         for (let i = 0; i < rows * columns; i++) {
             newBoard.push(getRandomColor());
         }
@@ -54,7 +63,7 @@ const RoofRunning: FC = () => {
         }
     }
 
-    const [gameStatus, setGameStatus] = useGame(countdownDuration, statusUpdateHandler);
+    const [gameStatus, setGameStatus] = useGame(timer*1000, statusUpdateHandler);
 
     const resetGame = () => {
         setGameStatus(1);
@@ -135,49 +144,124 @@ const RoofRunning: FC = () => {
         }
     }
 
+    const [settingsRows, setSettingsRows] = useState(rows);
+    const [settingsColumns, setSettingsColumns] = useState(columns);
+    const [settingsTimer, setSettingsTimer] = useState(timer);
+
+    useEffect(() => {
+        setSettingsRows(rows);
+        setSettingsColumns(columns)
+        setSettingsTimer(timer);
+
+        // I don't want to re-run the useEffect if this updates. My IDE wants me to put this in the dependencies, but
+        // that isn't what I want to do. I think it should be fine if it is left out?
+        if (gameStatus !== 4) {
+            resetGame();
+        }
+    }, [rows, columns, timer]);
+
+    const settings = {
+        handleSave: () => {
+            setRows(settingsRows);
+            setColumns(settingsColumns);
+            setTimer(settingsTimer);
+            setGameStatus(4);
+        },
+        handleReset: () => {
+            setRows(defaultRows);
+            setColumns(defaultColumns);
+            setTimer(defaultDuration);
+            setGameStatus(4);
+        },
+        children: (
+            <div className="flex flex-col items-center">
+                <div className={"flex w-full gap-2 *:flex-1 flex-row"}>
+                    <NPSettingsRange title={"Rows"} value={settingsRows} setValue={setSettingsRows} min={5} max={10}/>
+                    <NPSettingsRange title={"Columns"} value={settingsColumns} setValue={setSettingsColumns} min={5}
+                                     max={15}/>
+                </div>
+                <div
+                    className="flex items-center justify-center aspect-[15/10] w-[50%] mt-6 h-auto "
+                    // style={{
+                    //     height: `${10 * 20}px`,
+                    //     width: `${15 * 20}px`,
+                    // }}
+                >
+                    <div
+                        className="
+                            [outline:2px_solid_rgb(94_93_93)]
+                            bg-radient-circle-c
+                            from-[rgb(22_40_52/0.651)] to-[rgb(22_40_52)]
+
+                            *:whitespace-nowrap
+                            *:absolute
+                            *:text-base
+                            *:text-[rgb(84_255_164)]
+                            *:[text-shadow:0_0_2.1px_rgb(127_255_191)]
+                        "
+                        style={{
+                            height: `${100/10 * settingsRows}%`,
+                            width: `${100/15 * settingsColumns}%`,
+                        }}
+                    >
+                        <div className="left-1/2 -translate-y-full -translate-x-1/2">Columns</div>
+                        <div className="[writing-mode:vertical-lr] top-1/2 -translate-x-full -rotate-180">Rows</div>
+                    </div>
+                </div>
+                <div className={"flex w-full gap-2 *:flex-1 flex-col sm:flex-row"}>
+                    <NPSettingsRange title={"Timer"} value={settingsTimer} setValue={setSettingsTimer} min={5}
+                                     max={100}/>
+                </div>
+            </div>
+        ),
+    };
+
 
     return (
         <NPHackContainer
             title="Same Game"
             description="Click on matching groups of blocks"
             buttons={[]}
-            countdownDuration={countdownDuration}
+            countdownDuration={timer*1000}
             resetCallback={resetGame}
             resetDelay={3000}
             status={gameStatus}
             setStatus={setGameStatus}
             statusMessage={getStatusMessage(gameStatus)}
+            settings={settings}
         >
-            <div className="
-
-                grid grid-rows-8 grid-cols-11
-                gap-x-0.5 gap-y-1
-
-                mx-auto
-
-                *:aspect-square
-                *:bg-gradient-to-b
-
-                data-[color=red]:*:from-[#f30308]
-                data-[color=red]:*:to-[#92393b]
-                data-[color=red]:*:[box-shadow:0px_5px_0px_#5c2829]
-
-                data-[color=green]:*:from-[#8ab357]
-                data-[color=green]:*:to-[#668a3d]
-                data-[color=green]:*:[box-shadow:0px_5px_0px_#48612f]
-
-                data-[color=blue]:*:from-[#5490b2]
-                data-[color=blue]:*:to-[#3a7494]
-                data-[color=blue]:*:[box-shadow:0px_5px_0px_#345066]
-
-                *:overflow-hidden
-
-                *:*:size-full
-                *:*:opacity-50
-                *:*:overflow-visible
-
-                *:data-[color=empty]:*:hidden
-            "
+            <div className={classNames(
+                `
+                    grid
+                    gap-x-0.5 gap-y-1
+    
+                    mx-auto
+    
+                    *:aspect-square
+                    *:bg-gradient-to-b
+    
+                    data-[color=red]:*:from-[#f30308]
+                    data-[color=red]:*:to-[#92393b]
+                    data-[color=red]:*:[box-shadow:0px_5px_0px_#5c2829]
+    
+                    data-[color=green]:*:from-[#8ab357]
+                    data-[color=green]:*:to-[#668a3d]
+                    data-[color=green]:*:[box-shadow:0px_5px_0px_#48612f]
+    
+                    data-[color=blue]:*:from-[#5490b2]
+                    data-[color=blue]:*:to-[#3a7494]
+                    data-[color=blue]:*:[box-shadow:0px_5px_0px_#345066]
+    
+                    *:overflow-hidden
+    
+                    *:*:size-full
+                    *:*:opacity-50
+                    *:*:overflow-visible
+    
+                    *:data-[color=empty]:*:hidden
+                `,
+                gameStatus === 0 || gameStatus === 4 ? "blur" : "",
+            )}
                 style={{
                     // TODO: Refactor the responsive sizing so it doesn't use hardcoded values.
 
@@ -193,6 +277,8 @@ const RoofRunning: FC = () => {
 
                     width: `calc(100vw - 64px)`,
                 //     aspectRatio: `${columns}/${rows}`,
+                    gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
+                    gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
                 }}
             >{/* TODO: Dynamic size */}
                 {board.map((color, index) => {

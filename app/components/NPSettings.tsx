@@ -130,7 +130,7 @@ const NPSettings: FC<NPSettingsProps> = ({
                         fixed w-full h-full
                         top-0 left-0
                         bg-black/50
-                        z-40
+                        z-30
                     `,
                     visible ? "" : "hidden",
                 )}
@@ -141,16 +141,17 @@ const NPSettings: FC<NPSettingsProps> = ({
                     absolute
                     w-[640px] max-w-[90%]
                     p-4 gap-5
+                    top-[64px]
                     left-[50%]
-                    top-[50%]
-                    [transform:translate(-50%,-50%)]
+                    my-5
+                    -translate-x-1/2
                     flex flex-col
                     bg-radient-circle-c
                     from-[rgb(15_27_33/0.781)]
                     to-[rgb(15_27_33)]
                     [outline:3px_solid_rgb(84_255_164)]
                     rounded-lg
-                    z-50
+                    z-40
                 `,
                 visible ? "" : "hidden",
             )}>
