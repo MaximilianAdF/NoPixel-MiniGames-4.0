@@ -251,31 +251,10 @@ function generateCircle(circleNum: number): HTMLElement {
   }
   lockCircle.id = `lock-circle${circleNum}`;
   lockCircle.className = "lock-circle";
-  lockCircle.style.width = `calc(var(--px) * ${-20 + 100 * circleNum})`;
-  lockCircle.style.height = `calc(var(--px) * ${-20 + 100 * circleNum})`;
+  lockCircle.style.width = `${-20 + 100 * circleNum}px`;
+  lockCircle.style.height = `${-20 + 100 * circleNum}px`;
   lockContainer.appendChild(lockCircle);
   return lockCircle;
-}
-
-function vSize(percent: number) {
-  var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - 325;
-  var w = .85 * Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-
-  return Math.min(h, w) * percent;
-}
-
-function pxFactorVSize(px: number) {
-  return vSize(px / 580);
-}
-
-function setCircleSize(element: SVGCircleElement) {
-  const r = pxFactorVSize(Number(element.getAttribute("data-r-px")));
-
-  element.setAttribute("r", `${r}`)
-  element.style.strokeDasharray = `${2 * r * Math.PI}`;
-  element.style.strokeDashoffset = `${(11 * (2 * r * Math.PI)) / 12}`;
-
-  return element;
 }
 
 function generateSemiCircle(
@@ -288,18 +267,18 @@ function generateSemiCircle(
     "circle"
   );
   const svgCircle = document.querySelector(".position-container svg");
-
-  semiCircle.setAttribute("data-r-px", String(5 + circleNum * 50))//The radius needed for the different lockCircles
+  const r = 5 + circleNum * 50; //The radius needed for the different lockCircles
 
   semiCircle.setAttribute("class", "position-circle");
   semiCircle.setAttribute("id", `circle${circleNum}-${position}`);
   semiCircle.setAttribute("cx", "50%");
   semiCircle.setAttribute("cy", "50%");
+  semiCircle.setAttribute("r", `${r}`);
 
   semiCircle.style.transform = `rotate(${-15 + position}deg)`;
   semiCircle.style.stroke = color;
-
-  setCircleSize(semiCircle);
+  semiCircle.style.strokeDasharray = `${2 * r * Math.PI}`;
+  semiCircle.style.strokeDashoffset = `${(11 * (2 * r * Math.PI)) / 12}`;
 
   svgCircle?.appendChild(semiCircle);
 }
@@ -332,7 +311,7 @@ function generateHack(): void {
       ballElem.className = "ball";
       ballElem.style.transform = `translate(-50%, -50%) rotateZ(${
         shuffledPositions[j]
-      }deg) translate(calc(var(--px) * ${-10 + 50 * i}), 0px)`;
+      }deg) translate(${-10 + 50 * i}px, 0px)`;
       ballElem.style.backgroundColor = randomColor;
       lockCircle?.appendChild(ballElem);
     }
@@ -360,9 +339,9 @@ function rotateBalls(dir: Direction): void {
     } else {
       newRotateZ = currentRotateZ - 30;
     }
-    ball.style.transform = `translate(-50%, -50%) rotateZ(${newRotateZ}deg) translate(calc(var(--px) * ${
+    ball.style.transform = `translate(-50%, -50%) rotateZ(${newRotateZ}deg) translate(${
       -10 + 50 * currentCircle
-    }), 0px)`;
+    }px, 0px)`;
   });
 }
 
@@ -422,10 +401,3 @@ document.addEventListener("DOMContentLoaded", (event) => {
 });
 
 document.addEventListener("keydown", handleKeyPress);
-
-addEventListener("resize", (event) => {
-  // We have to use px instead of vmin on the SVG, so when we resize we need to recalculate.
-  // There should be a data-r-px attribute that we can use to recalculate the values without fully redrawing the SVG
-  console.log("Resize!");
-  document.querySelectorAll("svg circle.position-circle").forEach((element) => setCircleSize(element as SVGCircleElement));
-});

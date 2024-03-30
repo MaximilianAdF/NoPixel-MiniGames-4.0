@@ -1,7 +1,21 @@
-body {
-    color: aliceblue;
+@font-face {
+    font-family: 'Gilroy';
+    src: url('../fonts/Gilroy-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }
 
+body {
+    font-family: 'Gilroy', sans-serif;
+    color: aliceblue;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(rgba(21, 27, 48, 0.97), rgba(21, 27, 48, 0.97)),
+      url(https://i.pinimg.com/originals/05/9c/6f/059c6f6f28f86e82367da81344f89206.png);
+    background-size: cover;
+}
+
+    
 /* Top Rectangle */
 .topRectangle {
     display: flex;
