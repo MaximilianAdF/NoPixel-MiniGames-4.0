@@ -21,7 +21,8 @@ class Letter {
 
     getElement() {
         const element = document.createElement("div");
-        element.className = "letter" + (this.state === "done" ? " done" : "");
+        if (this.state) element.className = "letter" + (this.state === "done" ? " done" : " fail");
+        else element.className = "letter";
         element.innerHTML = this.value.toUpperCase();
         return element;
     }
@@ -152,7 +153,11 @@ function handleKeyPress(event: KeyboardEvent) {
         if (activeLetter.value === event.key) {
             activeLetter.state = "done";
             activeLetter.updateContainer();
-        } else endGame("lose");
+        } else {
+            activeLetter.state = "fail";   
+            activeLetter.updateContainer();
+            endGame("lose");
+        }
     }
 }
 

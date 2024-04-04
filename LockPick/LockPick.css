@@ -1,6 +1,6 @@
 :root {
 
-    --vh-box-size: calc((calc(100vh - 325px)));
+    --vh-box-size: calc((calc(100vh - 400px)));
     --vw-box-size: 85vw;
 
     --box-size: min(var(--vh-box-size), var(--vw-box-size));

@@ -1,4 +1,3 @@
-"use strict";
 var timerTimeout;
 var timerProgressBar;
 var totalSecondsVar = 7;
@@ -18,7 +17,10 @@ var Letter = /** @class */ (function () {
     }
     Letter.prototype.getElement = function () {
         var element = document.createElement("div");
-        element.className = "letter" + (this.state === "done" ? " done" : "");
+        if (this.state)
+            element.className = "letter" + (this.state === "done" ? " done" : " fail");
+        else
+            element.className = "letter";
         element.innerHTML = this.value.toUpperCase();
         return element;
     };
@@ -133,8 +135,11 @@ function handleKeyPress(event) {
             activeLetter.state = "done";
             activeLetter.updateContainer();
         }
-        else
+        else {
+            activeLetter.state = "fail";
+            activeLetter.updateContainer();
             endGame("lose");
+        }
     }
 }
 function runTimer() {

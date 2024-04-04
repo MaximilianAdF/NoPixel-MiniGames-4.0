@@ -116,6 +116,13 @@
   background-color: rgba(84, 255, 164, 0.05);
 }
 
+.letter.fail {
+  color: rgb(255, 84, 84);
+  border: 0.125rem solid rgba(255, 84, 84, 0.4);
+  background-color: rgba(255, 84, 84, 0.05);
+
+}
+
 .overlay {
   position: fixed;
   top: 0;
