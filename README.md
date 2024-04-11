@@ -22,7 +22,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
 
 <a id="StartOfMiniGames"></a>
 - ## 🔗 [RoofRunning v.1.0.3](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/RoofRunning-v.1.0.3)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7d94e398-ae40-45d2-ae25-d20fa5a62301](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/5e110451-62cf-496b-9e61-1d4e2b4989be))](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7d94e398-ae40-45d2-ae25-d20fa5a62301](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/5e110451-62cf-496b-9e61-1d4e2b4989be))](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/RoofRunning/RoofRunning.html)
   <p align="center">↑ Click to play ↑</p>
 
    ### Description
@@ -35,7 +35,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   <br>
   
 - ## 🔗 [SmokeCrack v.1.0.3](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/SmokeCrack/SmokeCrack.html)
-   [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/3d2d218e-ec33-4b16-a981-56a16771aa64)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/SmokeCrack/SmokeCrack.html)
+   [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/3d2d218e-ec33-4b16-a981-56a16771aa64)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/SmokeCrack/SmokeCrack.html)
   <p align="center">↑ Click to play ↑</p>
 
   ### Description
@@ -51,7 +51,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
 
   <a id="LockPick"></a>
 - ## 🔗 [Lockpick v.1.0.3](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/LockPick-v.1.0.3)
-   [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/e5e00eac-ea19-46e1-944c-67c7ff8ca5cf)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/LockPick/LockPick.html)
+   [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/e5e00eac-ea19-46e1-944c-67c7ff8ca5cf)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/LockPick/LockPick.html)
   <p align="center">↑ Click to play ↑</p>
   
   ### Description
@@ -66,7 +66,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   <br>
  
 - ## 🔗 [Laundromat v.1.0.1](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/Laundromat-v1.0.1)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/75745b11-da0f-4a80-9b17-fb389140dbad)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/Laundromat/Laundromat.html)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/75745b11-da0f-4a80-9b17-fb389140dbad)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/Laundromat/Laundromat.html)
   
    <p align="center">↑ Click to play ↑</p>
    
@@ -80,7 +80,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   <br>
 
 - ## 🔗 [RepairKit v.1.0.1](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
-   [![Screenshot 2024-02-07 at 13 27 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/4888fd16-2b24-44c0-9952-275ddb626332)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
+   [![Screenshot 2024-02-07 at 13 27 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/4888fd16-2b24-44c0-9952-275ddb626332)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/RepairKit/RepairKit.html)
   <p align="center">↑ Click to play ↑</p>
   
   ### Description
