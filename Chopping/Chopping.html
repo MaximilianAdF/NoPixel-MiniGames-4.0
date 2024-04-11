@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chopping</title>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="google-site-verification" content="S-FJQGrin5Z7C-YheOScSZRfMpd2wcrPb4pWS3L2zf0" />
+        <link rel="stylesheet" type="text/css" href="../puzzle.css">
+        <link rel="stylesheet" type="text/css" href="Chopping.css" />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Roboto:400,400i,700&display=swap"
+        />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+        <script src="Chopping.js"></script>
+    </head>
+    <body>
+        <div class="other-container">
+            <a href="/NoPixel-MiniGames-4.0/" class="home-button">Check other Mini-games</a>
+            <i class="fas fa-gear" id="settings-icon" onclick="toggleSettings()"></i>
+        </div>
+        <div class="settings-container">
+            <h2 class="settings-header">Settings</h2>
+            <i class="fas fa-xmark" id="settings-exit" onclick="toggleSettings('close')"></i>
+            <div class="sliders">
+                <div class="letters-container">
+                    <div class="slider-value"><span>15</span></div>
+                    <label for="letters-slider">Letters</label>
+                    <input type="range" id="letters-slider" name="rows" min="15" max="18" value="15"/>
+                </div>
+            </div>
+            <div class="timing-container">
+                <div class="slider-value"><span>7</span></div>
+                <label for="timing-slider">Timer</label>
+                <input type="range" id="timing-slider" name="timing" min="5" max="100" value="7"/>
+            </div>
+            <div class="button-container">
+                <button id="save-button" onclick="applySettings()">Save</button>
+                <button id="reset-button" onclick="resetSettings()">Reset</button>
+            </div> 
+        </div>
+        <div class="hack-box-container">
+            <div class="outer-container">
+                <div class="info-container">
+                    <embed class="gamePad" src="../gamePad.svg">
+                    <h2>Alphabet</h2>
+                    <p>Tap the letters in order</p>
+                </div>
+                <div class="message-container">
+                    <div class="lose-message">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        <p>Failed!</p>
+                    </div>
+                    <div class="win-message">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <p>Success!</p>
+                    </div>
+                    <div class="reset-message">
+                        <i class="fas fa-hourglass-start"></i>
+                        <p>Reset!</p>
+                    </div>
+                </div>
+                <div class="hack-box">
+                    <div class="lock-container" id="container">
+                        <div class="lock-row"></div>
+                        <div class="lock-row"></div>
+                        <div class="lock-row"></div>
+                    </div>
+                </div>
+            <div class="timer-container">
+                <div class="timer-progress-bar"></div>
+            </div>
+        </div>  
+    </body>
+</html>

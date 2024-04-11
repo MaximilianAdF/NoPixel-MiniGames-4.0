@@ -22,7 +22,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
 
 <a id="StartOfMiniGames"></a>
 - ## 🔗 [RoofRunning v.1.0.3](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/RoofRunning-v.1.0.3)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7d94e398-ae40-45d2-ae25-d20fa5a62301)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7d94e398-ae40-45d2-ae25-d20fa5a62301](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/5e110451-62cf-496b-9e61-1d4e2b4989be))](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RoofRunning/RoofRunning.html)
   <p align="center">↑ Click to play ↑</p>
 
    ### Description
@@ -66,9 +66,10 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   <br>
  
 - ## 🔗 [Laundromat v.1.0.1](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/Laundromat-v1.0.1)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7a0a6e18-a39f-45b8-b186-5d0069241ce0)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/Laundromat/Laundromat.html)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/75745b11-da0f-4a80-9b17-fb389140dbad)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/Laundromat/Laundromat.html)
+  
    <p align="center">↑ Click to play ↑</p>
-
+   
    ### Description
    A simple twist to the pre existing [LockPick](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0#LockPick) hack. This is the hack that is required to complete in order to open the money safe in the back of the Laundromat in NoPixel 4.0. The difference between this minigame and the [LockPick](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0#LockPick) is the addition of an extra lock-circle, now totaling five and a decrease in time from roughly 20 seconds down to 10. You can also easily alter the timer yourself if you'd like to practice even faster or slower lockpick variations.
 
