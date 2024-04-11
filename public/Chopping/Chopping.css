@@ -364,6 +364,7 @@ input::-webkit-slider-thumb {
   color: rgb(94, 93, 93);
   width: 35%;
   font-size: 20px;
+  transform: translate(92%);
 }
 
 .letters-container .slider-value {

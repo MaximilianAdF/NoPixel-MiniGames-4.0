@@ -61,11 +61,6 @@ class Letter {
     }
 }
 
-function shouldFail(): boolean {
-    return true;
-}
-// ------------------------------------------------------------^
-
 
 function endGame(outcome: string): void {
     if (isLocked) return;
