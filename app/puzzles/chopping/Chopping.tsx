@@ -153,7 +153,7 @@ const Chopping: FC = () => {
                 <NPSettingsRange
                     title={"Number of letters"}
                     min={13}
-                    max={18}
+                    max={30}
                     value={settingsNumLetters}
                     setValue={setSettingsNumLetters}
                 />
