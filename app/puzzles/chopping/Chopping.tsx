@@ -10,6 +10,9 @@ import useGame from "@/app/utils/useGame";
 import classNames from "classnames";
 
 
+import "../../../public/Chopping/Chopping.css";
+
+
 const getStatusMessage = (status: number | undefined) => {
     switch (status) {
         case 0:
@@ -41,7 +44,7 @@ const Chopping: FC = () => {
     const [numLetters, setNumLetters] = usePersistantState("chopping-num-letters", defaultNumLetters);
     const [activeIndex, setActiveIndex] = usePersistantState("chopping-active-index", 0);
 
-    const [board, setBoard] = useState<Letter[]>(new Array(defaultNumLetters).fill(''));
+    const [board, setBoard] = useState<Letter[]>(new Array(defaultNumLetters));
     const [stateBoard, setStateBoard] = useState<LetterState[]>(new Array(defaultNumLetters).fill(''));
 
 
@@ -52,6 +55,7 @@ const Chopping: FC = () => {
             newBoard.push(getRandomLetter());
         }
         setBoard(newBoard);
+        setActiveIndex(0);
 
         const newStateBoard = new Array(numLetters).fill('');
         setStateBoard(newStateBoard);
@@ -66,7 +70,6 @@ const Chopping: FC = () => {
         }
     }
 
-    
     const [gameStatus, setGameStatus] = useGame(timer*1000, statusUpdateHandler);
 
     
@@ -100,7 +103,7 @@ const Chopping: FC = () => {
         const newBoard = [...board];
         const newStateBoard = [...stateBoard];
 
-        if (key === board[activeIndex]) {
+        if (key.toUpperCase() === board[activeIndex]) {
             newStateBoard[activeIndex] = 'done';
             setActiveIndex(activeIndex + 1);
         } else {
@@ -113,7 +116,11 @@ const Chopping: FC = () => {
     }
 
 
-    useKeyDown((key: string | undefined) => handleKeyDown(key || ''), Letters);
+    useKeyDown((key?: string) => {
+        if (key && gameStatus == 1) {
+            handleKeyDown(key);
+        }
+    }, ['Q', 'q', 'W', 'w', 'E', 'e', 'R', 'r', 'A', 'a', 'S', 's', 'D', 'd']);
     const [settingsNumLetters, setSettingsNumLetters] = useState(defaultNumLetters);
     const [settingsDuration, setSettingsDuration] = useState(defaultDuration);
 
@@ -121,7 +128,7 @@ const Chopping: FC = () => {
     useEffect(() => {
         setSettingsNumLetters(numLetters);
         setSettingsDuration(timer);
-
+        
         if (gameStatus !== 4) {
             resetGame();
         }
@@ -164,7 +171,7 @@ const Chopping: FC = () => {
 
     return (
         <NPHackContainer
-            title="Chopping"
+            title="Alphabet"
             description="Tap the letters in order"
             buttons={[]}
             countdownDuration={timer*1000}
@@ -175,9 +182,40 @@ const Chopping: FC = () => {
             statusMessage={getStatusMessage(gameStatus)}
             settings={settings}
         >
+            <div className='grid'>
+                {/* Dynamically create grid rows based on numLetters and defaultGridCols */}
+                {Array.from({ length: Math.ceil(numLetters / defaultGridCols) }).map((_, rowIndex) => (
+                    <div key={rowIndex} className='grid-row' style={{ gridTemplateColumns: `repeat(${Math.min(numLetters - rowIndex * defaultGridCols, defaultGridCols)}, min-content)` }}>
 
+                        {/* Create grid columns within each row */}
+                        {Array.from({ length: defaultGridCols }).map((_, colIndex) => {
+                            const letterIndex = rowIndex * defaultGridCols + colIndex;
+                            if (letterIndex < numLetters) {
+                                const letter = board[letterIndex];
+                                const isActive = letterIndex === activeIndex;
+                                const isDone = stateBoard[letterIndex] === 'done';
+                                const isFail = stateBoard[letterIndex] === 'fail';
 
+                                const classes = classNames("letter", {
+                                    'letter-active': isActive,
+                                    'done': isDone,
+                                    'fail': isFail,
+                                });
 
+                                return (
+                                    <div key={colIndex} className={classes} style={{ justifySelf: 'center' }}>
+                                        {letter}
+                                    </div>
+                                );
+                            } else {
+                                // Stop the loop once all letters are rendered in the row
+                                return null;
+                            }
+                        })}
+                    </div>
+                ))}
+            </div>
+            
         </NPHackContainer>
     )
 

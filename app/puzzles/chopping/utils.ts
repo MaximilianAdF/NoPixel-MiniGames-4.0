@@ -1,4 +1,4 @@
-export type Letter = 'q' | 'w' | 'e' | 'r' | 'a' | 's' | 'd';
+export type Letter = 'Q' | 'W' | 'E' | 'R' | 'A' | 'S' | 'D';
 export type LetterState = 'done' | 'fail' | '';
 
-export const Letters: Letter[] = ['q', 'w', 'e', 'r', 'a', 's', 'd'];
+export const Letters: Letter[] = ['Q', 'W', 'E', 'R', 'A', 'S', 'D'];
