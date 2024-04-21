@@ -141,7 +141,7 @@ const NPSettings: FC<NPSettingsProps> = ({
                     absolute
                     w-[640px] max-w-[90%]
                     p-4 gap-5
-                    top-[64px]
+                    top-[300px]
                     left-[50%]
                     my-5
                     -translate-x-1/2

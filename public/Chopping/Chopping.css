@@ -8,6 +8,23 @@
   margin-top: 10%;
 }
 
+.grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  grid-template-rows: repeat(var(--grid-rows), 1fr);
+  gap: 0.5rem;
+  z-index: 1;
+}
+
+.grid-row {
+  display: grid;
+  justify-content: center;
+  grid-template-columns: repeat(var(--grid-columns), 1fr);
+  grid-template-rows: repeat(1, 1fr);
+  gap: 0.5rem;
+  z-index: 1;
+}
+
 .lock-container {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
@@ -107,7 +124,7 @@
   color: rgb(112, 193, 255);
   border: 0.125rem solid rgba(112, 193, 255, 0.4);
   border-radius: 5px;
-  z-index: 1000;
+  z-index: 1;
 }
 
 .letter.done {
@@ -364,6 +381,7 @@ input::-webkit-slider-thumb {
   color: rgb(94, 93, 93);
   width: 35%;
   font-size: 20px;
+  transform: translate(92%);
 }
 
 .letters-container .slider-value {

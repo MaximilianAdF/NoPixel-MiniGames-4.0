@@ -17,7 +17,6 @@ export default function PuzzleLayout({
                 fixed w-full h-16
                 flex items-start justify-start
                 gap-2.5 px-5
-                bg-slate-700
                 z-50
             ">
               {/* TODO: Use more standard navbar practices like "Home" or an icon instead of "Check other minigames" */}

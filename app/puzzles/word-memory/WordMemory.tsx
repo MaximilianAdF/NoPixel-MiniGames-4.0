@@ -37,7 +37,7 @@ const getStatusMessage = (status: number | undefined) => {
 // }
 
 export default function WordMemory() {
-    const countdownDuration = 60000;  // TODO: Get the actual speed
+    const countdownDuration = 25;  // TODO: Get the actual speed
     const maxRounds = 25;
 
     const statusUpdateHandler = (newStatus: number) => {
