@@ -33,8 +33,21 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
    - Highscore, Current score interface (global?)
    ---
   <br>
+
+<a id="Chopping"></a>
+- ## 🔗 [Chopping v.1.0.1](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/Chopping-v.1.0.1)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/66cf9e24-4bdf-4c76-bfa9-fed56570cc40)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/Chopping/Chopping.html)
+  <p align="center">↑ Click to play ↑</p>
+
+  ### Description
+  The chopping minigame utilizes the same concept as the [SmokeCrack](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0#LockPick) minigame where you're tasked to enter all the letters in the correct order before the timer runs out. The game with this UI is triggered whenever you're trying to break into a civ's car. It appears when amplifying the car key's signal from outside their house to then be able to unlock the car. The letters are randomly generated but can only be chosen from the following characters ["q", "w", "e", "r", "a", "s", "d"], tapping any other keys on your keyboard will not affect the minigame. The original letter count is set to 15 and the timer is set to 7 seconds.
+
+  ---
+<br>
   
-- ## 🔗 [SmokeCrack v.1.0.3](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/SmokeCrack/SmokeCrack.html)
+
+<a id="SmokeCrack"></a>
+- ## 🔗 [SmokeCrack v.1.0.3](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/SmokeCrack-v.1.0.3)
    [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/3d2d218e-ec33-4b16-a981-56a16771aa64)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/SmokeCrack/SmokeCrack.html)
   <p align="center">↑ Click to play ↑</p>
 
