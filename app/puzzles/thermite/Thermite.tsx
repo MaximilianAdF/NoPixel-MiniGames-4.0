@@ -18,6 +18,10 @@ import { NPSettingsRange } from "@/app/components/NPSettings";
 import NPButton from "@/app/components/NPButton";
 import usePersistantState from "@/app/utils/usePersistentState";
 
+import Image from "next/image";
+import crossImg from "@/public/images/thermite/cross.svg";
+import backgroundImg from "@/public/images/thermite/background.svg";
+
 import "@/app/puzzles/thermite/style.css";
 
 const Thermite: FC = () => {
@@ -67,6 +71,7 @@ const Thermite: FC = () => {
     setComboCounter(0);
     setLastKillTimestamp(-1);
     setTotalCombos(0);
+    setOutOfMoves(false);
   }, [columns, rows]);
 
   /**
@@ -78,7 +83,6 @@ const Thermite: FC = () => {
     (newStatus: number): void => {
       switch (newStatus) {
         case 1:
-          setOutOfMoves(false);
           setResetAnimation(false);
           resetBoard();
           break;
@@ -152,28 +156,17 @@ const Thermite: FC = () => {
       const [targetRow, targetCol] = targetCoord;
       const [attackerRow, attackerCol] = attackerCoord;
 
-      let distance = 1;
-      switch (attackerPiece) {
-        case "long":
-          distance = 3;
-          break;
-        case "medium":
-          distance = 2;
-          break;
-        case "short":
-          distance = 1;
-          break;
-      }
-
       /**
        * I'm pretty sure there's a much more clever way to code this
        * condition but I was born dumb.
        */
       return (
-        targetCol % distance === attackerCol % distance &&
-        targetRow % distance === attackerRow % distance &&
-        Math.abs(targetCol - attackerCol) <= distance &&
-        Math.abs(targetRow - attackerRow) <= distance
+        targetCol % attackerPiece.distance ===
+          attackerCol % attackerPiece.distance &&
+        targetRow % attackerPiece.distance ===
+          attackerRow % attackerPiece.distance &&
+        Math.abs(targetCol - attackerCol) <= attackerPiece.distance &&
+        Math.abs(targetRow - attackerRow) <= attackerPiece.distance
       );
     },
     []
@@ -346,8 +339,8 @@ const Thermite: FC = () => {
             title={"Target score"}
             value={settingsTargetScore}
             setValue={setSettingsTargetScore}
-            min={14}
-            max={38}
+            min={10}
+            max={75}
           />
           <NPSettingsRange
             title={"Timer"}
@@ -469,13 +462,18 @@ const Thermite: FC = () => {
                       onClick={() => handleClick([rowIndex, columnIndex])}
                     >
                       <span className="piece">
-                        <embed src={`/images/thermite-${square.piece}.svg`} />
+                        <Image
+                          src={square.piece.img}
+                          alt=""
+                          width={75}
+                          height={75}
+                        />
                       </span>
                       <div className="crosses">
-                        <embed src={`/images/thermite-cross.svg`} />
-                        <embed src={`/images/thermite-cross.svg`} />
-                        <embed src={`/images/thermite-cross.svg`} />
-                        <embed src={`/images/thermite-cross.svg`} />
+                        <Image src={crossImg} alt="" width={16} height={16} />
+                        <Image src={crossImg} alt="" width={16} height={16} />
+                        <Image src={crossImg} alt="" width={16} height={16} />
+                        <Image src={crossImg} alt="" width={16} height={16} />
                       </div>
                       <div
                         className="highlight"
@@ -497,7 +495,7 @@ const Thermite: FC = () => {
               CRC Bypassed!
             </span>
           </div>
-          <embed className="background" src={`/images/bg-circuit.svg`} />
+          <Image src={backgroundImg} alt="" fill />
         </Fragment>
       </div>
     </NPHackContainer>

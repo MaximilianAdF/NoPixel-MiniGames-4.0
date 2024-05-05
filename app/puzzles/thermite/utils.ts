@@ -1,5 +1,27 @@
-export type SquarePiece = "short" | "medium" | "long";
-export const squarePieces: SquarePiece[] = ["short", "medium", "long"];
+import shortImg from "@/public/images/thermite/short.svg";
+import mediumImg from "@/public/images/thermite/medium.svg";
+import longImg from "@/public/images/thermite/long.svg";
+
+export type PieceType = "short" | "medium" | "long";
+export type SquarePiece = {type: PieceType, distance: number, img: any};
+const squarePieces: SquarePiece[] = [
+    {
+        type: "short",
+        distance: 1,
+        img: shortImg,
+    },
+    {
+        type: "medium",
+        distance: 2,
+        img: mediumImg,
+    },
+    {
+        type: "long",
+        distance: 3,
+        img: longImg,
+    },
+];
+
 export type SquareStatus = "full" | "half" | "empty";
 export type Square = {
     piece: SquarePiece,
@@ -31,7 +53,7 @@ export const presets = [
 ];
 export const initialBoard: GridRow[] = new Array(presets[0].rows).fill(
     new Array(presets[0].columns).fill({
-      piece: "short",
+      piece: squarePieces[0],
       status: "full",
       highlighted: false,
     })

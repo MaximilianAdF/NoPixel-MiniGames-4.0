@@ -27,14 +27,14 @@
 
         .piece {
             @apply w-full h-full p-[25%];
-
-            embed {
-                @apply relative w-full h-full z-20 pointer-events-none;
-            }
         }
 
         .crosses {
             @apply absolute size-full grid grid-rows-[min-content_min-content] grid-cols-[min-content_min-content] justify-between content-between p-1 opacity-30;
+
+            img {
+                @apply max-w-none;
+            }
         }
 
         .highlight {
