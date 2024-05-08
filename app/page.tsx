@@ -1,7 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { thermiteImg } from "@/public/images/puzzles";
+
 const puzzles = [
+  {
+    href: "/puzzles/thermite",
+    img: thermiteImg,
+    title: "Thermite",
+    description:
+      "Replica of the Thermite hack that is triggered when disabling lasers inside the Maze Bank on NoPixel 4.0",
+  },
   {
     href: "/puzzles/roof-running",
     img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7d94e398-ae40-45d2-ae25-d20fa5a62301",
