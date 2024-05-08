@@ -1,4 +1,4 @@
-![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/69354edc-8c7d-4688-9a6a-06d5270cb8d1)# NoPixel-Hacking-Simulator
+# NoPixel-Hacking-Simulator
  A web-based project designed to replicate/build similar "hacking" challenges that can be found on the NoPixel 4.0 FiveM Server. Any and all **input** is appreciated greatly; create an [issue](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator/issues) regarding suggestions, improvements or questions, I will respond as soon as possible.
  > Developed using HTML, CSS, TS (Compiled to JS).
  <br>
