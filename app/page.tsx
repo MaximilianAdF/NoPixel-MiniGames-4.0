@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { thermiteImg } from "@/public/images/puzzles";
+import { describe } from "node:test";
 
 const puzzles = [
   {
@@ -46,6 +47,12 @@ const puzzles = [
     img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/71356958/835f82cb-a5de-43b7-ade0-6bc74285ed00",
     title: "Word Memory",
     description: ""
+  },
+  {
+    href: "/puzzles/chopping",
+    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/66cf9e24-4bdf-4c76-bfa9-fed56570cc40",
+    title: "Chopping",
+    description: "Replica of the Chopping hack that is triggered when chopping vehicles on NoPixel 4.0"
   }
 ]
 
