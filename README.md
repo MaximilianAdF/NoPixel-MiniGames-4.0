@@ -1,4 +1,4 @@
-# NoPixel-Hacking-Simulator
+![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/69354edc-8c7d-4688-9a6a-06d5270cb8d1)# NoPixel-Hacking-Simulator
  A web-based project designed to replicate/build similar "hacking" challenges that can be found on the NoPixel 4.0 FiveM Server. Any and all **input** is appreciated greatly; create an [issue](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator/issues) regarding suggestions, improvements or questions, I will respond as soon as possible.
  > Developed using HTML, CSS, TS (Compiled to JS).
  <br>
@@ -22,7 +22,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
 
 <a id="StartOfMiniGames"></a>
 - ## 🔗 [RoofRunning v.1.0.3](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/RoofRunning-v.1.0.3)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/5e110451-62cf-496b-9e61-1d4e2b4989be)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/RoofRunning/RoofRunning.html)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/5e110451-62cf-496b-9e61-1d4e2b4989be)](https://no-px.vercel.app/puzzles/roof-running)
   <p align="center">↑ Click to play ↑</p>
 
    ### Description
@@ -36,12 +36,20 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
 
 <a id="Thermite"></a>
 - ## 🔗 [Thermite v.1.0.1](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/Thermite-v.1.0.1)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/01185345-4520-4caa-aa92-9998fe137ef4)]()
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/01185345-4520-4caa-aa92-9998fe137ef4)](https://no-px.vercel.app/puzzles/thermite)
   <p align="center">↑ Click to play ↑</p>
 
   ### Description
   The thermite minigame is based on the hack that is triggered when disabling lasers in the Maze Bank on NoPixel 4.0. The minigame offers two presets: the Maze Bank sewers generators and the Maze Bank vault. The game can also be configured through the settings. You can alter the grid size (Rows x Columns), Timer duration and the Target Score.
 
+  ---
+  <br>
+
+<a id="Word-memory"></a>
+- ## Word-Memory v.1.0.1
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/77bb8147-1f2b-47cb-b210-5c1c7d240d2c)](https://no-px.vercel.app/puzzles/word-memory)
+   <p align="center">↑ Click to play ↑</p>
+   
   ---
   <br>
   
@@ -60,7 +68,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
 
 <a id="SmokeCrack"></a>
 - ## 🔗 [SmokeCrack v.1.0.3](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/SmokeCrack-v.1.0.3)
-   [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/3d2d218e-ec33-4b16-a981-56a16771aa64)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/SmokeCrack/SmokeCrack.html)
+   [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/3d2d218e-ec33-4b16-a981-56a16771aa64)](https://no-px.vercel.app/SmokeCrack/SmokeCrack.html)
   <p align="center">↑ Click to play ↑</p>
 
   ### Description
@@ -76,7 +84,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
 
   <a id="LockPick"></a>
 - ## 🔗 [Lockpick v.1.0.3](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/LockPick-v.1.0.3)
-   [![Screenshot 2024-02-07 at 13 32 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/e5e00eac-ea19-46e1-944c-67c7ff8ca5cf)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/LockPick/LockPick.html)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/a512ef6c-970e-4b29-95c9-a7bac09434cc)](https://no-px.vercel.app/puzzles/lockpick)
   <p align="center">↑ Click to play ↑</p>
   
   ### Description
@@ -91,7 +99,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   <br>
  
 - ## 🔗 [Laundromat v.1.0.1](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/Laundromat-v1.0.1)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/75745b11-da0f-4a80-9b17-fb389140dbad)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/Laundromat/Laundromat.html)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/75745b11-da0f-4a80-9b17-fb389140dbad)](https://no-px.vercel.app/puzzles/laundromat)
   
    <p align="center">↑ Click to play ↑</p>
    
@@ -105,7 +113,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   <br>
 
 - ## 🔗 [RepairKit v.1.0.1](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
-   [![Screenshot 2024-02-07 at 13 27 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/4888fd16-2b24-44c0-9952-275ddb626332)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/RepairKit/RepairKit.html)
+   [![Screenshot 2024-02-07 at 13 27 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/4888fd16-2b24-44c0-9952-275ddb626332)](https://no-px.vercel.app/puzzles/repair-kit)
   <p align="center">↑ Click to play ↑</p>
   
   ### Description
