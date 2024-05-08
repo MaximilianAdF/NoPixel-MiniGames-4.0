@@ -59,12 +59,30 @@ const config: Config = {
     extend: {
       animation: {
         win: "winBounce 0.6s ease-in-out forwards",
+        highlight: 'highlight 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        notice: 'notice 1.5s ease-out',
       },
       keyframes: {
         winBounce: {
           "0%, 100%": { scale: "1" },
           "50%": { scale: "1.2" },
         },
+        highlight: {
+          '0%, 100%': { opacity: "0.18" },
+          '50%': { opacity: "0.15" },
+        },
+        notice: {
+          '0%': {
+            scale: "1",
+            opacity: "0.8",
+            letterSpacing: "0",
+          },
+          '100%': {
+            scale: "1.6",
+            opacity: "0",
+            letterSpacing: "4px",
+          }
+        }
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -137,6 +155,32 @@ const config: Config = {
           '800': '#0e6157',
           '900': '#105148',
           '950': '#02312d',
+        },
+        'grey': {
+          '50': '#f5f6f6',
+          '100': '#e6e7e7',
+          '200': '#cfd2d1',
+          '300': '#aeb2b1',
+          '400': '#858b89',
+          '500': '#6a706f',
+          '600': '#5a605f',
+          '700': '#4d5151',
+          '800': '#434747',
+          '900': '#3b3e3e',
+          '950': '#252727',
+        },
+        'error': {
+          '50': '#fff0f1',
+          '100': '#ffdddf',
+          '200': '#ffc1c4',
+          '300': '#ff969c',
+          '400': '#ff5a63',
+          '500': '#ff2733',
+          '600': '#fb0714',
+          '700': '#d4010c',
+          '800': '#7e1117',
+          '900': '#71090e',
+          '950': '#380003',
         },
       },
     },

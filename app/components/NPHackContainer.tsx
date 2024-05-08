@@ -33,6 +33,8 @@ interface NPHackContainerProps {
     setStatus: (status: number) => void,
     statusMessage: string,
     settings?: NPHackContainerSettings,
+    score?: number,
+    targetScore?: number,
 
     // props: {[key: string]: any},
     className?: string,
@@ -51,6 +53,8 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
     setStatus,
     statusMessage,
     settings,
+    score,
+    targetScore,
     ...props
 }) => {
     // This can be decreased if you need to call a func every frame
@@ -125,9 +129,9 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                 ">
                     {/* Header */}
                     <div className="
-                        mb-5
-                        h-10
-                        flex justify-between items-center
+                        grid
+                        grid-cols-[auto_min-content]
+                        mb-4
                     ">
                         <div className="
                             flex items-center
@@ -149,7 +153,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                                 {description}
                             </p>
                         </div>
-                        {settings && <div className="h-full aspect-square justify-center items-center flex p-1">
+                        {settings && <div className="h-full flex aspect-square justify-center items-center p-1 mr-7">
                             <FontAwesomeIcon
                                 icon={faGear}
                                 className="
@@ -162,6 +166,16 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                                 title={"Open Settings"}
                             />
                         </div>}
+                        {targetScore && (
+                            <div className="
+                                col-span-full
+                                text-center
+                                text-white
+                                text-lg
+                            ">
+                                {score}/{targetScore}
+                            </div>
+                        )}
                     </div>
                     {status !== undefined && <div className={classNames(
                         `

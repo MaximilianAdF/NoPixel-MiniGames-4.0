@@ -22,7 +22,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
 
 <a id="StartOfMiniGames"></a>
 - ## 🔗 [RoofRunning v.1.0.3](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/RoofRunning-v.1.0.3)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7d94e398-ae40-45d2-ae25-d20fa5a62301](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/5e110451-62cf-496b-9e61-1d4e2b4989be))](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/RoofRunning/RoofRunning.html)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/5e110451-62cf-496b-9e61-1d4e2b4989be)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/RoofRunning/RoofRunning.html)
   <p align="center">↑ Click to play ↑</p>
 
    ### Description
@@ -33,6 +33,18 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
    - Highscore, Current score interface (global?)
    ---
   <br>
+
+<a id="Thermite"></a>
+- ## 🔗 [Thermite v.1.0.1](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/Thermite-v.1.0.1)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/01185345-4520-4caa-aa92-9998fe137ef4)]()
+  <p align="center">↑ Click to play ↑</p>
+
+  ### Description
+  The thermite minigame is based on the hack that is triggered when disabling lasers in the Maze Bank on NoPixel 4.0. The minigame offers two presets: the Maze Bank sewers generators and the Maze Bank vault. The game can also be configured through the settings. You can alter the grid size (Rows x Columns), Timer duration and the Target Score.
+
+  ---
+  <br>
+  
 
 <a id="Chopping"></a>
 - ## 🔗 [Chopping v.1.0.1](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/Chopping-v.1.0.1)

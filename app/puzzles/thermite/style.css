@@ -1,0 +1,60 @@
+.thermite {
+    @apply relative grid gap-2 mx-auto;
+
+   .square {
+        @apply relative aspect-square bg-radient-circle-c opacity-80 rounded-lg overflow-hidden z-10;
+        @apply flex items-center justify-center;
+
+        &[data-status=full] {
+            @apply from-turquoise-600 to-turquoise-950;
+        }
+
+        &[data-status=half] {
+            @apply from-grey-500 to-grey-950;
+        }
+
+        &[data-status=fail] {
+            @apply from-error-800 to-error-950;
+        }
+
+        &[data-status=empty] {
+            @apply bg-transparent;
+
+            * {
+                @apply hidden;
+            }
+        }
+
+        .piece {
+            @apply w-full h-full p-[25%];
+        }
+
+        .crosses {
+            @apply absolute size-full grid grid-rows-[min-content_min-content] grid-cols-[min-content_min-content] justify-between content-between p-1 opacity-30;
+
+            img {
+                @apply max-w-none;
+            }
+        }
+
+        .highlight {
+            @apply absolute size-full bg-transparent opacity-20 animate-highlight;
+        }
+
+        &[data-highlighted=true] .highlight {
+            @apply bg-white cursor-pointer;
+        }
+    }
+
+    .notice {
+        @apply absolute inset-0 grid place-content-center pointer-events-none z-30;
+
+        span {
+            @apply animate-notice text-[2.5rem] text-white opacity-0;
+        }
+    }
+
+    .background {
+        @apply bg-radient-circle-c from-[#121D23] to-[#0B161C] absolute size-full inset-0 pointer-events-none;
+    }
+}
