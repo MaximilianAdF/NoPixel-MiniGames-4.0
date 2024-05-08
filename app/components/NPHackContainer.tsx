@@ -153,7 +153,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                                 {description}
                             </p>
                         </div>
-                        {settings && <div className="h-full aspect-square justify-center items-center flex p-1">
+                        {settings && <div className="h-full flex aspect-square justify-center items-center p-1 mr-7">
                             <FontAwesomeIcon
                                 icon={faGear}
                                 className="
