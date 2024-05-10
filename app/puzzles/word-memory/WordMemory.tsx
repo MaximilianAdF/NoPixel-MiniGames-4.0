@@ -128,7 +128,7 @@ export default function WordMemory() {
                     }
                 ],
             ]}
-            countdownDuration={countdownDuration}
+            countdownDuration={countdownDuration * 1000}
             resetCallback={resetGame}
             resetDelay={3000}
             status={gameStatus}
