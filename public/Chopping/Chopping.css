@@ -8,7 +8,7 @@
   margin-top: 10%;
 }
 
-.grid {
+.game-grid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
   grid-template-rows: repeat(var(--grid-rows), 1fr);
@@ -16,7 +16,7 @@
   z-index: 1;
 }
 
-.grid-row {
+.game-grid-row {
   display: grid;
   justify-content: center;
   grid-template-columns: repeat(var(--grid-columns), 1fr);

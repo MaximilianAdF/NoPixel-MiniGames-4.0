@@ -153,7 +153,7 @@ const Chopping: FC = () => {
                 <NPSettingsRange
                     title={"Number of letters"}
                     min={13}
-                    max={30}
+                    max={18}
                     value={settingsNumLetters}
                     setValue={setSettingsNumLetters}
                 />
@@ -182,10 +182,10 @@ const Chopping: FC = () => {
             statusMessage={getStatusMessage(gameStatus)}
             settings={settings}
         >
-            <div className='grid'>
+            <div className='game-grid'>
                 {/* Dynamically create grid rows based on numLetters and defaultGridCols */}
                 {Array.from({ length: Math.ceil(numLetters / defaultGridCols) }).map((_, rowIndex) => (
-                    <div key={rowIndex} className='grid-row' style={{ gridTemplateColumns: `repeat(${Math.min(numLetters - rowIndex * defaultGridCols, defaultGridCols)}, min-content)` }}>
+                    <div key={rowIndex} className='game-grid-row' style={{ gridTemplateColumns: `repeat(${Math.min(numLetters - rowIndex * defaultGridCols, defaultGridCols)}, min-content)` }}>
 
                         {/* Create grid columns within each row */}
                         {Array.from({ length: defaultGridCols }).map((_, colIndex) => {
