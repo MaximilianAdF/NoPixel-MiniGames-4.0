@@ -67,7 +67,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
 
 <a id="Chopping"></a>
 - ## 🔗 [Chopping v.1.0.1](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/Chopping-v.1.0.1)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/66cf9e24-4bdf-4c76-bfa9-fed56570cc40)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/Chopping/Chopping.html)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/162ea81b-5c8e-4240-a5ef-7707eb9d5c23)](https://no-px.vercel.app/puzzles/chopping)
   <p align="center">↑ Click to play ↑</p>
 
   ### Description
