@@ -45,6 +45,15 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   ---
   <br>
 
+<a id="Pincracker"></a>
+- ## Pincracker v.1.0.1
+
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/25f89ddd-f8ad-415d-a8a9-1708d5736a6b)](https://no-px.vercel.app/puzzles/pincracker)
+   <p align="center">↑ Click to play ↑</p>
+
+ ---
+ <br>
+
 <a id="Word-memory"></a>
 - ## Word-Memory v.1.0.1
 
