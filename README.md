@@ -45,9 +45,20 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   ---
   <br>
 
+
+<a id="Pincracker"></a>
+- ## Pincracker v.1.0.1
+
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/d0786242-b869-4aef-9a53-e3f6c4a3da5c)](https://no-px.vercel.app/puzzles/pincracker)
+   <p align="center">↑ Click to play ↑</p>
+
+ ---
+ <br>
+
 <a id="Word-memory"></a>
 - ## Word-Memory v.1.0.1
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/77bb8147-1f2b-47cb-b210-5c1c7d240d2c)](https://no-px.vercel.app/puzzles/word-memory)
+
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/aeaacf57-bdd1-4622-9562-807030f61af4)](https://no-px.vercel.app/puzzles/word-memory)
    <p align="center">↑ Click to play ↑</p>
    
   ---
@@ -56,7 +67,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
 
 <a id="Chopping"></a>
 - ## 🔗 [Chopping v.1.0.1](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/Chopping-v.1.0.1)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/66cf9e24-4bdf-4c76-bfa9-fed56570cc40)](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/public/Chopping/Chopping.html)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/162ea81b-5c8e-4240-a5ef-7707eb9d5c23)](https://no-px.vercel.app/puzzles/chopping)
   <p align="center">↑ Click to play ↑</p>
 
   ### Description
