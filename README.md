@@ -47,7 +47,8 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
 
 <a id="Word-memory"></a>
 - ## Word-Memory v.1.0.1
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/77bb8147-1f2b-47cb-b210-5c1c7d240d2c)](https://no-px.vercel.app/puzzles/word-memory)
+
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/aeaacf57-bdd1-4622-9562-807030f61af4)](https://no-px.vercel.app/puzzles/word-memory)
    <p align="center">↑ Click to play ↑</p>
    
   ---
