@@ -43,7 +43,6 @@ const Chopping: FC = () => {
     const [timer, setTimer] = usePersistantState("chopping-timer", defaultDuration);
     const [numLetters, setNumLetters] = usePersistantState("chopping-num-letters", defaultNumLetters);
     const [activeIndex, setActiveIndex] = usePersistantState("chopping-active-index", 0);
-
     const [board, setBoard] = useState<Letter[]>(new Array(defaultNumLetters));
     const [stateBoard, setStateBoard] = useState<LetterState[]>(new Array(defaultNumLetters).fill(''));
 
@@ -182,40 +181,48 @@ const Chopping: FC = () => {
             statusMessage={getStatusMessage(gameStatus)}
             settings={settings}
         >
-            <div className='game-grid'>
-                {/* Dynamically create grid rows based on numLetters and defaultGridCols */}
-                {Array.from({ length: Math.ceil(numLetters / defaultGridCols) }).map((_, rowIndex) => (
-                    <div key={rowIndex} className='game-grid-row' style={{ gridTemplateColumns: `repeat(${Math.min(numLetters - rowIndex * defaultGridCols, defaultGridCols)}, min-content)` }}>
+            <div className="
+                h-max w-max max-w-full
+                rounded-lg
+                bg-[rgb(22_40_52)]
+                flex items-center justify-center
+                text-white text-5xl
+                p-2
+            ">
+                <div className='game-grid'>
+                    {/* Dynamically create grid rows based on numLetters and defaultGridCols */}
+                    {Array.from({ length: Math.ceil(numLetters / defaultGridCols) }).map((_, rowIndex) => (
+                        <div key={rowIndex} className='game-grid-row' style={{ gridTemplateColumns: `repeat(${Math.min(numLetters - rowIndex * defaultGridCols, defaultGridCols)}, min-content)` }}>
 
-                        {/* Create grid columns within each row */}
-                        {Array.from({ length: defaultGridCols }).map((_, colIndex) => {
-                            const letterIndex = rowIndex * defaultGridCols + colIndex;
-                            if (letterIndex < numLetters) {
-                                const letter = board[letterIndex];
-                                const isActive = letterIndex === activeIndex;
-                                const isDone = stateBoard[letterIndex] === 'done';
-                                const isFail = stateBoard[letterIndex] === 'fail';
+                            {/* Create grid columns within each row */}
+                            {Array.from({ length: defaultGridCols }).map((_, colIndex) => {
+                                const letterIndex = rowIndex * defaultGridCols + colIndex;
+                                if (letterIndex < numLetters) {
+                                    const letter = board[letterIndex];
+                                    const isActive = letterIndex === activeIndex;
+                                    const isDone = stateBoard[letterIndex] === 'done';
+                                    const isFail = stateBoard[letterIndex] === 'fail';
 
-                                const classes = classNames("letter", {
-                                    'letter-active': isActive,
-                                    'done': isDone,
-                                    'fail': isFail,
-                                });
+                                    const classes = classNames("letter", {
+                                        'letter-active': isActive,
+                                        'done': isDone,
+                                        'fail': isFail,
+                                    });
 
-                                return (
-                                    <div key={colIndex} className={classes} style={{ justifySelf: 'center' }}>
-                                        {letter}
-                                    </div>
-                                );
-                            } else {
-                                // Stop the loop once all letters are rendered in the row
-                                return null;
-                            }
-                        })}
-                    </div>
-                ))}
+                                    return (
+                                        <div key={colIndex} className={classes} style={{ justifySelf: 'center' }}>
+                                            {letter}
+                                        </div>
+                                    );
+                                } else {
+                                    // Stop the loop once all letters are rendered in the row
+                                    return null;
+                                }
+                            })}
+                        </div>
+                    ))}
+                </div>
             </div>
-            
         </NPHackContainer>
     )
 

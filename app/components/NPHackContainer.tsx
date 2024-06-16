@@ -181,7 +181,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                         `
                             gap-2.5
                             absolute
-                            right-2.5
+                            right-14
                             top-2.5
                             text-white
                             px-4 py-2

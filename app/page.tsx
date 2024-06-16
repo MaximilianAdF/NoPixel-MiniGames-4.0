@@ -44,15 +44,21 @@ const puzzles = [
   },
   {
     href: "/puzzles/word-memory",
-    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/71356958/835f82cb-a5de-43b7-ade0-6bc74285ed00",
+    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/aeaacf57-bdd1-4622-9562-807030f61af4",
     title: "Word Memory",
-    description: ""
+    description: "Replica of the Word Memory hack that is triggered when hacking the Maze Bank on NoPixel 4.0"
   },
   {
     href: "/puzzles/chopping",
-    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/66cf9e24-4bdf-4c76-bfa9-fed56570cc40",
+    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/162ea81b-5c8e-4240-a5ef-7707eb9d5c23",
     title: "Chopping",
     description: "Replica of the Chopping hack that is triggered when chopping vehicles on NoPixel 4.0"
+  },
+  {
+    href: "/puzzles/pincracker",
+    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/d0786242-b869-4aef-9a53-e3f6c4a3da5c",
+    title: "PinCracker",
+    description: "Replica of the PinCracker hack that is triggered when hacking the Maze Bank on NoPixel 4.0"
   }
 ]
 
