@@ -45,10 +45,11 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   ---
   <br>
 
+
 <a id="Pincracker"></a>
 - ## Pincracker v.1.0.1
 
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/25f89ddd-f8ad-415d-a8a9-1708d5736a6b)](https://no-px.vercel.app/puzzles/pincracker)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/d0786242-b869-4aef-9a53-e3f6c4a3da5c)](https://no-px.vercel.app/puzzles/pincracker)
    <p align="center">↑ Click to play ↑</p>
 
  ---
