@@ -1,28 +1,43 @@
 "use client";
 
-import { Digit, Digits, DigitState } from "@/app/puzzles/pincracker/utils";
+import { checkBeepPlayer, successPlayer } from "@/public/audio/AudioManager";
+import { Digit, Digits } from "@/app/puzzles/pincracker/utils";
 import NPHackContainer from "@/app/components/NPHackContainer";
 import { NPSettingsRange } from "@/app/components/NPSettings";
-import React, { FC, useEffect, useState } from "react";
-import { getStatusMessage } from "../thermite/utils";
+import React, { FC, useEffect, useState, useRef } from "react";
 import usePersistantState from "@/app/utils/usePersistentState";
 import { useKeyDown } from "@/app/utils/useKeyDown";
 import useGame from "@/app/utils/useGame";
-import classNames from "classnames";
-import { clear } from "console";
-import { generate } from "random-words";
 
 const defaultDuration = 20;
+
+const getStatusMessage = (status: number | undefined) => {
+    switch (status) {
+        case 0:
+            return "";
+        case 1:
+            return "";
+        case 2:
+            return "Failed!";
+        case 3:
+            return "Success!";
+        case 4:
+            return "Reset!";
+        default:
+            return `Error: Unknown game status ${status}`;
+    }
+}
 
 const Pincracker: FC = () => {
     const [timer, setTimer] = usePersistantState("chopping-timer", defaultDuration);
     const [settingsDuration, setSettingsDuration] = useState(defaultDuration);
     const [activeIndex, setActiveIndex] = usePersistantState("pincracker-active-index", 0);
     const [allowKeyDown, setAllowKeyDown] = useState(true);
+    const [pinLength, setPinLength] = useState(4);
     const [pin, setPin] = useState<Digit[]>();
 
     const handleCrack = () => {
-        if (activeIndex < 4) {
+        if (activeIndex < pinLength) {
             console.log('Incomplete pin');
         } else {
             const wrappers = document.querySelectorAll('.wrapper');
@@ -31,8 +46,12 @@ const Pincracker: FC = () => {
             const guess = Array.from(digits).map(d => (d.innerHTML as Digit));
             setAllowKeyDown(false);
 
-            for (let i = 0; i < 4; i++) {
+
+            for (let i = 0; i < pinLength; i++) {
                 setTimeout(() => {
+                    // Play the check beep audio
+                    checkBeepPlayer.play();
+
                     // Remove the background color of the previous wrapper if it exists
                     if (i > 0) {
                         wrappers[i - 1].classList.remove('bg-gradient-radial', 'from-spring-green-300', 'to-turquoise-900/50');
@@ -66,7 +85,6 @@ const Pincracker: FC = () => {
 
             setTimeout(() => {
                 if (pin && guess.join('') === pin.join('')) {
-                    console.log('Success!');
                     setGameStatus(3);
                 }
                 setActiveIndex(0);
@@ -77,15 +95,15 @@ const Pincracker: FC = () => {
 
     const clearBoard = (delay: number) => {
         const digits = document.querySelectorAll('.digit');
-        for (let i = 3; i > -1; i--) {
+        for (let i = pinLength-1; i > -1; i--) {
             setTimeout(() => {
                 digits[i].innerHTML = '';
-            }, (4-i) * delay);
+            }, (pinLength-i) * delay);
         }
 
         setTimeout(() => {
             setAllowKeyDown(true);
-        }, delay * 4);
+        }, delay * pinLength);
     }
 
     const clearMarkings = () => {
@@ -104,7 +122,7 @@ const Pincracker: FC = () => {
             [Digits[i], Digits[j]] = [Digits[j], Digits[i]];
         }
     
-        const newPin = Digits.slice(0, 4);
+        const newPin = Digits.slice(0, pinLength);
         setPin(newPin);
     }
 
@@ -121,9 +139,7 @@ const Pincracker: FC = () => {
         switch (newStatus) {
             case 1:
                 setAllowKeyDown(false);
-                console.log('Reset game');
                 resetBoard();
-
                 break;
         }
     }
@@ -150,7 +166,7 @@ const Pincracker: FC = () => {
         }
 
         else {
-            if (activeIndex < 4) {
+            if (activeIndex < pinLength) {
                 const digits = document.querySelectorAll('.digit');
                 digits[activeIndex].innerHTML = key.toString();
                 setActiveIndex(activeIndex + 1);
@@ -166,10 +182,10 @@ const Pincracker: FC = () => {
     }, ['1','2','3','4','5','6','7','8','9','0', 'Backspace', 'Enter']);
 
     useEffect(() => {
-        if (gameStatus !== 4) {
-            resetGame();
+        if (gameStatus === 3) {
+            successPlayer.play();
         }
-    }, [timer])
+    }, [gameStatus])
 
     const settings = {
         handleSave: () => {
@@ -185,6 +201,13 @@ const Pincracker: FC = () => {
         children: (
             <div className="flex flex-col items-center">
                 <NPSettingsRange
+                    title={"Pin Length"}
+                    min={2}
+                    max={6}
+                    value={pinLength}
+                    setValue={setPinLength}
+                />
+                <NPSettingsRange
                     title={"Duration (seconds)"}
                     min={5}
                     max={30}
@@ -197,58 +220,40 @@ const Pincracker: FC = () => {
 
     return (
         <NPHackContainer
-            title="PinCracker"
-            description="Decode digits of the pin code"
-            buttons={[
-                [
-                    {
-                        label: "Crack",
-                        color: "green",
-                        callback: handleCrack,
-                        disabled: gameStatus !== 1,
-                    }
-                ]
-            ]}
-            countdownDuration={timer*1000}
-            resetCallback={resetGame}
-            resetDelay={3000}
-            status={gameStatus}
-            setStatus={setGameStatus}
-            statusMessage={getStatusMessage(gameStatus)}
-            settings={settings}
+          title="PinCracker"
+          description="Decode digits of the pin code"
+          buttons={[
+            [
+              {
+                label: "Crack",
+                color: "green",
+                callback: handleCrack,
+                disabled: gameStatus !== 1,
+              }
+            ]
+          ]}
+          countdownDuration={timer * 1000}
+          resetCallback={resetGame}
+          resetDelay={3000}
+          status={gameStatus}
+          setStatus={setGameStatus}
+          statusMessage={getStatusMessage(gameStatus)}
+          settings={settings}
         >
-
-            <div className="
-                h-32 w-[600px] max-w-full
-                rounded-lg
-                bg-[rgb(22_40_52)]
-                flex items-center justify-between
-                text-white text-5xl
-                
-            ">
-
-                <div className="flex flex-col items-center justify-center w-3/12 h-full gap-3 rounded-md wrapper">
-                    <div className='h-[50px] digit'></div>
-                    <div className="px-5 h-1 bg-slate-400 marker"/>
-                </div>
-                
-                <div className="flex flex-col items-center justify-center w-3/12 h-full gap-3 rounded-md wrapper">
-                    <div className='h-[50px] digit'></div>
-                    <div className="px-5 h-1 bg-slate-400 marker"/>
-                </div>
-
-                <div className="flex flex-col items-center justify-center w-3/12 h-full gap-3 rounded-md wrapper">
-                    <div className='h-[50px] digit'></div>
-                    <div className="px-5 h-1 bg-slate-400 marker"/>
-                </div>
-
-                <div className="flex flex-col items-center justify-center w-3/12 h-full gap-3 rounded-md wrapper">
-                    <div className='h-[50px] digit'></div>
-                    <div className="px-5 h-1 bg-slate-400 marker"/>
-                </div>
-
-            </div>
-
+          <div className="
+            h-32 w-[600px] max-w-full
+            rounded-lg
+            bg-[rgb(22_40_52)]
+            flex items-center justify-between
+            text-white text-5xl
+          ">
+            {[...Array(pinLength)].map((_, index) => (
+              <div key={index} className="flex flex-col items-center justify-center w-3/12 h-full gap-3 rounded-md wrapper">
+                <div className='h-[50px] digit'></div>
+                <div className="px-5 h-1 bg-slate-400 marker"/>
+              </div>
+            ))}
+          </div>
         </NPHackContainer>
     );
 }

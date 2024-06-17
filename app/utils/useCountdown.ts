@@ -1,11 +1,8 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
+import {timerBeepPlayer} from "@/public/audio/AudioManager";
 import {useInterval} from "@/app/utils/useInterval";
 
-export const useCountdown = (
-    callback: () => void,
-    duration: number,
-    delay: number = 50
-): [number, () => void, () => void] => {
+export const useCountdown = (callback: () => void, duration: number, delay: number = 50): [number, () => void, () => void] => {
     const savedCallback = useRef<() => void>();
     const [startTime, setStartTime] = useState<number>();
 
@@ -20,8 +17,15 @@ export const useCountdown = (
     const tick = useCallback(() => {
         if (startTime === undefined || freeze)
             return;
+
+        // Calculate the progress
         const elapsed = Date.now() - startTime;
         const p = Math.max(Math.min(elapsed / duration,1), 0) * 100;
+
+        // Play audio each tick
+        if (p <= 100) {
+            timerBeepPlayer.play();
+        }
 
         if (p === 100) {
             savedCallback.current?.();
