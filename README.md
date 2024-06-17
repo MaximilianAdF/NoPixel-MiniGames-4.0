@@ -19,10 +19,9 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   # ‎
   <br>
 
-
 <a id="StartOfMiniGames"></a>
 - ## 🔗 [RoofRunning v.1.0.3](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/RoofRunning-v.1.0.3)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/5e110451-62cf-496b-9e61-1d4e2b4989be)](https://no-px.vercel.app/puzzles/roof-running)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/e8387474-4a34-4f02-842f-195484160a60)](https://no-px.vercel.app/puzzles/roof-running)
   <p align="center">↑ Click to play ↑</p>
 
    ### Description
@@ -36,7 +35,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
 
 <a id="Thermite"></a>
 - ## 🔗 [Thermite v.1.0.1](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/Thermite-v.1.0.1)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/01185345-4520-4caa-aa92-9998fe137ef4)](https://no-px.vercel.app/puzzles/thermite)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/0674273c-43da-4d39-a98e-1443517a4eac)](https://no-px.vercel.app/puzzles/thermite)
   <p align="center">↑ Click to play ↑</p>
 
   ### Description
@@ -45,11 +44,10 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   ---
   <br>
 
-
 <a id="Pincracker"></a>
 - ## Pincracker v.1.0.1
 
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/d0786242-b869-4aef-9a53-e3f6c4a3da5c)](https://no-px.vercel.app/puzzles/pincracker)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/e3619d89-7059-45fe-b8e5-3d429151ff41)](https://no-px.vercel.app/puzzles/pincracker)
    <p align="center">↑ Click to play ↑</p>
 
  ---
@@ -58,16 +56,15 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
 <a id="Word-memory"></a>
 - ## Word-Memory v.1.0.1
 
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/aeaacf57-bdd1-4622-9562-807030f61af4)](https://no-px.vercel.app/puzzles/word-memory)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/613422a5-39ba-4cd8-bd64-c0a41427629d)](https://no-px.vercel.app/puzzles/word-memory)
    <p align="center">↑ Click to play ↑</p>
    
   ---
   <br>
-  
 
 <a id="Chopping"></a>
 - ## 🔗 [Chopping v.1.0.1](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/Chopping-v.1.0.1)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/162ea81b-5c8e-4240-a5ef-7707eb9d5c23)](https://no-px.vercel.app/puzzles/chopping)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/815913c0-c159-4d17-b363-7136e08a1077)](https://no-px.vercel.app/puzzles/chopping)
   <p align="center">↑ Click to play ↑</p>
 
   ### Description
@@ -95,7 +92,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
 
   <a id="LockPick"></a>
 - ## 🔗 [Lockpick v.1.0.3](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/LockPick-v.1.0.3)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/a512ef6c-970e-4b29-95c9-a7bac09434cc)](https://no-px.vercel.app/puzzles/lockpick)
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/472d8447-c69b-4474-aaeb-474516b8f014)](https://no-px.vercel.app/puzzles/lockpick)
   <p align="center">↑ Click to play ↑</p>
   
   ### Description
@@ -108,10 +105,10 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   
   ---
   <br>
+
  
 - ## 🔗 [Laundromat v.1.0.1](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/Laundromat-v1.0.1)
-   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/75745b11-da0f-4a80-9b17-fb389140dbad)](https://no-px.vercel.app/puzzles/laundromat)
-  
+   [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/23371a81-fd85-49b5-819b-de1207a5a4f8)](https://no-px.vercel.app/puzzles/laundromat)
    <p align="center">↑ Click to play ↑</p>
    
    ### Description
@@ -124,7 +121,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   <br>
 
 - ## 🔗 [RepairKit v.1.0.1](https://maximilianadf.github.io/NoPixel-MiniGames-4.0/RepairKit/RepairKit.html)
-   [![Screenshot 2024-02-07 at 13 27 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/4888fd16-2b24-44c0-9952-275ddb626332)](https://no-px.vercel.app/puzzles/repair-kit)
+   [![Screenshot 2024-02-07 at 13 27 40](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/ac828de8-fb5d-4c9f-97ac-ee000702b630)](https://no-px.vercel.app/puzzles/repair-kit)
   <p align="center">↑ Click to play ↑</p>
   
   ### Description
