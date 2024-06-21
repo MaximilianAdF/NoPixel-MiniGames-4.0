@@ -7,32 +7,31 @@ import { describe } from "node:test";
 const puzzles = [
   {
     href: "/puzzles/thermite",
-    img: thermiteImg,
+    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/0674273c-43da-4d39-a98e-1443517a4eac",
     title: "Thermite",
-    description:
-      "Replica of the Thermite hack that is triggered when disabling lasers inside the Maze Bank on NoPixel 4.0",
+    description: "Replica of the Thermite hack that is triggered when disabling lasers inside the Maze Bank on NoPixel 4.0",
   },
   {
     href: "/puzzles/roof-running",
-    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7d94e398-ae40-45d2-ae25-d20fa5a62301",
+    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/e8387474-4a34-4f02-842f-195484160a60",
     title: "Roof Running",
     description: "Replica of the Roof Running hack that is triggered when robbing AC-Units on NoPixel 4.0"
   },
   {
     href: "/puzzles/laundromat",
-    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/7a0a6e18-a39f-45b8-b186-5d0069241ce0",
+    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/23371a81-fd85-49b5-819b-de1207a5a4f8",
     title: "Laundromat",
     description: "Replica of the Laundromat hack that is triggered when robbing the safe inside the south-side Laundromat on NoPixel 4.0"
   },
   {
     href: "/puzzles/lockpick",
-    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/e5e00eac-ea19-46e1-944c-67c7ff8ca5cf",
+    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/472d8447-c69b-4474-aaeb-474516b8f014",
     title: "LockPick",
     description: "Replica of the LockPick hack that is triggered when lockpicking vehicles, among other things, on NoPixel 4.0"
   },
   {
     href: "/puzzles/repair-kit",
-    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/4888fd16-2b24-44c0-9952-275ddb626332",
+    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/ac828de8-fb5d-4c9f-97ac-ee000702b630",
     title: "RepairKit",
     description: "Replica of the RepairKit hack that is triggered when repairing vehicles on NoPixel 4.0"
   },
@@ -44,19 +43,19 @@ const puzzles = [
   },
   {
     href: "/puzzles/word-memory",
-    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/aeaacf57-bdd1-4622-9562-807030f61af4",
+    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/613422a5-39ba-4cd8-bd64-c0a41427629d",
     title: "Word Memory",
     description: "Replica of the Word Memory hack that is triggered when hacking the Maze Bank on NoPixel 4.0"
   },
   {
     href: "/puzzles/chopping",
-    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/162ea81b-5c8e-4240-a5ef-7707eb9d5c23",
+    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/815913c0-c159-4d17-b363-7136e08a1077",
     title: "Chopping",
     description: "Replica of the Chopping hack that is triggered when chopping vehicles on NoPixel 4.0"
   },
   {
     href: "/puzzles/pincracker",
-    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/d0786242-b869-4aef-9a53-e3f6c4a3da5c",
+    img: "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/e3619d89-7059-45fe-b8e5-3d429151ff41",
     title: "PinCracker",
     description: "Replica of the PinCracker hack that is triggered when hacking the Maze Bank on NoPixel 4.0"
   }

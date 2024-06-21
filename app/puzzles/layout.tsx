@@ -32,11 +32,11 @@ export default function PuzzleLayout({
                     select-none
 
                     hover:[box-shadow:rgba(127,255,191,0.397)_0_-25px_18px_-14px_inset,rgba(127,255,191,0.397)_0_1px_2px,rgba(127,255,191,0.397)_0_2px_4px,rgba(127,255,191,0.397)_0_4px_8px,rgba(127,255,191,0.397)_0_8px_16px,rgba(127,255,191,0.397)_0_16px_32px]
-                    hover:scale-105 hover:-rotate-1
+                    hover:scale-110
                     ">
                   {/* TODO: Before react rewrite, this had touch-manipulation set. Is that needed? */}
                   {/* Edit: I don't think so, probably safe to remove it. */}
-                  Check other Mini-games
+                  <i className='fas fa-house'></i>
               </Link>
           </nav>
           <main className="absolute h-screen w-screen pt-16">
