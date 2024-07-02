@@ -75,7 +75,6 @@ export default function Home() {
       <main className="flex min-h-screen flex-col items-center p-5 gap-5 ">
         <div className="absolute top-0 right-0 p-5 flex flex-row">
           <StatHandler 
-            hasSearch={false}  
           />
           <FontAwesomeIcon
             icon={faFileLines}
