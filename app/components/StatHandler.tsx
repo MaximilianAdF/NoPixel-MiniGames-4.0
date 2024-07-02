@@ -61,6 +61,9 @@ const StatHandler: FC<StatHandlerProps> = ({
             setUsername(enteredUsername);
             setOpenUserMenu(false);
             setErrorMessage('');
+            if (setKeyDown) {
+                setKeyDown(true);
+            }
         }
     }
 
