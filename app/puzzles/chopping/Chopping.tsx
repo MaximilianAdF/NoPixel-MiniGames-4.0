@@ -8,7 +8,6 @@ import { NPSettingsRange } from "@/app/components/NPSettings";
 import StatHandler from "@/app/components/StatHandler";
 import React, { FC, useEffect, useState } from "react";
 import { useKeyDown } from "@/app/utils/useKeyDown";
-import { Minigame } from '@/interfaces/minigame';
 import useGame from "@/app/utils/useGame";
 import classNames from "classnames";
 
@@ -47,6 +46,7 @@ const Chopping: FC = () => {
     const [activeIndex, setActiveIndex] = usePersistantState("chopping-active-index", 0);
     const [board, setBoard] = useState<Letter[]>(new Array(defaultNumLetters));
     const [stateBoard, setStateBoard] = useState<LetterState[]>(new Array(defaultNumLetters).fill(''));
+    const [allowKeyDown, setAllowKeyDown] = useState(true);
     const [elapsed, setElapsed] = useState(0);
 
 
@@ -120,14 +120,9 @@ const Chopping: FC = () => {
         checkStatus(newStateBoard);
     }
 
-    useKeyDown((key?: string) => {
-        if (key && gameStatus === 1 && document.activeElement?.tagName !== 'INPUT') {
-            handleKeyDown(key);
-        }
-    }, ['Q', 'q', 'W', 'w', 'E', 'e', 'R', 'r', 'A', 'a', 'S', 's', 'D', 'd']);
+
     const [settingsNumLetters, setSettingsNumLetters] = useState(defaultNumLetters);
     const [settingsDuration, setSettingsDuration] = useState(defaultDuration);
-
 
     useEffect(() => {
         setSettingsNumLetters(numLetters);
@@ -138,7 +133,14 @@ const Chopping: FC = () => {
         }
     }, [numLetters, timer]);
 
-    
+        
+    useKeyDown((key?: string) => {
+        if (key && gameStatus === 1 && document.activeElement?.tagName !== 'INPUT') {
+            handleKeyDown(key);
+        }
+    }, ['Q', 'q', 'W', 'w', 'E', 'e', 'R', 'r', 'A', 'a', 'S', 's', 'D', 'd'], allowKeyDown);
+
+
     const settings = {
         handleSave: () => {
             setNumLetters(settingsNumLetters);
@@ -179,6 +181,7 @@ const Chopping: FC = () => {
             <StatHandler
                 streak={streak}
                 elapsed={elapsed}
+                setKeyDown={setAllowKeyDown}
                 minigame={
                     {
                         puzzle: "Chopping",

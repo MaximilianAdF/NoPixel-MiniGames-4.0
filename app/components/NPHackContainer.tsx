@@ -63,7 +63,6 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
     // For now, 1s per frame seems reasonable
 
     const frameSpeed = 20;
-    let elapsedTime = 0;
 
     const resetTimeout = useTimeout(() => {
         resetCallback();

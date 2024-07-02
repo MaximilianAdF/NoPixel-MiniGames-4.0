@@ -8,8 +8,6 @@ import {getCluster, handleGravity, handleLeftShift, SquareColor, squareColors, S
 import {NPSettingsRange} from "@/app/components/NPSettings";
 import usePersistantState from "@/app/utils/usePersistentState";
 import StatHandler from "@/app/components/StatHandler";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChampagneGlasses } from "@fortawesome/free-solid-svg-icons";
 
 
 const getStatusMessage = (status: number | undefined) => {

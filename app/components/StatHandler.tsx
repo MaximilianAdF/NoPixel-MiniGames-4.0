@@ -14,14 +14,14 @@ interface StatHandlerProps {
     streak?: number;
     elapsed?: number;
     minigame?: Minigame;
-    hasSearch?: boolean;
+    setKeyDown?: (allowed: boolean) => void;
 }
 
 const StatHandler: FC<StatHandlerProps> = ({
     streak,
     elapsed,
     minigame,
-    hasSearch = true,
+    setKeyDown,
 }) => {
 
     const [username, setUsername] = useState('');
@@ -71,6 +71,7 @@ const StatHandler: FC<StatHandlerProps> = ({
             return '';
         }
     }
+
 
     // Set the previous minigame
     useEffect(() => {
@@ -149,14 +150,6 @@ const StatHandler: FC<StatHandlerProps> = ({
 
     }, [streak, highscore, newHighscore])
 
-    if (hasSearch) {
-        useKeyDown((key?: string) => {
-            if (document.activeElement?.tagName === 'INPUT') {
-                setTempUsername((document.getElementById('username-input') as HTMLInputElement).value + key);
-            }
-        }, ['Q', 'q', 'W', 'w', 'E', 'e', 'R', 'r', 'A', 'a', 'S', 's', 'D', 'd', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']);
-    }
-
     return (
         <>
             {username && highscoreAlert && (         
@@ -192,7 +185,12 @@ const StatHandler: FC<StatHandlerProps> = ({
                     <FontAwesomeIcon
                         icon={faUser}
                         className="cursor-pointer size-8 text-spring-green-300 hover:scale-110 duration-200"
-                        onClick={() => setOpenUserMenu(!openUserMenu)}
+                        onClick={() => {
+                            setOpenUserMenu(!openUserMenu)
+                            if (setKeyDown) {
+                                setKeyDown(false);
+                            }
+                        }}
                         title="User Menu"
                     />
                 </div>
@@ -213,6 +211,9 @@ const StatHandler: FC<StatHandlerProps> = ({
                             onClick={() => {
                                 setTempUsername(username);
                                 setOpenUserMenu(false);
+                                if (setKeyDown) {
+                                    setKeyDown(true);
+                                }
                                 setErrorMessage('');
                             }}
                         ></div>
@@ -253,9 +254,11 @@ const StatHandler: FC<StatHandlerProps> = ({
                                     <p className="text-rose-400 font-bold" style={{ height: '1em' }}>{errorMessage}</p>
                                 </div>
                                 <button onClick={() => {
-
                                     setTempUsername(username);
                                     setOpenUserMenu(false)
+                                    if (setKeyDown) {
+                                        setKeyDown(true);
+                                    }
                                     }}>
                                     <i
                                         className="
@@ -299,6 +302,9 @@ const StatHandler: FC<StatHandlerProps> = ({
                                     color="red"
                                     onClick={() => {
                                         setOpenUserMenu(false);
+                                        if (setKeyDown) {
+                                            setKeyDown(true);
+                                        }
                                         setTempUsername('');
                                         setErrorMessage('');
                                         setUsername('');

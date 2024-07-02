@@ -150,6 +150,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
 }) => {
     const [levels, setLevels] = usePersistantState(`np-lockpick-${title}-levels`, maxLevels);
     const [timer, setTimer] = usePersistantState(`np-lockpick-${title}-timer`, countdownDuration);
+    const [allowKeyDown, setAllowKeyDown] = useState(true);
     const [rings, setRings] = useState<Ring[]>([]);
     const [rotation, setRotation] = useState<number>(0);
     const [level, setLevel] = useState<number>(0);
@@ -244,9 +245,9 @@ const NPLockpick: FC<NPLockpickProps> = ({
         }
     }
 
-    useKeyDown(handleKeyDown(handleLeft), ["ArrowLeft", "a", "A"]);
-    useKeyDown(handleKeyDown(handleRight), ["ArrowRight", "d", "D"]);
-    useKeyDown(handleKeyDown(handleUnlock), ["Enter", " "]);
+    useKeyDown(handleKeyDown(handleLeft), ["ArrowLeft", "a", "A"], allowKeyDown);
+    useKeyDown(handleKeyDown(handleRight), ["ArrowRight", "d", "D"], allowKeyDown);
+    useKeyDown(handleKeyDown(handleUnlock), ["Enter", " "], allowKeyDown);
 
     const svgSize = 50 * (levels * 2 + 1);
 
@@ -290,6 +291,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
             <StatHandler
                 streak={streak}
                 elapsed={elapsed}
+                setKeyDown={setAllowKeyDown}
                 minigame={
                     {
                         puzzle: title,

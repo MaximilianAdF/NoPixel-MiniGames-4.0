@@ -183,7 +183,7 @@ const Pincracker: FC = () => {
         if (allowKeyDown && key && gameStatus == 1) {
             handleKeyDown(key);
         }
-    }, ['1','2','3','4','5','6','7','8','9','0', 'Backspace', 'Enter']);
+    }, ['1','2','3','4','5','6','7','8','9','0', 'Backspace', 'Enter'], allowKeyDown);
 
     useEffect(() => {
         setSettingsPinLength(pinLength);
@@ -234,6 +234,7 @@ const Pincracker: FC = () => {
             <StatHandler
                 streak={streak}
                 elapsed={elapsed}
+                setKeyDown={setAllowKeyDown}
                 minigame={
                     {
                         puzzle: "PinCracker",

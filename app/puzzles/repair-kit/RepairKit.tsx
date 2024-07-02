@@ -9,12 +9,12 @@ import StatHandler from "@/app/components/StatHandler";
 
 
 export default function RepairKit() {
-
     // Game status: 0=Stopped,1=Running,2=Failed,3=Win
     const [gameStatus, setGameStatus] = useState(0);
     const [currentPosition, setCurrentPosition] = useState(0);
     const [slotPosition, setSlotPosition] = useState<number | null>(null);
     const resetTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
+    const [allowKeyDown, setAllowKeyDown] = useState(true);
     const [streak, setStreak] = useState(0);
 
     const handleWin = (message: string) => {
@@ -90,7 +90,7 @@ export default function RepairKit() {
     }
 
     //
-    useKeyDown(handleKeyDown, ["e", "E"]);
+    useKeyDown(handleKeyDown, ["e", "E"], allowKeyDown);
 
     // Reset the game once loaded
     useEffect(() => {
@@ -113,6 +113,7 @@ export default function RepairKit() {
         <>
             <StatHandler
                 streak={streak}
+                setKeyDown={setAllowKeyDown}
                 minigame={
                     {
                         puzzle: "RepairKit",
