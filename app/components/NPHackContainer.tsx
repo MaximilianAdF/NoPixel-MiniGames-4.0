@@ -26,6 +26,7 @@ interface NPHackContainerProps {
     description?: string,
     buttons: NPHackContainerButton[][],
     countdownDuration: number,
+    elapsedCallback: (elapsed: number) => void,
     resetCallback: () => void,
     resetDelay: number,
     // frameSpeed: number,
@@ -46,6 +47,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
     description,
     buttons,
     countdownDuration,
+    elapsedCallback,
     resetCallback,
     resetDelay,
     // frameSpeed,
@@ -60,7 +62,8 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
     // This can be decreased if you need to call a func every frame
     // For now, 1s per frame seems reasonable
 
-    const frameSpeed = 1000;
+    const frameSpeed = 20;
+    let elapsedTime = 0;
 
     const resetTimeout = useTimeout(() => {
         resetCallback();
@@ -74,13 +77,14 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
     }, [resetTimeout, status]);
 
     const timerReset = () => {
-        setStatus(2);
+        setStatus(2); 
     }
 
-    const [countdown, resetCountdown, freezeCountdown] = useCountdown(timerReset, countdownDuration, frameSpeed);
+    const [countdown, resetCountdown, freezeCountdown] = useCountdown(timerReset, elapsedCallback, countdownDuration, frameSpeed);
 
     useEffect(() => {
         if (status !== 1 && status !== 0) {
+
             freezeCountdown();
         }
     }, [freezeCountdown, status]);
@@ -182,7 +186,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                             gap-2.5
                             absolute
                             right-14
-                            top-2.5
+                            top-4
                             text-white
                             px-4 py-2
                             rounded

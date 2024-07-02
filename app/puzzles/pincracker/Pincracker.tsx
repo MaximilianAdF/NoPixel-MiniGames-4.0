@@ -8,8 +8,10 @@ import React, { FC, useEffect, useState, useRef } from "react";
 import usePersistantState from "@/app/utils/usePersistentState";
 import { useKeyDown } from "@/app/utils/useKeyDown";
 import useGame from "@/app/utils/useGame";
+import StatHandler from "@/app/components/StatHandler";
 
 const defaultDuration = 20;
+const defaultPinLength = 4;
 
 const getStatusMessage = (status: number | undefined) => {
     switch (status) {
@@ -31,10 +33,12 @@ const getStatusMessage = (status: number | undefined) => {
 const Pincracker: FC = () => {
     const [timer, setTimer] = usePersistantState("chopping-timer", defaultDuration);
     const [settingsDuration, setSettingsDuration] = useState(defaultDuration);
+    const [settingsPinLength, setSettingsPinLength] = useState(defaultPinLength);
     const [activeIndex, setActiveIndex] = usePersistantState("pincracker-active-index", 0);
     const [allowKeyDown, setAllowKeyDown] = useState(true);
     const [pinLength, setPinLength] = useState(4);
     const [pin, setPin] = useState<Digit[]>();
+    const [elapsed, setElapsed] = useState(0);
 
     const handleCrack = () => {
         if (activeIndex < pinLength) {
@@ -144,7 +148,7 @@ const Pincracker: FC = () => {
         }
     }
 
-    const [gameStatus, setGameStatus] = useGame(timer*1000, statusUpdateHandler);
+    const [gameStatus, setGameStatus, streak] = useGame(timer*1000, statusUpdateHandler);
 
     const resetGame = () => {
         setGameStatus(1);
@@ -182,19 +186,26 @@ const Pincracker: FC = () => {
     }, ['1','2','3','4','5','6','7','8','9','0', 'Backspace', 'Enter']);
 
     useEffect(() => {
+        setSettingsPinLength(pinLength);
+        setSettingsDuration(timer);
+
         if (gameStatus === 3) {
             successPlayer.play();
         }
-    }, [gameStatus])
+    }, [gameStatus, pinLength, timer])
 
     const settings = {
         handleSave: () => {
+            setPinLength(settingsPinLength);
             setTimer(settingsDuration);
             setGameStatus(4);
         },
 
         handleReset: () => {
             setSettingsDuration(defaultDuration);
+            setSettingsPinLength(defaultPinLength);
+            setPinLength(defaultPinLength);
+            setTimer(defaultDuration);
             setGameStatus(4);
         },
 
@@ -204,11 +215,11 @@ const Pincracker: FC = () => {
                     title={"Pin Length"}
                     min={2}
                     max={6}
-                    value={pinLength}
-                    setValue={setPinLength}
+                    value={settingsPinLength}
+                    setValue={setSettingsPinLength}
                 />
                 <NPSettingsRange
-                    title={"Duration (seconds)"}
+                    title={"Timer"}
                     min={5}
                     max={30}
                     value={settingsDuration}
@@ -219,42 +230,57 @@ const Pincracker: FC = () => {
     }
 
     return (
-        <NPHackContainer
-          title="PinCracker"
-          description="Decode digits of the pin code"
-          buttons={[
-            [
-              {
-                label: "Crack",
-                color: "green",
-                callback: handleCrack,
-                disabled: gameStatus !== 1,
-              }
-            ]
-          ]}
-          countdownDuration={timer * 1000}
-          resetCallback={resetGame}
-          resetDelay={3000}
-          status={gameStatus}
-          setStatus={setGameStatus}
-          statusMessage={getStatusMessage(gameStatus)}
-          settings={settings}
-        >
-          <div className="
-            h-32 w-[600px] max-w-full
-            rounded-lg
-            bg-[rgb(22_40_52)]
-            flex items-center justify-between
-            text-white text-5xl
-          ">
-            {[...Array(pinLength)].map((_, index) => (
-              <div key={index} className="flex flex-col items-center justify-center w-3/12 h-full gap-3 rounded-md wrapper">
-                <div className='h-[50px] digit'></div>
-                <div className="px-5 h-1 bg-slate-400 marker"/>
-              </div>
-            ))}
-          </div>
-        </NPHackContainer>
+        <>
+            <StatHandler
+                streak={streak}
+                elapsed={elapsed}
+                minigame={
+                    {
+                        puzzle: "PinCracker",
+                        preset: (defaultDuration === timer && defaultPinLength === pinLength) ? 'Standard' : 'Custom',
+                        duration: timer,
+                        pinLength: pinLength,
+                    }
+                }
+            />
+            <NPHackContainer
+            title="PinCracker"
+            description="Decode digits of the pin code"
+            buttons={[
+                [
+                {
+                    label: "Crack",
+                    color: "green",
+                    callback: handleCrack,
+                    disabled: gameStatus !== 1,
+                }
+                ]
+            ]}
+            countdownDuration={timer * 1000}
+            resetCallback={resetGame}
+            elapsedCallback={setElapsed}
+            resetDelay={3000}
+            status={gameStatus}
+            setStatus={setGameStatus}
+            statusMessage={getStatusMessage(gameStatus)}
+            settings={settings}
+            >
+            <div className="
+                h-32 w-[600px] max-w-full
+                rounded-lg
+                bg-[rgb(22_40_52)]
+                flex items-center justify-between
+                text-white text-5xl
+            ">
+                {[...Array(pinLength)].map((_, index) => (
+                <div key={index} className="flex flex-col items-center justify-center w-3/12 h-full gap-3 rounded-md wrapper">
+                    <div className='h-[50px] digit'></div>
+                    <div className="px-5 h-1 bg-slate-400 marker"/>
+                </div>
+                ))}
+            </div>
+            </NPHackContainer>
+        </>
     );
 }
 

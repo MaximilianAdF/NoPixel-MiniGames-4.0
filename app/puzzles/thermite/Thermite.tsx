@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FC, Fragment, useCallback, useEffect, useState } from "react";
+import React, { FC, Fragment, use, useCallback, useEffect, useState } from "react";
 import NPHackContainer from "@/app/components/NPHackContainer";
 import useGame from "@/app/utils/useGame";
 import {
@@ -23,10 +23,15 @@ import crossImg from "@/public/images/thermite/cross.svg";
 import backgroundImg from "@/public/images/thermite/background.svg";
 
 import "@/app/puzzles/thermite/style.css";
+import classNames from "classnames";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChampagneGlasses } from "@fortawesome/free-solid-svg-icons";
+import StatHandler from "@/app/components/StatHandler";
 
 const Thermite: FC = () => {
   const [board, setBoard] = useState<GridRow[]>(initialBoard);
   const [score, setScore] = useState<number>(0);
+  const [elasped, setElapsed] = useState<number>(0);
   const [comboCounter, setComboCounter] = useState<number>(0);
   const [lastKillTimestamp, setLastKillTimestamp] = useState<number>(-1);
   const [totalCombos, setTotalCombos] = useState<number>(0);
@@ -94,7 +99,7 @@ const Thermite: FC = () => {
     [resetBoard]
   );
 
-  const [gameStatus, setGameStatus] = useGame(
+  const [gameStatus, setGameStatus, streak] = useGame(
     timer * 1000,
     statusUpdateHandler
   );
@@ -286,6 +291,7 @@ const Thermite: FC = () => {
       totalCombos,
     ]
   );
+  
 
   // Settings.
   const [settingsPreset, setSettingsPreset] = useState<number>(selectedPreset);
@@ -411,94 +417,109 @@ const Thermite: FC = () => {
   };
 
   return (
-    <NPHackContainer
-      title="Mazer"
-      description="Decrypt the required number of bytes"
-      buttons={[]}
-      countdownDuration={timer * 1000}
-      resetCallback={resetGame}
-      resetDelay={3000}
-      status={gameStatus}
-      setStatus={setGameStatus}
-      statusMessage={getStatusMessage(gameStatus)}
-      settings={settings}
-      score={score}
-      targetScore={targetScore}
-    >
-      <div
-        className={
-          "thermite" + (gameStatus === 0 || gameStatus === 4 ? " blur" : "")
-        }
-        style={{
-          /**
-           * TODO: Refactor the responsive sizing so it doesn't use hardcoded values.
-           *
-           * Note: These values will need to be updated if the page styles are changed.
-           */
-          maxWidth: `calc(calc(calc(calc(calc(100vh - 236px) - ${
-            4 * (rows - 1)
-          }px) / ${rows}) * ${columns}) + ${2 * (columns - 1)}px)`,
-          width: `calc(100vw - 64px)`,
-          gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
-          gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+    <>
+      <StatHandler
+        streak={streak}
+        elapsed={elasped}
+        minigame={{
+          puzzle: "Thermite",
+          preset: (timer === presets[0].timer && targetScore === presets[0].targetScore && columns === presets[0].columns && rows === presets[0].columns ) ? "Maze Bank - Sewer" : (timer === presets[1].timer && targetScore === presets[1].targetScore && columns === presets[1].columns && rows === presets[1].columns) ? "Maze Bank - Vault" : "Custom", // TODO: Refactor this to use a function to determine the preset name
+          duration: timer,
+          targetScore: targetScore,
+          rows: rows,
+          columns: columns,
         }}
+      />
+      <NPHackContainer
+        title="Mazer"
+        description="Decrypt the required number of bytes"
+        buttons={[]}
+        countdownDuration={timer * 1000}
+        resetCallback={resetGame}
+        elapsedCallback={setElapsed}
+        resetDelay={3000}
+        status={gameStatus}
+        setStatus={setGameStatus}
+        statusMessage={getStatusMessage(gameStatus)}
+        settings={settings}
+        score={score}
+        targetScore={targetScore}
       >
-        <Fragment>
-          {board.map((row, rowIndex) => {
-            return (
-              <Fragment key={rowIndex}>
-                {row.map((square, columnIndex) => {
-                  return (
-                    <div
-                      key={`${rowIndex}_${columnIndex}`}
-                      className="square"
-                      data-piece={square.piece}
-                      data-status={
-                        isOutOfMoves && square.status !== "empty"
-                          ? "fail"
-                          : square.status
-                      }
-                      data-highlighted={square.highlighted}
-                      onClick={() => handleClick([rowIndex, columnIndex])}
-                    >
-                      <span className="piece">
-                        <Image
-                          src={square.piece.img}
-                          alt=""
-                          width={75}
-                          height={75}
-                        />
-                      </span>
-                      <div className="crosses">
-                        <Image src={crossImg} alt="" width={16} height={16} />
-                        <Image src={crossImg} alt="" width={16} height={16} />
-                        <Image src={crossImg} alt="" width={16} height={16} />
-                        <Image src={crossImg} alt="" width={16} height={16} />
-                      </div>
+        <div
+          className={
+            "thermite" + (gameStatus === 0 || gameStatus === 4 ? " blur" : "")
+          }
+          style={{
+            /**
+             * TODO: Refactor the responsive sizing so it doesn't use hardcoded values.
+             *
+             * Note: These values will need to be updated if the page styles are changed.
+             */
+            maxWidth: `calc(calc(calc(calc(calc(100vh - 236px) - ${
+              4 * (rows - 1)
+            }px) / ${rows}) * ${columns}) + ${2 * (columns - 1)}px)`,
+            width: `calc(100vw - 64px)`,
+            gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
+            gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+          }}
+        >
+          <Fragment>
+            {board.map((row, rowIndex) => {
+              return (
+                <Fragment key={rowIndex}>
+                  {row.map((square, columnIndex) => {
+                    return (
                       <div
-                        className="highlight"
-                        style={{
-                          animationName: resetAnimation ? "none" : "highlight",
-                        }}
-                      ></div>
-                    </div>
-                  );
-                })}
-              </Fragment>
-            );
-          })}
-          <div className="notice">
-            <span
-              style={{ animationName: showComboNotice ? "notice" : "none" }}
-              onAnimationEnd={() => setShowComboNotice(false)}
-            >
-              CRC Bypassed!
-            </span>
-          </div>
-          <Image src={backgroundImg} alt="" fill />
-        </Fragment>
-      </div>
-    </NPHackContainer>
+                        key={`${rowIndex}_${columnIndex}`}
+                        className="square"
+                        data-piece={square.piece}
+                        data-status={
+                          isOutOfMoves && square.status !== "empty"
+                            ? "fail"
+                            : square.status
+                        }
+                        data-highlighted={square.highlighted}
+                        onClick={() => handleClick([rowIndex, columnIndex])}
+                      >
+                        <span className="piece">
+                          <Image
+                            src={square.piece.img}
+                            alt=""
+                            width={75}
+                            height={75}
+                          />
+                        </span>
+                        <div className="crosses">
+                          <Image src={crossImg} alt="" width={16} height={16} />
+                          <Image src={crossImg} alt="" width={16} height={16} />
+                          <Image src={crossImg} alt="" width={16} height={16} />
+                          <Image src={crossImg} alt="" width={16} height={16} />
+                        </div>
+                        <div
+                          className="highlight"
+                          style={{
+                            animationName: resetAnimation ? "none" : "highlight",
+                          }}
+                        ></div>
+                      </div>
+                    );
+                  })}
+                </Fragment>
+              );
+            })}
+            <div className="notice">
+              <span
+                style={{ animationName: showComboNotice ? "notice" : "none" }}
+                onAnimationEnd={() => setShowComboNotice(false)}
+              >
+                CRC Bypassed!
+              </span>
+            </div>
+            <Image src={backgroundImg} alt="" fill />
+          </Fragment>
+        </div>
+      </NPHackContainer>
+    </>
   );
 };
 

@@ -22,7 +22,8 @@
     }
   },
   "include": [
-    "next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+    "next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "lib/mongodb.js", "pages/api/*.ts"
+  ],
   "exclude": [
     "node_modules", "public/**" // TODO: Remove public once all old pages are replaced
   ]

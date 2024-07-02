@@ -1,11 +1,14 @@
 "use client";
 
+import { successPlayer, checkBeepPlayer } from "@/public/audio/AudioManager";
 import { Letter, Letters, LetterState } from "@/app/puzzles/chopping/utils";
 import usePersistantState from "@/app/utils/usePersistentState";
 import NPHackContainer from "@/app/components/NPHackContainer";
 import { NPSettingsRange } from "@/app/components/NPSettings";
+import StatHandler from "@/app/components/StatHandler";
 import React, { FC, useEffect, useState } from "react";
 import { useKeyDown } from "@/app/utils/useKeyDown";
+import { Minigame } from '@/interfaces/minigame';
 import useGame from "@/app/utils/useGame";
 import classNames from "classnames";
 
@@ -36,7 +39,6 @@ const getRandomLetter = (): Letter => {
 
 const defaultNumLetters = 15;
 const defaultDuration = 7;
-const defaultGridRows = 3;
 const defaultGridCols = 6;
 
 const Chopping: FC = () => {
@@ -45,6 +47,7 @@ const Chopping: FC = () => {
     const [activeIndex, setActiveIndex] = usePersistantState("chopping-active-index", 0);
     const [board, setBoard] = useState<Letter[]>(new Array(defaultNumLetters));
     const [stateBoard, setStateBoard] = useState<LetterState[]>(new Array(defaultNumLetters).fill(''));
+    const [elapsed, setElapsed] = useState(0);
 
 
     const resetBoard = () => {
@@ -59,6 +62,7 @@ const Chopping: FC = () => {
         const newStateBoard = new Array(numLetters).fill('');
         setStateBoard(newStateBoard);
     }
+   
 
     const statusUpdateHandler = (newStatus: number) => {
         switch (newStatus) {
@@ -69,15 +73,16 @@ const Chopping: FC = () => {
         }
     }
 
-    const [gameStatus, setGameStatus] = useGame(timer*1000, statusUpdateHandler);
-
+    const [gameStatus, setGameStatus, streak] = useGame(timer*1000, statusUpdateHandler);
     
+
     const resetGame = () => {
         setGameStatus(1);
     }
 
     const handleWin = (message: string) => {
         console.log(`Win: ${message}`);
+        successPlayer.play();
         setGameStatus(3);
     }
 
@@ -105,6 +110,7 @@ const Chopping: FC = () => {
         if (key.toUpperCase() === board[activeIndex]) {
             newStateBoard[activeIndex] = 'done';
             setActiveIndex(activeIndex + 1);
+            checkBeepPlayer.play();
         } else {
             newStateBoard[activeIndex] = 'fail';
         }
@@ -114,9 +120,8 @@ const Chopping: FC = () => {
         checkStatus(newStateBoard);
     }
 
-
     useKeyDown((key?: string) => {
-        if (key && gameStatus == 1) {
+        if (key && gameStatus === 1 && document.activeElement?.tagName !== 'INPUT') {
             handleKeyDown(key);
         }
     }, ['Q', 'q', 'W', 'w', 'E', 'e', 'R', 'r', 'A', 'a', 'S', 's', 'D', 'd']);
@@ -127,7 +132,7 @@ const Chopping: FC = () => {
     useEffect(() => {
         setSettingsNumLetters(numLetters);
         setSettingsDuration(timer);
-        
+
         if (gameStatus !== 4) {
             resetGame();
         }
@@ -144,6 +149,8 @@ const Chopping: FC = () => {
         handleReset: () => {
             setSettingsNumLetters(defaultNumLetters);
             setSettingsDuration(defaultDuration);
+            setNumLetters(defaultNumLetters);
+            setTimer(defaultDuration);
             setGameStatus(4);
         },
 
@@ -157,7 +164,7 @@ const Chopping: FC = () => {
                     setValue={setSettingsNumLetters}
                 />
                 <NPSettingsRange
-                    title={"Duration (seconds)"}
+                    title={"Timer"}
                     min={5}
                     max={30}
                     value={settingsDuration}
@@ -167,63 +174,77 @@ const Chopping: FC = () => {
         )
     }
 
-
     return (
-        <NPHackContainer
-            title="Alphabet"
-            description="Tap the letters in order"
-            buttons={[]}
-            countdownDuration={timer*1000}
-            resetCallback={resetGame}
-            resetDelay={3000}
-            status={gameStatus}
-            setStatus={setGameStatus}
-            statusMessage={getStatusMessage(gameStatus)}
-            settings={settings}
-        >
-            <div className="
-                h-max w-max max-w-full
-                rounded-lg
-                bg-[rgb(22_40_52)]
-                flex items-center justify-center
-                text-white text-5xl
-                p-2
-            ">
-                <div className='game-grid'>
-                    {/* Dynamically create grid rows based on numLetters and defaultGridCols */}
-                    {Array.from({ length: Math.ceil(numLetters / defaultGridCols) }).map((_, rowIndex) => (
-                        <div key={rowIndex} className='game-grid-row' style={{ gridTemplateColumns: `repeat(${Math.min(numLetters - rowIndex * defaultGridCols, defaultGridCols)}, min-content)` }}>
+        <>
+            <StatHandler
+                streak={streak}
+                elapsed={elapsed}
+                minigame={
+                    {
+                        puzzle: "Chopping",
+                        preset: (defaultDuration === timer && defaultNumLetters === numLetters) ? 'Standard' : 'Custom',
+                        duration: timer,
+                        numLetters: numLetters,
+                    }
+                }
+            />
+            <NPHackContainer
+                title="Alphabet"
+                description="Tap the letters in order"
+                buttons={[]}
+                countdownDuration={timer*1000}
+                elapsedCallback={setElapsed}
+                resetCallback={resetGame}
+                resetDelay={3000}
+                status={gameStatus}
+                setStatus={setGameStatus}
+                statusMessage={getStatusMessage(gameStatus)}
+                settings={settings}
+            >
+                <div className="
+                    h-max w-max max-w-full
+                    rounded-lg
+                    bg-[rgb(22_40_52)]
+                    flex items-center justify-center
+                    text-white text-5xl
+                    p-2
+                ">
+                    <div className='game-grid'>
+                        {/* Dynamically create grid rows based on numLetters and defaultGridCols */}
+                        {Array.from({ length: Math.ceil(numLetters / defaultGridCols) }).map((_, rowIndex) => (
+                            <div key={rowIndex} className='game-grid-row' style={{ gridTemplateColumns: `repeat(${Math.min(numLetters - rowIndex * defaultGridCols, defaultGridCols)}, min-content)` }}>
 
-                            {/* Create grid columns within each row */}
-                            {Array.from({ length: defaultGridCols }).map((_, colIndex) => {
-                                const letterIndex = rowIndex * defaultGridCols + colIndex;
-                                if (letterIndex < numLetters) {
-                                    const letter = board[letterIndex];
-                                    const isActive = letterIndex === activeIndex;
-                                    const isDone = stateBoard[letterIndex] === 'done';
-                                    const isFail = stateBoard[letterIndex] === 'fail';
+                                {/* Create grid columns within each row */}
+                                {Array.from({ length: defaultGridCols }).map((_, colIndex) => {
+                                    const letterIndex = rowIndex * defaultGridCols + colIndex;
+                                    if (letterIndex < numLetters) {
+                                        const letter = board[letterIndex];
+                                        const isActive = letterIndex === activeIndex;
+                                        const isDone = stateBoard[letterIndex] === 'done';
+                                        const isFail = stateBoard[letterIndex] === 'fail';
 
-                                    const classes = classNames("letter", {
-                                        'letter-active': isActive,
-                                        'done': isDone,
-                                        'fail': isFail,
-                                    });
+                                        const classes = classNames("letter", {
+                                            'letter-active': isActive,
+                                            'done': isDone,
+                                            'fail': isFail,
+                                        });
 
-                                    return (
-                                        <div key={colIndex} className={classes} style={{ justifySelf: 'center' }}>
-                                            {letter}
-                                        </div>
-                                    );
-                                } else {
-                                    // Stop the loop once all letters are rendered in the row
-                                    return null;
-                                }
-                            })}
-                        </div>
-                    ))}
+                                        return (
+                                            <div key={colIndex} className={classes} style={{ justifySelf: 'center' }}>
+                                                {letter}
+                                            </div>
+                                        );
+                                    } else {
+                                        // Stop the loop once all letters are rendered in the row
+                                        return null;
+                                    }
+                                })}
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </NPHackContainer>
+            </NPHackContainer>
+        </>
     )
 
 }

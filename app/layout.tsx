@@ -37,7 +37,7 @@ const gilroy = localFont({
 
 export const metadata: Metadata = {
   title: "NoPixel Hacking Simulator",
-  description: "NoPixel Hacking Simulator is a collection of minigames that simulate the hacking mechanics of NoPixel 4.0. Play Laundromat, LockPick, RepairKit, RoofRunning, SmokeCrack minigames completely for free.",
+  description: "NoPixel Hacking Simulator is a collection of minigames that simulate the hacking mechanics of NoPixel 4.0. Play Laundromat, LockPick, RepairKit, RoofRunning, SmokeCrack, PinCracker, Word Memory minigames completely for free.",
   keywords: ["NoPixel", "NoPixel 4.0", "NoPixel Hacking Simulator", "Laundromat", "LockPick", "RepairKit", "RoofRunning", "SmokeCrack", "Minigames", "Hacking", "Simulator", "GTA V", "GTA 5", "Grand Theft Auto V", "Grand Theft Auto 5", "RP", "Roleplay", "GTA RP", "NoPixel RP", "NoPixel 4.0 RP", "NoPixel 4.0 Hacking Simulator", "FiveM"],
   verification: {
     google: "S-FJQGrin5Z7C-YheOScSZRfMpd2wcrPb4pWS3L2zf0",

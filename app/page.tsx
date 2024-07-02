@@ -1,8 +1,15 @@
+"use client";
+
+import StatHandler from "./components/StatHandler";
 import Image from "next/image";
 import Link from "next/link";
 
-import { thermiteImg } from "@/public/images/puzzles";
-import { describe } from "node:test";
+
+
+import { useState } from "react";
+import Highscores from "./components/Highscores";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownLeftAndUpRightToCenter, faFileLines, faUpRightAndDownLeftFromCenter } from "@fortawesome/free-solid-svg-icons";
 
 const puzzles = [
   {
@@ -62,8 +69,21 @@ const puzzles = [
 ]
 
 export default function Home() {
+  const [showHighscores, setShowHighscores] = useState(false);
+
   return (
       <main className="flex min-h-screen flex-col items-center p-5 gap-5 ">
+        <div className="absolute top-0 right-0 p-5 flex flex-row">
+          <StatHandler 
+            hasSearch={false}  
+          />
+          <FontAwesomeIcon
+            icon={faFileLines}
+            className="cursor-pointer size-8 text-spring-green-300 hover:scale-110 duration-200"
+            onClick={() => window.open('https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0', '_blank')}
+            title="View Source Code"
+          />
+        </div>
         <div className="
           w-full max-w-2xl
           p-5 mx-auto
@@ -85,8 +105,9 @@ export default function Home() {
             information checkout the <Link href="https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0">GitHub Repository</Link>.
           </p>
         </div>
+        {showHighscores && <Highscores />}
         <div className="flex flex-wrap justify-center max-w-4xl mx-auto">
-          {puzzles.map((puzzle, index) => {
+          {!showHighscores && puzzles.map((puzzle, index) => {
             return (
               <div className="flex-item m-2 p-2 rounded-lg text-center relative overflow-hidden bg-spring-green-300 shadow" key={index}>
                 <Link href={puzzle.href} className="">
@@ -134,8 +155,19 @@ export default function Home() {
 
           bg-mirage-900/50
         ">
-          <h2 className="text-5xl pb-5">Highscores</h2>
-          <p className="text-xl max-w-[80%]">Coming soon...</p>
+          <h3 className="text-5xl pb-5">Highscores</h3>
+          {!showHighscores && <FontAwesomeIcon 
+            icon={faUpRightAndDownLeftFromCenter}
+            className="cursor-pointer size-8 text-spring-green-300"
+            onClick={() => setShowHighscores(!showHighscores)}
+            title="Expand Highscores"
+          />}
+          {showHighscores && <FontAwesomeIcon 
+            icon={faDownLeftAndUpRightToCenter}
+            className="cursor-pointer size-8 text-spring-green-300"
+            onClick={() => setShowHighscores(!showHighscores)}
+            title="Minimize Highscores"
+          />}
         </div>
       </main>
   );
