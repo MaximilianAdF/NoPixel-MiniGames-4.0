@@ -295,7 +295,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
                 minigame={
                     {
                         puzzle: title,
-                        preset: (levels === maxLevels && timer === countdownDuration) ? 'Preset': 'Custom',
+                        preset: (levels === maxLevels && timer === countdownDuration) ? 'Standard': 'Custom',
                         duration: timer,
                         levels: levels,
                     }
