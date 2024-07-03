@@ -92,7 +92,7 @@ export default function Home() {
         {newsAlert && 
         <div className="absolute top-0 left-0 p-5">
           <div className="bg-spring-green-600 pl-2 pr-3 rounded flex flex-row justify-between">
-            <a href="https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0?tab=readme-ov-file#-highscores">
+          <a href="https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0?tab=readme-ov-file#-highscores" target="_blank">
               <div className="bg-spring-green-300 px-4 py-2 rounded flex flex-row gap-2 items-center">
                 <FontAwesomeIcon
                   id="info-icon"
