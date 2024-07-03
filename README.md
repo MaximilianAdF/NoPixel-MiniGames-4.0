@@ -19,6 +19,20 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   # ‎
   <br>
 
+## 🚨 Highscores
+A revamp of the entire no-px structure that now incorporates a universal scoring system for each minigame and each combination of presets. A user can now locally track their streak of sucessfully solved games (in a row) automatically, displayed in the bottom right corner of all minigames[^1]. Furthermore this update includes a user structure where a user can enter their own username that will be associated with their highscores. An individual whom enters their username will have their thereafter highscores published to the no-px database and displayed in the highscore section of the main menu. If you prefer to not partake in this public system simply press 'Remove' in the user menu[^2], you will still be able to utilize the streak/highscore system locally. A sucessfully uploaded highscore is indicated by the alert '🥂 Highscore Uploaded'[^3].
+
+[^1]: This picture shows the new structure of minigame layout's where the user and highscore sections are visible in the top right and bottom right corners respectively.
+![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/209d6f83-7d27-46f8-9c73-38837fae07db)
+
+[^2]: This is the user menu where one can enter a username that will be associated with their highscores, press 'Remove' to not partake in the storing & sharing of your highscores
+![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/fa99f249-874e-4f93-8794-22ef77298b56)
+
+[^3]: This image shows the '🥂 Highscore Uploaded' when the user has entered a username in the user menu and set a new highscore for the minigame or preset
+![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/8edd06f5-75a7-4f16-ad1a-11666e677379)
+
+
+
 <a id="StartOfMiniGames"></a>
 - ## 🔗 [RoofRunning v.1.0.3](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/releases/tag/RoofRunning-v.1.0.3)
    [![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/e8387474-4a34-4f02-842f-195484160a60)](https://no-px.vercel.app/puzzles/roof-running)
