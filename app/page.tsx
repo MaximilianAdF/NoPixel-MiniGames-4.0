@@ -6,7 +6,7 @@ import Link from "next/link";
 
 
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Highscores from "./components/Highscores";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownLeftAndUpRightToCenter, faFileLines, faInfo, faUpRightAndDownLeftFromCenter, faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -72,6 +72,11 @@ export default function Home() {
   const [showHighscores, setShowHighscores] = useState(false);
   const [newsAlert, setNewsAlert] = useState(true);
 
+  useEffect(() => {
+    const infoIcon = document.getElementById("info-icon");
+    infoIcon?.classList.remove("hidden");
+  });
+
   return (
       <main className="flex min-h-screen flex-col items-center p-5 gap-5 ">
         <div className="absolute top-0 right-0 p-5 flex flex-row">
@@ -90,7 +95,8 @@ export default function Home() {
             <a href="https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0?tab=readme-ov-file#-highscores">
               <div className="bg-spring-green-300 px-4 py-2 rounded flex flex-row gap-2 items-center">
                 <FontAwesomeIcon
-                  className="text-spring-green-800 pb-1"
+                  id="info-icon"
+                  className="text-spring-green-800 pb-1 hidden"
                   icon={faInfo}
                 />
                 <span className="text-spring-green-800 underline underline-offset-2">Explore new highscore system</span>
