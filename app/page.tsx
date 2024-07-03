@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useState } from "react";
 import Highscores from "./components/Highscores";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownLeftAndUpRightToCenter, faFileLines, faUpRightAndDownLeftFromCenter } from "@fortawesome/free-solid-svg-icons";
+import { faDownLeftAndUpRightToCenter, faFileLines, faInfo, faUpRightAndDownLeftFromCenter, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 const puzzles = [
   {
@@ -70,6 +70,7 @@ const puzzles = [
 
 export default function Home() {
   const [showHighscores, setShowHighscores] = useState(false);
+  const [newsAlert, setNewsAlert] = useState(true);
 
   return (
       <main className="flex min-h-screen flex-col items-center p-5 gap-5 ">
@@ -83,6 +84,28 @@ export default function Home() {
             title="View Source Code"
           />
         </div>
+        {newsAlert && 
+        <div className="absolute top-0 left-0 p-5">
+          <div className="bg-spring-green-600 pl-2 pr-3 rounded flex flex-row justify-between">
+            <a href="https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0?tab=readme-ov-file#-highscores">
+              <div className="bg-spring-green-300 px-4 py-2 rounded flex flex-row gap-2 items-center">
+                <FontAwesomeIcon
+                  className="text-spring-green-800 pb-1"
+                  icon={faInfo}
+                />
+                <span className="text-spring-green-800 underline underline-offset-2">Explore new highscore system</span>
+              </div>
+            </a>
+            <div className="ml-3 flex items-center">
+              <FontAwesomeIcon
+                className="text-spring-green-800 cursor-pointer"
+                onClick={() => setNewsAlert(false)}
+                icon={faXmark}
+              />
+            </div>
+          </div>
+        </div>
+        }
         <div className="
           w-full max-w-2xl
           p-5 mx-auto
