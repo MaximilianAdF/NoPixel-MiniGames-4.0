@@ -19,7 +19,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   # ‎
   <br>
 
-<a id="#release-info"></a>
+<a id="#release"></a>
 ## 🚨 Highscores
 A revamp of the entire no-px structure that now incorporates a universal scoring system for each minigame and each combination of presets. A user can now locally track their streak of sucessfully solved games (in a row) automatically, displayed in the bottom right corner of all minigames[^1]. Furthermore this update includes a user structure where a user can enter their own username that will be associated with their highscores. An individual whom enters their username will have their thereafter highscores published to the no-px database and displayed in the highscore section of the main menu. If you prefer to not partake in this public system simply press 'Remove' in the user menu[^2], you will still be able to utilize the streak/highscore system locally. A sucessfully uploaded highscore is indicated by the alert '🥂 Highscore Uploaded'[^3].
   # ‎
