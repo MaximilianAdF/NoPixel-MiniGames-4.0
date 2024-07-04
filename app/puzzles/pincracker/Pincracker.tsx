@@ -4,7 +4,7 @@ import { checkBeepPlayer, successPlayer } from "@/public/audio/AudioManager";
 import { Digit, Digits } from "@/app/puzzles/pincracker/utils";
 import NPHackContainer from "@/app/components/NPHackContainer";
 import { NPSettingsRange } from "@/app/components/NPSettings";
-import React, { FC, useEffect, useState, useRef } from "react";
+import React, { FC, useEffect, useState } from "react";
 import usePersistantState from "@/app/utils/usePersistentState";
 import { useKeyDown } from "@/app/utils/useKeyDown";
 import useGame from "@/app/utils/useGame";
@@ -226,7 +226,7 @@ const Pincracker: FC = () => {
                     setValue={setSettingsDuration}
                 />
             </div>
-        )
+        )   
     }
 
     return (

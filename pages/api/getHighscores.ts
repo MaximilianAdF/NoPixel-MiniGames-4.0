@@ -61,7 +61,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .collection(puzzle as string)
       .find(query)
       .sort({ [sortBy ? sortBy as string : 'highscore.streak']: sortOrder === 'asc' ? 1 : -1 }) // 'asc (ascending)' or 'desc (descending)'
-      .limit(10)
+      .limit(50)
       .toArray();
 
     res.status(200).json(highscores);
