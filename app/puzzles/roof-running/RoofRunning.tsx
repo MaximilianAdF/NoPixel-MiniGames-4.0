@@ -1,12 +1,13 @@
 "use client";
 
 import NPHackContainer from "@/app/components/NPHackContainer";
-import React, {FC, useCallback, useEffect, useState} from "react";
+import React, {FC, useEffect, useState} from "react";
 import useGame from "@/app/utils/useGame";
 import classNames from "classnames";
 import {getCluster, handleGravity, handleLeftShift, SquareColor, squareColors, SquareValue} from "@/app/puzzles/roof-running/utils";
 import {NPSettingsRange} from "@/app/components/NPSettings";
 import usePersistantState from "@/app/utils/usePersistentState";
+import StatHandler from "@/app/components/StatHandler";
 
 
 const getStatusMessage = (status: number | undefined) => {
@@ -40,9 +41,8 @@ const RoofRunning: FC = () => {
     const [timer, setTimer] = usePersistantState("np-roofrunning-timer", defaultDuration);  // TODO: Get the actual speed
     const [rows, setRows] = usePersistantState("np-roofrunning-rows", defaultRows);
     const [columns, setColumns] = usePersistantState("np-roofrunning-columns", defaultColumns);
-
     const [board, setBoard] = useState<SquareValue[]>(new Array(rows*columns).fill("empty"));
-
+    const [elapsed, setElapsed] = useState(0);
 
     const resetBoard = () => {
         const newBoard: SquareColor[] = [];
@@ -63,7 +63,7 @@ const RoofRunning: FC = () => {
         }
     }
 
-    const [gameStatus, setGameStatus] = useGame(timer*1000, statusUpdateHandler);
+    const [gameStatus, setGameStatus, streak] = useGame(timer*1000, statusUpdateHandler);
 
     const resetGame = () => {
         setGameStatus(1);
@@ -218,108 +218,124 @@ const RoofRunning: FC = () => {
 
 
     return (
-        <NPHackContainer
-            title="Same Game"
-            description="Click on matching groups of blocks"
-            buttons={[]}
-            countdownDuration={timer*1000}
-            resetCallback={resetGame}
-            resetDelay={3000}
-            status={gameStatus}
-            setStatus={setGameStatus}
-            statusMessage={getStatusMessage(gameStatus)}
-            settings={settings}
-        >
-            <div className={classNames(
-                `
-                    grid
-                    gap-x-0.5 gap-y-1
-    
-                    mx-auto
-    
-                    *:aspect-square
-                    *:bg-gradient-to-b
-    
-                    data-[color=red]:*:from-[#f30308]
-                    data-[color=red]:*:to-[#92393b]
-                    data-[color=red]:*:[box-shadow:0px_5px_0px_#5c2829]
-    
-                    data-[color=green]:*:from-[#8ab357]
-                    data-[color=green]:*:to-[#668a3d]
-                    data-[color=green]:*:[box-shadow:0px_5px_0px_#48612f]
-    
-                    data-[color=blue]:*:from-[#5490b2]
-                    data-[color=blue]:*:to-[#3a7494]
-                    data-[color=blue]:*:[box-shadow:0px_5px_0px_#345066]
-    
-                    *:overflow-hidden
-    
-                    *:*:size-full
-                    *:*:opacity-50
-                    *:*:overflow-visible
-    
-                    *:data-[color=empty]:*:hidden
-                `,
-                gameStatus === 0 || gameStatus === 4 ? "blur" : "",
-            )}
-                style={{
-                    // TODO: Refactor the responsive sizing so it doesn't use hardcoded values.
+        <>
+            <StatHandler
+                streak={streak}
+                elapsed={elapsed}
+                minigame={
+                    {
+                        puzzle: "RoofRunning",
+                        preset: (defaultDuration === timer && defaultRows === rows && defaultColumns === columns) ? 'Standard' : 'Custom',
+                        duration: timer,
+                        rows: rows,
+                        columns: columns,
+                    }
+                }
+            />
+            <NPHackContainer
+                title="Same Game"
+                description="Click on matching groups of blocks"
+                buttons={[]}
+                countdownDuration={timer*1000}
+                resetCallback={resetGame}
+                elapsedCallback={setElapsed}
+                resetDelay={3000}
+                status={gameStatus}
+                setStatus={setGameStatus}
+                statusMessage={getStatusMessage(gameStatus)}
+                settings={settings}
+            >
+                <div className={classNames(
+                    `
+                        grid
+                        gap-x-0.5 gap-y-1
+        
+                        mx-auto
+        
+                        *:aspect-square
+                        *:bg-gradient-to-b
+        
+                        data-[color=red]:*:from-[#f30308]
+                        data-[color=red]:*:to-[#92393b]
+                        data-[color=red]:*:[box-shadow:0px_5px_0px_#5c2829]
+        
+                        data-[color=green]:*:from-[#8ab357]
+                        data-[color=green]:*:to-[#668a3d]
+                        data-[color=green]:*:[box-shadow:0px_5px_0px_#48612f]
+        
+                        data-[color=blue]:*:from-[#5490b2]
+                        data-[color=blue]:*:to-[#3a7494]
+                        data-[color=blue]:*:[box-shadow:0px_5px_0px_#345066]
+        
+                        *:overflow-hidden
+        
+                        *:*:size-full
+                        *:*:opacity-50
+                        *:*:overflow-visible
+        
+                        *:data-[color=empty]:*:hidden
+                    `,
+                    gameStatus === 0 || gameStatus === 4 ? "blur" : "",
+                )}
+                    style={{
+                        // TODO: Refactor the responsive sizing so it doesn't use hardcoded values.
 
-                    // Note: These values will need to be updated if the page styles are changed.
+                        // Note: These values will need to be updated if the page styles are changed.
 
-                    // Total height of the container element is 94px plus a 64px header and 40px padding
-                    // Total width of the container is 24px plus 40px padding
+                        // Total height of the container element is 94px plus a 64px header and 40px padding
+                        // Total width of the container is 24px plus 40px padding
 
-                    // (height - verticalGapSum) / rows * columns + horizontalGapSum
-                    // (height - {2(rows - 1)}px) / rows * columns + {2(columns - 1)}px
-                    maxWidth: `calc(calc(calc(calc(calc(100vh - 208px) - ${4*(rows-1)}px) / ${rows}) * ${columns}) + ${2*(columns-1)}px)`,
-                    // maxWidth: `calc(calc(calc(100vh - 208px) / ${rows}) * ${columns})`,  // height / rows * columns
+                        // (height - verticalGapSum) / rows * columns + horizontalGapSum
+                        // (height - {2(rows - 1)}px) / rows * columns + {2(columns - 1)}px
+                        maxWidth: `calc(calc(calc(calc(calc(100vh - 208px) - ${4*(rows-1)}px) / ${rows}) * ${columns}) + ${2*(columns-1)}px)`,
+                        // maxWidth: `calc(calc(calc(100vh - 208px) / ${rows}) * ${columns})`,  // height / rows * columns
 
-                    width: `calc(100vw - 64px)`,
-                //     aspectRatio: `${columns}/${rows}`,
-                    gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
-                    gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-                }}
-            >{/* TODO: Dynamic size */}
-                {board.map((color, index) => {
-                    return (
-                        <div
-                            key={index}
-                            data-color={color}
-                            onClick={() => handleClick(index)}
-                        >
-                            <svg
-                                viewBox="0 0 100 100"
-                                style={{
-                                    padding: "0.5px"
-                                }}
-                                // style={{
-                                //     border: "0.5px solid rgba(255,255,255, 0)"
-                                // }}
+                        width: `calc(100vw - 64px)`,
+                    //     aspectRatio: `${columns}/${rows}`,
+                        gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
+                        gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+                    }}
+                >{/* TODO: Dynamic size */}
+                    {board.map((color, index) => {
+                        return (
+                            <div
+                                key={index}
+                                data-color={color}
+                                onClick={() => handleClick(index)}
                             >
-                                <rect
-                                    // x={1} y={1} width={99} height={99}
-                                    width={100} height={100}
+                                <svg
+                                    viewBox="0 0 100 100"
                                     style={{
-                                        fill:"none",
-                                        stroke:"white",
-                                        strokeWidth: "2",
+                                        padding: "0.5px"
                                     }}
-                                />
-                                <path d="M5 25 V5 H25 M75 5 H95 V25 M95 75 V95 H75 M25 95 H5 V75"
-                                    style={{
-                                        fill:"none",
-                                        stroke:"white",
-                                        strokeWidth: "1.5",
-                                    }}
-                                />
-                            </svg>
-                            {/*<div className=""></div>*/}
-                        </div>
-                );
-                })}
-            </div>
-        </NPHackContainer>
+                                    // style={{
+                                    //     border: "0.5px solid rgba(255,255,255, 0)"
+                                    // }}
+                                >
+                                    <rect
+                                        // x={1} y={1} width={99} height={99}
+                                        width={100} height={100}
+                                        style={{
+                                            fill:"none",
+                                            stroke:"white",
+                                            strokeWidth: "2",
+                                        }}
+                                    />
+                                    <path d="M5 25 V5 H25 M75 5 H95 V25 M95 75 V95 H75 M25 95 H5 V75"
+                                        style={{
+                                            fill:"none",
+                                            stroke:"white",
+                                            strokeWidth: "1.5",
+                                        }}
+                                    />
+                                </svg>
+                                {/*<div className=""></div>*/}
+                            </div>
+                    );
+                    })}
+                </div>
+            </NPHackContainer>
+        </>
     );
 }
 
