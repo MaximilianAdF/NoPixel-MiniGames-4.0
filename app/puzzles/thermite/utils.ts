@@ -50,6 +50,13 @@ export const presets = [
         rows: 6,
         columns: 6,
     },
+    {
+        //Art Asylum - Water
+        timer: 25,
+        targetScore: 30,
+        rows: 6,
+        columns: 6,
+    }
 ];
 export const initialBoard: GridRow[] = new Array(presets[0].rows).fill(
     new Array(presets[0].columns).fill({
@@ -103,4 +110,30 @@ export const getStatusMessage = (status: number | undefined) => {
         default:
             return `Error: Unknown game status ${status}`;
     }
+}
+
+/**
+ * Returns if the last 3 clicked are a valid combo.
+ * 
+ * @param previousClicks 
+ * @returns {bool}
+ */
+export const isValidCombo = (previousClicks: number[]) => {
+    const combo = previousClicks.slice(-3);
+    /*
+    Valid Combos:
+    CRC BYPASS: 111, 222, 333
+    Triple Data Link: 123
+    Reverse Data Sequence: 321
+    */
+    const crcBypass = combo.every(v => v === combo[0]);
+    const tripleDataLink = combo.every((v, i, arr) => {
+        if(i === 0) { return true; }
+        return v === arr[i - 1] + 1;
+    });
+    const reverseDataSequence = combo.every((v, i, arr) => {
+        if(i === 0) { return true; }
+        return v === arr[i - 1] - 1;
+    });
+    return crcBypass || tripleDataLink || reverseDataSequence;
 }
