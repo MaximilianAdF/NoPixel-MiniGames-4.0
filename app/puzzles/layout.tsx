@@ -5,7 +5,8 @@ import Script from "next/script";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse } from "@fortawesome/free-solid-svg-icons";
-
+import DonateContainer from "@/app/components/DonateContainer";
+import bmcLogo from "../utils/bmc-logo.png";
 
 export default function PuzzleLayout({
   children,
@@ -21,7 +22,6 @@ export default function PuzzleLayout({
                 gap-2.5 px-5 py-5
                 z-50
             ">
-              {/* TODO: Use more standard navbar practices like "Home" or an icon instead of "Check other minigames" */}
               <a href='/'>
                 <FontAwesomeIcon
                   icon={faHouse}
@@ -38,6 +38,11 @@ export default function PuzzleLayout({
                   {/*</div>*/}
               </div>
           </main>
+          <DonateContainer title="Donate" description="If you like this project, consider donating to support development" className="absolute bottom-0 left-0 px-5 py-5 w-80">
+            <a href="https://www.buymeacoffee.com/MaximilianAdF" target="_blank" rel="noreferrer">
+                <img src={bmcLogo.src} alt="Buy Me A Coffee" className="rounded-lg bg-spring-green-300" style={{ height: 60 }} />
+            </a>
+          </DonateContainer>
       </>
   );
 }

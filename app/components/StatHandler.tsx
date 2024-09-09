@@ -6,7 +6,6 @@ import { faChampagneGlasses, faUser } from "@fortawesome/free-solid-svg-icons";
 import uploadHighscore from "../utils/uploadHighscore";
 import NPButton from "./NPButton";
 import classNames from "classnames";
-import { useKeyDown } from "../utils/useKeyDown";
 import { Minigame } from "@/interfaces/minigame";
 import BadWordsNext from "bad-words-next";
 

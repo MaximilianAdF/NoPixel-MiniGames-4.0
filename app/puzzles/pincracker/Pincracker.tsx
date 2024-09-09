@@ -9,6 +9,7 @@ import usePersistantState from "@/app/utils/usePersistentState";
 import { useKeyDown } from "@/app/utils/useKeyDown";
 import useGame from "@/app/utils/useGame";
 import StatHandler from "@/app/components/StatHandler";
+import NPButton from "@/app/components/NPButton";
 
 const defaultDuration = 20;
 const defaultPinLength = 4;
@@ -36,6 +37,7 @@ const Pincracker: FC = () => {
     const [settingsPinLength, setSettingsPinLength] = useState(defaultPinLength);
     const [activeIndex, setActiveIndex] = usePersistantState("pincracker-active-index", 0);
     const [allowKeyDown, setAllowKeyDown] = useState(true);
+    const [autoClear, setAutoClear] = useState(true);
     const [pinLength, setPinLength] = useState(4);
     const [pin, setPin] = useState<Digit[]>();
     const [elapsed, setElapsed] = useState(0);
@@ -91,8 +93,12 @@ const Pincracker: FC = () => {
                 if (pin && guess.join('') === pin.join('')) {
                     setGameStatus(3);
                 }
-                setActiveIndex(0);
-                clearBoard(250);
+                if (autoClear) {
+                    setActiveIndex(0);
+                    clearBoard(250);
+                } else {
+                    setAllowKeyDown(true);
+                }
             }, 1000);
         }
     }
@@ -225,6 +231,20 @@ const Pincracker: FC = () => {
                     value={settingsDuration}
                     setValue={setSettingsDuration}
                 />
+                <div className="py-4 flex items-center align-items flex-col">
+                    <NPButton
+                        label="Auto Clear"
+                        color={autoClear ? "green" : "red"}
+                        onClick={() => setAutoClear(!autoClear)}
+                    >Auto Clear
+                    </NPButton>
+                    <p className="
+                        text-xs
+                        sm:text-base
+                        text-[rgb(142_142_142)]">
+                        Automtic removal of digits after each guess
+                    </p>
+                </div>
             </div>
         )   
     }

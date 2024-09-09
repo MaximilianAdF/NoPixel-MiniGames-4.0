@@ -6,6 +6,8 @@ import classNames from 'classnames';
 import {useKeyDown} from "@/app/utils/useKeyDown";
 import {useInterval} from "@/app/utils/useInterval";
 import StatHandler from "@/app/components/StatHandler";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faSmile, faFaceMeh, faFaceAngry, faFaceDizzy} from "@fortawesome/free-solid-svg-icons";
 
 
 export default function RepairKit() {
@@ -15,6 +17,7 @@ export default function RepairKit() {
     const [slotPosition, setSlotPosition] = useState<number | null>(null);
     const resetTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
     const [allowKeyDown, setAllowKeyDown] = useState(true);
+    const [tickSpeed, setTickSpeed] = useState(5);
     const [streak, setStreak] = useState(0);
 
     const handleWin = (message: string) => {
@@ -64,7 +67,10 @@ export default function RepairKit() {
     const resetGame = useCallback(() => {
         setCurrentPosition(0);
         randomSlotPosition();
-        setGameStatus(1);
+        setGameStatus(0);
+        setTimeout(() => {
+            setGameStatus(1);
+        }, 250);
     }, []);
 
     const tick = () => {
@@ -102,7 +108,7 @@ export default function RepairKit() {
 
 
     // Schedule a tick interval every 50ms
-    useInterval(tick, 50);
+    useInterval(tick, tickSpeed);
 
     // TODO: Make the speed configurable
     // TODO: Rewrite how the game loop works. Instead of running frames at a set interval, we can offload the animation
@@ -217,6 +223,33 @@ export default function RepairKit() {
                             <div className="bottom-[-10px]"></div>
                         </div>
                     }
+                </div>
+                <div className="flex justify-center items-center">
+                    <button
+                        onClick={ () => {
+                            resetGame();
+                            setTickSpeed(tickSpeed < 10 ? 40 : tickSpeed / 2);
+                            }
+                        }
+                        className={classNames('p-2 flex items-center justify-center rounded-full text-white transform duration-300', {
+                            'bg-spring-green-300': tickSpeed === 40,
+                            'bg-yellow-500': tickSpeed === 20,
+                            'bg-red-500': tickSpeed === 10,
+                            'bg-purple-500': tickSpeed === 5,
+                            'hover:-rotate-12': true,
+                            'hover:scale-110': true,
+                        })}
+                    >
+                        <FontAwesomeIcon
+                            icon={tickSpeed === 5? faFaceDizzy : tickSpeed === 10? faFaceAngry : tickSpeed === 20 ? faFaceMeh : faSmile}
+                            className={classNames("text-xl size-6", {
+                                'text-spring-green-700': tickSpeed === 40,
+                                'text-yellow-700': tickSpeed === 20,
+                                'text-red-800': tickSpeed === 10,
+                                'text-purple-800': tickSpeed === 5,
+                            })}
+                        />
+                    </button>
                 </div>
             </div>
         </>
