@@ -10,6 +10,9 @@ import { useEffect, useState } from "react";
 import Highscores from "./components/Highscores";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownLeftAndUpRightToCenter, faFileLines, faInfo, faUpRightAndDownLeftFromCenter, faXmark } from "@fortawesome/free-solid-svg-icons";
+import DonateContainer from "@/app/components/DonateContainer";
+import bmcLogo from "./utils/bmc-logo.png";
+
 
 const puzzles = [
   {
@@ -70,7 +73,7 @@ const puzzles = [
 
 export default function Home() {
   const [showHighscores, setShowHighscores] = useState(false);
-  const [newsAlert, setNewsAlert] = useState(true);
+  const [newsAlert, setNewsAlert] = useState(false);
 
   useEffect(() => {
     const infoIcon = document.getElementById("info-icon");
@@ -197,6 +200,13 @@ export default function Home() {
             title="Minimize Highscores"
           />}
         </div>
+
+        <DonateContainer title="Donate" description="If you like this project, consider donating to support development" className="absolute bottom-0 left-0 px-5 py-5 w-80">
+          <a href="https://www.buymeacoffee.com/MaximilianAdF" target="_blank" rel="noreferrer">
+              <img src={bmcLogo.src} alt="Buy Me A Coffee" className="rounded-lg bg-spring-green-300" style={{ height: 60 }} />
+          </a>
+        </DonateContainer>
+
       </main>
   );
 }
