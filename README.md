@@ -1,5 +1,6 @@
 # NoPixel-Hacking-Simulator
- A web-based project designed to replicate/build similar "hacking" challenges that can be found on the NoPixel 4.0 FiveM Server. Any and all **input** is appreciated greatly; create an [issue](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator/issues) regarding suggestions, improvements or questions, I will respond as soon as possible.
+ A web-based project designed to replicate/build similar "hacking" challenges that can be found on the NoPixel 4.0 FiveM Server. Any and all **input** is appreciated greatly; create an [issue](https://github.com/MaximilianAdF/NoPixel-Hacking-Simulator/issues) regarding suggestions, improvements or questions, I will respond as soon as possible. This will be deployed on PipeOps, let's see what we can make do with this.
+ 
  > Developed using HTML, CSS, TS (Compiled to JS).
  <br>
 
