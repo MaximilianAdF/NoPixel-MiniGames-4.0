@@ -9,6 +9,12 @@
 
  <br>
 
+## 🏆 Hall of fame
+xQc plays NoPixel-MiniGames-4.0
+![clip](https://github.com/user-attachments/assets/faf67074-08a0-44d1-bf8c-b0738dfbc10e)
+
+
+
 ## 📈 Contributions
 The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0) is a completely free-to-use service. As long as I have time and interest I will continue to update and advance different aspects of this project. Whether that's new [MiniGames](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0#StartOfMiniGames) or general bug fixes. If you would like to contribute to this free-to-use project and me, [@MaximilianAdF](https://github.com/MaximilianAdF), in general, you can do it in the following ways:
   
