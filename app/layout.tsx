@@ -5,6 +5,7 @@ import Image from 'next/image'
 import background from '../public/images/bg.png'
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import Script from 'next/script';
 
 function Background() {
   return (
@@ -56,6 +57,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={gilroy.className}>
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8849653057967400"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <Background />
         {children}
         <Analytics />
