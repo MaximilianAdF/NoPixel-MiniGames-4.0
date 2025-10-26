@@ -56,13 +56,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={gilroy.className}>
+      <head>
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8849653057967400"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
         />
+      </head>
+      <body className={gilroy.className}>
         <Background />
         {children}
         <Analytics />
