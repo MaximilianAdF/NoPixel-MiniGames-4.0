@@ -13,6 +13,7 @@ import {
   Square,
   SquarePiece,
   getStatusMessage,
+  isValidCombo,
 } from "@/app/puzzles/thermite/utils";
 import { NPSettingsRange } from "@/app/components/NPSettings";
 import NPButton from "@/app/components/NPButton";
@@ -33,6 +34,7 @@ const Thermite: FC = () => {
   const [score, setScore] = useState<number>(0);
   const [elasped, setElapsed] = useState<number>(0);
   const [comboCounter, setComboCounter] = useState<number>(0);
+  const [previousClicks, setpreviousClicks] = useState<number[]>(new Array);
   const [lastKillTimestamp, setLastKillTimestamp] = useState<number>(-1);
   const [totalCombos, setTotalCombos] = useState<number>(0);
   const [resetAnimation, setResetAnimation] = useState<boolean>(false);
@@ -77,6 +79,7 @@ const Thermite: FC = () => {
     setLastKillTimestamp(-1);
     setTotalCombos(0);
     setOutOfMoves(false);
+    setpreviousClicks(new Array);
   }, [columns, rows]);
 
   /**
@@ -234,6 +237,10 @@ const Thermite: FC = () => {
         let currentScore = score;
         currentScore++;
 
+        let clicked = previousClicks;
+        clicked.push(clickedSquare.piece.distance);
+        setpreviousClicks(clicked);
+        
         const thisKillTimestamp = Date.now();
         if (
           currentCombo === 0 ||
@@ -246,7 +253,7 @@ const Thermite: FC = () => {
         }
         setLastKillTimestamp(thisKillTimestamp);
 
-        if (currentCombo >= 3) {
+        if (currentCombo >= 3 && isValidCombo(previousClicks)) {
           /**
            * Combo! Three eliminations in a row.
            * Points incremented by 1 + 2 ^ <total number of combos>.
@@ -352,7 +359,7 @@ const Thermite: FC = () => {
             title={"Timer"}
             value={settingsTimer}
             setValue={setSettingsTimer}
-            min={30}
+            min={10}
             max={180}
           />
         </div>
@@ -409,6 +416,20 @@ const Thermite: FC = () => {
               }}
             >
               Maze Bank - Vault
+            </NPButton>
+            <NPButton
+              label="Art Asylum - Water"
+              color="green"
+              disabled={settingsPreset === 2}
+              onClick={() => {
+                setSettingsPreset(2);
+                setSettingsTimer(presets[2].timer);
+                setSettingsTargetScore(presets[2].targetScore);
+                setSettingsRows(presets[2].rows);
+                setSettingsColumns(presets[2].columns);
+              }}
+            >
+              Art Asylum - Water
             </NPButton>
           </div>
         </div>
