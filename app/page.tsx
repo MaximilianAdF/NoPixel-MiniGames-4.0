@@ -558,7 +558,7 @@ export default function Home() {
               <p className="hover:text-gray-200 transition-colors duration-300">
                 Welcome to the most comprehensive NoPixel 4.0 hacking simulator available online. 
                 This platform provides authentic replicas of the challenging minigames featured in the popular Grand Theft Auto V roleplay 
-                server, NoPixel. Whether you're a seasoned criminal looking to hone your skills or a curious newcomer wanting to experience 
+                server, NoPixel. Whether you&apos;re a seasoned criminal looking to hone your skills or a curious newcomer wanting to experience 
                 the thrill of virtual heists, this simulator offers the perfect training ground.
               </p>
               <p className="hover:text-gray-200 transition-colors duration-300">
@@ -613,12 +613,12 @@ export default function Home() {
             <div className="space-y-4 text-gray-300 leading-relaxed text-lg">
               <p className="hover:text-gray-200 transition-colors duration-300">
                 This project is completely open source and available on GitHub. We welcome contributions from the community, whether 
-                it's bug reports, feature suggestions, or code contributions. The codebase is built with modern web technologies 
+                it&apos;s bug reports, feature suggestions, or code contributions. The codebase is built with modern web technologies 
                 including Next.js, React, and TypeScript, making it easy for developers to understand and contribute.
               </p>
               <p className="hover:text-gray-200 transition-colors duration-300">
                 If you find this simulator helpful, consider starring the repository on GitHub or sharing it with your fellow NoPixel 
-                enthusiasts. Your support helps us continue to improve and maintain this free resource for the community. We're constantly 
+                enthusiasts. Your support helps us continue to improve and maintain this free resource for the community. We&apos;re constantly 
                 working to add new features, improve existing minigames, and ensure the simulator stays up-to-date with the latest NoPixel updates.
               </p>
               <div className="pt-4">
