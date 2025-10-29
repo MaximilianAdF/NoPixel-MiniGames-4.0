@@ -158,7 +158,8 @@ const RoofRunning: FC = () => {
         if (gameStatus !== 4) {
             resetGame();
         }
-    }, [rows, columns, timer, gameStatus, resetGame]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [rows, columns, timer]);
 
     const settings = {
         handleSave: () => {

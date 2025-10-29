@@ -131,7 +131,8 @@ const Chopping: FC = () => {
         if (gameStatus !== 4) {
             resetGame();
         }
-    }, [numLetters, timer, gameStatus, resetGame]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [numLetters, timer]);
 
         
     useKeyDown((key?: string) => {

@@ -263,7 +263,8 @@ const NPLockpick: FC<NPLockpickProps> = ({
         if (gameStatus !== 4) {
             resetGame();
         }
-    }, [levels, timer, gameStatus, resetGame]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [levels, timer]);
 
     const settings = {
         handleSave: () => {
