@@ -70,6 +70,7 @@ const puzzles = [
 export default function Home() {
   const [showHighscores, setShowHighscores] = useState(false);
   const [newsAlert, setNewsAlert] = useState(false);
+  const [showRevampNotice, setShowRevampNotice] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Changed back to true to prevent FOUC
   const hasLoadedRef = useRef(false);
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -77,6 +78,12 @@ export default function Home() {
   useEffect(() => {
     const infoIcon = document.getElementById("info-icon");
     infoIcon?.classList.remove("hidden");
+
+    // Check if user has seen the revamp notice
+    const hasSeenRevamp = localStorage.getItem('hasSeenRevampNotice');
+    if (!hasSeenRevamp) {
+      setShowRevampNotice(true);
+    }
 
     // Check if fonts are ready
     if (document.fonts) {
@@ -277,6 +284,57 @@ export default function Home() {
                 onClick={() => setNewsAlert(false)}
                 icon={faXmark}
               />
+            </div>
+          </div>
+        </div>
+        }
+
+        {/* Revamp Notice - Shows once */}
+        {showRevampNotice && 
+        <div className="fixed bottom-6 right-6 p-5 z-50 max-w-md animate-in slide-in-from-bottom duration-700">
+          <div className="bg-gradient-to-br from-mirage-800 to-mirage-900 border border-spring-green-500/40 rounded-xl shadow-2xl shadow-spring-green-900/30 overflow-hidden">
+            {/* Top accent bar */}
+            <div className="h-1 bg-gradient-to-r from-spring-green-500 via-aquamarine-400 to-spring-green-500"></div>
+            
+            <div className="p-5">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">✨</span>
+                  <h3 className="text-lg font-bold text-white">New Look!</h3>
+                </div>
+                <button 
+                  onClick={() => {
+                    setShowRevampNotice(false);
+                    localStorage.setItem('hasSeenRevampNotice', 'true');
+                  }}
+                  className="text-gray-400 hover:text-white transition-colors"
+                  aria-label="Close"
+                >
+                  <FontAwesomeIcon icon={faXmark} className="size-5" />
+                </button>
+              </div>
+              
+              {/* Content */}
+              <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                We&apos;re redesigning the entire site with fresh visuals and new features. 
+                <strong className="text-spring-green-400"> Have ideas?</strong> We&apos;d love to hear them!
+              </p>
+              
+              {/* CTA Button */}
+              <a 
+                href="https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0#revamp" 
+                target="_blank"
+                onClick={() => {
+                  localStorage.setItem('hasSeenRevampNotice', 'true');
+                }}
+                className="group inline-flex items-center gap-2 px-4 py-2.5 bg-spring-green-600 hover:bg-spring-green-500 text-white text-sm font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-spring-green-900/50 w-full justify-center"
+              >
+                <span>Share Your Ideas</span>
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </a>
             </div>
           </div>
         </div>
