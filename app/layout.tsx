@@ -111,7 +111,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950 overscroll-none">
+    <html lang="en" className="bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950 overscroll-y-none">
       <head>
         <Script
           async
@@ -120,7 +120,7 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
       </head>
-      <body className={`${gilroy.className} bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950 overscroll-none`}>
+      <body className={`${gilroy.className} bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950 overscroll-y-none`}>
         <Background />
         {children}
         <Analytics />
