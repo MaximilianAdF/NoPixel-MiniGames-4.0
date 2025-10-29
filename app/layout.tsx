@@ -38,11 +38,17 @@ const gilroy = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://no-px.vercel.app'),
+  applicationName: 'NoPixel Hacking Simulator',
   title: {
     default: "NoPixel 4.0 Hacking Simulator | Practice GTA RP Minigames Free",
     template: "%s | NoPixel 4.0 Minigames"
   },
   description: "Master NoPixel 4.0 hacking minigames with our free practice simulator. Train on Thermite, Lockpick, Laundromat, Roof Running, and more GTA RP challenges. Improve your skills risk-free with authentic replicas and global leaderboards.",
+  icons: {
+    icon: '/icon',
+    shortcut: '/icon',
+    apple: '/icon',
+  },
   keywords: [
     // Core brand terms
     "NoPixel", "NoPixel 4.0", "NoPixel minigames", "NoPixel hacking simulator",
@@ -74,17 +80,17 @@ export const metadata: Metadata = {
     description: 'Master NoPixel 4.0 hacking minigames with our free practice simulator. Train on Thermite, Lockpick, Laundromat, and more GTA RP challenges.',
     siteName: 'NoPixel 4.0 Minigames',
     images: [{
-      url: '/images/og-image.png',
-      width: 1200,
-      height: 630,
-      alt: 'NoPixel 4.0 Hacking Simulator - Practice GTA RP Minigames',
+      url: '/icon',
+      width: 32,
+      height: 32,
+      alt: 'NoPixel 4.0 Minigames Icon',
     }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'NoPixel 4.0 Hacking Simulator | Practice GTA RP Minigames Free',
     description: 'Master NoPixel 4.0 hacking minigames with our free practice simulator. Train on Thermite, Lockpick, Laundromat, and more.',
-    images: ['/images/og-image.png'],
+    images: ['/icon'],
   },
   robots: {
     index: true,
