@@ -25,7 +25,7 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
   <br>
 
 
-<a id="#revamp"></a>
+<a id="revamp"></a>
 ## 🎨 Design & UX Revamp
 No-px is currently in the process of a complete revamp of the design and functionality characteristics. This will mean all pages on the website such as the home page & minigames will be updated with new designs and functionalities. Furthermore new pages will be added such as a dedicated settings page, highscore page, among others. <ins>**If you have suggestions on what you would like to see, create an [issue](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/issues/new/choose) with your ideas**</ins>. Below is the status for what has been [✅] finished, [🚧] in progress & [⛔] not yet started.
 
