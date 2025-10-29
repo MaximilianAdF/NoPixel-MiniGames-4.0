@@ -172,7 +172,7 @@ const Highscores = () => {
             .catch(error => {
                 console.error('Error fetching highscores:', error);
             });
-    }, []); // Empty dependency array means this effect runs once on mount
+    }, [activeSortKey, sortDirection, fetchHighscores]); // Added dependencies
 
 
 

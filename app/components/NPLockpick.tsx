@@ -263,7 +263,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
         if (gameStatus !== 4) {
             resetGame();
         }
-    }, [levels, timer]);
+    }, [levels, timer, gameStatus, resetGame]);
 
     const settings = {
         handleSave: () => {

@@ -18,10 +18,6 @@ const nextConfig = {
   },
   // Enable SWC minification (faster)
   swcMinify: true,
-  // Experimental features for better performance
-  experimental: {
-    optimizeCss: true,
-  },
 };
 
 export default nextConfig;

@@ -158,7 +158,7 @@ const RoofRunning: FC = () => {
         if (gameStatus !== 4) {
             resetGame();
         }
-    }, [rows, columns, timer]);
+    }, [rows, columns, timer, gameStatus, resetGame]);
 
     const settings = {
         handleSave: () => {

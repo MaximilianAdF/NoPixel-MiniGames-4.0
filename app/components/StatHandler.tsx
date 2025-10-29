@@ -80,7 +80,7 @@ const StatHandler: FC<StatHandlerProps> = ({
         if (minigame && minigame !== prevMinigame) {
             setPrevMinigame(minigame);
         }
-    })
+    }, [minigame, prevMinigame])
 
 
     // Set the username from localStorage on the client side only
@@ -113,7 +113,7 @@ const StatHandler: FC<StatHandlerProps> = ({
                 newHighscore(0);
             }
         }
-    }, [minigame]);
+    }, [minigame, prevMinigame]);
 
     //useEffect for handlixng highscore update
     useEffect(() => {
@@ -150,7 +150,7 @@ const StatHandler: FC<StatHandlerProps> = ({
             setTotalTime(0);
         }
 
-    }, [streak, highscore, newHighscore])
+    }, [streak, highscore, newHighscore, elapsed, highscoreUpdated, minigame, prevStreak, totalTime])
 
     return (
         <>

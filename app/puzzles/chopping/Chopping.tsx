@@ -131,7 +131,7 @@ const Chopping: FC = () => {
         if (gameStatus !== 4) {
             resetGame();
         }
-    }, [numLetters, timer]);
+    }, [numLetters, timer, gameStatus, resetGame]);
 
         
     useKeyDown((key?: string) => {
