@@ -27,19 +27,19 @@ The project [NoPixel-MiniGames-4.0](https://github.com/MaximilianAdF/NoPixel-Min
 <a id="#release"></a>
 
 
-## 🚨 Highscores
-A revamp of the entire no-px structure that now incorporates a universal scoring system for each minigame and each combination of presets. A user can now locally track their streak of sucessfully solved games (in a row) automatically, displayed in the bottom right corner of all minigames[^1]. Furthermore this update includes a user structure where a user can enter their own username that will be associated with their highscores. An individual whom enters their username will have their thereafter highscores published to the no-px database and displayed in the highscore section of the main menu. If you prefer to not partake in this public system simply press 'Remove' in the user menu[^2], you will still be able to utilize the streak/highscore system locally. A sucessfully uploaded highscore is indicated by the alert '🥂 Highscore Uploaded'[^3].
-  # ‎
+## 🎨 Design & UX Revamp
+No-px is currently in the process of a complete revamp of the design and functionality characteristics. This will mean all pages on the website such as the home page & minigames will be updated with new designs and functionalities. Furthermore new pages will be added such as a dedicated settings page, highscore page, among others. <ins>**If you have suggestions on what you would like to see, create an [issue](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/issues/new/choose) with your ideas**</ins>. Below is the status for what has been [✅] finished, [🚧] in progress & [⛔] not yet started.
+
+- 🚧 Homepage
+- ⛔ Minigames
+- ⛔ Highscores menu & Leaderboards 
+- ⛔ Navigation menu
+- ⛔ Settings menu
+- ⛔ Revamped Account functionality
+- ⛔ Personal Achievements
+
 <br>
 
-[^1]: This picture shows the new structure of minigame layout's where the user and highscore sections are visible in the top right and bottom right corners respectively.
-![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/209d6f83-7d27-46f8-9c73-38837fae07db)
-
-[^2]: This is the user menu where one can enter a username that will be associated with their highscores, press 'Remove' to not partake in the storing & sharing of your highscores
-![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/fa99f249-874e-4f93-8794-22ef77298b56)
-
-[^3]: This image shows the '🥂 Highscore Uploaded' when the user has entered a username in the user menu and set a new highscore for the minigame or preset
-![image](https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/8edd06f5-75a7-4f16-ad1a-11666e677379)
 
 
 
