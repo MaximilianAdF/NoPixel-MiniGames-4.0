@@ -22,13 +22,13 @@ export default function PuzzleLayout({
                 gap-2.5 px-5 py-5
                 z-50
             ">
-              <a href='/'>
+              <Link href='/'>
                 <FontAwesomeIcon
                   icon={faHouse}
                   className="cursor-pointer text-spring-green-300 size-9 hover:scale-110 duration-200"
                   title="Return to Home Page"
                 />
-              </a>
+              </Link>
           </nav>
           <main className="absolute h-screen w-screen pt-16">
               <div className="h-full w-full p-5 m-auto flex items-center justify-center">

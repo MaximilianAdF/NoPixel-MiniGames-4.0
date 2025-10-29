@@ -254,16 +254,18 @@ const RoofRunning: FC = () => {
                         mx-auto
         
                         *:aspect-square
-                        *:bg-gradient-to-b
         
+                        data-[color=red]:*:bg-gradient-to-b
                         data-[color=red]:*:from-[#f30308]
                         data-[color=red]:*:to-[#92393b]
                         data-[color=red]:*:[box-shadow:0px_5px_0px_#5c2829]
         
+                        data-[color=green]:*:bg-gradient-to-b
                         data-[color=green]:*:from-[#8ab357]
                         data-[color=green]:*:to-[#668a3d]
                         data-[color=green]:*:[box-shadow:0px_5px_0px_#48612f]
         
+                        data-[color=blue]:*:bg-gradient-to-b
                         data-[color=blue]:*:from-[#5490b2]
                         data-[color=blue]:*:to-[#3a7494]
                         data-[color=blue]:*:[box-shadow:0px_5px_0px_#345066]

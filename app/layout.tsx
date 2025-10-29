@@ -6,6 +6,7 @@ import background from '../public/images/bg.png'
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from 'next/script';
+import { Orbitron, Rajdhani, Caveat } from 'next/font/google';
 
 function Background() {
   return (
@@ -31,7 +32,29 @@ const gilroy = localFont({
       weight: '400',
       style: 'normal',
     },
-  ]
+  ],
+  variable: '--font-gilroy',
+});
+
+const orbitron = Orbitron({
+  weight: '900',
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-orbitron',
+});
+
+const rajdhani = Rajdhani({
+  weight: '700',
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-rajdhani',
+});
+
+const caveat = Caveat({
+  weight: '600',
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-caveat',
 });
 
 
@@ -117,7 +140,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950 overscroll-y-none">
+    <html lang="en" className={`bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950 overscroll-y-none ${orbitron.variable} ${rajdhani.variable} ${caveat.variable}`}>
       <head>
         <Script
           async

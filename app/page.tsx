@@ -70,20 +70,43 @@ const puzzles = [
 export default function Home() {
   const [showHighscores, setShowHighscores] = useState(false);
   const [newsAlert, setNewsAlert] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // Changed back to true to prevent FOUC
+  const hasLoadedRef = useRef(false);
+  const [fontsLoaded, setFontsLoaded] = useState(false);
 
   useEffect(() => {
     const infoIcon = document.getElementById("info-icon");
     infoIcon?.classList.remove("hidden");
 
-    // Simulate initial load
-    const loadTimer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
+    // Check if fonts are ready
+    if (document.fonts) {
+      document.fonts.ready.then(() => {
+        setFontsLoaded(true);
+      });
+    } else {
+      // Fallback for older browsers
+      setFontsLoaded(true);
+    }
 
-    return () => {
-      clearTimeout(loadTimer);
-    };
+    // Check if returning from a minigame or first visit
+    const isReturning = sessionStorage.getItem('homePageVisited') === 'true';
+    
+    if (isReturning) {
+      // Skip loading animation when returning to homepage
+      setIsLoading(false);
+      hasLoadedRef.current = true;
+    } else {
+      // Show loading animation on first visit
+      const loadTimer = setTimeout(() => {
+        setIsLoading(false);
+        hasLoadedRef.current = true;
+        sessionStorage.setItem('homePageVisited', 'true');
+      }, 800);
+
+      return () => {
+        clearTimeout(loadTimer);
+      };
+    }
   }, []);
 
   return (
@@ -136,11 +159,6 @@ export default function Home() {
           }}
         />
         
-        {/* Google Fonts */}
-        <style jsx global>{`
-          @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Rajdhani:wght@700&family=Caveat:wght@600&display=swap');
-        `}</style>
-
         {/* Subtle Background Grid - Static */}
         <div className="fixed inset-0 opacity-10 pointer-events-none">
           <div className="absolute inset-0" 
@@ -273,7 +291,7 @@ export default function Home() {
                 <span 
                   className="inline-block text-7xl sm:text-8xl lg:text-9xl font-black bg-clip-text text-transparent transition-all duration-500 group-hover:translate-x-2"
                   style={{ 
-                    fontFamily: "'Orbitron', sans-serif", 
+                    fontFamily: 'var(--font-orbitron)', 
                     letterSpacing: '0.05em',
                     backgroundImage: 'linear-gradient(90deg, #09de6e, #64ffda, #40e0d0, #09de6e)',
                     backgroundSize: '200% 100%',
@@ -286,7 +304,7 @@ export default function Home() {
                 <span 
                   className="absolute inset-0 text-7xl sm:text-8xl lg:text-9xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent opacity-0 group-hover:opacity-60 transition-all duration-500"
                   style={{ 
-                    fontFamily: "'Orbitron', sans-serif", 
+                    fontFamily: 'var(--font-orbitron)', 
                     letterSpacing: '0.05em'
                   }}
                 >
@@ -296,7 +314,7 @@ export default function Home() {
                 <span 
                   className="absolute inset-0 text-7xl sm:text-8xl lg:text-9xl font-black text-spring-green-400 pointer-events-none"
                   style={{ 
-                    fontFamily: "'Orbitron', sans-serif", 
+                    fontFamily: 'var(--font-orbitron)', 
                     letterSpacing: '0.05em',
                     opacity: '0.08'
                   }}
@@ -310,7 +328,7 @@ export default function Home() {
                 <span 
                   className="inline-block text-4xl sm:text-5xl lg:text-6xl font-bold text-white transition-all duration-300 group-hover:scale-125 group-hover:-rotate-12 group-hover:text-spring-green-300"
                   style={{ 
-                    fontFamily: "'Rajdhani', sans-serif", 
+                    fontFamily: 'var(--font-rajdhani)', 
                     fontWeight: 700,
                     animation: 'microShake 10s infinite'
                   }}
@@ -321,7 +339,7 @@ export default function Home() {
                 <span 
                   className="absolute inset-0 text-4xl sm:text-5xl lg:text-6xl font-bold text-aquamarine-400 opacity-0 group-hover:opacity-40 transition-all duration-200 group-hover:translate-x-1 group-hover:translate-y-1"
                   style={{ 
-                    fontFamily: "'Rajdhani', sans-serif", 
+                    fontFamily: 'var(--font-rajdhani)', 
                     fontWeight: 700
                   }}
                 >
@@ -344,7 +362,7 @@ export default function Home() {
               <span 
                 className="inline-block text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-400 transition-all duration-500 group-hover:rotate-3 group-hover:text-aquamarine-400 group-hover:scale-105"
                 style={{ 
-                  fontFamily: "'Caveat', cursive", 
+                  fontFamily: 'var(--font-caveat)', 
                   fontWeight: 600, 
                   transformOrigin: 'left center',
                   transform: 'rotate(-3deg)',
@@ -359,7 +377,7 @@ export default function Home() {
               <span 
                 className="absolute inset-0 text-5xl sm:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent opacity-0 group-hover:opacity-60 transition-all duration-300"
                 style={{ 
-                  fontFamily: "'Caveat', cursive", 
+                  fontFamily: 'var(--font-caveat)', 
                   fontWeight: 600,
                   transform: 'rotate(-3deg)'
                 }}
@@ -370,7 +388,7 @@ export default function Home() {
               <span 
                 className="absolute inset-0 text-5xl sm:text-6xl lg:text-7xl font-bold text-aquamarine-400 pointer-events-none"
                 style={{ 
-                  fontFamily: "'Caveat', cursive", 
+                  fontFamily: 'var(--font-caveat)', 
                   fontWeight: 600,
                   opacity: '0.05',
                   transform: 'rotate(-3deg)'
