@@ -1,0 +1,16 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Crawl-delay for politeness
+Crawl-delay: 0.5
+
+# Sitemap location
+Sitemap: https://no-px.vercel.app/sitemap.xml
+
+# Disallow admin/api routes if any
+User-agent: *
+Disallow: /api/
+
+# Allow search engines to crawl all minigame pages
+Allow: /puzzles/
