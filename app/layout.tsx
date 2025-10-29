@@ -101,7 +101,7 @@ export const metadata: Metadata = {
     canonical: 'https://no-px.vercel.app',
   },
   verification: {
-    google: "MLiKqucwFbBLAhfHFnD7IlQsnRI7ZRP7iEUr57HB4WY",
+    google: "cafrsYUjNLn9L2Y6ssoK0Ip1nnONFp2xMWe622VyCyE",
   },
 };
 
