@@ -237,6 +237,70 @@ export default function Home() {
               transform: translate(-1px, 0px) rotate(-1deg);
             }
           }
+          
+          /* Mobile cycling animations */
+          @keyframes mobileColorCycle {
+            0%, 100% {
+              opacity: 0;
+            }
+            50% {
+              opacity: 0.5;
+            }
+          }
+          
+          @keyframes mobileScaleRotate {
+            0%, 100% {
+              transform: scale(1) rotate(0deg);
+            }
+            50% {
+              transform: scale(1.15) rotate(-8deg);
+            }
+          }
+          
+          @keyframes mobileSlantCycle {
+            0%, 100% {
+              transform: rotate(-3deg) scale(1);
+            }
+            50% {
+              transform: rotate(1deg) scale(1.03);
+            }
+          }
+          
+          @keyframes mobileUnderline {
+            0%, 100% {
+              width: 0%;
+            }
+            50% {
+              width: 60%;
+            }
+          }
+          
+          @media (min-width: 768px) {
+            @keyframes mobileColorCycle {
+              0%, 100% {
+                opacity: 0;
+              }
+            }
+            
+            @keyframes mobileScaleRotate {
+              0%, 100% {
+                transform: none;
+              }
+            }
+            
+            @keyframes mobileSlantCycle {
+              0%, 100% {
+                transform: rotate(-3deg);
+              }
+            }
+            
+            @keyframes mobileUnderline {
+              0%, 100% {
+                width: 0%;
+              }
+            }
+          }
+          
           @keyframes slantShift {
             0%, 80%, 100% {
               transform: rotate(-3deg);
@@ -340,14 +404,14 @@ export default function Home() {
         </div>
         }
 
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16 overflow-hidden">
           {/* Hero Section */}
-          <header className="relative pt-16 pb-8 px-4">
-            <div className={`relative flex items-start justify-center gap-4 transition-all duration-1000 ${isLoading ? 'opacity-0 translate-y-10' : 'opacity-100 translate-y-0'}`}>
+          <header className="relative pt-16 pb-8 px-2 sm:px-4 overflow-hidden">
+            <div className={`relative flex flex-col sm:flex-row items-center sm:items-start justify-center gap-2 sm:gap-4 transition-all duration-1000 ${isLoading ? 'opacity-0 translate-y-10' : 'opacity-100 translate-y-0'}`}>
               {/* NoPixel - Large on the left */}
-              <h1 className="relative group cursor-pointer">
+              <h1 className="relative group cursor-pointer text-center sm:text-left">
                 <span 
-                  className="inline-block text-7xl sm:text-8xl lg:text-9xl font-black bg-clip-text text-transparent transition-all duration-500 group-hover:translate-x-2"
+                  className="inline-block text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black bg-clip-text text-transparent transition-all duration-500 group-hover:translate-x-2"
                   style={{ 
                     fontFamily: 'var(--font-orbitron)', 
                     letterSpacing: '0.05em',
@@ -358,19 +422,20 @@ export default function Home() {
                 >
                   NOPIXEL
                 </span>
-                {/* Color overlay on hover */}
+                {/* Color overlay - permanent cycle on mobile, hover on desktop */}
                 <span 
-                  className="absolute inset-0 text-7xl sm:text-8xl lg:text-9xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent opacity-0 group-hover:opacity-60 transition-all duration-500"
+                  className="absolute inset-0 text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent md:opacity-0 md:group-hover:opacity-60 transition-all duration-500"
                   style={{ 
                     fontFamily: 'var(--font-orbitron)', 
-                    letterSpacing: '0.05em'
+                    letterSpacing: '0.05em',
+                    animation: 'mobileColorCycle 8s ease-in-out infinite'
                   }}
                 >
                   NOPIXEL
                 </span>
                 {/* Subtle constant glitch overlay */}
                 <span 
-                  className="absolute inset-0 text-7xl sm:text-8xl lg:text-9xl font-black text-spring-green-400 pointer-events-none"
+                  className="absolute inset-0 text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black text-spring-green-400 pointer-events-none"
                   style={{ 
                     fontFamily: 'var(--font-orbitron)', 
                     letterSpacing: '0.05em',
@@ -382,31 +447,11 @@ export default function Home() {
               </h1>
               
               {/* 4.0 - Small in top right corner of NoPixel */}
-              <div className="relative group cursor-pointer -ml-2 mt-2">
+              <div className="relative cursor-pointer -ml-2 -mt-4 sm:-ml-2 sm:mt-2">
                 <span 
-                  className="inline-block text-4xl sm:text-5xl lg:text-6xl font-bold text-white transition-all duration-300 group-hover:scale-125 group-hover:-rotate-12 group-hover:text-spring-green-300"
+                  className="inline-block text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white"
                   style={{ 
                     fontFamily: 'var(--font-rajdhani)', 
-                    fontWeight: 700,
-                    animation: 'microShake 10s infinite'
-                  }}
-                >
-                  4.0
-                </span>
-                {/* Multiple shadow layers on hover */}
-                <span 
-                  className="absolute inset-0 text-4xl sm:text-5xl lg:text-6xl font-bold text-aquamarine-400 opacity-0 group-hover:opacity-40 transition-all duration-200 group-hover:translate-x-1 group-hover:translate-y-1"
-                  style={{ 
-                    fontFamily: 'var(--font-rajdhani)', 
-                    fontWeight: 700
-                  }}
-                >
-                  4.0
-                </span>
-                <span 
-                  className="absolute inset-0 text-4xl sm:text-5xl lg:text-6xl font-bold text-turquoise-400 opacity-0 group-hover:opacity-30 transition-all duration-150 group-hover:translate-x-2 group-hover:translate-y-2"
-                  style={{ 
-                    fontFamily: "'Rajdhani', sans-serif", 
                     fontWeight: 700
                   }}
                 >
@@ -416,40 +461,15 @@ export default function Home() {
             </div>
             
             {/* Minigames - Below and slanted */}
-            <div className={`relative mt-4 ml-8 group cursor-pointer w-fit transition-all duration-1000 ${isLoading ? 'opacity-0 translate-y-10' : 'opacity-100 translate-y-0'}`}>
+            <div className={`relative mt-2 sm:mt-4 ml-4 sm:ml-8 cursor-pointer w-fit transition-all duration-1000 ${isLoading ? 'opacity-0 translate-y-10' : 'opacity-100 translate-y-0'}`}>
               <span 
-                className="inline-block text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-400 transition-all duration-500 group-hover:rotate-3 group-hover:text-aquamarine-400 group-hover:scale-105"
+                className="inline-block text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-400"
                 style={{ 
                   fontFamily: 'var(--font-caveat)', 
                   fontWeight: 600, 
                   transformOrigin: 'left center',
                   transform: 'rotate(-3deg)',
                   animation: 'colorShift 7s infinite'
-                }}
-              >
-                Hacking Simulator
-              </span>
-              {/* Underline animation */}
-              <div className="absolute bottom-2 left-0 h-1 w-0 bg-gradient-to-r from-aquamarine-400 to-transparent group-hover:w-full transition-all duration-500"></div>
-              {/* Multiple color shift on hover */}
-              <span 
-                className="absolute inset-0 text-5xl sm:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent opacity-0 group-hover:opacity-60 transition-all duration-300"
-                style={{ 
-                  fontFamily: 'var(--font-caveat)', 
-                  fontWeight: 600,
-                  transform: 'rotate(-3deg)'
-                }}
-              >
-                Hacking Simulator
-              </span>
-              {/* Subtle constant shimmer */}
-              <span 
-                className="absolute inset-0 text-5xl sm:text-6xl lg:text-7xl font-bold text-aquamarine-400 pointer-events-none"
-                style={{ 
-                  fontFamily: 'var(--font-caveat)', 
-                  fontWeight: 600,
-                  opacity: '0.05',
-                  transform: 'rotate(-3deg)'
                 }}
               >
                 Hacking Simulator

@@ -6,10 +6,11 @@ import usePersistantState from "@/app/utils/usePersistentState";
 import NPHackContainer from "@/app/components/NPHackContainer";
 import { NPSettingsRange } from "@/app/components/NPSettings";
 import StatHandler from "@/app/components/StatHandler";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState, useRef } from "react";
 import { useKeyDown } from "@/app/utils/useKeyDown";
 import useGame from "@/app/utils/useGame";
 import classNames from "classnames";
+import { useIsMobileOrTablet } from "@/app/utils/useMediaQuery";
 
 
 import "../../../public/Chopping/Chopping.css";
@@ -48,11 +49,13 @@ const Chopping: FC = () => {
     const [stateBoard, setStateBoard] = useState<LetterState[]>(new Array(defaultNumLetters).fill(''));
     const [allowKeyDown, setAllowKeyDown] = useState(true);
     const [elapsed, setElapsed] = useState(0);
+    const isMobileOrTablet = useIsMobileOrTablet();
+    const mobileInputRef = useRef<HTMLInputElement>(null);
 
 
     const resetBoard = () => {
         const newBoard: Letter[] = [];
-        console.log(`Resetting board with ${numLetters} letters`);
+        // Resetting board
         for (let i = 0; i < numLetters; i++) {
             newBoard.push(getRandomLetter());
         }
@@ -67,7 +70,7 @@ const Chopping: FC = () => {
     const statusUpdateHandler = (newStatus: number) => {
         switch (newStatus) {
             case 1:
-                console.log('Reset game');
+                // Reset game
                 resetBoard();
                 break;
         }
@@ -81,13 +84,13 @@ const Chopping: FC = () => {
     }
 
     const handleWin = (message: string) => {
-        console.log(`Win: ${message}`);
+        // Win
         successPlayer.play();
         setGameStatus(3);
     }
 
     const handleLose = (message: string) => {
-        console.log(`Lose: ${message}`);
+        // Lose
         setGameStatus(2);
     }
 
@@ -133,6 +136,25 @@ const Chopping: FC = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [numLetters, timer]);
+
+    // Auto-focus mobile input when game is running
+    useEffect(() => {
+        if (isMobileOrTablet && gameStatus === 1 && mobileInputRef.current) {
+            // Small delay to ensure DOM is ready
+            setTimeout(() => {
+                mobileInputRef.current?.focus();
+            }, 100);
+        }
+    }, [gameStatus, isMobileOrTablet]);
+
+    // Handle mobile input
+    const handleMobileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const key = e.target.value.slice(-1); // Get last character
+        if (key && gameStatus === 1) {
+            handleKeyDown(key);
+            e.target.value = ''; // Clear input
+        }
+    };
 
         
     useKeyDown((key?: string) => {
@@ -205,13 +227,28 @@ const Chopping: FC = () => {
                 statusMessage={getStatusMessage(gameStatus)}
                 settings={settings}
             >
+                {/* Hidden input for mobile keyboard */}
+                {isMobileOrTablet && gameStatus === 1 && (
+                    <input
+                        ref={mobileInputRef}
+                        type="text"
+                        inputMode="text"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="characters"
+                        className="absolute opacity-0 pointer-events-none"
+                        style={{ position: 'absolute', left: '-9999px' }}
+                        onChange={handleMobileInput}
+                        aria-label="Type letters here"
+                    />
+                )}
                 <div className="
                     h-max w-max max-w-full
                     rounded-lg
                     bg-[rgb(22_40_52)]
                     flex items-center justify-center
-                    text-white text-5xl
-                    p-2
+                    text-white
+                    p-2 sm:p-3 md:p-4
                 ">
                     <div className='game-grid'>
                         {/* Dynamically create grid rows based on numLetters and defaultGridCols */}

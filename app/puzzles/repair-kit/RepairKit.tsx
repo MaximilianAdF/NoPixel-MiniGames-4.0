@@ -5,9 +5,11 @@ import {useState, useEffect, useCallback, useRef} from "react";
 import classNames from 'classnames';
 import {useKeyDown} from "@/app/utils/useKeyDown";
 import {useInterval} from "@/app/utils/useInterval";
+import {useIsMobileOrTablet} from "@/app/utils/useMediaQuery";
 import StatHandler from "@/app/components/StatHandler";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSmile, faFaceMeh, faFaceAngry, faFaceDizzy} from "@fortawesome/free-solid-svg-icons";
+import {Hand} from "lucide-react";
 
 
 export default function RepairKit() {
@@ -19,18 +21,15 @@ export default function RepairKit() {
     const [allowKeyDown, setAllowKeyDown] = useState(true);
     const [tickSpeed, setTickSpeed] = useState(5);
     const [streak, setStreak] = useState(0);
+    const isMobileOrTablet = useIsMobileOrTablet();
 
     const handleWin = (message: string) => {
-        console.log(`Win: ${message}`);
-        setStreak((v) => v+1);
+        // Win
         setGameStatus(3);
-        // gameStatus=3 triggers an animation.
-        // setTimeout(() => setGameStatus(0), 300);
     }
 
     const handleLose = (message: string) => {
-        console.log(`Lose: ${message}`);
-        setStreak(0);
+        // Lose
         setGameStatus(2);
     }
 
@@ -115,7 +114,6 @@ export default function RepairKit() {
     //  to CSS and make less updates to the react state. This should be more efficient.
 
     return (
-        // TODO: Add a breakpoint to shrink some elements on mobile
         <>
             <StatHandler
                 streak={streak}
@@ -127,32 +125,44 @@ export default function RepairKit() {
                     }
                 }
             />
-            <div className="
-                h-24 w-full max-w-[800px]
-                m-auto
-                p-5
-                flex
-                relative
-                rounded-lg
-                gap-3
-                bg-gradient-to-r from-[rgb(18_19_20)] to-[rgb(36_68_90)]
-                shadow
-            ">
-                <div className={classNames(`
-                    h-full aspect-square
-                    rounded-sm
-                    flex items-center justify-center
-                    text-3xl text-white
-                    bg-radient-circle-c
-                    `, gameStatus != 2 ? `
-                        from-[rgb(0_183_140)] to-[rgb(0,81,61)]
-                    ` : `
-                        from-[rgb(255_85_76)] to-[rgb(132_32_32/0.894)]
-                    `
-                )}>E</div>
+            <div className={classNames(
+                "w-full m-auto p-2 sm:p-3 md:p-5 flex relative rounded-lg gap-2 sm:gap-3",
+                "bg-gradient-to-r from-[rgb(18_19_20)] to-[rgb(36_68_90)] shadow",
+                "h-16 sm:h-20 md:h-24",
+                "max-w-[95vw] sm:max-w-[600px] md:max-w-[800px]"
+            )}>
+                <button
+                    onClick={() => handleGameOver()}
+                    disabled={gameStatus !== 1}
+                    className={classNames(
+                        "h-full aspect-square rounded-sm flex items-center justify-center",
+                        "text-white bg-radient-circle-c relative overflow-hidden",
+                        "transition-all duration-300",
+                        "text-xl sm:text-2xl md:text-3xl",
+                        gameStatus !== 2 ? 
+                            "from-[rgb(0_183_140)] to-[rgb(0,81,61)]" : 
+                            "from-[rgb(255_85_76)] to-[rgb(132_32_32/0.894)]",
+                        isMobileOrTablet && gameStatus === 1 ? 
+                            "cursor-pointer active:scale-95 hover:scale-105 shadow-lg" : 
+                            "cursor-default",
+                        gameStatus !== 1 && "opacity-50"
+                    )}
+                    aria-label={isMobileOrTablet ? "Tap to stop" : "Press E to stop"}
+                >
+                    {isMobileOrTablet ? (
+                        <>
+                            <Hand className="relative z-10 w-8 h-8 sm:w-10 sm:h-10" strokeWidth={2.5} />
+                            {gameStatus === 1 && (
+                                <span className="absolute inset-0 bg-white/20 animate-ping rounded-sm" />
+                            )}
+                        </>
+                    ) : (
+                        <span className="relative z-10">E</span>
+                    )}
+                </button>
                 <div className="
                     h-full w-full
-                    p-2
+                    p-1 sm:p-1.5 md:p-2
                     rounded
                     flex items-center
                     outline outline-2 outline-neutral-500/[.162]
@@ -231,7 +241,7 @@ export default function RepairKit() {
                             setTickSpeed(tickSpeed < 10 ? 40 : tickSpeed / 2);
                             }
                         }
-                        className={classNames('p-2 flex items-center justify-center rounded-full text-white transform duration-300', {
+                        className={classNames('p-1.5 sm:p-2 flex items-center justify-center rounded-full text-white transform duration-300', {
                             'bg-spring-green-300': tickSpeed === 40,
                             'bg-yellow-500': tickSpeed === 20,
                             'bg-red-500': tickSpeed === 10,
@@ -239,10 +249,11 @@ export default function RepairKit() {
                             'hover:-rotate-12': true,
                             'hover:scale-110': true,
                         })}
+                        aria-label="Change difficulty"
                     >
                         <FontAwesomeIcon
                             icon={tickSpeed === 5? faFaceDizzy : tickSpeed === 10? faFaceAngry : tickSpeed === 20 ? faFaceMeh : faSmile}
-                            className={classNames("text-xl size-6", {
+                            className={classNames("size-5 sm:size-6", {
                                 'text-spring-green-700': tickSpeed === 40,
                                 'text-yellow-700': tickSpeed === 20,
                                 'text-red-800': tickSpeed === 10,

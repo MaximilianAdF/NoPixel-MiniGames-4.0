@@ -48,7 +48,7 @@ export function resetGame(status: "win" | "lose" | "init" | "reset"): void {
       if (countdown === 0) {
         countdownElem.style.display = "none";
         clearInterval(countdownInterval);
-        console.log(1)
+        // Countdown complete
       }
     }, 900);
 
@@ -410,7 +410,7 @@ export function resetSettings() {
 }
 
 export function pause() {
-  clearTimeout(timerInterval);
+  clearTimeout(timerTimeout);
 }
 
 

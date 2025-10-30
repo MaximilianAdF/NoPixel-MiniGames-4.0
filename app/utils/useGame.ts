@@ -9,7 +9,6 @@ const useGame = (
     const [streak, setStreak] = useState(0);
 
     const handleStatusUpdate = useCallback((status: number) => {
-        console.log("Handling update", status);
         if (status === 3) {
             setStreak(prevStreak => prevStreak + 1);
         }

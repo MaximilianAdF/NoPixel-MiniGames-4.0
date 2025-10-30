@@ -120,13 +120,14 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                     max-h-full max-w-full
                     rounded-lg
                     overflow-hidden
+                    touch-manipulation
                 `,
                 props.className
             )}>
                 <div className="
                     max-h-full max-w-full
                     relative
-                    p-3
+                    p-2 sm:p-3
                     flex flex-col justify-center
                     bg-[rgb(7_19_32)]
                 ">
@@ -134,35 +135,39 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                     <div className="
                         grid
                         grid-cols-[auto_min-content]
-                        mb-4
+                        mb-3 sm:mb-4
                     ">
                         <div className="
                             flex items-center
-                            gap-4
+                            gap-2 sm:gap-4
                         ">
-                            <embed className="w-8 sm:w-10" src="/gamePad.svg"/>
+                            <embed className="w-6 sm:w-8 md:w-10" src="/gamePad.svg"/>
                             <h2 className="
-                                text-lg
-                                sm:text-2xl
+                                text-base
+                                sm:text-lg
+                                md:text-2xl
                                 text-spring-green-300
                                 [text-shadow:0_0_40px_rgb(127_255_191)]
                             ">{/*Originally, text shadow was 2.1px, but it looks much bigger on nopixel*/}
                                 {title}
                             </h2>
                             <p className="
-                                text-xs
-                                sm:text-base
-                                text-[rgb(142_142_142)]">
+                                text-[10px]
+                                sm:text-xs
+                                md:text-base
+                                text-[rgb(142_142_142)]
+                                hidden sm:block">
                                 {description}
                             </p>
                         </div>
-                        {settings && <div className="h-full flex aspect-square justify-center items-center p-1 mr-7">
+                        {settings && <div className="h-full flex aspect-square justify-center items-center p-1 mr-4 sm:mr-7">
                             <FontAwesomeIcon
                                 icon={faGear}
                                 className="
                                     size-full
                                     text-gray-500
                                     hover:rotate-90 hover:scale-110 hover:cursor-pointer
+                                    active:scale-95
                                     transition-transform
                                 "
                                 onClick={() => setSettingsVisible(true)}
@@ -174,7 +179,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                                 col-span-full
                                 text-center
                                 text-white
-                                text-lg
+                                text-base sm:text-lg
                             ">
                                 {score}/{targetScore}
                             </div>
@@ -182,12 +187,12 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                     </div>
                     {status !== undefined && <div className={classNames(
                         `
-                            gap-2.5
+                            gap-2 sm:gap-2.5
                             absolute
-                            right-14
-                            top-4
+                            right-8 sm:right-14
+                            top-3 sm:top-4
                             text-white
-                            px-4 py-2
+                            px-2 sm:px-4 py-1 sm:py-2
                             rounded
                             flex items-center justify-center
                         `,
@@ -206,7 +211,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                         {/*    status === 3 ? "fa-circle-check text-[rgb(84_255_164)]" :*/}
                         {/*    status === 0 ? "fa-hourglass-start text-[rgb(118_128_37)]" : "hidden"  // TODO: Fix reset icon*/}
                         {/*)}></i>*/}
-                        <p className="text-xs font-medium">{statusMessage}</p>
+                        <p className="text-[10px] sm:text-xs font-medium">{statusMessage}</p>
                     </div>}
                     {/* Main puzzle */}
                     <div className="w-full pb-2 flex-1">
@@ -236,7 +241,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                 </div>
                 {/* Timer bar */}
                 {/* TODO: Check BG color, before react rewrite was rgb(36 47 59)*/}
-                <div className="bg-[rgb(15_27_33)] flex w-full h-2.5">
+                <div className="bg-[rgb(15_27_33)] flex w-full h-2 sm:h-2.5">
                     <div
                         className={classNames(
                             "bg-[orangered] w-full h-full [transition:width_linear]",

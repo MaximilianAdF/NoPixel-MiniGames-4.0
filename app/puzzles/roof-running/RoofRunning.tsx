@@ -46,7 +46,7 @@ const RoofRunning: FC = () => {
 
     const resetBoard = () => {
         const newBoard: SquareColor[] = [];
-        console.log(`generating new ${rows}x${columns} board`)
+        // Generating new board
         for (let i = 0; i < rows * columns; i++) {
             newBoard.push(getRandomColor());
         }
@@ -57,7 +57,7 @@ const RoofRunning: FC = () => {
     const statusUpdateHandler = (newStatus: number) => {
         switch (newStatus) {
             case 1:
-                console.log('Reset game');
+                // Reset game
                 resetBoard();
                 break;
         }
@@ -70,13 +70,13 @@ const RoofRunning: FC = () => {
     };
 
     const handleWin = (message: string) => {
-        console.log(`Win: ${message}`);
+        // Win
 
         setGameStatus(3);
     }
 
     const handleLose = (message: string) => {
-        console.log(`Lose: ${message}`);
+        // Lose
 
         setGameStatus(2);
     }

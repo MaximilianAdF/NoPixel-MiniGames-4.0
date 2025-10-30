@@ -13,8 +13,8 @@ export class AudioPlayer {
     play(): void {
         if (this.audioElement) {
             this.audioElement.currentTime = 0; // Reset to start
-            this.audioElement.play().catch(error => {
-                console.error('Audio playback failed:', error);
+            this.audioElement.play().catch(() => {
+                // Silently handle autoplay restrictions
             });
         }
     }

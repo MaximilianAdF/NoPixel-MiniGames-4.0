@@ -4,12 +4,13 @@ import { checkBeepPlayer, successPlayer } from "@/public/audio/AudioManager";
 import { Digit, Digits } from "@/app/puzzles/pincracker/utils";
 import NPHackContainer from "@/app/components/NPHackContainer";
 import { NPSettingsRange } from "@/app/components/NPSettings";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState, useRef } from "react";
 import usePersistantState from "@/app/utils/usePersistentState";
 import { useKeyDown } from "@/app/utils/useKeyDown";
 import useGame from "@/app/utils/useGame";
 import StatHandler from "@/app/components/StatHandler";
 import NPButton from "@/app/components/NPButton";
+import { useIsMobileOrTablet } from "@/app/utils/useMediaQuery";
 
 const defaultDuration = 20;
 const defaultPinLength = 4;
@@ -41,10 +42,12 @@ const Pincracker: FC = () => {
     const [pinLength, setPinLength] = useState(4);
     const [pin, setPin] = useState<Digit[]>();
     const [elapsed, setElapsed] = useState(0);
+    const isMobileOrTablet = useIsMobileOrTablet();
+    const mobileInputRef = useRef<HTMLInputElement>(null);
 
     const handleCrack = () => {
         if (activeIndex < pinLength) {
-            console.log('Incomplete pin');
+            // Incomplete pin
         } else {
             const wrappers = document.querySelectorAll('.wrapper');
             const markers = document.querySelectorAll('.marker');
@@ -137,7 +140,7 @@ const Pincracker: FC = () => {
     }
 
     const resetBoard = () => {
-        console.log(`Resetting cracker with ${timer} seconds`);
+        // Resetting cracker
         setActiveIndex(0);
         generatePin();
         clearMarkings();
@@ -190,6 +193,32 @@ const Pincracker: FC = () => {
             handleKeyDown(key);
         }
     }, ['1','2','3','4','5','6','7','8','9','0', 'Backspace', 'Enter'], allowKeyDown);
+
+    // Auto-focus mobile input when game is running
+    useEffect(() => {
+        if (isMobileOrTablet && gameStatus === 1 && mobileInputRef.current) {
+            setTimeout(() => {
+                mobileInputRef.current?.focus();
+            }, 100);
+        }
+    }, [gameStatus, isMobileOrTablet]);
+
+    // Handle mobile input
+    const handleMobileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const key = e.target.value.slice(-1);
+        if (gameStatus === 1) {
+            handleKeyDown(key);
+            e.target.value = '';
+        }
+    };
+
+    const handleMobileBackspace = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Backspace' && gameStatus === 1) {
+            handleKeyDown('Backspace');
+        } else if (e.key === 'Enter' && gameStatus === 1) {
+            handleKeyDown('Enter');
+        }
+    };
 
     useEffect(() => {
         setSettingsPinLength(pinLength);
@@ -286,17 +315,36 @@ const Pincracker: FC = () => {
             statusMessage={getStatusMessage(gameStatus)}
             settings={settings}
             >
+            {/* Hidden input for mobile keyboard - number pad */}
+            {isMobileOrTablet && gameStatus === 1 && (
+                <input
+                    ref={mobileInputRef}
+                    type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    autoComplete="off"
+                    className="absolute opacity-0 pointer-events-none"
+                    style={{ position: 'absolute', left: '-9999px' }}
+                    onChange={handleMobileInput}
+                    onKeyDown={handleMobileBackspace}
+                    aria-label="Enter PIN digits"
+                />
+            )}
             <div className="
-                h-32 w-[600px] max-w-full
+                h-56 sm:h-60 md:h-64 
+                min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px]
+                w-full max-w-full
                 rounded-lg
                 bg-[rgb(22_40_52)]
                 flex items-center justify-between
-                text-white text-5xl
+                text-white text-6xl sm:text-7xl md:text-8xl
+                px-3 sm:px-5 md:px-6
+                mx-auto
             ">
                 {[...Array(pinLength)].map((_, index) => (
-                <div key={index} className="flex flex-col items-center justify-center w-3/12 h-full gap-3 rounded-md wrapper">
-                    <div className='h-[50px] digit'></div>
-                    <div className="px-5 h-1 bg-slate-400 marker"/>
+                <div key={index} className="flex flex-col items-center justify-center w-3/12 h-full gap-5 sm:gap-6 md:gap-7 rounded-md wrapper">
+                    <div className='h-20 sm:h-24 md:h-28 digit'></div>
+                    <div className="px-4 sm:px-6 md:px-7 h-1.5 bg-slate-400 marker"/>
                 </div>
                 ))}
             </div>

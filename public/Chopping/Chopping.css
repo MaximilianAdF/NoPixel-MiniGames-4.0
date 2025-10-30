@@ -4,6 +4,19 @@
   --letter-size: calc(48vh / var(--grid-columns));
 }
 
+/* Mobile & Tablet responsive letter sizing at root level */
+@media (max-width: 1023px) {
+  :root {
+    --letter-size: min(calc(70vw / 6), calc(42vh / 4), 45px);
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --letter-size: min(calc(75vw / 6), calc(60vh / 4), 80px);
+  }
+}
+
 .hack-box-container {
   margin-top: 10%;
 }
@@ -14,6 +27,8 @@
   grid-template-rows: repeat(var(--grid-rows), 1fr);
   gap: 0.5rem;
   z-index: 1;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .game-grid-row {
@@ -23,6 +38,25 @@
   grid-template-rows: repeat(1, 1fr);
   gap: 0.5rem;
   z-index: 1;
+  max-width: 100%;
+}
+
+/* Mobile & Tablet: Additional constraints to prevent overflow */
+@media (max-width: 1023px) {
+  .game-grid {
+    gap: 0.15rem;
+    max-width: 88vw;
+    padding: 0.5rem;
+  }
+  
+  .game-grid-row {
+    gap: 0.15rem;
+  }
+
+  .letter {
+    font-size: 0.8rem;
+    padding: 0.2rem;
+  }
 }
 
 .lock-container {
@@ -125,6 +159,27 @@
   border: 0.125rem solid rgba(112, 193, 255, 0.4);
   border-radius: 5px;
   z-index: 1;
+  flex-shrink: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Mobile responsive font sizing */
+@media (max-width: 1023px) {
+  .letter {
+    font-size: 0.8rem;
+    border: 0.0625rem solid rgba(112, 193, 255, 0.4);
+    border-radius: 3px;
+    padding: 0.2rem;
+  }
+  
+  .letter.done {
+    border: 0.0625rem solid rgba(84, 255, 164, 0.4);
+  }
+  
+  .letter.fail {
+    border: 0.0625rem solid rgba(255, 84, 84, 0.4);
+  }
 }
 
 .letter.done {

@@ -159,7 +159,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
     const statusUpdateHandler = (newStatus: number) => {
         switch (newStatus) {
             case 1:
-                console.log('Reset game');
+                // Reset game
                 const newRings: Ring[] = [];
                 for (let i = 0; i < levels; i++) {
                     // TODO: Add config for difficulty
@@ -179,13 +179,13 @@ const NPLockpick: FC<NPLockpickProps> = ({
     };
 
     const handleWin = (message: string) => {
-        console.log(`Win: ${message}`);
+        // Win
 
         setGameStatus(3);
     }
 
     const handleLose = (message: string) => {
-        console.log(`Lose: ${message}`);
+        // Lose
 
         setGameStatus(2);
     }

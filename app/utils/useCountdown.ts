@@ -36,7 +36,6 @@ export const useCountdown = (
 
     if (p === 100) {
       savedCallback.current?.();
-      console.log("finished ticks");
     }
     setProgress(p);
   }, [duration, freeze, startTime, setElapsed]);

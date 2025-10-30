@@ -45,7 +45,7 @@ export default function WordMemory() {
     const statusUpdateHandler = (newStatus: number) => {
         switch (newStatus) {
             case 1:
-                console.log('Reset game');
+                // Reset game
                 setRandomWord();
                 setCurrentRound(0);
                 setSeenWords([]);
@@ -75,14 +75,14 @@ export default function WordMemory() {
     };
 
     const handleWin = (message: string) => {
-        console.log(`Win: ${message}`);
+        // Win
         successPlayer.play();
 
         setGameStatus(3);
     }
 
     const handleLose = (message: string) => {
-        console.log(`Lose: ${message}`);
+        // Lose
         //Play fail sound
 
         setGameStatus(2);
