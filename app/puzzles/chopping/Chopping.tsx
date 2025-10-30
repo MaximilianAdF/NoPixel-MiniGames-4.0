@@ -51,6 +51,15 @@ const Chopping: FC = () => {
     const [elapsed, setElapsed] = useState(0);
     const isMobileOrTablet = useIsMobileOrTablet();
     const mobileInputRef = useRef<HTMLInputElement>(null);
+    const gameWrapperRef = useRef<HTMLDivElement>(null);
+    const [keyboardOffset, setKeyboardOffset] = useState(0);
+
+    const bringGameIntoView = useCallback(() => {
+        if (!isMobileOrTablet) return;
+        const wrapper = gameWrapperRef.current;
+        if (!wrapper) return;
+        wrapper.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+    }, [isMobileOrTablet]);
 
     const focusMobileInput = useCallback(() => {
         if (!isMobileOrTablet) return;
@@ -62,13 +71,17 @@ const Chopping: FC = () => {
             input.focus();
         }
         input.setSelectionRange?.(input.value.length, input.value.length);
-    }, [isMobileOrTablet]);
+        bringGameIntoView();
+    }, [bringGameIntoView, isMobileOrTablet]);
 
     useEffect(() => {
         if (!isMobileOrTablet) return;
-        const timer = setTimeout(focusMobileInput, 200);
+        const timer = setTimeout(() => {
+            focusMobileInput();
+            bringGameIntoView();
+        }, 200);
         return () => clearTimeout(timer);
-    }, [focusMobileInput, isMobileOrTablet]);
+    }, [bringGameIntoView, focusMobileInput, isMobileOrTablet]);
 
 
     const resetBoard = () => {
@@ -169,6 +182,28 @@ const Chopping: FC = () => {
                 document.removeEventListener('visibilitychange', visibilityHandler);
             };
         }, [focusMobileInput, gameStatus, isMobileOrTablet]);
+
+        useEffect(() => {
+            if (!isMobileOrTablet || typeof window === 'undefined' || !window.visualViewport) return;
+
+            const viewport = window.visualViewport;
+            const handleResize = () => {
+                const offset = Math.max(0, window.innerHeight - viewport.height);
+                setKeyboardOffset(offset);
+                if (offset > 0) {
+                    bringGameIntoView();
+                }
+            };
+
+            viewport.addEventListener('resize', handleResize);
+            viewport.addEventListener('scroll', handleResize);
+            handleResize();
+
+            return () => {
+                viewport.removeEventListener('resize', handleResize);
+                viewport.removeEventListener('scroll', handleResize);
+            };
+        }, [bringGameIntoView, isMobileOrTablet]);
 
         // Handle mobile input
     const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {
@@ -277,7 +312,9 @@ const Chopping: FC = () => {
                         autoFocus
                     />
                 )}
-                <div className="
+                <div
+                    ref={gameWrapperRef}
+                    className="
                     h-max w-max max-w-full
                     rounded-lg
                     bg-[rgb(22_40_52)]
@@ -287,6 +324,10 @@ const Chopping: FC = () => {
                 "
                     onTouchStartCapture={focusMobileInput}
                     onPointerDownCapture={focusMobileInput}
+                    style={{
+                        marginBottom: keyboardOffset ? `${keyboardOffset + 24}px` : undefined,
+                        scrollMarginTop: '15vh',
+                    }}
                 >
                     <div className='game-grid'>
                         {/* Dynamically create grid rows based on numLetters and defaultGridCols */}
