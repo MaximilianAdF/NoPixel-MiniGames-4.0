@@ -133,6 +133,7 @@ const Chopping: FC = () => {
         setBoard(newBoard);
         setStateBoard(newStateBoard);
         checkStatus(newStateBoard);
+        focusMobileInput();
     }
 
 
@@ -169,6 +170,7 @@ const Chopping: FC = () => {
         if (key && gameStatus === 1) {
             handleKeyDown(key);
             e.target.value = ''; // Clear input
+            focusMobileInput();
         }
     };
 
@@ -252,9 +254,17 @@ const Chopping: FC = () => {
                         autoComplete="off"
                         autoCorrect="off"
                         autoCapitalize="characters"
-                        className="absolute opacity-0 pointer-events-none"
-                        style={{ position: 'absolute', left: '-9999px' }}
+                        className="opacity-0"
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            width: '1px',
+                            height: '1px',
+                            background: 'transparent',
+                        }}
                         onChange={handleMobileInput}
+                        onBlur={focusMobileInput}
                         aria-label="Type letters here"
                         autoFocus
                     />

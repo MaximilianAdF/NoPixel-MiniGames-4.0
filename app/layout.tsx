@@ -155,7 +155,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`overscroll-y-none ${orbitron.variable} ${rajdhani.variable} ${caveat.variable}`} style={{ background: '#020617', minHeight: '100dvh' }}>
+    <html
+      lang="en"
+      className={`overscroll-y-none ${orbitron.variable} ${rajdhani.variable} ${caveat.variable}`}
+      style={{
+        backgroundColor: '#020617',
+        backgroundImage: 'linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%)',
+        minHeight: '100dvh',
+      }}
+    >
       <head>
         <meta name="theme-color" content="#020617" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -169,14 +177,18 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
       </head>
-      <body className={`${gilroy.className} overscroll-y-none`} style={{ 
-        minHeight: '100dvh',
-        background: 'linear-gradient(to bottom right, #020617, #1e293b, #020617)',
-        paddingTop: 'env(safe-area-inset-top, 0px)',
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-        paddingLeft: 'env(safe-area-inset-left, 0px)',
-        paddingRight: 'env(safe-area-inset-right, 0px)'
-      }}>
+      <body
+        className={`${gilroy.className} overscroll-y-none`}
+        style={{
+          minHeight: '100dvh',
+          backgroundColor: '#020617',
+          backgroundImage: 'linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%)',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          paddingLeft: 'env(safe-area-inset-left, 0px)',
+          paddingRight: 'env(safe-area-inset-right, 0px)',
+        }}
+      >
         <Background />
         {children}
         <Analytics />

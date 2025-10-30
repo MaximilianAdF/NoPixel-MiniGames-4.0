@@ -17,8 +17,8 @@
   
   /* Force dark background on html and body to cover safe areas */
   html {
-    background-color: var(--bg-color) !important;
-    background-image: linear-gradient(to bottom right, #020617, #1e293b, #020617) !important;
+  background-color: var(--bg-color) !important;
+  background-image: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%) !important;
     /* Prevent iOS text size adjustment */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
@@ -29,8 +29,8 @@
     min-height: 100vh;
     min-height: 100dvh;
     min-height: -webkit-fill-available;
-    background-color: var(--bg-color) !important;
-    background-image: linear-gradient(to bottom right, #020617, #1e293b, #020617) !important;
+  background-color: var(--bg-color) !important;
+  background-image: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%) !important;
     /* Prevent iOS text size adjustment */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
@@ -49,7 +49,7 @@
     width: 100vw;
     height: 100vh;
     height: 100dvh;
-    background: linear-gradient(to bottom right, #020617, #1e293b, #020617);
+  background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%);
     z-index: -100;
     pointer-events: none;
   }

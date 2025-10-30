@@ -183,11 +183,13 @@ const Pincracker: FC = () => {
     const handleKeyDown = (key: string) => {
         if (key === 'Enter') {
             handleCrack();
+            focusMobileInput();
         }
 
         else if (key === 'Backspace') {
             setActiveIndex(Math.max(activeIndex - 1, 0));
             removeDigit(Math.max(activeIndex - 1, 0));
+            focusMobileInput();
         }
 
         else {
@@ -195,6 +197,7 @@ const Pincracker: FC = () => {
                 const digits = document.querySelectorAll('.digit');
                 digits[activeIndex].innerHTML = key.toString();
                 setActiveIndex(activeIndex + 1);
+                focusMobileInput();
             }
         }
 
@@ -226,6 +229,7 @@ const Pincracker: FC = () => {
         if (gameStatus === 1) {
             handleKeyDown(key);
             e.target.value = '';
+            focusMobileInput();
         }
     };
 
@@ -340,10 +344,18 @@ const Pincracker: FC = () => {
                     inputMode="numeric"
                     pattern="[0-9]*"
                     autoComplete="off"
-                    className="absolute opacity-0 pointer-events-none"
-                    style={{ position: 'absolute', left: '-9999px' }}
+                    className="opacity-0"
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '1px',
+                        height: '1px',
+                        background: 'transparent',
+                    }}
                     onChange={handleMobileInput}
                     onKeyDown={handleMobileBackspace}
+                    onBlur={focusMobileInput}
                     aria-label="Enter PIN digits"
                     autoFocus
                 />
