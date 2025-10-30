@@ -103,22 +103,33 @@ const Chopping: FC = () => {
 
     const focusInputOnInteraction = useCallback(() => {
         if (!isMobileOrTablet) return;
-        if (hasInteractedRef.current) return; // Only trigger once per game session
-        hasInteractedRef.current = true;
-        dismissMobileHint();
-
-        const attemptFocus = () => focusMobileInput({ force: true });
         
-        if (typeof window !== 'undefined') {
-            // Delay initial focus to avoid flash
-            window.setTimeout(() => {
-                attemptFocus();
-                window.requestAnimationFrame(attemptFocus);
-            }, 100);
-        } else {
-            attemptFocus();
+        if (!hasInteractedRef.current) {
+            hasInteractedRef.current = true;
+            dismissMobileHint();
         }
-    }, [dismissMobileHint, focusMobileInput, isMobileOrTablet]);
+
+        const input = mobileInputRef.current;
+        if (!input) return;
+
+        // Immediate focus attempt
+        try {
+            input.focus({ preventScroll: true });
+        } catch {
+            input.focus();
+        }
+
+        // Additional attempts to ensure keyboard stays open
+        if (typeof window !== 'undefined') {
+            window.requestAnimationFrame(() => {
+                try {
+                    input.focus({ preventScroll: true });
+                } catch {
+                    input.focus();
+                }
+            });
+        }
+    }, [dismissMobileHint, isMobileOrTablet]);
 
     useEffect(() => {
         if (!isMobileOrTablet) return;
