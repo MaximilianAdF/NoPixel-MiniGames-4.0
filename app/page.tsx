@@ -117,7 +117,7 @@ export default function Home() {
   }, []);
 
   return (
-      <main className="relative flex min-h-screen flex-col items-center overflow-hidden bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950">
+      <main className="relative flex min-h-screen flex-col items-center bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950">
         {/* Structured Data for SEO */}
         <Script
           id="structured-data"
@@ -404,9 +404,9 @@ export default function Home() {
         </div>
         }
 
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16 overflow-hidden">
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
           {/* Hero Section */}
-          <header className="relative pt-16 pb-8 px-2 sm:px-4 overflow-hidden">
+          <header className="relative pt-16 pb-8 px-2 sm:px-4">
             <div className={`relative flex flex-col sm:flex-row items-center sm:items-start justify-center gap-2 sm:gap-4 transition-all duration-1000 ${isLoading ? 'opacity-0 translate-y-10' : 'opacity-100 translate-y-0'}`}>
               {/* NoPixel - Large on the left */}
               <h1 className="relative group cursor-pointer text-center sm:text-left">

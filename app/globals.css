@@ -21,6 +21,7 @@
     /* Prevent iOS text size adjustment */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    overflow-x: hidden;
   }
   
   body {
@@ -33,6 +34,7 @@
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     position: relative;
+    overflow-x: hidden;
   }
   
   /* Pseudo-element to force background behind safe areas on iOS */
