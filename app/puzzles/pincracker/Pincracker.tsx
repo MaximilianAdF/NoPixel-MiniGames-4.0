@@ -48,6 +48,12 @@ const Pincracker: FC = () => {
     const gameWrapperRef = useRef<HTMLDivElement>(null);
     const hintDismissedRef = useRef(false);
     const [showMobileHint, setShowMobileHint] = useState(false);
+    const hasInteractedRef = useRef(false);
+
+    useEffect(() => {
+        checkBeepPlayer.whenReady();
+        successPlayer.whenReady();
+    }, []);
 
     const ensureVisible = useCallback((behavior: ScrollBehavior = 'auto') => {
         if (!isMobileOrTablet || typeof window === 'undefined') return;
@@ -73,8 +79,9 @@ const Pincracker: FC = () => {
         }
     }, []);
 
-    const focusMobileInput = useCallback(() => {
+    const focusMobileInput = useCallback((options?: { force?: boolean }) => {
         if (!isMobileOrTablet) return;
+        if (!options?.force && !hasInteractedRef.current) return;
         const input = mobileInputRef.current;
         if (!input) return;
         try {
@@ -86,14 +93,19 @@ const Pincracker: FC = () => {
         ensureVisible();
     }, [ensureVisible, isMobileOrTablet]);
 
+    const focusInputOnInteraction = useCallback(() => {
+        hasInteractedRef.current = true;
+        dismissMobileHint();
+        focusMobileInput({ force: true });
+    }, [dismissMobileHint, focusMobileInput]);
+
     useEffect(() => {
         if (!isMobileOrTablet) return;
         const timer = setTimeout(() => {
-            focusMobileInput();
             ensureVisible();
         }, 200);
         return () => clearTimeout(timer);
-    }, [ensureVisible, focusMobileInput, isMobileOrTablet]);
+    }, [ensureVisible, isMobileOrTablet]);
 
 
     const handleCrack = () => {
@@ -257,20 +269,6 @@ const Pincracker: FC = () => {
     }, ['1','2','3','4','5','6','7','8','9','0', 'Backspace', 'Enter'], allowKeyDown);
 
     useEffect(() => {
-        if (!isMobileOrTablet || gameStatus !== 1) return;
-        focusMobileInput();
-        const raf = requestAnimationFrame(focusMobileInput);
-        const timeout = setTimeout(focusMobileInput, 250);
-        const visibilityHandler = () => focusMobileInput();
-        document.addEventListener('visibilitychange', visibilityHandler);
-        return () => {
-            cancelAnimationFrame(raf);
-            clearTimeout(timeout);
-            document.removeEventListener('visibilitychange', visibilityHandler);
-        };
-    }, [focusMobileInput, gameStatus, isMobileOrTablet]);
-
-    useEffect(() => {
         if (!isMobileOrTablet || typeof window === 'undefined' || !window.visualViewport) return;
 
         const viewport = window.visualViewport;
@@ -291,33 +289,36 @@ const Pincracker: FC = () => {
         };
     }, [ensureVisible, isMobileOrTablet]);
 
-    useEffect(() => {
-        if (!isMobileOrTablet) return;
-        const handler = () => {
-            dismissMobileHint();
-            focusMobileInput();
-        };
-        window.addEventListener('touchstart', handler, { passive: true });
-        return () => window.removeEventListener('touchstart', handler);
-    }, [dismissMobileHint, focusMobileInput, isMobileOrTablet]);
-
     // Handle mobile input
     const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {
         const input = e.currentTarget;
         const key = input.value.slice(-1);
-        if (gameStatus === 1) {
-            dismissMobileHint();
-            handleKeyDown(key.toString());
-            input.value = '';
-            focusMobileInput();
+        if (!key || gameStatus !== 1) {
+            if (!key) {
+                input.value = '';
+            }
+            return;
         }
+        if (!hasInteractedRef.current) {
+            hasInteractedRef.current = true;
+        }
+        dismissMobileHint();
+        handleKeyDown(key.toString());
+        input.value = '';
+        focusMobileInput();
     };
 
     const handleMobileBackspace = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Backspace' && gameStatus === 1) {
+            if (!hasInteractedRef.current) {
+                hasInteractedRef.current = true;
+            }
             dismissMobileHint();
             handleKeyDown('Backspace');
         } else if (e.key === 'Enter' && gameStatus === 1) {
+            if (!hasInteractedRef.current) {
+                hasInteractedRef.current = true;
+            }
             dismissMobileHint();
             handleKeyDown('Enter');
         }
@@ -443,9 +444,7 @@ const Pincracker: FC = () => {
                     }}
                     onInput={handleMobileInput}
                     onKeyDown={handleMobileBackspace}
-                    onBlur={focusMobileInput}
                     aria-label="Enter PIN digits"
-                    autoFocus
                 />
             )}
             <div
@@ -461,14 +460,8 @@ const Pincracker: FC = () => {
                 px-3 sm:px-5 md:px-6
                 mx-auto
             "
-                onTouchStartCapture={() => {
-                    dismissMobileHint();
-                    focusMobileInput();
-                }}
-                onPointerDownCapture={() => {
-                    dismissMobileHint();
-                    focusMobileInput();
-                }}
+                onTouchStartCapture={focusInputOnInteraction}
+                onPointerDownCapture={focusInputOnInteraction}
                 style={{ scrollMarginTop: '15vh' }}
             >
                 {[...Array(pinLength)].map((_, index) => (

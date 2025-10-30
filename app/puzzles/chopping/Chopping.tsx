@@ -56,6 +56,12 @@ const Chopping: FC = () => {
     const hintDismissedRef = useRef(false);
     const [showMobileHint, setShowMobileHint] = useState(false);
     const skipNextInputRef = useRef(false);
+    const hasInteractedRef = useRef(false);
+
+    useEffect(() => {
+        checkBeepPlayer.whenReady();
+        successPlayer.whenReady();
+    }, []);
 
     const ensureVisible = useCallback((behavior: ScrollBehavior = 'auto') => {
         if (!isMobileOrTablet || typeof window === 'undefined') return;
@@ -81,8 +87,9 @@ const Chopping: FC = () => {
         }
     }, []);
 
-    const focusMobileInput = useCallback(() => {
+    const focusMobileInput = useCallback((options?: { force?: boolean }) => {
         if (!isMobileOrTablet) return;
+        if (!options?.force && !hasInteractedRef.current) return;
         const input = mobileInputRef.current;
         if (!input) return;
         try {
@@ -94,14 +101,19 @@ const Chopping: FC = () => {
         ensureVisible();
     }, [ensureVisible, isMobileOrTablet]);
 
+    const focusInputOnInteraction = useCallback(() => {
+        hasInteractedRef.current = true;
+        dismissMobileHint();
+        focusMobileInput({ force: true });
+    }, [dismissMobileHint, focusMobileInput]);
+
     useEffect(() => {
         if (!isMobileOrTablet) return;
         const timer = setTimeout(() => {
-            focusMobileInput();
             ensureVisible();
         }, 200);
         return () => clearTimeout(timer);
-    }, [ensureVisible, focusMobileInput, isMobileOrTablet]);
+    }, [ensureVisible, isMobileOrTablet]);
 
 
     const resetBoard = () => {
@@ -198,20 +210,6 @@ const Chopping: FC = () => {
         }, [numLetters, timer]);
 
         useEffect(() => {
-            if (!isMobileOrTablet || gameStatus !== 1) return;
-            focusMobileInput();
-            const raf = requestAnimationFrame(focusMobileInput);
-            const timeout = setTimeout(focusMobileInput, 250);
-            const visibilityHandler = () => focusMobileInput();
-            document.addEventListener('visibilitychange', visibilityHandler);
-            return () => {
-                cancelAnimationFrame(raf);
-                clearTimeout(timeout);
-                document.removeEventListener('visibilitychange', visibilityHandler);
-            };
-        }, [focusMobileInput, gameStatus, isMobileOrTablet]);
-
-        useEffect(() => {
             if (!isMobileOrTablet || typeof window === 'undefined' || !window.visualViewport) return;
 
             const viewport = window.visualViewport;
@@ -232,20 +230,13 @@ const Chopping: FC = () => {
             };
         }, [ensureVisible, isMobileOrTablet]);
 
-        useEffect(() => {
-            if (!isMobileOrTablet) return;
-            const handler = () => {
-                dismissMobileHint();
-                focusMobileInput();
-            };
-            window.addEventListener('touchstart', handler, { passive: true });
-            return () => window.removeEventListener('touchstart', handler);
-        }, [dismissMobileHint, focusMobileInput, isMobileOrTablet]);
-
         // Handle mobile input
     const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (gameStatus !== 1) return;
         const { key } = e;
+        if (!hasInteractedRef.current) {
+            hasInteractedRef.current = true;
+        }
 
         if (key.length === 1) {
             skipNextInputRef.current = true;
@@ -272,6 +263,9 @@ const Chopping: FC = () => {
         }
         const key = input.value.slice(-1);
         if (key && gameStatus === 1) {
+            if (!hasInteractedRef.current) {
+                hasInteractedRef.current = true;
+            }
             dismissMobileHint();
             handleKeyDown(key.toUpperCase());
             input.value = '';
@@ -323,14 +317,6 @@ const Chopping: FC = () => {
 
     return (
         <>
-            {isMobileOrTablet && showMobileHint && (
-                <div
-                    className="pointer-events-none fixed left-1/2 z-40 w-[90vw] max-w-sm -translate-x-1/2 rounded-full bg-mirage-900/90 px-4 py-2 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40"
-                    style={{ top: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)' }}
-                >
-                    Tap the puzzle, then type the letters to play.
-                </div>
-            )}
             <div ref={outerContainerRef} className="relative">
             <StatHandler
                 streak={streak}
@@ -345,6 +331,11 @@ const Chopping: FC = () => {
                     }
                 }
             />
+            {isMobileOrTablet && showMobileHint && (
+                <div className="mb-4 rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
+                    Tap the puzzle, then type the letters to play.
+                </div>
+            )}
             <NPHackContainer
                 title="Alphabet"
                 description="Tap the letters in order"
@@ -378,9 +369,7 @@ const Chopping: FC = () => {
                         }}
                         onInput={handleMobileInput}
                         onKeyDown={handleMobileKeyDown}
-                        onBlur={focusMobileInput}
                         aria-label="Type letters here"
-                        autoFocus
                     />
                 )}
                 <div
@@ -393,14 +382,8 @@ const Chopping: FC = () => {
                     text-white
                     p-2 sm:p-3 md:p-4
                 "
-                    onTouchStartCapture={() => {
-                        dismissMobileHint();
-                        focusMobileInput();
-                    }}
-                    onPointerDownCapture={() => {
-                        dismissMobileHint();
-                        focusMobileInput();
-                    }}
+                    onTouchStartCapture={focusInputOnInteraction}
+                    onPointerDownCapture={focusInputOnInteraction}
                     style={{ scrollMarginTop: '15vh' }}
                 >
                     <div className='game-grid'>

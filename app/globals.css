@@ -39,19 +39,79 @@
   }
   
   /* Pseudo-element to force background behind safe areas on iOS */
-  body::before {
+  html::before {
     content: '';
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     width: 100vw;
     height: 100vh;
     height: 100dvh;
   background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%);
     z-index: -100;
     pointer-events: none;
+  }
+
+  body::before,
+  body::after {
+    content: '';
+    position: fixed;
+    pointer-events: none;
+    background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%);
+  z-index: -95;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  }
+
+  body::before {
+    top: 0;
+    left: 0;
+    right: auto;
+    bottom: auto;
+    width: 0;
+    height: 0;
+  }
+
+  body::after {
+    top: auto;
+    bottom: 0;
+    left: auto;
+    right: 0;
+    width: 0;
+    height: 0;
+  }
+
+  @media (orientation: portrait) {
+    body::before {
+      width: 100vw;
+      height: max(var(--safe-area-inset-top), 0px);
+      opacity: 1;
+      right: 0;
+    }
+
+    body::after {
+      width: 100vw;
+      height: max(var(--safe-area-inset-bottom), 0px);
+      opacity: 1;
+      left: 0;
+    }
+  }
+
+  @media (orientation: landscape) {
+    body::before {
+      width: max(var(--safe-area-inset-left), 0px);
+      height: 100vh;
+      height: 100dvh;
+      opacity: 1;
+      right: auto;
+    }
+
+    body::after {
+      width: max(var(--safe-area-inset-right), 0px);
+      height: 100vh;
+      height: 100dvh;
+      opacity: 1;
+      top: 0;
+    }
   }
   
   /* Prevent iOS from scaling up icons and SVGs */

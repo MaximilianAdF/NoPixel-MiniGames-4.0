@@ -156,6 +156,11 @@ const NPLockpick: FC<NPLockpickProps> = ({
     const [level, setLevel] = useState<number>(0);
     const [elapsed, setElapsed] = useState(0);
 
+    useEffect(() => {
+        checkBeepPlayer.whenReady();
+        successPlayer.whenReady();
+    }, []);
+
     const statusUpdateHandler = (newStatus: number) => {
         switch (newStatus) {
             case 1:

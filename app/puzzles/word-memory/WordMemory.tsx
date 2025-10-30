@@ -2,7 +2,7 @@
 
 import { successPlayer, checkBeepPlayer } from "@/public/audio/AudioManager";
 import NPHackContainer from "@/app/components/NPHackContainer";
-import {useCallback, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import useGame from "@/app/utils/useGame";
 import {generate} from "random-words";
 import StatHandler from "@/app/components/StatHandler";
@@ -41,6 +41,11 @@ const getStatusMessage = (status: number | undefined) => {
 export default function WordMemory() {
     const countdownDuration = 25;  // TODO: Get the actual speed
     const maxRounds = 25;
+
+    useEffect(() => {
+        checkBeepPlayer.whenReady();
+        successPlayer.whenReady();
+    }, []);
 
     const statusUpdateHandler = (newStatus: number) => {
         switch (newStatus) {

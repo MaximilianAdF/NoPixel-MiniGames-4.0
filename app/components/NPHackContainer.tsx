@@ -1,4 +1,4 @@
-import React, {FC, ReactNode, useEffect, useState} from "react";
+import React, {FC, useEffect, useState} from "react";
 import NPButton from "@/app/components/NPButton";
 import classNames from "classnames";
 import {useCountdown} from "@/app/utils/useCountdown";
@@ -7,6 +7,9 @@ import NPSettings from "@/app/components/NPSettings";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faGear} from "@fortawesome/free-solid-svg-icons";
 import { Gamepad2 } from "lucide-react";
+import type { LucideProps } from "lucide-react";
+
+const GamepadIcon = Gamepad2 as unknown as FC<LucideProps>;
 
 interface NPHackContainerButton {
     label: string,
@@ -18,11 +21,11 @@ interface NPHackContainerButton {
 interface NPHackContainerSettings {
     handleSave: () => void,
     handleReset: () => void,
-    children: ReactNode,
+    children: React.ReactNode,
 }
 
 interface NPHackContainerProps {
-    children: ReactNode,
+    children: React.ReactNode,
     title: string,
     description?: string,
     buttons: NPHackContainerButton[][],
@@ -63,8 +66,6 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
     // This can be decreased if you need to call a func every frame
     // For now, 1s per frame seems reasonable
 
-    const frameSpeed = 20;
-
     const resetTimeout = useTimeout(() => {
         resetCallback();
         resetCountdown();
@@ -80,7 +81,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
         setStatus(2); 
     }
 
-    const [countdown, resetCountdown, freezeCountdown] = useCountdown(timerReset, elapsedCallback, countdownDuration, frameSpeed);
+    const [countdownProgress, resetCountdown, freezeCountdown] = useCountdown(timerReset, elapsedCallback, countdownDuration);
 
     useEffect(() => {
         if (status !== 1 && status !== 0) {
@@ -89,18 +90,9 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
         }
     }, [freezeCountdown, status]);
     
-    const calculateTimerBar = () => {
-        let width = 100
-        if (status === 1) {
-            // Only move the timer if the game is running
-            width -= countdown;
-            // We want to anticipate the next tick so the transition will start instantly
-            width -= Math.max(Math.min(frameSpeed/countdownDuration,1),0) * 100;
-            // And clamp that between 0-100
-            width = Math.max(Math.min(width, 100),0);
-        }
-        return width;
-    }
+    const currentTimerScale = status === 0
+        ? 1
+        : Math.max(1 - countdownProgress / 100, 0);
 
 
     const [settingsVisible, setSettingsVisible] = useState(false);
@@ -142,7 +134,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                             flex items-center
                             gap-2 sm:gap-4
                         ">
-                            <Gamepad2
+                            <GamepadIcon
                                 aria-hidden="true"
                                 className="size-6 sm:size-8 md:size-10 text-spring-green-300"
                                 strokeWidth={1.5}
@@ -247,15 +239,13 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                 </div>
                 {/* Timer bar */}
                 {/* TODO: Check BG color, before react rewrite was rgb(36 47 59)*/}
-                <div className="bg-[rgb(15_27_33)] flex w-full h-2 sm:h-2.5">
+                <div className="bg-[rgb(15_27_33)] flex w-full h-2 sm:h-2.5 overflow-hidden">
                     <div
-                        className={classNames(
-                            "bg-[orangered] w-full h-full [transition:width_linear]",
-                        )}
+                        className="bg-[orangered] w-full h-full will-change-transform"
                         style={{
-                            transitionDuration: status !== 1 ? "0ms" : `${frameSpeed}ms`,
-                            // transitionTimingFunction: "cubic-bezier(0.4, 1, 0.7, 0.93)",
-                            width: `${calculateTimerBar()}%`,
+                            transform: `scaleX(${currentTimerScale})`,
+                            transformOrigin: "left center",
+                            transition: status === 1 ? "none" : "transform 160ms ease-out",
                         }}
                     ></div>
                 </div>
