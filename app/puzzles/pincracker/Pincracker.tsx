@@ -95,15 +95,20 @@ const Pincracker: FC = () => {
 
     const focusInputOnInteraction = useCallback(() => {
         if (!isMobileOrTablet) return;
+        if (hasInteractedRef.current) return; // Only trigger once per game session
         hasInteractedRef.current = true;
         dismissMobileHint();
 
         const attemptFocus = () => focusMobileInput({ force: true });
-        attemptFocus();
-
+        
         if (typeof window !== 'undefined') {
-            window.requestAnimationFrame(attemptFocus);
-            window.setTimeout(attemptFocus, 50);
+            // Delay initial focus to avoid flash
+            window.setTimeout(() => {
+                attemptFocus();
+                window.requestAnimationFrame(attemptFocus);
+            }, 100);
+        } else {
+            attemptFocus();
         }
     }, [dismissMobileHint, focusMobileInput, isMobileOrTablet]);
 
@@ -392,26 +397,26 @@ const Pincracker: FC = () => {
 
     return (
         <>
-            <div ref={outerContainerRef} className="relative">
-            <StatHandler
-                streak={streak}
-                elapsed={elapsed}
-                setKeyDown={setAllowKeyDown}
-                minigame={
-                    {
-                        puzzle: "PinCracker",
-                        preset: (defaultDuration === timer && defaultPinLength === pinLength) ? 'Standard' : 'Custom',
-                        duration: timer,
-                        pinLength: pinLength,
+            <div className="flex flex-col gap-4">
+                <StatHandler
+                    streak={streak}
+                    elapsed={elapsed}
+                    setKeyDown={setAllowKeyDown}
+                    minigame={
+                        {
+                            puzzle: "PinCracker",
+                            preset: (defaultDuration === timer && defaultPinLength === pinLength) ? 'Standard' : 'Custom',
+                            duration: timer,
+                            pinLength: pinLength,
+                        }
                     }
-                }
-            />
-            {isMobileOrTablet && showMobileHint && (
-                <div className="mb-4 rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
-                    Tap the puzzle, then start typing to enter the code.
-                </div>
-            )}
-            <NPHackContainer
+                />
+                {isMobileOrTablet && showMobileHint && (
+                    <div className="rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
+                        Tap the puzzle, then start typing to enter the code.
+                    </div>
+                )}
+                <NPHackContainer
             title="PinCracker"
             description="Decode digits of the pin code"
             buttons={[

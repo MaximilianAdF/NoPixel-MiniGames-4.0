@@ -103,15 +103,20 @@ const Chopping: FC = () => {
 
     const focusInputOnInteraction = useCallback(() => {
         if (!isMobileOrTablet) return;
+        if (hasInteractedRef.current) return; // Only trigger once per game session
         hasInteractedRef.current = true;
         dismissMobileHint();
 
         const attemptFocus = () => focusMobileInput({ force: true });
-        attemptFocus();
-
+        
         if (typeof window !== 'undefined') {
-            window.requestAnimationFrame(attemptFocus);
-            window.setTimeout(attemptFocus, 50);
+            // Delay initial focus to avoid flash
+            window.setTimeout(() => {
+                attemptFocus();
+                window.requestAnimationFrame(attemptFocus);
+            }, 100);
+        } else {
+            attemptFocus();
         }
     }, [dismissMobileHint, focusMobileInput, isMobileOrTablet]);
 
@@ -325,7 +330,7 @@ const Chopping: FC = () => {
 
     return (
         <>
-            <div ref={outerContainerRef} className="relative">
+            <div className="flex flex-col gap-4">
                 <StatHandler
                     streak={streak}
                     elapsed={elapsed}
@@ -340,7 +345,7 @@ const Chopping: FC = () => {
                     }
                 />
                 {isMobileOrTablet && showMobileHint && (
-                    <div className="mb-4 rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
+                    <div className="rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
                         Tap the puzzle, then type the letters to play.
                     </div>
                 )}
