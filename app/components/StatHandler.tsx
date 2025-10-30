@@ -173,152 +173,128 @@ const StatHandler: FC<StatHandlerProps> = ({
                 </div>
             )}
 
-            <div className={`${streak !== undefined ? 'absolute top-0 right-0 p-5' : ''} flex flex-col-reverse items-end h-full justify-between`}>  
+            <div
+                className={classNames(
+                    streak !== undefined ? "absolute top-0 right-0 p-5" : "",
+                    "flex h-full flex-col items-end gap-3"
+                )}
+            >
+                <button
+                    type="button"
+                    className="text-spring-green-300 transition-transform duration-200 hover:scale-110 focus:outline-none"
+                    onClick={() => {
+                        setOpenUserMenu(true);
+                        if (setKeyDown) {
+                            setKeyDown(false);
+                        }
+                    }}
+                    title="User Menu"
+                    aria-label="User Menu"
+                >
+                    <FontAwesomeIcon icon={faUser} className="size-8" />
+                </button>
+
                 {streak !== undefined && (
-                    <div className="font-bold text-white">
+                    <div className="text-right font-bold text-white leading-tight">
                         <div>Highscore: {highscore}</div>
                         <div>Streak: {streak}</div>
                     </div>
                 )}
+            </div>
 
-                {/* User menu btn */}
-                <div>
-                    {/* TODO: Use more standard navbar practices like "Home" or an icon instead of "Check other minigames" */}
-                    <FontAwesomeIcon
-                        icon={faUser}
-                        className="cursor-pointer size-8 text-spring-green-300 hover:scale-110 duration-200"
+            {/* User menu */}
+            {openUserMenu && (
+                <div className="fixed inset-0 z-40">
+                    <div
+                        className="absolute inset-0 bg-black/50"
                         onClick={() => {
-                            setOpenUserMenu(!openUserMenu)
+                            setTempUsername(username);
+                            setOpenUserMenu(false);
                             if (setKeyDown) {
-                                setKeyDown(false);
+                                setKeyDown(true);
                             }
+                            setErrorMessage('');
                         }}
-                        title="User Menu"
-                    />
-                </div>
-
-                {/* User menu */}
-                {openUserMenu && (
-                    <div className="absolute h-screen w-screen top-0 right-0">
-                        <div
-                            className={classNames(
-                                `
-                                    fixed w-full h-full
-                                    top-0 left-0
-                                    bg-black/50
-                                    z-30
-                                `,
-                                openUserMenu ? "" : "hidden",
-                            )}
-                            onClick={() => {
-                                setTempUsername(username);
-                                setOpenUserMenu(false);
-                                if (setKeyDown) {
-                                    setKeyDown(true);
-                                }
-                                setErrorMessage('');
-                            }}
-                        ></div>
-                        <div className={classNames(
-                            `
-                                absolute
-                                w-[640px] max-w-[90%]
-                                p-4 gap-5
-                                top-[300px]
-                                left-[50%]
-                                my-5
-                                -translate-x-1/2
-                                flex flex-col
-                                bg-radient-circle-c
-                                from-[rgba(15,27,33,0.88)]
-                                to-[rgb(15_27_33)]
-                                [outline:3px_solid_rgb(84_255_164)]
-                                rounded-lg
-                                z-40
-                            `,
-                            openUserMenu ? "" : "hidden",
-                        )}>
-                            <div className="
-                                mb-5
-                                h-auto
-                                flex items-center justify-between
-                                gap-4
-                            ">  
-                                <div className="flex flex-col"> 
-                                    <h2 className="
+                    ></div>
+                    <div className="absolute left-1/2 top-[300px] my-5 w-[640px] max-w-[90%] -translate-x-1/2 gap-5 rounded-lg bg-radient-circle-c from-[rgba(15,27,33,0.88)] to-[rgb(15_27_33)] p-4 [outline:3px_solid_rgb(84_255_164)] z-50 flex flex-col">
+                        <div className="mb-5 flex h-auto items-center justify-between gap-4">
+                            <div className="flex flex-col">
+                                <h2 className="
                                         text-lg
                                         sm:text-2xl
                                         text-spring-green-300
                                         [text-shadow:0_0_40px_rgb(127_255_191)]
                                     ">{/*Originally, text shadow was 2.1px, but it looks much bigger on nopixel*/}
-                                        User
-                                    </h2>
-                                    <p className="text-rose-400 font-bold" style={{ height: '1em' }}>{errorMessage}</p>
-                                </div>
-                                <button onClick={() => {
+                                    User
+                                </h2>
+                                <p className="text-rose-400 font-bold" style={{ height: '1em' }}>{errorMessage}</p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
                                     setTempUsername(username);
-                                    setOpenUserMenu(false)
+                                    setOpenUserMenu(false);
                                     if (setKeyDown) {
                                         setKeyDown(true);
                                     }
-                                    }}>
-                                    <i
-                                        className="
+                                }}
+                            >
+                                <i
+                                    className="
                                             fas fa-xmark
                                             text-lg sm:text-2xl
                                             text-[rgb(94_93_93)]
                                             aspect-square
                                         "
-                                    ></i>
-                                </button>
-                            </div>
-                            <div className="flex justify-center pb-12">
-                                <div className="w-1/2 flex flex-row gap-4">
-                                    <FontAwesomeIcon
-                                        icon={faUser}
-                                        className="text-spring-green-300 size-14"
+                                ></i>
+                            </button>
+                        </div>
+                        <div className="flex justify-center pb-12">
+                            <div className="flex w-1/2 flex-row gap-4">
+                                <FontAwesomeIcon
+                                    icon={faUser}
+                                    className="text-spring-green-300 size-14"
+                                />
+                                <div className="flex flex-col gap-1">
+                                    <input
+                                        id="username-input"
+                                        className="w-full h-8 rounded-lg bg-[rgb(15_27_33)] p-2 text-white [box-shadow:0_0_2px_rgb(127_255_191)] outline-none"
+                                        type="text"
+                                        value={tempUsername}
+                                        placeholder="Enter your username..."
+                                        onChange={(e) => setTempUsername(e.target.value)}
                                     />
-                                    <div className="flex flex-col gap-1">
-                                        <input 
-                                            id="username-input"
-                                            className="w-full h-8 p-2 text-white bg-[rgb(15_27_33)] [box-shadow:0_0_2px_rgb(127_255_191)] rounded-lg outline-none"
-                                            type="text"
-                                            value={tempUsername}
-                                            placeholder="Enter your username..."
-                                            onChange={(e) => setTempUsername(e.target.value)}
-                                        />
-                                    <p className="text-gray-500 ml-2">Chracters: 3-16</p>
-                                    </div>
+                                    <p className="ml-2 text-gray-500">Chracters: 3-16</p>
                                 </div>
                             </div>
-                            <div className="flex w-full gap-1 *:flex-1">
-                                <NPButton
-                                    color="green"
-                                    onClick={() => {
-                                        handleUsernameChange();
-                                    }}
-                                >
-                                    Save
-                                </NPButton>
-                                <NPButton
-                                    color="red"
-                                    onClick={() => {
-                                        setOpenUserMenu(false);
-                                        if (setKeyDown) {
-                                            setKeyDown(true);
-                                        }
-                                        setTempUsername('');
-                                        setErrorMessage('');
-                                        setUsername('');
-                                    }}
-                                >
-                                    Remove
-                                </NPButton>
-                            </div>
+                        </div>
+                        <div className="flex w-full gap-1 *:flex-1">
+                            <NPButton
+                                color="green"
+                                onClick={() => {
+                                    handleUsernameChange();
+                                }}
+                            >
+                                Save
+                            </NPButton>
+                            <NPButton
+                                color="red"
+                                onClick={() => {
+                                    setOpenUserMenu(false);
+                                    if (setKeyDown) {
+                                        setKeyDown(true);
+                                    }
+                                    setTempUsername('');
+                                    setErrorMessage('');
+                                    setUsername('');
+                                }}
+                            >
+                                Remove
+                            </NPButton>
                         </div>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </>
     );
 }

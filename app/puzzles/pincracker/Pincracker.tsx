@@ -93,11 +93,19 @@ const Pincracker: FC = () => {
         ensureVisible();
     }, [ensureVisible, isMobileOrTablet]);
 
-    const focusInputOnInteraction = useCallback(() => {
+    const focusInputOnInteraction = useCallback((event?: React.SyntheticEvent) => {
+        if (!isMobileOrTablet) return;
+        event?.preventDefault?.();
         hasInteractedRef.current = true;
         dismissMobileHint();
-        focusMobileInput({ force: true });
-    }, [dismissMobileHint, focusMobileInput]);
+        if (typeof window !== 'undefined') {
+            window.setTimeout(() => {
+                focusMobileInput({ force: true });
+            }, 30);
+        } else {
+            focusMobileInput({ force: true });
+        }
+    }, [dismissMobileHint, focusMobileInput, isMobileOrTablet]);
 
     useEffect(() => {
         if (!isMobileOrTablet) return;

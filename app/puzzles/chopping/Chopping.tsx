@@ -101,11 +101,19 @@ const Chopping: FC = () => {
         ensureVisible();
     }, [ensureVisible, isMobileOrTablet]);
 
-    const focusInputOnInteraction = useCallback(() => {
+    const focusInputOnInteraction = useCallback((event?: React.SyntheticEvent) => {
+        if (!isMobileOrTablet) return;
+        event?.preventDefault?.();
         hasInteractedRef.current = true;
         dismissMobileHint();
-        focusMobileInput({ force: true });
-    }, [dismissMobileHint, focusMobileInput]);
+        if (typeof window !== 'undefined') {
+            window.setTimeout(() => {
+                focusMobileInput({ force: true });
+            }, 30);
+        } else {
+            focusMobileInput({ force: true });
+        }
+    }, [dismissMobileHint, focusMobileInput, isMobileOrTablet]);
 
     useEffect(() => {
         if (!isMobileOrTablet) return;
@@ -317,110 +325,113 @@ const Chopping: FC = () => {
 
     return (
         <>
-            <div ref={outerContainerRef} className="relative">
-            <StatHandler
-                streak={streak}
-                elapsed={elapsed}
-                setKeyDown={setAllowKeyDown}
-                minigame={
-                    {
-                        puzzle: "Chopping",
-                        preset: (defaultDuration === timer && defaultNumLetters === numLetters) ? 'Standard' : 'Custom',
-                        duration: timer,
-                        numLetters: numLetters,
-                    }
-                }
-            />
-            {isMobileOrTablet && showMobileHint && (
-                <div className="mb-4 rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
-                    Tap the puzzle, then type the letters to play.
-                </div>
-            )}
-            <NPHackContainer
-                title="Alphabet"
-                description="Tap the letters in order"
-                buttons={[]}
-                countdownDuration={timer*1000}
-                elapsedCallback={setElapsed}
-                resetCallback={resetGame}
-                resetDelay={3000}
-                status={gameStatus}
-                setStatus={setGameStatus}
-                statusMessage={getStatusMessage(gameStatus)}
-                settings={settings}
-            >
-                {/* Hidden input for mobile keyboard */}
-                {isMobileOrTablet && gameStatus === 1 && (
-                    <input
-                        ref={mobileInputRef}
-                        type="text"
-                        inputMode="text"
-                        autoComplete="off"
-                        autoCorrect="off"
-                        autoCapitalize="characters"
-                        className="opacity-0"
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            width: '1px',
-                            height: '1px',
-                            background: 'transparent',
-                        }}
-                        onInput={handleMobileInput}
-                        onKeyDown={handleMobileKeyDown}
-                        aria-label="Type letters here"
-                    />
+            <div className="flex flex-col gap-4">
+                {isMobileOrTablet && showMobileHint && (
+                    <div className="rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
+                        Tap the puzzle, then type the letters to play.
+                    </div>
                 )}
-                <div
-                    ref={gameWrapperRef}
-                    className="
-                    h-max w-max max-w-full
+                <div ref={outerContainerRef} className="relative">
+                    <StatHandler
+                        streak={streak}
+                        elapsed={elapsed}
+                        setKeyDown={setAllowKeyDown}
+                        minigame={
+                            {
+                                puzzle: "Chopping",
+                                preset: (defaultDuration === timer && defaultNumLetters === numLetters) ? 'Standard' : 'Custom',
+                                duration: timer,
+                                numLetters: numLetters,
+                            }
+                        }
+                    />
+                    <NPHackContainer
+                        title="Alphabet"
+                        description="Tap the letters in order"
+                        buttons={[]}
+                        countdownDuration={timer * 1000}
+                        elapsedCallback={setElapsed}
+                        resetCallback={resetGame}
+                        resetDelay={3000}
+                        status={gameStatus}
+                        setStatus={setGameStatus}
+                        statusMessage={getStatusMessage(gameStatus)}
+                        settings={settings}
+                    >
+                        {/* Hidden input for mobile keyboard */}
+                        {isMobileOrTablet && gameStatus === 1 && (
+                            <input
+                                ref={mobileInputRef}
+                                type="text"
+                                inputMode="text"
+                                autoComplete="off"
+                                autoCorrect="off"
+                                autoCapitalize="characters"
+                                className="opacity-0"
+                                style={{
+                                    position: 'fixed',
+                                    top: 0,
+                                    left: 0,
+                                    width: '1px',
+                                    height: '1px',
+                                    background: 'transparent',
+                                }}
+                                onInput={handleMobileInput}
+                                onKeyDown={handleMobileKeyDown}
+                                aria-label="Type letters here"
+                            />
+                        )}
+                        <div
+                            ref={gameWrapperRef}
+                            className="
+                    w-full max-w-[640px]
                     rounded-lg
                     bg-[rgb(22_40_52)]
                     flex items-center justify-center
                     text-white
-                    p-2 sm:p-3 md:p-4
+                    p-3 sm:p-4
+                    mx-auto
                 "
-                    onTouchStartCapture={focusInputOnInteraction}
-                    onPointerDownCapture={focusInputOnInteraction}
-                    style={{ scrollMarginTop: '15vh' }}
-                >
-                    <div className='game-grid'>
-                        {/* Dynamically create grid rows based on numLetters and defaultGridCols */}
-                        {Array.from({ length: Math.ceil(numLetters / defaultGridCols) }).map((_, rowIndex) => (
-                            <div key={rowIndex} className='game-grid-row' style={{ gridTemplateColumns: `repeat(${Math.min(numLetters - rowIndex * defaultGridCols, defaultGridCols)}, min-content)` }}>
+                            onTouchStartCapture={focusInputOnInteraction}
+                            onPointerDownCapture={focusInputOnInteraction}
+                            style={{ scrollMarginTop: '15vh' }}
+                        >
+                            <div className='game-grid'>
+                                {/* Dynamically create grid rows based on numLetters and defaultGridCols */}
+                                {Array.from({ length: Math.ceil(numLetters / defaultGridCols) }).map((_, rowIndex) => (
+                                    <div key={rowIndex} className='game-grid-row' style={{ gridTemplateColumns: `repeat(${Math.min(numLetters - rowIndex * defaultGridCols, defaultGridCols)}, min-content)` }}>
 
-                                {/* Create grid columns within each row */}
-                                {Array.from({ length: defaultGridCols }).map((_, colIndex) => {
-                                    const letterIndex = rowIndex * defaultGridCols + colIndex;
-                                    if (letterIndex < numLetters) {
-                                        const letter = board[letterIndex];
-                                        const isActive = letterIndex === activeIndex;
-                                        const isDone = stateBoard[letterIndex] === 'done';
-                                        const isFail = stateBoard[letterIndex] === 'fail';
+                                        {/* Create grid columns within each row */}
+                                        {Array.from({ length: defaultGridCols }).map((_, colIndex) => {
+                                            const letterIndex = rowIndex * defaultGridCols + colIndex;
+                                            if (letterIndex < numLetters) {
+                                                const letter = board[letterIndex];
+                                                const isActive = letterIndex === activeIndex;
+                                                const isDone = stateBoard[letterIndex] === 'done';
+                                                const isFail = stateBoard[letterIndex] === 'fail';
 
-                                        const classes = classNames("letter", {
-                                            'letter-active': isActive,
-                                            'done': isDone,
-                                            'fail': isFail,
-                                        });
+                                                const classes = classNames("letter", {
+                                                    'letter-active': isActive,
+                                                    'done': isDone,
+                                                    'fail': isFail,
+                                                });
 
-                                        return (
-                                            <div key={colIndex} className={classes} style={{ justifySelf: 'center' }}>
-                                                {letter}
-                                            </div>
-                                        );
-                                    } else {
-                                        // Stop the loop once all letters are rendered in the row
-                                        return null;
-                                    }
-                                })}
+                                                return (
+                                                    <div key={colIndex} className={classes} style={{ justifySelf: 'center' }}>
+                                                        {letter}
+                                                    </div>
+                                                );
+                                            } else {
+                                                // Stop the loop once all letters are rendered in the row
+                                                return null;
+                                            }
+                                        })}
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    </NPHackContainer>
                 </div>
-            </NPHackContainer>
             </div>
         </>
     )
