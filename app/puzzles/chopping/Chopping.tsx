@@ -55,6 +55,7 @@ const Chopping: FC = () => {
     const gameWrapperRef = useRef<HTMLDivElement>(null);
     const hintDismissedRef = useRef(false);
     const [showMobileHint, setShowMobileHint] = useState(false);
+    const skipNextInputRef = useRef(false);
 
     const ensureVisible = useCallback((behavior: ScrollBehavior = 'auto') => {
         if (!isMobileOrTablet || typeof window === 'undefined') return;
@@ -242,13 +243,38 @@ const Chopping: FC = () => {
         }, [dismissMobileHint, focusMobileInput, isMobileOrTablet]);
 
         // Handle mobile input
+    const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (gameStatus !== 1) return;
+        const { key } = e;
+
+        if (key.length === 1) {
+            skipNextInputRef.current = true;
+            e.preventDefault();
+            dismissMobileHint();
+            handleKeyDown(key.toUpperCase());
+            mobileInputRef.current && (mobileInputRef.current.value = '');
+            return;
+        }
+
+        if (key === 'Backspace') {
+            skipNextInputRef.current = true;
+            e.preventDefault();
+            mobileInputRef.current && (mobileInputRef.current.value = '');
+        }
+    };
+
     const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {
         const input = e.currentTarget;
-        const key = input.value.slice(-1); // Get last character
+        if (skipNextInputRef.current) {
+            skipNextInputRef.current = false;
+            input.value = '';
+            return;
+        }
+        const key = input.value.slice(-1);
         if (key && gameStatus === 1) {
             dismissMobileHint();
             handleKeyDown(key.toUpperCase());
-            input.value = ''; // Clear input
+            input.value = '';
             focusMobileInput();
         }
     };
@@ -296,13 +322,16 @@ const Chopping: FC = () => {
     }
 
     return (
-        <> 
-            <div ref={outerContainerRef} className="relative">
+        <>
             {isMobileOrTablet && showMobileHint && (
-                <div className="pointer-events-none absolute left-1/2 top-2 z-40 w-[85vw] max-w-sm -translate-x-1/2 rounded-full bg-mirage-900/90 px-4 py-2 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
+                <div
+                    className="pointer-events-none fixed left-1/2 z-40 w-[90vw] max-w-sm -translate-x-1/2 rounded-full bg-mirage-900/90 px-4 py-2 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40"
+                    style={{ top: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)' }}
+                >
                     Tap the puzzle, then type the letters to play.
                 </div>
             )}
+            <div ref={outerContainerRef} className="relative">
             <StatHandler
                 streak={streak}
                 elapsed={elapsed}
@@ -348,6 +377,7 @@ const Chopping: FC = () => {
                             background: 'transparent',
                         }}
                         onInput={handleMobileInput}
+                        onKeyDown={handleMobileKeyDown}
                         onBlur={focusMobileInput}
                         aria-label="Type letters here"
                         autoFocus
