@@ -46,13 +46,22 @@ const Pincracker: FC = () => {
     const mobileInputRef = useRef<HTMLInputElement>(null);
     const outerContainerRef = useRef<HTMLDivElement>(null);
     const gameWrapperRef = useRef<HTMLDivElement>(null);
-    const [keyboardOffset, setKeyboardOffset] = useState(0);
 
-    const bringGameIntoView = useCallback(() => {
-        if (!isMobileOrTablet) return;
-        const wrapper = gameWrapperRef.current;
-        if (!wrapper) return;
-        wrapper.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+    const ensureVisible = useCallback((behavior: ScrollBehavior = 'smooth') => {
+        if (!isMobileOrTablet || typeof window === 'undefined') return;
+        const container = outerContainerRef.current ?? gameWrapperRef.current;
+        if (!container) return;
+
+        const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+        const rect = container.getBoundingClientRect();
+        const topBuffer = 24;
+        const bottomBuffer = 24;
+
+        if (rect.top < topBuffer) {
+            window.scrollBy({ top: rect.top - topBuffer, behavior });
+        } else if (rect.bottom > viewportHeight - bottomBuffer) {
+            window.scrollBy({ top: rect.bottom - (viewportHeight - bottomBuffer), behavior });
+        }
     }, [isMobileOrTablet]);
 
     const focusMobileInput = useCallback(() => {
@@ -65,17 +74,17 @@ const Pincracker: FC = () => {
             input.focus();
         }
         input.setSelectionRange?.(input.value.length, input.value.length);
-        bringGameIntoView();
-    }, [bringGameIntoView, isMobileOrTablet]);
+        ensureVisible();
+    }, [ensureVisible, isMobileOrTablet]);
 
     useEffect(() => {
         if (!isMobileOrTablet) return;
         const timer = setTimeout(() => {
             focusMobileInput();
-            bringGameIntoView();
+            ensureVisible();
         }, 200);
         return () => clearTimeout(timer);
-    }, [bringGameIntoView, focusMobileInput, isMobileOrTablet]);
+    }, [ensureVisible, focusMobileInput, isMobileOrTablet]);
 
     const handleCrack = () => {
         if (activeIndex < pinLength) {
@@ -249,10 +258,8 @@ const Pincracker: FC = () => {
         const viewport = window.visualViewport;
         const handleResize = () => {
             const offset = Math.max(0, window.innerHeight - viewport.height);
-            setKeyboardOffset(offset);
-            if (offset > 0) {
-                bringGameIntoView();
-            }
+            document.body.style.paddingBottom = offset ? `${offset}px` : '';
+            ensureVisible();
         };
 
         viewport.addEventListener('resize', handleResize);
@@ -260,10 +267,11 @@ const Pincracker: FC = () => {
         handleResize();
 
         return () => {
+            document.body.style.paddingBottom = '';
             viewport.removeEventListener('resize', handleResize);
             viewport.removeEventListener('scroll', handleResize);
         };
-    }, [bringGameIntoView, isMobileOrTablet]);
+    }, [ensureVisible, isMobileOrTablet]);
 
     useEffect(() => {
         if (!isMobileOrTablet) return;
@@ -351,13 +359,7 @@ const Pincracker: FC = () => {
 
     return (
         <>
-            <div
-                ref={outerContainerRef}
-                style={{
-                    transition: 'transform 220ms ease-out',
-                    transform: keyboardOffset ? `translateY(-${Math.min(keyboardOffset * 0.7, 240)}px)` : undefined,
-                }}
-            >
+            <div ref={outerContainerRef}>
             <StatHandler
                 streak={streak}
                 elapsed={elapsed}
@@ -433,10 +435,7 @@ const Pincracker: FC = () => {
             "
                 onTouchStartCapture={focusMobileInput}
                 onPointerDownCapture={focusMobileInput}
-                style={{
-                    marginBottom: keyboardOffset ? `${keyboardOffset + 24}px` : undefined,
-                    scrollMarginTop: '15vh',
-                }}
+                style={{ scrollMarginTop: '15vh' }}
             >
                 {[...Array(pinLength)].map((_, index) => (
                 <div key={index} className="flex flex-col items-center justify-center w-3/12 h-full gap-5 sm:gap-6 md:gap-7 rounded-md wrapper">
