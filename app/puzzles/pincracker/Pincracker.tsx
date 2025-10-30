@@ -383,12 +383,7 @@ const Pincracker: FC = () => {
 
     return (
         <>
-            <div ref={outerContainerRef} className="relative">
-            {isMobileOrTablet && showMobileHint && (
-                <div className="pointer-events-none absolute left-1/2 top-2 z-40 w-[85vw] max-w-sm -translate-x-1/2 rounded-full bg-mirage-900/90 px-4 py-2 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
-                    Tap the puzzle, then start typing to enter the code.
-                </div>
-            )}
+            <div ref={outerContainerRef}>
             <StatHandler
                 streak={streak}
                 elapsed={elapsed}
@@ -402,6 +397,11 @@ const Pincracker: FC = () => {
                     }
                 }
             />
+            {isMobileOrTablet && showMobileHint && (
+                <div className="mb-4 rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
+                    Tap the puzzle, then start typing to enter the code.
+                </div>
+            )}
             <NPHackContainer
             title="PinCracker"
             description="Decode digits of the pin code"

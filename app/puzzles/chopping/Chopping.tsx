@@ -253,16 +253,6 @@ const Chopping: FC = () => {
         }
     };
 
-    const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (!gameStatus || gameStatus !== 1) return;
-        const key = e.key.length === 1 ? e.key : '';
-        if (key) {
-            dismissMobileHint();
-            handleKeyDown(key.toUpperCase());
-        }
-    };
-
-        
     useKeyDown((key?: string) => {
         if (key && gameStatus === 1 && document.activeElement?.tagName !== 'INPUT') {
             handleKeyDown(key);
@@ -358,7 +348,6 @@ const Chopping: FC = () => {
                             background: 'transparent',
                         }}
                         onInput={handleMobileInput}
-                        onKeyDown={handleMobileKeyDown}
                         onBlur={focusMobileInput}
                         aria-label="Type letters here"
                         autoFocus
