@@ -53,8 +53,10 @@ const Chopping: FC = () => {
     const mobileInputRef = useRef<HTMLInputElement>(null);
     const outerContainerRef = useRef<HTMLDivElement>(null);
     const gameWrapperRef = useRef<HTMLDivElement>(null);
+    const hintDismissedRef = useRef(false);
+    const [showMobileHint, setShowMobileHint] = useState(false);
 
-    const ensureVisible = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    const ensureVisible = useCallback((behavior: ScrollBehavior = 'auto') => {
         if (!isMobileOrTablet || typeof window === 'undefined') return;
         const container = outerContainerRef.current ?? gameWrapperRef.current;
         if (!container) return;
@@ -70,6 +72,13 @@ const Chopping: FC = () => {
             window.scrollBy({ top: rect.bottom - (viewportHeight - bottomBuffer), behavior });
         }
     }, [isMobileOrTablet]);
+
+    const dismissMobileHint = useCallback(() => {
+        if (!hintDismissedRef.current) {
+            hintDismissedRef.current = true;
+            setShowMobileHint(false);
+        }
+    }, []);
 
     const focusMobileInput = useCallback(() => {
         if (!isMobileOrTablet) return;
@@ -118,6 +127,14 @@ const Chopping: FC = () => {
     }
 
     const [gameStatus, setGameStatus, streak] = useGame(timer*1000, statusUpdateHandler);
+
+    useEffect(() => {
+        if (isMobileOrTablet && gameStatus === 1 && !hintDismissedRef.current) {
+            setShowMobileHint(true);
+        } else {
+            setShowMobileHint(false);
+        }
+    }, [gameStatus, isMobileOrTablet]);
     
 
     const resetGame = () => {
@@ -216,19 +233,32 @@ const Chopping: FC = () => {
 
         useEffect(() => {
             if (!isMobileOrTablet) return;
-            const handler = () => focusMobileInput();
+            const handler = () => {
+                dismissMobileHint();
+                focusMobileInput();
+            };
             window.addEventListener('touchstart', handler, { passive: true });
             return () => window.removeEventListener('touchstart', handler);
-        }, [focusMobileInput, isMobileOrTablet]);
+        }, [dismissMobileHint, focusMobileInput, isMobileOrTablet]);
 
         // Handle mobile input
     const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {
         const input = e.currentTarget;
         const key = input.value.slice(-1); // Get last character
         if (key && gameStatus === 1) {
+            dismissMobileHint();
             handleKeyDown(key.toUpperCase());
             input.value = ''; // Clear input
             focusMobileInput();
+        }
+    };
+
+    const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (!gameStatus || gameStatus !== 1) return;
+        const key = e.key.length === 1 ? e.key : '';
+        if (key) {
+            dismissMobileHint();
+            handleKeyDown(key.toUpperCase());
         }
     };
 
@@ -277,7 +307,12 @@ const Chopping: FC = () => {
 
     return (
         <> 
-            <div ref={outerContainerRef}>
+            <div ref={outerContainerRef} className="relative">
+            {isMobileOrTablet && showMobileHint && (
+                <div className="pointer-events-none absolute left-1/2 top-2 z-40 w-[85vw] max-w-sm -translate-x-1/2 rounded-full bg-mirage-900/90 px-4 py-2 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
+                    Tap the puzzle, then type the letters to play.
+                </div>
+            )}
             <StatHandler
                 streak={streak}
                 elapsed={elapsed}
@@ -321,9 +356,9 @@ const Chopping: FC = () => {
                             width: '1px',
                             height: '1px',
                             background: 'transparent',
-                            pointerEvents: 'none',
                         }}
                         onInput={handleMobileInput}
+                        onKeyDown={handleMobileKeyDown}
                         onBlur={focusMobileInput}
                         aria-label="Type letters here"
                         autoFocus
@@ -339,8 +374,14 @@ const Chopping: FC = () => {
                     text-white
                     p-2 sm:p-3 md:p-4
                 "
-                    onTouchStartCapture={focusMobileInput}
-                    onPointerDownCapture={focusMobileInput}
+                    onTouchStartCapture={() => {
+                        dismissMobileHint();
+                        focusMobileInput();
+                    }}
+                    onPointerDownCapture={() => {
+                        dismissMobileHint();
+                        focusMobileInput();
+                    }}
                     style={{ scrollMarginTop: '15vh' }}
                 >
                     <div className='game-grid'>
