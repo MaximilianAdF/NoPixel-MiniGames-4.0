@@ -30,8 +30,19 @@ export default function PuzzleLayout({
                 />
               </Link>
           </nav>
-          <main className="fixed inset-0 pt-16 overflow-hidden">
-              <div className="h-full w-full p-5 m-auto flex items-center justify-center">
+          <main
+            className="fixed inset-0 pt-16 overflow-hidden"
+            style={{
+              height: 'calc(100dvh - env(keyboard-inset-height, 0px))',
+              paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + env(keyboard-inset-height, 0px))',
+            }}
+          >
+              <div
+                className="h-full w-full p-5 m-auto flex items-center justify-center"
+                style={{
+                  paddingBottom: 'calc(env(keyboard-inset-height, 0px) + env(safe-area-inset-bottom, 0px))',
+                }}
+              >
                   {children}
                   {/*<div className="h-full w-full flex items-center justify-center">*/}
                   {/*{children}*/}

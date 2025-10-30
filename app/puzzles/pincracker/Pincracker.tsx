@@ -57,6 +57,12 @@ const Pincracker: FC = () => {
         input.setSelectionRange?.(input.value.length, input.value.length);
     }, [isMobileOrTablet]);
 
+    useEffect(() => {
+        if (!isMobileOrTablet) return;
+        const timer = setTimeout(focusMobileInput, 200);
+        return () => clearTimeout(timer);
+    }, [focusMobileInput, isMobileOrTablet]);
+
     const handleCrack = () => {
         if (activeIndex < pinLength) {
             // Incomplete pin
@@ -224,11 +230,12 @@ const Pincracker: FC = () => {
     }, [focusMobileInput, gameStatus, isMobileOrTablet]);
 
     // Handle mobile input
-    const handleMobileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const key = e.target.value.slice(-1);
+    const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {
+        const input = e.currentTarget;
+        const key = input.value.slice(-1);
         if (gameStatus === 1) {
             handleKeyDown(key);
-            e.target.value = '';
+            input.value = '';
             focusMobileInput();
         }
     };
@@ -352,8 +359,9 @@ const Pincracker: FC = () => {
                         width: '1px',
                         height: '1px',
                         background: 'transparent',
+                        pointerEvents: 'none',
                     }}
-                    onChange={handleMobileInput}
+                    onInput={handleMobileInput}
                     onKeyDown={handleMobileBackspace}
                     onBlur={focusMobileInput}
                     aria-label="Enter PIN digits"

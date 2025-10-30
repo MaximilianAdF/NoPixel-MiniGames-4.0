@@ -64,6 +64,12 @@ const Chopping: FC = () => {
         input.setSelectionRange?.(input.value.length, input.value.length);
     }, [isMobileOrTablet]);
 
+    useEffect(() => {
+        if (!isMobileOrTablet) return;
+        const timer = setTimeout(focusMobileInput, 200);
+        return () => clearTimeout(timer);
+    }, [focusMobileInput, isMobileOrTablet]);
+
 
     const resetBoard = () => {
         const newBoard: Letter[] = [];
@@ -165,11 +171,12 @@ const Chopping: FC = () => {
         }, [focusMobileInput, gameStatus, isMobileOrTablet]);
 
         // Handle mobile input
-    const handleMobileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const key = e.target.value.slice(-1); // Get last character
+    const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {
+        const input = e.currentTarget;
+        const key = input.value.slice(-1); // Get last character
         if (key && gameStatus === 1) {
             handleKeyDown(key);
-            e.target.value = ''; // Clear input
+            input.value = ''; // Clear input
             focusMobileInput();
         }
     };
@@ -262,8 +269,9 @@ const Chopping: FC = () => {
                             width: '1px',
                             height: '1px',
                             background: 'transparent',
+                            pointerEvents: 'none',
                         }}
-                        onChange={handleMobileInput}
+                        onInput={handleMobileInput}
                         onBlur={focusMobileInput}
                         aria-label="Type letters here"
                         autoFocus

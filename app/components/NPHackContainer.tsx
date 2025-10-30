@@ -6,6 +6,7 @@ import useTimeout from "@/app/utils/useTimeout";
 import NPSettings from "@/app/components/NPSettings";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faGear} from "@fortawesome/free-solid-svg-icons";
+import { Gamepad2 } from "lucide-react";
 
 interface NPHackContainerButton {
     label: string,
@@ -141,7 +142,11 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                             flex items-center
                             gap-2 sm:gap-4
                         ">
-                            <embed className="w-6 sm:w-8 md:w-10" src="/gamePad.svg"/>
+                            <Gamepad2
+                                aria-hidden="true"
+                                className="size-6 sm:size-8 md:size-10 text-spring-green-300"
+                                strokeWidth={1.5}
+                            />
                             <h2 className="
                                 text-base
                                 sm:text-lg
