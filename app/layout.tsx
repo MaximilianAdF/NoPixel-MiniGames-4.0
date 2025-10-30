@@ -10,14 +10,14 @@ import { Orbitron, Rajdhani, Caveat } from 'next/font/google';
 
 function Background() {
   return (
-    <div className="fixed w-screen -z-50 bg-mirage-950" style={{ 
-      top: 0, 
-      left: 0, 
-      right: 0, 
-      bottom: 0,
-      height: '100vh',
-      minHeight: '-webkit-fill-available'
-    }}>
+    <div
+      className="fixed w-screen -z-50 bg-mirage-950"
+      style={{
+        inset: 0,
+        height: '100vh',
+        minHeight: '100dvh',
+      }}
+    >
       <Image
         alt=""
         src={background}
@@ -158,6 +158,10 @@ export default function RootLayout({
     <html lang="en" className={`overscroll-y-none ${orbitron.variable} ${rajdhani.variable} ${caveat.variable}`} style={{ background: '#020617', minHeight: '100dvh' }}>
       <head>
         <meta name="theme-color" content="#020617" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="color-scheme" content="dark" />
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8849653057967400"

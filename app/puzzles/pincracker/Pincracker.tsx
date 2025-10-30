@@ -206,6 +206,20 @@ const Pincracker: FC = () => {
         }
     }, ['1','2','3','4','5','6','7','8','9','0', 'Backspace', 'Enter'], allowKeyDown);
 
+    useEffect(() => {
+        if (!isMobileOrTablet || gameStatus !== 1) return;
+        focusMobileInput();
+        const raf = requestAnimationFrame(focusMobileInput);
+        const timeout = setTimeout(focusMobileInput, 250);
+        const visibilityHandler = () => focusMobileInput();
+        document.addEventListener('visibilitychange', visibilityHandler);
+        return () => {
+            cancelAnimationFrame(raf);
+            clearTimeout(timeout);
+            document.removeEventListener('visibilitychange', visibilityHandler);
+        };
+    }, [focusMobileInput, gameStatus, isMobileOrTablet]);
+
     // Handle mobile input
     const handleMobileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const key = e.target.value.slice(-1);
@@ -344,7 +358,10 @@ const Pincracker: FC = () => {
                 text-white text-6xl sm:text-7xl md:text-8xl
                 px-3 sm:px-5 md:px-6
                 mx-auto
-            ">
+            "
+                onTouchStartCapture={focusMobileInput}
+                onPointerDownCapture={focusMobileInput}
+            >
                 {[...Array(pinLength)].map((_, index) => (
                 <div key={index} className="flex flex-col items-center justify-center w-3/12 h-full gap-5 sm:gap-6 md:gap-7 rounded-md wrapper">
                     <div className='h-20 sm:h-24 md:h-28 digit'></div>
