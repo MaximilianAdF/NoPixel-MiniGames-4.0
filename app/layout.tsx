@@ -10,7 +10,14 @@ import { Orbitron, Rajdhani, Caveat } from 'next/font/google';
 
 function Background() {
   return (
-    <div className="fixed h-screen w-screen -z-50 bg-mirage-950">
+    <div className="fixed w-screen -z-50 bg-mirage-950" style={{ 
+      top: 0, 
+      left: 0, 
+      right: 0, 
+      bottom: 0,
+      height: '100vh',
+      minHeight: '-webkit-fill-available'
+    }}>
       <Image
         alt=""
         src={background}

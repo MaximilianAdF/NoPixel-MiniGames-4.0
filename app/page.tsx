@@ -545,7 +545,7 @@ export default function Home() {
                     <div 
                       className="relative overflow-hidden rounded-lg bg-gradient-to-br from-mirage-900/50 via-mirage-900/40 to-mirage-800/50 backdrop-blur-md border border-spring-green-500/20 hover:border-spring-green-400/60 transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-spring-green-500/20 hover:-translate-y-2"
                       style={{ 
-                        height: '320px',
+                        minHeight: '320px',
                         display: 'flex',
                         flexDirection: 'column',
                         animation: `fadeSlideIn 600ms ease-out ${index * 100}ms forwards`,

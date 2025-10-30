@@ -32,6 +32,23 @@
     /* Prevent iOS text size adjustment */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    position: relative;
+  }
+  
+  /* Pseudo-element to force background behind safe areas on iOS */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: #020617;
+    z-index: -100;
+    pointer-events: none;
   }
   
   /* Prevent iOS from scaling up icons and SVGs */
