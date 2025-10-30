@@ -30,7 +30,7 @@ export default function PuzzleLayout({
                 />
               </Link>
           </nav>
-          <main className="absolute h-screen w-screen pt-16">
+          <main className="fixed inset-0 pt-16 overflow-hidden">
               <div className="h-full w-full p-5 m-auto flex items-center justify-center">
                   {children}
                   {/*<div className="h-full w-full flex items-center justify-center">*/}

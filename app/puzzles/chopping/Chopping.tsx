@@ -137,16 +137,6 @@ const Chopping: FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [numLetters, timer]);
 
-    // Auto-focus mobile input when game is running
-    useEffect(() => {
-        if (isMobileOrTablet && gameStatus === 1 && mobileInputRef.current) {
-            // Small delay to ensure DOM is ready
-            setTimeout(() => {
-                mobileInputRef.current?.focus();
-            }, 100);
-        }
-    }, [gameStatus, isMobileOrTablet]);
-
     // Handle mobile input
     const handleMobileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const key = e.target.value.slice(-1); // Get last character
@@ -240,6 +230,7 @@ const Chopping: FC = () => {
                         style={{ position: 'absolute', left: '-9999px' }}
                         onChange={handleMobileInput}
                         aria-label="Type letters here"
+                        autoFocus
                     />
                 )}
                 <div className="

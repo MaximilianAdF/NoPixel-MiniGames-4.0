@@ -194,15 +194,6 @@ const Pincracker: FC = () => {
         }
     }, ['1','2','3','4','5','6','7','8','9','0', 'Backspace', 'Enter'], allowKeyDown);
 
-    // Auto-focus mobile input when game is running
-    useEffect(() => {
-        if (isMobileOrTablet && gameStatus === 1 && mobileInputRef.current) {
-            setTimeout(() => {
-                mobileInputRef.current?.focus();
-            }, 100);
-        }
-    }, [gameStatus, isMobileOrTablet]);
-
     // Handle mobile input
     const handleMobileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const key = e.target.value.slice(-1);
@@ -328,6 +319,7 @@ const Pincracker: FC = () => {
                     onChange={handleMobileInput}
                     onKeyDown={handleMobileBackspace}
                     aria-label="Enter PIN digits"
+                    autoFocus
                 />
             )}
             <div className="

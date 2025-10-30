@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from 'next/font/local'
 import "./globals.css";
 import Image from 'next/image'
@@ -139,13 +139,14 @@ export const metadata: Metadata = {
   verification: {
     google: "cafrsYUjNLn9L2Y6ssoK0Ip1nnONFp2xMWe622VyCyE",
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: 'cover', // This allows content to extend into safe areas
-  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover', // This allows content to extend into safe areas
 };
 
 export default function RootLayout({
