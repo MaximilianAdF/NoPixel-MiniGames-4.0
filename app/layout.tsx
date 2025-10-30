@@ -147,8 +147,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950 overscroll-y-none ${orbitron.variable} ${rajdhani.variable} ${caveat.variable}`} style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+    <html lang="en" className={`overscroll-y-none ${orbitron.variable} ${rajdhani.variable} ${caveat.variable}`} style={{ background: '#020617', minHeight: '100dvh' }}>
       <head>
+        <meta name="theme-color" content="#020617" />
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8849653057967400"
@@ -156,7 +157,14 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
       </head>
-      <body className={`${gilroy.className} bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950 overscroll-y-none`} style={{ minHeight: '100vh', paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <body className={`${gilroy.className} overscroll-y-none`} style={{ 
+        minHeight: '100dvh',
+        background: 'linear-gradient(to bottom right, #020617, #1e293b, #020617)',
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        paddingLeft: 'env(safe-area-inset-left, 0px)',
+        paddingRight: 'env(safe-area-inset-right, 0px)'
+      }}>
         <Background />
         {children}
         <Analytics />

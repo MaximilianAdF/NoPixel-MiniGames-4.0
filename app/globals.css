@@ -9,11 +9,15 @@
     --safe-area-inset-bottom: env(safe-area-inset-bottom);
     --safe-area-inset-left: env(safe-area-inset-left);
     --safe-area-inset-right: env(safe-area-inset-right);
+    
+    /* Dark background color that matches the site */
+    --bg-color: #020617;
   }
   
-  /* Ensure body extends into safe areas with proper background */
+  /* Force dark background on html and body to cover safe areas */
   html {
-    background: linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a);
+    background: #020617 !important;
+    background: linear-gradient(to bottom right, #020617, #1e293b, #020617) !important;
     /* Prevent iOS text size adjustment */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
@@ -21,7 +25,10 @@
   
   body {
     min-height: 100vh;
+    min-height: 100dvh;
     min-height: -webkit-fill-available;
+    background: #020617 !important;
+    background: linear-gradient(to bottom right, #020617, #1e293b, #020617) !important;
     /* Prevent iOS text size adjustment */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
