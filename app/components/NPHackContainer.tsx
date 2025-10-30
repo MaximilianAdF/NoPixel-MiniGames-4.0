@@ -160,16 +160,17 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                                 {description}
                             </p>
                         </div>
-                        {settings && <div className="h-full flex aspect-square justify-center items-center p-1 mr-4 sm:mr-7">
+                        {settings && <div className="flex justify-center items-center p-1 mr-4 sm:mr-7 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 shrink-0">
                             <FontAwesomeIcon
                                 icon={faGear}
                                 className="
-                                    size-full
+                                    w-full h-full
                                     text-gray-500
                                     hover:rotate-90 hover:scale-110 hover:cursor-pointer
                                     active:scale-95
                                     transition-transform
                                 "
+                                style={{ WebkitTextSizeAdjust: '100%', textSizeAdjust: '100%' }}
                                 onClick={() => setSettingsVisible(true)}
                                 title={"Open Settings"}
                             />

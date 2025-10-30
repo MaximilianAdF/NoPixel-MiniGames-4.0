@@ -14,11 +14,23 @@
   /* Ensure body extends into safe areas with proper background */
   html {
     background: linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a);
+    /* Prevent iOS text size adjustment */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
   
   body {
     min-height: 100vh;
     min-height: -webkit-fill-available;
+    /* Prevent iOS text size adjustment */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  /* Prevent iOS from scaling up icons and SVGs */
+  svg, img {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 }
 
