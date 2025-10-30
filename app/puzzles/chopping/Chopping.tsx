@@ -6,7 +6,7 @@ import usePersistantState from "@/app/utils/usePersistentState";
 import NPHackContainer from "@/app/components/NPHackContainer";
 import { NPSettingsRange } from "@/app/components/NPSettings";
 import StatHandler from "@/app/components/StatHandler";
-import React, { FC, useEffect, useState, useRef } from "react";
+import React, { FC, useEffect, useState, useRef, useCallback } from "react";
 import { useKeyDown } from "@/app/utils/useKeyDown";
 import useGame from "@/app/utils/useGame";
 import classNames from "classnames";
@@ -51,6 +51,18 @@ const Chopping: FC = () => {
     const [elapsed, setElapsed] = useState(0);
     const isMobileOrTablet = useIsMobileOrTablet();
     const mobileInputRef = useRef<HTMLInputElement>(null);
+
+    const focusMobileInput = useCallback(() => {
+        if (!isMobileOrTablet) return;
+        const input = mobileInputRef.current;
+        if (!input) return;
+        try {
+            input.focus({ preventScroll: true });
+        } catch {
+            input.focus();
+        }
+        input.setSelectionRange?.(input.value.length, input.value.length);
+    }, [isMobileOrTablet]);
 
 
     const resetBoard = () => {
@@ -135,9 +147,23 @@ const Chopping: FC = () => {
             resetGame();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [numLetters, timer]);
+        }, [numLetters, timer]);
 
-    // Handle mobile input
+        useEffect(() => {
+            if (!isMobileOrTablet || gameStatus !== 1) return;
+            focusMobileInput();
+            const raf = requestAnimationFrame(focusMobileInput);
+            const timeout = setTimeout(focusMobileInput, 250);
+            const visibilityHandler = () => focusMobileInput();
+            document.addEventListener('visibilitychange', visibilityHandler);
+            return () => {
+                cancelAnimationFrame(raf);
+                clearTimeout(timeout);
+                document.removeEventListener('visibilitychange', visibilityHandler);
+            };
+        }, [focusMobileInput, gameStatus, isMobileOrTablet]);
+
+        // Handle mobile input
     const handleMobileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const key = e.target.value.slice(-1); // Get last character
         if (key && gameStatus === 1) {
@@ -240,7 +266,10 @@ const Chopping: FC = () => {
                     flex items-center justify-center
                     text-white
                     p-2 sm:p-3 md:p-4
-                ">
+                "
+                    onTouchStartCapture={focusMobileInput}
+                    onPointerDownCapture={focusMobileInput}
+                >
                     <div className='game-grid'>
                         {/* Dynamically create grid rows based on numLetters and defaultGridCols */}
                         {Array.from({ length: Math.ceil(numLetters / defaultGridCols) }).map((_, rowIndex) => (

@@ -4,7 +4,7 @@ import { checkBeepPlayer, successPlayer } from "@/public/audio/AudioManager";
 import { Digit, Digits } from "@/app/puzzles/pincracker/utils";
 import NPHackContainer from "@/app/components/NPHackContainer";
 import { NPSettingsRange } from "@/app/components/NPSettings";
-import React, { FC, useEffect, useState, useRef } from "react";
+import React, { FC, useEffect, useState, useRef, useCallback } from "react";
 import usePersistantState from "@/app/utils/usePersistentState";
 import { useKeyDown } from "@/app/utils/useKeyDown";
 import useGame from "@/app/utils/useGame";
@@ -44,6 +44,18 @@ const Pincracker: FC = () => {
     const [elapsed, setElapsed] = useState(0);
     const isMobileOrTablet = useIsMobileOrTablet();
     const mobileInputRef = useRef<HTMLInputElement>(null);
+
+    const focusMobileInput = useCallback(() => {
+        if (!isMobileOrTablet) return;
+        const input = mobileInputRef.current;
+        if (!input) return;
+        try {
+            input.focus({ preventScroll: true });
+        } catch {
+            input.focus();
+        }
+        input.setSelectionRange?.(input.value.length, input.value.length);
+    }, [isMobileOrTablet]);
 
     const handleCrack = () => {
         if (activeIndex < pinLength) {
