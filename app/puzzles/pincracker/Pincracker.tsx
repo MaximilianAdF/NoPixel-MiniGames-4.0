@@ -468,6 +468,13 @@ const Pincracker: FC = () => {
                     }}
                     onInput={handleMobileInput}
                     onKeyDown={handleMobileBackspace}
+                    onBlur={(e) => {
+                        // Prevent keyboard from closing when tapping the game
+                        if (gameStatus === 1) {
+                            e.preventDefault();
+                            e.target.focus();
+                        }
+                    }}
                     aria-label="Enter PIN digits"
                 />
             )}

@@ -393,13 +393,21 @@ const Chopping: FC = () => {
                                 }}
                                 onInput={handleMobileInput}
                                 onKeyDown={handleMobileKeyDown}
+                                onBlur={(e) => {
+                                    // Prevent keyboard from closing when tapping the game
+                                    if (gameStatus === 1) {
+                                        e.preventDefault();
+                                        e.target.focus();
+                                    }
+                                }}
                                 aria-label="Type letters here"
                             />
                         )}
                         <div
                             ref={gameWrapperRef}
                             className="
-                    w-full max-w-[640px]
+                    min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px]
+                    w-full max-w-full
                     rounded-lg
                     bg-[rgb(22_40_52)]
                     flex items-center justify-center
