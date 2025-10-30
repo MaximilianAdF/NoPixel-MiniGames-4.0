@@ -1,20 +1,6 @@
 :root {
   --grid-columns: 6; /* unused, fallback */
   --grid-rows: 3; /* unused, fallback */
-  --letter-size: calc(48vh / var(--grid-columns));
-}
-
-/* Mobile & Tablet responsive letter sizing at root level */
-@media (max-width: 1023px) {
-  :root {
-    --letter-size: min(calc(70vw / 6), calc(42vh / 4), 45px);
-  }
-}
-
-@media (min-width: 1024px) {
-  :root {
-    --letter-size: min(calc(75vw / 6), calc(60vh / 4), 80px);
-  }
 }
 
 .hack-box-container {
@@ -22,40 +8,46 @@
 }
 
 .game-grid {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  grid-template-rows: repeat(var(--grid-rows), 1fr);
-  gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
   z-index: 1;
-  max-width: 100%;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
 .game-grid-row {
-  display: grid;
+  display: flex;
   justify-content: center;
-  grid-template-columns: repeat(var(--grid-columns), 1fr);
-  grid-template-rows: repeat(1, 1fr);
-  gap: 0.5rem;
+  align-items: center;
+  gap: 1rem;
   z-index: 1;
-  max-width: 100%;
 }
 
 /* Mobile & Tablet: Additional constraints to prevent overflow */
 @media (max-width: 1023px) {
   .game-grid {
-    gap: 0.15rem;
-    max-width: 88vw;
-    padding: 0.5rem;
+    gap: 0.3rem;
+    padding: 0;
   }
   
   .game-grid-row {
-    gap: 0.15rem;
+    gap: 0.3rem;
   }
+}
 
-  .letter {
-    font-size: 0.8rem;
-    padding: 0.2rem;
+/* Extra small devices */
+@media (max-width: 480px) {
+  .game-grid {
+    gap: 0.2rem;
+    padding: 0;
+  }
+  
+  .game-grid-row {
+    gap: 0.2rem;
   }
 }
 
@@ -148,51 +140,70 @@
 }
 
 .letter {
-  /*box-sizing: border-box;*/
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  width: var(--letter-size);
-  height: var(--letter-size);
-  color: rgb(112, 193, 255);
-  border: 0.125rem solid rgba(112, 193, 255, 0.4);
-  border-radius: 5px;
-  z-index: 1;
+  font-size: 3rem;
+  font-weight: 500;
+  width: 6rem;
+  height: 6rem;
   flex-shrink: 0;
-  max-width: 100%;
+  color: rgb(112, 193, 255);
+  border: 0.125rem solid rgba(112, 193, 255, 0.25);
+  border-radius: 8px;
+  background: rgba(22, 40, 52, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 1;
   box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
 /* Mobile responsive font sizing */
 @media (max-width: 1023px) {
   .letter {
-    font-size: 0.8rem;
-    border: 0.0625rem solid rgba(112, 193, 255, 0.4);
-    border-radius: 3px;
-    padding: 0.2rem;
+    font-size: clamp(1.4rem, 5vw, 2rem);
+    width: clamp(2.8rem, 14vw, 4rem);
+    height: clamp(2.8rem, 14vw, 4rem);
+    border: 0.1rem solid rgba(112, 193, 255, 0.25);
+    border-radius: 6px;
   }
   
   .letter.done {
-    border: 0.0625rem solid rgba(84, 255, 164, 0.4);
+    border: 0.1rem solid rgba(48, 221, 189, 0.4);
+    box-shadow: 0 0 15px rgba(48, 221, 189, 0.3);
   }
   
   .letter.fail {
-    border: 0.0625rem solid rgba(255, 84, 84, 0.4);
+    border: 0.1rem solid rgba(255, 84, 84, 0.4);
+    box-shadow: 0 0 15px rgba(255, 84, 84, 0.3);
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .letter {
+    font-size: clamp(1.2rem, 4.5vw, 1.6rem);
+    width: clamp(2.5rem, 13vw, 3.2rem);
+    height: clamp(2.5rem, 13vw, 3.2rem);
   }
 }
 
 .letter.done {
-  color: rgb(84, 255, 164);
-  border: 0.125rem solid rgba(84, 255, 164, 0.4);
-  background-color: rgba(84, 255, 164, 0.05);
+  color: rgb(48, 221, 189);
+  border: 0.125rem solid rgba(48, 221, 189, 0.4);
+  background: rgba(48, 221, 189, 0.12);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 20px rgba(48, 221, 189, 0.4), inset 0 0 15px rgba(48, 221, 189, 0.1);
+  text-shadow: 0 0 10px rgba(48, 221, 189, 0.6);
 }
 
 .letter.fail {
   color: rgb(255, 84, 84);
   border: 0.125rem solid rgba(255, 84, 84, 0.4);
-  background-color: rgba(255, 84, 84, 0.05);
-
+  background: rgba(255, 84, 84, 0.12);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 20px rgba(255, 84, 84, 0.4), inset 0 0 15px rgba(255, 84, 84, 0.1);
+  text-shadow: 0 0 10px rgba(255, 84, 84, 0.6);
 }
 
 .overlay {

@@ -1,4 +1,5 @@
 import React, {FC, useEffect, useState} from "react";
+import { gilroyNpTitle } from "@/app/fonts";
 import NPButton from "@/app/components/NPButton";
 import classNames from "classnames";
 import {useCountdown} from "@/app/utils/useCountdown";
@@ -6,10 +7,8 @@ import useTimeout from "@/app/utils/useTimeout";
 import NPSettings from "@/app/components/NPSettings";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faGear} from "@fortawesome/free-solid-svg-icons";
-import { Gamepad2 } from "lucide-react";
-import type { LucideProps } from "lucide-react";
-
-const GamepadIcon = Gamepad2 as unknown as FC<LucideProps>;
+import Image from "next/image";
+import gamePadIcon from '@/public/gamePad.svg';
 
 interface NPHackContainerButton {
     label: string,
@@ -134,18 +133,22 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                             flex items-center
                             gap-2 sm:gap-4
                         ">
-                            <GamepadIcon
-                                aria-hidden="true"
-                                className="size-6 sm:size-8 md:size-10 text-spring-green-300"
-                                strokeWidth={1.5}
+                            <Image
+                                src={gamePadIcon}
+                                alt="Gamepad"
+                                className="size-6 sm:size-8 md:size-10"
+                                style={{ filter: 'brightness(0) saturate(100%) invert(54%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(88%) contrast(88%)' }}
+                                width={32}
+                                height={32}
                             />
-                            <h2 className="
+                            <h2 className={`
                                 text-base
                                 sm:text-lg
                                 md:text-2xl
                                 text-spring-green-300
-                                [text-shadow:0_0_40px_rgb(127_255_191)]
-                            ">{/*Originally, text shadow was 2.1px, but it looks much bigger on nopixel*/}
+                                [text-shadow:0_0_2px_rgb(127_255_191)]
+                                ${gilroyNpTitle.className}
+                            `}>
                                 {title}
                             </h2>
                             <p className="

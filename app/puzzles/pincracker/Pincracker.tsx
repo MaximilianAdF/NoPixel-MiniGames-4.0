@@ -299,7 +299,16 @@ const Pincracker: FC = () => {
         const handleResize = () => {
             const offset = Math.max(0, window.innerHeight - viewport.height);
             document.body.style.paddingBottom = offset ? `${offset}px` : '';
-            ensureVisible();
+            
+            // When keyboard opens, scroll the game into view
+            if (offset > 100) {
+                requestAnimationFrame(() => {
+                    const container = gameWrapperRef.current;
+                    if (container) {
+                        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            }
         };
 
         viewport.addEventListener('resize', handleResize);
@@ -311,7 +320,7 @@ const Pincracker: FC = () => {
             viewport.removeEventListener('resize', handleResize);
             viewport.removeEventListener('scroll', handleResize);
         };
-    }, [ensureVisible, isMobileOrTablet]);
+    }, [isMobileOrTablet]);
 
     // Handle mobile input
     const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {

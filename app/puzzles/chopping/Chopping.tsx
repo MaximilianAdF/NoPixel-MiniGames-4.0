@@ -233,28 +233,35 @@ const Chopping: FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [numLetters, timer]);
 
-        useEffect(() => {
-            if (!isMobileOrTablet || typeof window === 'undefined' || !window.visualViewport) return;
+    useEffect(() => {
+        if (!isMobileOrTablet || typeof window === 'undefined' || !window.visualViewport) return;
 
-            const viewport = window.visualViewport;
-            const handleResize = () => {
-                const offset = Math.max(0, window.innerHeight - viewport.height);
-                document.body.style.paddingBottom = offset ? `${offset}px` : '';
-                ensureVisible();
-            };
+        const viewport = window.visualViewport;
+        const handleResize = () => {
+            const offset = Math.max(0, window.innerHeight - viewport.height);
+            document.body.style.paddingBottom = offset ? `${offset}px` : '';
+            
+            // When keyboard opens, scroll the game into view
+            if (offset > 100) {
+                requestAnimationFrame(() => {
+                    const container = gameWrapperRef.current;
+                    if (container) {
+                        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            }
+        };
 
-            viewport.addEventListener('resize', handleResize);
-            viewport.addEventListener('scroll', handleResize);
-            handleResize();
+        viewport.addEventListener('resize', handleResize);
+        viewport.addEventListener('scroll', handleResize);
+        handleResize();
 
-            return () => {
-                document.body.style.paddingBottom = '';
-                viewport.removeEventListener('resize', handleResize);
-                viewport.removeEventListener('scroll', handleResize);
-            };
-        }, [ensureVisible, isMobileOrTablet]);
-
-        // Handle mobile input
+        return () => {
+            document.body.style.paddingBottom = '';
+            viewport.removeEventListener('resize', handleResize);
+            viewport.removeEventListener('scroll', handleResize);
+        };
+    }, [isMobileOrTablet]);        // Handle mobile input
     const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (gameStatus !== 1) return;
         const { key } = e;
@@ -408,18 +415,19 @@ const Chopping: FC = () => {
                             className="
                     min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px]
                     w-full max-w-full
+                    h-full
                     rounded-lg
                     bg-[rgb(22_40_52)]
                     flex items-center justify-center
                     text-white
-                    p-3 sm:p-4
+                    p-1 sm:p-4
                     mx-auto
                 "
                             onTouchStartCapture={focusInputOnInteraction}
                             onPointerDownCapture={focusInputOnInteraction}
                             style={{ scrollMarginTop: '15vh' }}
                         >
-                            <div className='game-grid'>
+                            <div className='game-grid' style={{ height: '100%', width: '100%' }}>
                                 {/* Dynamically create grid rows based on numLetters and defaultGridCols */}
                                 {Array.from({ length: Math.ceil(numLetters / defaultGridCols) }).map((_, rowIndex) => (
                                     <div key={rowIndex} className='game-grid-row' style={{ gridTemplateColumns: `repeat(${Math.min(numLetters - rowIndex * defaultGridCols, defaultGridCols)}, min-content)` }}>

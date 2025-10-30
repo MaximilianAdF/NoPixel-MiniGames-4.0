@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import localFont from 'next/font/local'
+import { gilroy, gilroyNpTitle } from './fonts';
 import "./globals.css";
 import Image from 'next/image'
 import background from '../public/images/bg.png'
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import dynamic from 'next/dynamic';
 import Script from 'next/script';
 import { Orbitron, Rajdhani, Caveat } from 'next/font/google';
 
@@ -32,16 +32,7 @@ function Background() {
   )
 }
 
-const gilroy = localFont({
-  src: [
-    {
-      path: '../fonts/Gilroy-Regular.ttf',
-      weight: '400',
-      style: 'normal',
-    },
-  ],
-  variable: '--font-gilroy',
-});
+// fonts are now loaded from app/fonts.ts
 
 const orbitron = Orbitron({
   weight: '900',
@@ -149,6 +140,9 @@ export const viewport: Viewport = {
   viewportFit: 'cover', // This allows content to extend into safe areas
 };
 
+  // exported fonts moved to app/fonts.ts to avoid importing layout into client bundles
+const AppAnalytics = dynamic(() => import('./components/AppAnalytics'), { ssr: false });
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -157,7 +151,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`overscroll-y-none ${orbitron.variable} ${rajdhani.variable} ${caveat.variable}`}
+      className={`overscroll-y-none ${orbitron.variable} ${rajdhani.variable} ${caveat.variable} ${gilroyNpTitle.variable}`}
       style={{
         backgroundColor: '#020617',
         backgroundImage: 'linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%)',
@@ -191,8 +185,7 @@ export default function RootLayout({
       >
         <Background />
         {children}
-        <Analytics />
-        <SpeedInsights />
+        <AppAnalytics />
       </body>
     </html>
   );
