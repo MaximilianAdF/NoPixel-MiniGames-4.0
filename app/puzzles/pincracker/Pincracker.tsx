@@ -44,6 +44,7 @@ const Pincracker: FC = () => {
     const [elapsed, setElapsed] = useState(0);
     const isMobileOrTablet = useIsMobileOrTablet();
     const mobileInputRef = useRef<HTMLInputElement>(null);
+    const outerContainerRef = useRef<HTMLDivElement>(null);
     const gameWrapperRef = useRef<HTMLDivElement>(null);
     const [keyboardOffset, setKeyboardOffset] = useState(0);
 
@@ -264,12 +265,19 @@ const Pincracker: FC = () => {
         };
     }, [bringGameIntoView, isMobileOrTablet]);
 
+    useEffect(() => {
+        if (!isMobileOrTablet) return;
+        const handler = () => focusMobileInput();
+        window.addEventListener('touchstart', handler, { passive: true });
+        return () => window.removeEventListener('touchstart', handler);
+    }, [focusMobileInput, isMobileOrTablet]);
+
     // Handle mobile input
     const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {
         const input = e.currentTarget;
         const key = input.value.slice(-1);
         if (gameStatus === 1) {
-            handleKeyDown(key);
+            handleKeyDown(key.toString());
             input.value = '';
             focusMobileInput();
         }
@@ -343,6 +351,13 @@ const Pincracker: FC = () => {
 
     return (
         <>
+            <div
+                ref={outerContainerRef}
+                style={{
+                    transition: 'transform 220ms ease-out',
+                    transform: keyboardOffset ? `translateY(-${Math.min(keyboardOffset * 0.7, 240)}px)` : undefined,
+                }}
+            >
             <StatHandler
                 streak={streak}
                 elapsed={elapsed}
@@ -431,6 +446,7 @@ const Pincracker: FC = () => {
                 ))}
             </div>
             </NPHackContainer>
+            </div>
         </>
     );
 }

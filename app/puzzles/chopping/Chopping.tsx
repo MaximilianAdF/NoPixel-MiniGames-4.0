@@ -51,6 +51,7 @@ const Chopping: FC = () => {
     const [elapsed, setElapsed] = useState(0);
     const isMobileOrTablet = useIsMobileOrTablet();
     const mobileInputRef = useRef<HTMLInputElement>(null);
+    const outerContainerRef = useRef<HTMLDivElement>(null);
     const gameWrapperRef = useRef<HTMLDivElement>(null);
     const [keyboardOffset, setKeyboardOffset] = useState(0);
 
@@ -205,12 +206,19 @@ const Chopping: FC = () => {
             };
         }, [bringGameIntoView, isMobileOrTablet]);
 
+        useEffect(() => {
+            if (!isMobileOrTablet) return;
+            const handler = () => focusMobileInput();
+            window.addEventListener('touchstart', handler, { passive: true });
+            return () => window.removeEventListener('touchstart', handler);
+        }, [focusMobileInput, isMobileOrTablet]);
+
         // Handle mobile input
     const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {
         const input = e.currentTarget;
         const key = input.value.slice(-1); // Get last character
         if (key && gameStatus === 1) {
-            handleKeyDown(key);
+            handleKeyDown(key.toUpperCase());
             input.value = ''; // Clear input
             focusMobileInput();
         }
@@ -260,7 +268,14 @@ const Chopping: FC = () => {
     }
 
     return (
-        <>
+        <> 
+            <div
+                ref={outerContainerRef}
+                style={{
+                    transition: 'transform 220ms ease-out',
+                    transform: keyboardOffset ? `translateY(-${Math.min(keyboardOffset * 0.7, 240)}px)` : undefined,
+                }}
+            >
             <StatHandler
                 streak={streak}
                 elapsed={elapsed}
@@ -364,6 +379,7 @@ const Chopping: FC = () => {
                     </div>
                 </div>
             </NPHackContainer>
+            </div>
         </>
     )
 
