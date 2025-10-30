@@ -101,17 +101,17 @@ const Chopping: FC = () => {
         ensureVisible();
     }, [ensureVisible, isMobileOrTablet]);
 
-    const focusInputOnInteraction = useCallback((event?: React.SyntheticEvent) => {
+    const focusInputOnInteraction = useCallback(() => {
         if (!isMobileOrTablet) return;
-        event?.preventDefault?.();
         hasInteractedRef.current = true;
         dismissMobileHint();
+
+        const attemptFocus = () => focusMobileInput({ force: true });
+        attemptFocus();
+
         if (typeof window !== 'undefined') {
-            window.setTimeout(() => {
-                focusMobileInput({ force: true });
-            }, 30);
-        } else {
-            focusMobileInput({ force: true });
+            window.requestAnimationFrame(attemptFocus);
+            window.setTimeout(attemptFocus, 50);
         }
     }, [dismissMobileHint, focusMobileInput, isMobileOrTablet]);
 
@@ -325,27 +325,26 @@ const Chopping: FC = () => {
 
     return (
         <>
-            <div className="flex flex-col gap-4">
+            <div ref={outerContainerRef} className="relative">
+                <StatHandler
+                    streak={streak}
+                    elapsed={elapsed}
+                    setKeyDown={setAllowKeyDown}
+                    minigame={
+                        {
+                            puzzle: "Chopping",
+                            preset: (defaultDuration === timer && defaultNumLetters === numLetters) ? 'Standard' : 'Custom',
+                            duration: timer,
+                            numLetters: numLetters,
+                        }
+                    }
+                />
                 {isMobileOrTablet && showMobileHint && (
-                    <div className="rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
+                    <div className="mb-4 rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
                         Tap the puzzle, then type the letters to play.
                     </div>
                 )}
-                <div ref={outerContainerRef} className="relative">
-                    <StatHandler
-                        streak={streak}
-                        elapsed={elapsed}
-                        setKeyDown={setAllowKeyDown}
-                        minigame={
-                            {
-                                puzzle: "Chopping",
-                                preset: (defaultDuration === timer && defaultNumLetters === numLetters) ? 'Standard' : 'Custom',
-                                duration: timer,
-                                numLetters: numLetters,
-                            }
-                        }
-                    />
-                    <NPHackContainer
+                <NPHackContainer
                         title="Alphabet"
                         description="Tap the letters in order"
                         buttons={[]}
@@ -430,8 +429,7 @@ const Chopping: FC = () => {
                                 ))}
                             </div>
                         </div>
-                    </NPHackContainer>
-                </div>
+                </NPHackContainer>
             </div>
         </>
     )
