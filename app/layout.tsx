@@ -132,6 +132,13 @@ export const metadata: Metadata = {
   verification: {
     google: "cafrsYUjNLn9L2Y6ssoK0Ip1nnONFp2xMWe622VyCyE",
   },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    viewportFit: 'cover', // This allows content to extend into safe areas
+  },
 };
 
 export default function RootLayout({
@@ -140,7 +147,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950 overscroll-y-none ${orbitron.variable} ${rajdhani.variable} ${caveat.variable}`}>
+    <html lang="en" className={`bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950 overscroll-y-none ${orbitron.variable} ${rajdhani.variable} ${caveat.variable}`} style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       <head>
         <Script
           async
@@ -149,7 +156,7 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
       </head>
-      <body className={`${gilroy.className} bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950 overscroll-y-none`}>
+      <body className={`${gilroy.className} bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950 overscroll-y-none`} style={{ minHeight: '100vh', paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <Background />
         {children}
         <Analytics />

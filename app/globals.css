@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  /* iOS Safe Area Support */
+  :root {
+    --safe-area-inset-top: env(safe-area-inset-top);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+    --safe-area-inset-left: env(safe-area-inset-left);
+    --safe-area-inset-right: env(safe-area-inset-right);
+  }
+  
+  /* Ensure body extends into safe areas with proper background */
+  html {
+    background: linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a);
+  }
+  
+  body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+}
+
 @layer utilities {
   .animate-binaryRain {
     animation: binaryRain linear infinite;
