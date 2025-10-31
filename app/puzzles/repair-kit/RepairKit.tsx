@@ -10,6 +10,8 @@ import StatHandler from "@/app/components/StatHandler";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSmile, faFaceMeh, faFaceAngry, faFaceDizzy} from "@fortawesome/free-solid-svg-icons";
 import {Hand} from "lucide-react";
+import type { FC } from 'react';
+const HandIcon = Hand as unknown as FC<any>;
 
 
 export default function RepairKit() {
@@ -149,9 +151,9 @@ export default function RepairKit() {
                     )}
                     aria-label={isMobileOrTablet ? "Tap to stop" : "Press E to stop"}
                 >
-                    {isMobileOrTablet ? (
+                            {isMobileOrTablet ? (
                         <>
-                            <Hand className="relative z-10 w-8 h-8 sm:w-10 sm:h-10" strokeWidth={2.5} />
+                            <HandIcon className="relative z-10 w-8 h-8 sm:w-10 sm:h-10" strokeWidth={2.5} />
                             {gameStatus === 1 && (
                                 <span className="absolute inset-0 bg-white/20 animate-ping rounded-sm" />
                             )}
