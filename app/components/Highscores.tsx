@@ -2,7 +2,7 @@ import { faAward, faCalendarDays, faFire, faGamepad, faGear, faHourglass, faRank
 import { Puzzle, Preset, getPresets, SortOrder, SortBy} from "@/interfaces/queryTypes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import NPButton from "./NPButton";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 
 //Sort menu component
@@ -128,7 +128,7 @@ const Highscores = () => {
         return camelCase.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
     }
 
-    async function fetchHighscores(sortKey: SortBy, sortDir: SortOrder, date?: 'monthly' | 'weekly') {
+    const fetchHighscores = useCallback(async (sortKey: SortBy, sortDir: SortOrder, date?: 'monthly' | 'weekly') => {
         const apiUrl = '/api/getHighscores';
         const queryParams = {
             puzzle: selectedPuzzle,
@@ -153,7 +153,7 @@ const Highscores = () => {
             console.error('Error fetching highscores:', error);
             return null;
         }
-    }
+    }, [selectedPuzzle, selectedPresets, monthly]);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         const searchValue = e.target.value.toLowerCase();
@@ -172,7 +172,7 @@ const Highscores = () => {
             .catch(error => {
                 console.error('Error fetching highscores:', error);
             });
-    }, [activeSortKey, sortDirection, fetchHighscores]); // Added dependencies
+    }, [activeSortKey, sortDirection, fetchHighscores]); // fetchHighscores is memoized with useCallback
 
 
 
