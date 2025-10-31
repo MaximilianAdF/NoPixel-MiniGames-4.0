@@ -14,7 +14,7 @@ export const gilroy = localFont({
 export const gilroyNpTitle = localFont({
   src: [
     {
-      path: "../fonts/Gilroy-medium.ttf",
+      path: "../fonts/Gilroy-Medium.ttf",
       weight: "500",
       style: "normal",
     },
