@@ -1,7 +1,7 @@
 "use client";
 
 import NPHackContainer from "@/app/components/NPHackContainer";
-import React, {FC, useEffect, useState} from "react";
+import React, {FC, useCallback, useEffect, useState} from "react";
 import useGame from "@/app/utils/useGame";
 import classNames from "classnames";
 import {getCluster, handleGravity, handleLeftShift, SquareColor, squareColors, SquareValue} from "@/app/puzzles/roof-running/utils";
@@ -44,44 +44,44 @@ const RoofRunning: FC = () => {
     const [board, setBoard] = useState<SquareValue[]>(new Array(rows*columns).fill("empty"));
     const [elapsed, setElapsed] = useState(0);
 
-    const resetBoard = () => {
+    const resetBoard = useCallback(() => {
         const newBoard: SquareColor[] = [];
         // Generating new board
         for (let i = 0; i < rows * columns; i++) {
             newBoard.push(getRandomColor());
         }
         setBoard(newBoard);
-    }
+    }, [columns, rows]);
 
 
-    const statusUpdateHandler = (newStatus: number) => {
+    const statusUpdateHandler = useCallback((newStatus: number) => {
         switch (newStatus) {
             case 1:
                 // Reset game
                 resetBoard();
                 break;
         }
-    }
+    }, [resetBoard]);
 
     const [gameStatus, setGameStatus, streak] = useGame(timer*1000, statusUpdateHandler);
 
-    const resetGame = () => {
+    const resetGame = useCallback(() => {
         setGameStatus(1);
-    };
+    }, [setGameStatus]);
 
-    const handleWin = (message: string) => {
+    const handleWin = useCallback((message: string) => {
         // Win
 
         setGameStatus(3);
-    }
+    }, [setGameStatus]);
 
-    const handleLose = (message: string) => {
+    const handleLose = useCallback((message: string) => {
         // Lose
 
         setGameStatus(2);
-    }
+    }, [setGameStatus]);
 
-    const checkStatus = (newBoard: SquareValue[]) => {
+    const checkStatus = useCallback((newBoard: SquareValue[]) => {
         if (newBoard.every(value => value === "empty")) {
             handleWin("All tiles cleared");
         }
@@ -123,9 +123,9 @@ const RoofRunning: FC = () => {
         // Look for a cluster larger than 1
 
 
-    }
+    }, [handleLose, handleWin]);
 
-    const handleClick = (index: number) => {
+    const handleClick = useCallback((index: number) => {
         if (gameStatus !== 1) {
             return;
         }
@@ -142,7 +142,7 @@ const RoofRunning: FC = () => {
             setBoard(newBoard);
             checkStatus(newBoard);
         }
-    }
+    }, [board, checkStatus, columns, gameStatus, rows]);
 
     const [settingsRows, setSettingsRows] = useState(rows);
     const [settingsColumns, setSettingsColumns] = useState(columns);
