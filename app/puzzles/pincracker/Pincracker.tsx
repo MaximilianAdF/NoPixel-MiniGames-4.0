@@ -494,7 +494,7 @@ const Pincracker: FC = () => {
                 min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px]
                 w-full max-w-full
                 rounded-lg
-                bg-[rgb(22_40_52)]
+                bg-[rgba(0,28,49,0.3)]
                 flex items-center justify-between
                 text-white text-6xl sm:text-7xl md:text-8xl
                 px-3 sm:px-5 md:px-6

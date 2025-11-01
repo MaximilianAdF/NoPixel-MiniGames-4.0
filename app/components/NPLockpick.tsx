@@ -349,7 +349,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
                         aspect-square
                         max-h-full max-w-full
                         rounded-lg
-                        bg-[rgb(22_40_52)]
+                        bg-[rgba(0,28,49,0.3)]
                         flex items-center justify-center
                         relative
                     `,

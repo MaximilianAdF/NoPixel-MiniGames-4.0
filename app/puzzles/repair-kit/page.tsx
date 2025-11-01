@@ -1,5 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import RepairKit from "./RepairKit";
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+};
 
 export const metadata: Metadata = {
   title: "RepairKit Practice - NoPixel 4.0 Minigames",
@@ -8,10 +16,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: "RepairKit Practice - NoPixel 4.0",
     description: "Practice the RepairKit minigame from NoPixel 4.0. Master vehicle repair mechanics.",
-    url: "https://nopixel-minigames.vercel.app/puzzles/repair-kit",
+    url: "https://no-px.vercel.app/puzzles/repair-kit",
   },
   alternates: {
-    canonical: "https://nopixel-minigames.vercel.app/puzzles/repair-kit",
+    canonical: "https://no-px.vercel.app/puzzles/repair-kit",
   },
 };
 

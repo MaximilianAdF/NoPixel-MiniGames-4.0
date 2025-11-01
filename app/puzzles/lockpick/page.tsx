@@ -1,5 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Lockpick from "@/app/puzzles/lockpick/Lockpick";
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+};
 
 export const metadata: Metadata = {
   title: "Lockpick Practice - NoPixel 4.0 Minigames",
@@ -8,10 +16,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Lockpick Practice - NoPixel 4.0",
     description: "Practice the Lockpick minigame from NoPixel 4.0. Master vehicle lockpicking mechanics.",
-    url: "https://nopixel-minigames.vercel.app/puzzles/lockpick",
+    url: "https://no-px.vercel.app/puzzles/lockpick",
   },
   alternates: {
-    canonical: "https://nopixel-minigames.vercel.app/puzzles/lockpick",
+    canonical: "https://no-px.vercel.app/puzzles/lockpick",
   },
 };
 

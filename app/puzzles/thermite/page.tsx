@@ -1,5 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Thermite from "@/app/puzzles/thermite/Thermite";
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+};
 
 export const metadata: Metadata = {
   title: "Thermite Hack Practice - NoPixel 4.0 Minigames",
@@ -8,10 +16,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Thermite Hack Practice - NoPixel 4.0",
     description: "Master the Thermite hack from NoPixel 4.0. Practice the Maze Bank laser disable minigame for free.",
-    url: "https://nopixel-minigames.vercel.app/puzzles/thermite",
+    url: "https://no-px.vercel.app/puzzles/thermite",
   },
   alternates: {
-    canonical: "https://nopixel-minigames.vercel.app/puzzles/thermite",
+    canonical: "https://no-px.vercel.app/puzzles/thermite",
   },
 };
 

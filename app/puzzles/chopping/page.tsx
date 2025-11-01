@@ -1,5 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Chopping from "@/app/puzzles/chopping/Chopping";
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+};
 
 export const metadata: Metadata = {
   title: "Chopping Practice - NoPixel 4.0 Minigames",
@@ -8,10 +16,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Chopping Practice - NoPixel 4.0",
     description: "Practice the Chopping minigame from NoPixel 4.0. Master vehicle chopping mechanics.",
-    url: "https://nopixel-minigames.vercel.app/puzzles/chopping",
+    url: "https://no-px.vercel.app/puzzles/chopping",
   },
   alternates: {
-    canonical: "https://nopixel-minigames.vercel.app/puzzles/chopping",
+    canonical: "https://no-px.vercel.app/puzzles/chopping",
   },
 };
 

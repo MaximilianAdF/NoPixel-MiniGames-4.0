@@ -17,25 +17,36 @@
   
   /* Force dark background on html and body to cover safe areas */
   html {
-  background-color: var(--bg-color) !important;
-  background-image: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%) !important;
+    background-color: var(--bg-color) !important;
+    background-image: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%) !important;
     /* Prevent iOS text size adjustment */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     overflow-x: hidden;
+    /* Enable GPU acceleration for smoother scrolling */
+    -webkit-overflow-scrolling: touch;
   }
   
   body {
     min-height: 100vh;
     min-height: 100dvh;
     min-height: -webkit-fill-available;
-  background-color: var(--bg-color) !important;
-  background-image: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%) !important;
+    background-color: var(--bg-color) !important;
+    background-image: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%) !important;
     /* Prevent iOS text size adjustment */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     position: relative;
     overflow-x: hidden;
+    /* Improve rendering performance */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Performance optimization: use will-change sparingly */
+  * {
+    /* Remove will-change from all elements by default */
+    will-change: auto;
   }
   
   /* Pseudo-element to force background behind safe areas on iOS */
@@ -46,9 +57,11 @@
     width: 100vw;
     height: 100vh;
     height: 100dvh;
-  background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%);
+    background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%);
     z-index: -100;
     pointer-events: none;
+    /* Use transform for GPU acceleration */
+    transform: translateZ(0);
   }
 
   body::before,
@@ -57,9 +70,12 @@
     position: fixed;
     pointer-events: none;
     background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%);
-  z-index: -95;
-  opacity: 0;
-  transition: opacity 200ms ease;
+    z-index: -95;
+    opacity: 0;
+    /* Use faster transitions */
+    transition: opacity 150ms ease-out;
+    /* GPU acceleration */
+    transform: translateZ(0);
   }
 
   body::before {

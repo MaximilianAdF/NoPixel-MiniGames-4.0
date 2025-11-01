@@ -6,7 +6,7 @@ import usePersistantState from "@/app/utils/usePersistentState";
 import NPHackContainer from "@/app/components/NPHackContainer";
 import { NPSettingsRange } from "@/app/components/NPSettings";
 import StatHandler from "@/app/components/StatHandler";
-import React, { FC, useEffect, useState, useRef, useCallback } from "react";
+import React, { FC, useEffect, useState, useRef, useCallback, memo, useMemo, startTransition } from "react";
 import { useKeyDown } from "@/app/utils/useKeyDown";
 import useGame from "@/app/utils/useGame";
 import classNames from "classnames";
@@ -39,6 +39,110 @@ const getRandomLetter = (): Letter => {
 
 // Keep a stable allowed-keys array so keyboard hook doesn't get a new array each render
 const ALLOWED_KEYS = ['Q', 'q', 'W', 'w', 'E', 'e', 'R', 'r', 'A', 'a', 'S', 's', 'D', 'd'] as const;
+
+// Memoized letter cell to prevent re-rendering unchanged letters
+interface LetterCellProps {
+    letter: Letter;
+    isActive: boolean;
+    isDone: boolean;
+    isFail: boolean;
+}
+
+const LetterCell = memo<LetterCellProps>(({ letter, isActive, isDone, isFail }) => {
+    const classes = classNames("letter", {
+        'letter-active': isActive,
+        'done': isDone,
+        'fail': isFail,
+    });
+
+    return (
+        <div className={classes} style={{ justifySelf: 'center' }}>
+            {letter}
+        </div>
+    );
+}, (prevProps, nextProps) => {
+    // Custom comparison: only re-render if any prop actually changed
+    return prevProps.letter === nextProps.letter &&
+           prevProps.isActive === nextProps.isActive &&
+           prevProps.isDone === nextProps.isDone &&
+           prevProps.isFail === nextProps.isFail;
+});
+
+LetterCell.displayName = 'LetterCell';
+
+// Memoized grid row to prevent re-rendering entire rows when only one cell changes
+interface GridRowProps {
+    rowIndex: number;
+    board: Letter[];
+    stateBoard: LetterState[];
+    activeIndex: number;
+    numLetters: number;
+    gridCols: number;
+}
+
+const GridRow = memo<GridRowProps>(({ rowIndex, board, stateBoard, activeIndex, numLetters, gridCols }) => {
+    const colsInRow = Math.min(numLetters - rowIndex * gridCols, gridCols);
+    
+    // Memoize the cells array to avoid recalculating on every render
+    const cells = useMemo(() => {
+        const cellsArray = [];
+        for (let colIndex = 0; colIndex < gridCols; colIndex++) {
+            const letterIndex = rowIndex * gridCols + colIndex;
+            if (letterIndex < numLetters) {
+                cellsArray.push({
+                    key: colIndex,
+                    letterIndex,
+                    letter: board[letterIndex],
+                    isActive: letterIndex === activeIndex,
+                    isDone: stateBoard[letterIndex] === 'done',
+                    isFail: stateBoard[letterIndex] === 'fail',
+                });
+            }
+        }
+        return cellsArray;
+    }, [board, stateBoard, activeIndex, numLetters, gridCols, rowIndex]);
+
+    return (
+        <div 
+            className='game-grid-row' 
+            style={{ gridTemplateColumns: `repeat(${colsInRow}, min-content)` }}
+        >
+            {cells.map(cell => (
+                <LetterCell
+                    key={cell.key}
+                    letter={cell.letter}
+                    isActive={cell.isActive}
+                    isDone={cell.isDone}
+                    isFail={cell.isFail}
+                />
+            ))}
+        </div>
+    );
+}, (prevProps, nextProps) => {
+    // Only re-render if this row contains the active or changed letter
+    const prevRowStart = prevProps.rowIndex * prevProps.gridCols;
+    const prevRowEnd = prevRowStart + prevProps.gridCols;
+    const nextRowStart = nextProps.rowIndex * nextProps.gridCols;
+    const nextRowEnd = nextRowStart + nextProps.gridCols;
+    
+    // Check if active index moved into or out of this row
+    const prevHasActive = prevProps.activeIndex >= prevRowStart && prevProps.activeIndex < prevRowEnd;
+    const nextHasActive = nextProps.activeIndex >= nextRowStart && nextProps.activeIndex < nextRowEnd;
+    
+    if (prevHasActive !== nextHasActive) return false; // Re-render if active moved
+    
+    // Check if any state in this row changed
+    for (let i = 0; i < prevProps.gridCols; i++) {
+        const idx = prevProps.rowIndex * prevProps.gridCols + i;
+        if (idx >= prevProps.numLetters) break;
+        if (prevProps.board[idx] !== nextProps.board[idx]) return false;
+        if (prevProps.stateBoard[idx] !== nextProps.stateBoard[idx]) return false;
+    }
+    
+    return true; // Don't re-render
+});
+
+GridRow.displayName = 'GridRow';
 
 const defaultNumLetters = 15;
 const defaultDuration = 7;
@@ -225,18 +329,28 @@ const Chopping: FC = () => {
             newStateBoard[currentActive] = 'done';
             const nextIndex = currentActive + 1;
             activeIndexRef.current = nextIndex;
-            // update React state (keeps UI in sync)
+            
+            // Critical update: immediately update activeIndex for responsive UI
             setActiveIndex(nextIndex);
+            
+            // Non-critical update: stateBoard can be deferred
+            startTransition(() => {
+                setStateBoard(newStateBoard);
+            });
+            stateBoardRef.current = newStateBoard;
+            
             checkBeepPlayer.play();
         } else {
             newStateBoard[currentActive] = 'fail';
+            
+            // Fail state update can also be deferred slightly
+            startTransition(() => {
+                setStateBoard(newStateBoard);
+            });
+            stateBoardRef.current = newStateBoard;
         }
 
-        // Only update the piece of state that actually changed
-        setStateBoard(newStateBoard);
-        stateBoardRef.current = newStateBoard;
-
-        // Evaluate win/lose using refs
+        // Evaluate win/lose using refs (runs synchronously)
         // If the final state is 'done', it's a win
         if (newStateBoard[newStateBoard.length - 1] === 'done') {
             handleWin("All letters pressed successfully");
@@ -448,7 +562,7 @@ const Chopping: FC = () => {
                     w-full max-w-full
                     h-full
                     rounded-lg
-                    bg-[rgb(22_40_52)]
+                    bg-[rgba(0,28,49,0.3)]
                     flex items-center justify-center
                     text-white
                     p-1 sm:p-4
@@ -456,39 +570,20 @@ const Chopping: FC = () => {
                 "
                             onTouchStartCapture={focusInputOnInteraction}
                             onPointerDownCapture={focusInputOnInteraction}
-                            style={{ scrollMarginTop: '15vh' }}
+                            style={{ scrollMarginTop: '15vh', overflow: 'visible' }}
                         >
                             <div className='game-grid' style={{ height: '100%', width: '100%' }}>
-                                {/* Dynamically create grid rows based on numLetters and defaultGridCols */}
+                                {/* Memoized grid rows - only affected rows re-render */}
                                 {Array.from({ length: Math.ceil(numLetters / defaultGridCols) }).map((_, rowIndex) => (
-                                    <div key={rowIndex} className='game-grid-row' style={{ gridTemplateColumns: `repeat(${Math.min(numLetters - rowIndex * defaultGridCols, defaultGridCols)}, min-content)` }}>
-
-                                        {/* Create grid columns within each row */}
-                                        {Array.from({ length: defaultGridCols }).map((_, colIndex) => {
-                                            const letterIndex = rowIndex * defaultGridCols + colIndex;
-                                            if (letterIndex < numLetters) {
-                                                const letter = board[letterIndex];
-                                                const isActive = letterIndex === activeIndex;
-                                                const isDone = stateBoard[letterIndex] === 'done';
-                                                const isFail = stateBoard[letterIndex] === 'fail';
-
-                                                const classes = classNames("letter", {
-                                                    'letter-active': isActive,
-                                                    'done': isDone,
-                                                    'fail': isFail,
-                                                });
-
-                                                return (
-                                                    <div key={colIndex} className={classes} style={{ justifySelf: 'center' }}>
-                                                        {letter}
-                                                    </div>
-                                                );
-                                            } else {
-                                                // Stop the loop once all letters are rendered in the row
-                                                return null;
-                                            }
-                                        })}
-                                    </div>
+                                    <GridRow
+                                        key={rowIndex}
+                                        rowIndex={rowIndex}
+                                        board={board}
+                                        stateBoard={stateBoard}
+                                        activeIndex={activeIndex}
+                                        numLetters={numLetters}
+                                        gridCols={defaultGridCols}
+                                    />
                                 ))}
                             </div>
                         </div>

@@ -1,5 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Pincracker from "@/app/puzzles/pincracker/Pincracker";
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+};
 
 export const metadata: Metadata = {
   title: "PinCracker Practice - NoPixel 4.0 Minigames",
@@ -8,10 +16,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: "PinCracker Practice - NoPixel 4.0",
     description: "Master the PinCracker hack from NoPixel 4.0. Practice the Maze Bank security minigame.",
-    url: "https://nopixel-minigames.vercel.app/puzzles/pincracker",
+    url: "https://no-px.vercel.app/puzzles/pincracker",
   },
   alternates: {
-    canonical: "https://nopixel-minigames.vercel.app/puzzles/pincracker",
+    canonical: "https://no-px.vercel.app/puzzles/pincracker",
   },
 };
 

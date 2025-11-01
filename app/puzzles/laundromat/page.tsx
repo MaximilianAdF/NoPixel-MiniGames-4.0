@@ -1,5 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Laundromat from "@/app/puzzles/laundromat/Laundromat";
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+};
 
 export const metadata: Metadata = {
   title: "Laundromat Hack Practice - NoPixel 4.0 Minigames",
@@ -8,10 +16,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Laundromat Hack Practice - NoPixel 4.0",
     description: "Master the Laundromat safe hack from NoPixel 4.0. Practice the robbery minigame for free.",
-    url: "https://nopixel-minigames.vercel.app/puzzles/laundromat",
+    url: "https://no-px.vercel.app/puzzles/laundromat",
   },
   alternates: {
-    canonical: "https://nopixel-minigames.vercel.app/puzzles/laundromat",
+    canonical: "https://no-px.vercel.app/puzzles/laundromat",
   },
 };
 

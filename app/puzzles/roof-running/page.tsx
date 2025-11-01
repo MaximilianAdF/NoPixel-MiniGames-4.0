@@ -1,5 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import RoofRunning from "@/app/puzzles/roof-running/RoofRunning";
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+};
 
 export const metadata: Metadata = {
   title: "Roof Running Practice - NoPixel 4.0 Minigames",
@@ -8,10 +16,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Roof Running Practice - NoPixel 4.0",
     description: "Practice the Roof Running minigame from NoPixel 4.0. Master the AC-Unit robbery challenge.",
-    url: "https://nopixel-minigames.vercel.app/puzzles/roof-running",
+    url: "https://no-px.vercel.app/puzzles/roof-running",
   },
   alternates: {
-    canonical: "https://nopixel-minigames.vercel.app/puzzles/roof-running",
+    canonical: "https://no-px.vercel.app/puzzles/roof-running",
   },
 };
 
