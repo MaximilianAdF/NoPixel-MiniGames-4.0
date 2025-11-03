@@ -251,7 +251,7 @@ const Chopping: FC = () => {
     useEffect(() => {
         if (!isMobileOrTablet) return;
         const timer = setTimeout(() => {
-            ensureVisible();
+            ensureVisible('smooth');
         }, 200);
         return () => clearTimeout(timer);
     }, [ensureVisible, isMobileOrTablet]);
@@ -284,6 +284,16 @@ const Chopping: FC = () => {
     }
 
     const [gameStatus, setGameStatus, streak] = useGame(timer*1000, statusUpdateHandler);
+
+    // Auto-scroll when game starts on mobile
+    useEffect(() => {
+        if (isMobileOrTablet && gameStatus === 1) {
+            setTimeout(() => {
+                ensureVisible('smooth');
+                focusMobileInput({ force: true });
+            }, 300);
+        }
+    }, [gameStatus, isMobileOrTablet, ensureVisible, focusMobileInput]);
 
     useEffect(() => {
         if (isMobileOrTablet && gameStatus === 1 && !hintDismissedRef.current) {
@@ -341,7 +351,8 @@ const Chopping: FC = () => {
             });
             stateBoardRef.current = newStateBoard;
             
-            checkBeepPlayer.play();
+            // Defer audio playback to prevent blocking UI updates
+            setTimeout(() => checkBeepPlayer.play(), 0);
         } else {
             newStateBoard[currentActive] = 'fail';
             
