@@ -184,8 +184,20 @@ const Chopping: FC = () => {
         const container = outerContainerRef.current ?? gameWrapperRef.current;
         if (!container) return;
 
-        // Always scroll to center on mobile to ensure visibility above keyboard
-        container.scrollIntoView({ behavior, block: 'center', inline: 'nearest' });
+        // Get the container's position
+        const rect = container.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // Calculate position to center the element in viewport
+        const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+        const elementTop = rect.top + scrollTop;
+        const elementCenter = elementTop - (viewportHeight / 2) + (rect.height / 2);
+        
+        // Force scroll to position
+        window.scrollTo({
+            top: Math.max(0, elementCenter),
+            behavior: behavior
+        });
     }, [isMobileOrTablet]);
 
     const dismissMobileHint = useCallback(() => {
