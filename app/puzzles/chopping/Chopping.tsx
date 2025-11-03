@@ -561,6 +561,14 @@ const Chopping: FC = () => {
                                 }}
                                 onInput={handleMobileInput}
                                 onKeyDown={handleMobileKeyDown}
+                                onFocus={() => {
+                                    // Scroll when keyboard opens
+                                    if (isMobileOrTablet) {
+                                        setTimeout(() => ensureVisible('smooth'), 100);
+                                        setTimeout(() => ensureVisible('smooth'), 300);
+                                        setTimeout(() => ensureVisible('smooth'), 500);
+                                    }
+                                }}
                                 onBlur={(e) => {
                                     // Prevent keyboard from closing when tapping the game
                                     if (gameStatus === 1) {
