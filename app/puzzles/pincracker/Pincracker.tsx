@@ -65,10 +65,10 @@ const Pincracker: FC = () => {
         const topBuffer = 24;
         const bottomBuffer = 24;
 
-        if (rect.top < topBuffer) {
-            window.scrollBy({ top: rect.top - topBuffer, behavior });
-        } else if (rect.bottom > viewportHeight - bottomBuffer) {
-            window.scrollBy({ top: rect.bottom - (viewportHeight - bottomBuffer), behavior });
+        const needsAdjustment = rect.top < topBuffer || rect.bottom > viewportHeight - bottomBuffer;
+        if (needsAdjustment) {
+            const targetBlock: ScrollLogicalPosition = rect.height > viewportHeight ? 'start' : 'center';
+            container.scrollIntoView({ behavior, block: targetBlock, inline: 'nearest' });
         }
     }, [isMobileOrTablet]);
 
@@ -90,7 +90,7 @@ const Pincracker: FC = () => {
             input.focus();
         }
         input.setSelectionRange?.(input.value.length, input.value.length);
-        ensureVisible();
+        ensureVisible('smooth');
     }, [ensureVisible, isMobileOrTablet]);
 
     const focusInputOnInteraction = useCallback(() => {
@@ -121,7 +121,8 @@ const Pincracker: FC = () => {
                 }
             });
         }
-    }, [dismissMobileHint, isMobileOrTablet]);
+        ensureVisible('smooth');
+    }, [dismissMobileHint, ensureVisible, isMobileOrTablet]);
 
     useEffect(() => {
         if (!isMobileOrTablet) return;
@@ -417,7 +418,7 @@ const Pincracker: FC = () => {
 
     return (
         <>
-            <div className="flex flex-col gap-4">
+            <div ref={outerContainerRef} className="flex flex-col gap-4">
                 <StatHandler
                     streak={streak}
                     elapsed={elapsed}

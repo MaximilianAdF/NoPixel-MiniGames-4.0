@@ -151,7 +151,7 @@ const defaultGridCols = 6;
 const Chopping: FC = () => {
     const [timer, setTimer] = usePersistantState("chopping-timer", defaultDuration);
     const [numLetters, setNumLetters] = usePersistantState("chopping-num-letters", defaultNumLetters);
-    const [activeIndex, setActiveIndex] = usePersistantState("chopping-active-index", 0);
+    const [activeIndex, setActiveIndex] = useState<number>(0);
     const [board, setBoard] = useState<Letter[]>(new Array(defaultNumLetters));
     const [stateBoard, setStateBoard] = useState<LetterState[]>(new Array(defaultNumLetters).fill(''));
     const [allowKeyDown, setAllowKeyDown] = useState(true);
@@ -189,10 +189,10 @@ const Chopping: FC = () => {
         const topBuffer = 24;
         const bottomBuffer = 24;
 
-        if (rect.top < topBuffer) {
-            window.scrollBy({ top: rect.top - topBuffer, behavior });
-        } else if (rect.bottom > viewportHeight - bottomBuffer) {
-            window.scrollBy({ top: rect.bottom - (viewportHeight - bottomBuffer), behavior });
+        const needsAdjustment = rect.top < topBuffer || rect.bottom > viewportHeight - bottomBuffer;
+        if (needsAdjustment) {
+            const targetBlock: ScrollLogicalPosition = rect.height > viewportHeight ? 'start' : 'center';
+            container.scrollIntoView({ behavior, block: targetBlock, inline: 'nearest' });
         }
     }, [isMobileOrTablet]);
 
@@ -214,7 +214,7 @@ const Chopping: FC = () => {
             input.focus();
         }
         input.setSelectionRange?.(input.value.length, input.value.length);
-        ensureVisible();
+        ensureVisible('smooth');
     }, [ensureVisible, isMobileOrTablet]);
 
     const focusInputOnInteraction = useCallback(() => {
@@ -245,7 +245,8 @@ const Chopping: FC = () => {
                 }
             });
         }
-    }, [dismissMobileHint, isMobileOrTablet]);
+        ensureVisible('smooth');
+    }, [dismissMobileHint, ensureVisible, isMobileOrTablet]);
 
     useEffect(() => {
         if (!isMobileOrTablet) return;
@@ -262,9 +263,10 @@ const Chopping: FC = () => {
         for (let i = 0; i < numLetters; i++) {
             newBoard.push(getRandomLetter());
         }
-        setBoard(newBoard);
-        boardRef.current = newBoard;
-        setActiveIndex(0);
+    setBoard(newBoard);
+    boardRef.current = newBoard;
+    setActiveIndex(0);
+    activeIndexRef.current = 0;
 
         const newStateBoard = new Array(numLetters).fill('');
         setStateBoard(newStateBoard);
@@ -493,7 +495,7 @@ const Chopping: FC = () => {
 
     return (
         <>
-            <div className="flex flex-col gap-4">
+            <div ref={outerContainerRef} className="flex flex-col gap-4">
                 <StatHandler
                     streak={streak}
                     elapsed={elapsed}
