@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import RepairKit from "./RepairKit";
+import GameInstructions from "@/app/components/GameInstructions";
+import RepairKitInstructions from "./instructions";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -25,6 +27,11 @@ export const metadata: Metadata = {
 
 export default function Page() {
     return (
-        <RepairKit/>
+        <>
+            <RepairKit/>
+            <GameInstructions gameId="repair-kit" title="How to Play Repair Kit">
+                <RepairKitInstructions />
+            </GameInstructions>
+        </>
     );
 }

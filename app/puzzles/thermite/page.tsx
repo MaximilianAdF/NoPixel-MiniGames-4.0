@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Thermite from "@/app/puzzles/thermite/Thermite";
+import GameInstructions from "@/app/components/GameInstructions";
+import ThermiteInstructions from "./instructions";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -24,5 +26,12 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <Thermite />;
+  return (
+    <>
+      <Thermite />
+      <GameInstructions gameId="thermite" title="How to Play Thermite">
+        <ThermiteInstructions />
+      </GameInstructions>
+    </>
+  );
 }

@@ -59,33 +59,48 @@ const caveat = Caveat({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://no-px.vercel.app'),
-  applicationName: 'NoPixel Hacking Simulator',
+  applicationName: 'NoPixel Minigames',
   title: {
-    default: "NoPixel 4.0 Hacking Simulator | Practice GTA RP Minigames Free",
-    template: "%s | NoPixel 4.0 Minigames"
+    default: "NoPixel 4.0 Minigames - Free Practice Simulator for GTA RP Hacking 🎮",
+    template: "%s | NoPixel 4.0 Practice"
   },
-  description: "Master NoPixel 4.0 hacking minigames with our free practice simulator. Train on Thermite, Lockpick, Laundromat, Roof Running, and more GTA RP challenges. Improve your skills risk-free with authentic replicas and global leaderboards.",
+  description: "★★★★★ Master NoPixel 4.0 hacking minigames FREE! Practice Thermite, Lockpick, VAR, Laundromat & more GTA RP challenges. Real-time leaderboards, expert tips, mobile-friendly. 100% risk-free training for FiveM & GTA roleplay. Start now!",
   icons: {
     icon: '/icon',
     shortcut: '/icon',
     apple: '/icon',
+    other: [
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '32x32',
+        url: '/icon',
+      },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '16x16',
+        url: '/icon',
+      },
+    ],
   },
   keywords: [
     // Core brand terms
     "NoPixel", "NoPixel 4.0", "NoPixel minigames", "NoPixel hacking simulator",
     // Game specific
-    "GTA V RP", "GTA 5 roleplay", "FiveM", "GTA RP minigames",
+    "GTA V RP", "GTA 5 roleplay", "FiveM", "GTA RP minigames", "GTA RP hacks",
     // Specific minigames
     "Thermite hack", "Lockpick minigame", "Laundromat hack", "Roof Running",
-    "Word Memory", "PinCracker", "Chopping minigame", "RepairKit",
+    "Word Memory", "PinCracker", "Chopping minigame", "RepairKit", "VAR hack",
     // User intent keywords
     "practice hacking minigames", "free GTA RP trainer", "NoPixel hack practice",
     "hacking simulator", "minigame practice tool", "GTA RP training",
     // Long-tail keywords
     "how to practice NoPixel hacks", "best NoPixel practice site",
-    "NoPixel 4.0 hack trainer", "GTA RP skill improvement"
+    "NoPixel 4.0 hack trainer", "GTA RP skill improvement", "FiveM minigame trainer",
+    "free NoPixel practice", "NoPixel tutorial", "GTA RP minigame guide"
   ],
-  authors: [{ name: "NoPixel Minigames" }],
+  authors: [{ name: "NoPixel Minigames", url: "https://no-px.vercel.app" }],
   creator: "NoPixel Minigames",
   publisher: "NoPixel Minigames",
   formatDetection: {
@@ -97,21 +112,22 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://no-px.vercel.app',
-    title: 'NoPixel 4.0 Hacking Simulator | Practice GTA RP Minigames Free',
-    description: 'Master NoPixel 4.0 hacking minigames with our free practice simulator. Train on Thermite, Lockpick, Laundromat, and more GTA RP challenges.',
+    title: 'NoPixel 4.0 Minigames - Free GTA RP Hacking Practice Simulator 🎮',
+    description: '⭐ Master NoPixel hacks FREE! Practice Thermite, Lockpick, VAR & more. Global leaderboards, expert strategies, mobile-friendly. The #1 GTA RP training simulator!',
     siteName: 'NoPixel 4.0 Minigames',
     images: [{
-      url: '/icon',
-      width: 32,
-      height: 32,
-      alt: 'NoPixel 4.0 Minigames Icon',
+      url: '/og-image.png', // We'll create this
+      width: 1200,
+      height: 630,
+      alt: 'NoPixel 4.0 Minigames - Free GTA RP Practice Simulator',
     }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NoPixel 4.0 Hacking Simulator | Practice GTA RP Minigames Free',
-    description: 'Master NoPixel 4.0 hacking minigames with our free practice simulator. Train on Thermite, Lockpick, Laundromat, and more.',
-    images: ['/icon'],
+    title: 'NoPixel 4.0 Minigames - Free GTA RP Hacking Simulator 🎮',
+    description: '⭐ Master NoPixel hacks FREE! Practice Thermite, Lockpick, VAR & more. #1 GTA RP training tool with leaderboards & expert tips!',
+    images: ['/og-image.png'],
+    creator: '@NoPixelGames', // Update with your actual Twitter handle if you have one
   },
   robots: {
     index: true,

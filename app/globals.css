@@ -144,4 +144,40 @@
   .animate-scanLine {
     animation: scanLine 10s linear infinite;
   }
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile instructions styling improvements */
+.mobile-instructions h3 {
+  font-size: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.mobile-instructions p {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.mobile-instructions ul,
+.mobile-instructions ol {
+  font-size: 0.875rem;
+  padding-left: 1.25rem;
+}
+
+.mobile-instructions li {
+  margin-bottom: 0.5rem;
 }

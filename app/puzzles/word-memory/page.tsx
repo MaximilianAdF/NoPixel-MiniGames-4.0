@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import WordMemory from "@/app/puzzles/word-memory/WordMemory";
+import GameInstructions from "@/app/components/GameInstructions";
+import WordMemoryInstructions from "./instructions";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -24,5 +26,12 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-    return <WordMemory />;
+    return (
+        <>
+            <WordMemory />
+            <GameInstructions gameId="word-memory" title="How to Play Word Memory">
+                <WordMemoryInstructions />
+            </GameInstructions>
+        </>
+    );
 }

@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Lockpick from "@/app/puzzles/lockpick/Lockpick";
+import GameInstructions from "@/app/components/GameInstructions";
+import LockpickInstructions from "./instructions";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -24,5 +26,12 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-    return <Lockpick />;
+    return (
+        <>
+            <Lockpick />
+            <GameInstructions gameId="lockpick" title="How to Play Lockpick">
+                <LockpickInstructions />
+            </GameInstructions>
+        </>
+    );
 }

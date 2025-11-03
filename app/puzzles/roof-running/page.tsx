@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import RoofRunning from "@/app/puzzles/roof-running/RoofRunning";
+import GameInstructions from "@/app/components/GameInstructions";
+import RoofRunningInstructions from "./instructions";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -24,5 +26,12 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-    return <RoofRunning />;
+    return (
+        <>
+            <RoofRunning />
+            <GameInstructions gameId="roof-running" title="How to Play Roof Running">
+                <RoofRunningInstructions />
+            </GameInstructions>
+        </>
+    );
 }
