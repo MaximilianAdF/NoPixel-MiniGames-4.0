@@ -31,7 +31,7 @@ No-px is currently in the process of a complete revamp of the design and functio
 
 - 🚧 Homepage
 - ✅ Mobile responsiveness in minigames
-- ⛔ Minigames
+- ✅ Minigames
 - ⛔ Highscores menu & Leaderboards 
 - ⛔ Navigation menu
 - ⛔ Settings menu
