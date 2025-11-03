@@ -90,7 +90,11 @@ const Pincracker: FC = () => {
             input.focus();
         }
         input.setSelectionRange?.(input.value.length, input.value.length);
-        ensureVisible('smooth');
+        
+        // Scroll after delays to allow keyboard to open
+        setTimeout(() => ensureVisible('smooth'), 100);
+        setTimeout(() => ensureVisible('smooth'), 300);
+        setTimeout(() => ensureVisible('smooth'), 500);
     }, [ensureVisible, isMobileOrTablet]);
 
     const focusInputOnInteraction = useCallback(() => {
@@ -121,7 +125,11 @@ const Pincracker: FC = () => {
                 }
             });
         }
-        ensureVisible('smooth');
+        
+        // Scroll after delays to allow keyboard to open
+        setTimeout(() => ensureVisible('smooth'), 100);
+        setTimeout(() => ensureVisible('smooth'), 300);
+        setTimeout(() => ensureVisible('smooth'), 500);
     }, [dismissMobileHint, ensureVisible, isMobileOrTablet]);
 
     useEffect(() => {
@@ -314,11 +322,10 @@ const Pincracker: FC = () => {
             // When keyboard opens, scroll the game into view
             if (offset > 100) {
                 requestAnimationFrame(() => {
-                    const container = gameWrapperRef.current;
-                    if (container) {
-                        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
+                    ensureVisible('smooth');
                 });
+                // Retry after animation
+                setTimeout(() => ensureVisible('smooth'), 300);
             }
         };
 
@@ -331,7 +338,7 @@ const Pincracker: FC = () => {
             viewport.removeEventListener('resize', handleResize);
             viewport.removeEventListener('scroll', handleResize);
         };
-    }, [isMobileOrTablet]);
+    }, [isMobileOrTablet, ensureVisible]);
 
     // Handle mobile input
     const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {

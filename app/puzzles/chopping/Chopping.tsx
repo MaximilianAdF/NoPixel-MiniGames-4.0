@@ -214,7 +214,11 @@ const Chopping: FC = () => {
             input.focus();
         }
         input.setSelectionRange?.(input.value.length, input.value.length);
-        ensureVisible('smooth');
+        
+        // Scroll after a delay to allow keyboard to open
+        setTimeout(() => ensureVisible('smooth'), 100);
+        setTimeout(() => ensureVisible('smooth'), 300);
+        setTimeout(() => ensureVisible('smooth'), 500);
     }, [ensureVisible, isMobileOrTablet]);
 
     const focusInputOnInteraction = useCallback(() => {
@@ -245,7 +249,11 @@ const Chopping: FC = () => {
                 }
             });
         }
-        ensureVisible('smooth');
+        
+        // Scroll after delays to allow keyboard to open
+        setTimeout(() => ensureVisible('smooth'), 100);
+        setTimeout(() => ensureVisible('smooth'), 300);
+        setTimeout(() => ensureVisible('smooth'), 500);
     }, [dismissMobileHint, ensureVisible, isMobileOrTablet]);
 
     useEffect(() => {
@@ -310,9 +318,11 @@ const Chopping: FC = () => {
 
     const handleWin = useCallback((message: string) => {
         // Win
-        successPlayer.play();
+        if (!isMobileOrTablet) {
+            successPlayer.play();
+        }
         setGameStatus(3);
-    }, [setGameStatus]);
+    }, [setGameStatus, isMobileOrTablet]);
 
     const handleLose = useCallback((message: string) => {
         // Lose
@@ -351,8 +361,10 @@ const Chopping: FC = () => {
             });
             stateBoardRef.current = newStateBoard;
             
-            // Defer audio playback to prevent blocking UI updates
-            setTimeout(() => checkBeepPlayer.play(), 0);
+            // Only play audio on desktop to avoid mobile lag
+            if (!isMobileOrTablet) {
+                checkBeepPlayer.play();
+            }
         } else {
             newStateBoard[currentActive] = 'fail';
             
@@ -372,7 +384,7 @@ const Chopping: FC = () => {
         if (newStateBoard[currentActive] === 'fail') {
             handleLose(`Letter ${currentBoard?.[currentActive]} failed`);
         }
-    }, [handleWin, handleLose, setActiveIndex]);
+    }, [handleWin, handleLose, setActiveIndex, isMobileOrTablet]);
 
 
     const [settingsNumLetters, setSettingsNumLetters] = useState(defaultNumLetters);
@@ -399,11 +411,10 @@ const Chopping: FC = () => {
             // When keyboard opens, scroll the game into view
             if (offset > 100) {
                 requestAnimationFrame(() => {
-                    const container = gameWrapperRef.current;
-                    if (container) {
-                        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
+                    ensureVisible('smooth');
                 });
+                // Retry after animation
+                setTimeout(() => ensureVisible('smooth'), 300);
             }
         };
 
@@ -416,7 +427,7 @@ const Chopping: FC = () => {
             viewport.removeEventListener('resize', handleResize);
             viewport.removeEventListener('scroll', handleResize);
         };
-    }, [isMobileOrTablet]);        // Handle mobile input
+    }, [isMobileOrTablet, ensureVisible]);        // Handle mobile input
     const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (gameStatus !== 1) return;
         const { key } = e;
