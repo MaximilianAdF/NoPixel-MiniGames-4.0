@@ -60,16 +60,8 @@ const Pincracker: FC = () => {
         const container = outerContainerRef.current ?? gameWrapperRef.current;
         if (!container) return;
 
-        const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
-        const rect = container.getBoundingClientRect();
-        const topBuffer = 24;
-        const bottomBuffer = 24;
-
-        const needsAdjustment = rect.top < topBuffer || rect.bottom > viewportHeight - bottomBuffer;
-        if (needsAdjustment) {
-            const targetBlock: ScrollLogicalPosition = rect.height > viewportHeight ? 'start' : 'center';
-            container.scrollIntoView({ behavior, block: targetBlock, inline: 'nearest' });
-        }
+        // Always scroll to center on mobile to ensure visibility above keyboard
+        container.scrollIntoView({ behavior, block: 'center', inline: 'nearest' });
     }, [isMobileOrTablet]);
 
     const dismissMobileHint = useCallback(() => {

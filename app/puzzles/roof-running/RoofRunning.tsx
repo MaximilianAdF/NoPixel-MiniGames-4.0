@@ -84,46 +84,37 @@ const RoofRunning: FC = () => {
     const checkStatus = useCallback((newBoard: SquareValue[]) => {
         if (newBoard.every(value => value === "empty")) {
             handleWin("All tiles cleared");
+            return;
         }
 
         // Fail if:
         // 1. There is exactly one tile of any color remaining
         // 2. There are no clusters larger than 1
 
-        // Check every color
+        // Check every color for single tiles
         for (let i=0; i<squareColors.length; i++) {
             if (newBoard.filter(value => value === squareColors[i]).length === 1) {
                 handleLose(`Unsolvable: 1 ${squareColors[i]} tile remaining`);
+                return;
             }
-            // This code should be a bit quicker since it immediately exits upon finding 0 or >1, but it doesn't seem to
-            // work for some reason.
-
-            // const first = squareColors.indexOf(squareColors[i]);
-            // if (first === -1) {
-            //     // No instances of this color, continue
-            //     continue;
-            // }
-            // // Count the occurrences
-            // let count = 0;
-            // getCount: {
-            //     for (let j=first; j<newBoard.length; j++) {
-            //         if (newBoard[j] === squareColors[i]) {
-            //             count++;
-            //             if (count > 1) {
-            //                 // There's more than one,
-            //                 break getCount;
-            //             }
-            //         }
-            //     }
-            //     console.log(first);
-            //     handleLose(`Unsolvable: ${count} ${squareColors[i]} tile remaining`);
-            // }
         }
 
-        // Look for a cluster larger than 1
+        // Check if there are any valid moves (clusters of 2+)
+        let hasValidMove = false;
+        for (let i = 0; i < newBoard.length; i++) {
+            if (newBoard[i] !== "empty") {
+                const cluster = getCluster(newBoard, i, rows, columns);
+                if (cluster.length > 1) {
+                    hasValidMove = true;
+                    break;
+                }
+            }
+        }
 
-
-    }, [handleLose, handleWin]);
+        if (!hasValidMove) {
+            handleLose("Unsolvable: No valid moves remaining");
+        }
+    }, [handleLose, handleWin, rows, columns]);
 
     const handleClick = useCallback((index: number) => {
         if (gameStatus !== 1) {
