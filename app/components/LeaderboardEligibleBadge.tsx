@@ -32,22 +32,21 @@ export default function LeaderboardEligibleBadge({
 
   return (
     <div className={`
-      fixed top-4 left-1/2 -translate-x-1/2 z-50
-      bg-gradient-to-r from-yellow-500/90 to-amber-500/90
+      fixed top-20 right-4 z-40
+      bg-gradient-to-br from-yellow-500/20 to-amber-600/20
       backdrop-blur-sm
-      border-2 border-yellow-400
-      rounded-full
-      px-4 py-2
+      border border-yellow-500/50
+      rounded-lg
+      px-3 py-1.5
       flex items-center gap-2
-      shadow-lg shadow-yellow-500/20
+      shadow-md
       animate-fade-in
       ${className}
     `}>
-      <Trophy className="w-4 h-4 text-yellow-900" />
-      <span className="text-sm font-bold text-yellow-900">
-        Leaderboard Mode
+      <Trophy className="w-3.5 h-3.5 text-yellow-400" />
+      <span className="text-xs font-semibold text-yellow-300">
+        Leaderboard Eligible
       </span>
-      <CheckCircle className="w-4 h-4 text-yellow-900" />
     </div>
   );
 }

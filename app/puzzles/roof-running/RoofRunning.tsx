@@ -8,6 +8,7 @@ import {getCluster, handleGravity, handleLeftShift, SquareColor, squareColors, S
 import {NPSettingsRange} from "@/app/components/NPSettings";
 import usePersistantState from "@/app/utils/usePersistentState";
 import GameStatsTracker from "@/app/components/GameStatsTracker";
+import LeaderboardEligibleBadge from "@/app/components/LeaderboardEligibleBadge";
 import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
 import { useSearchParams } from "next/navigation";
 
@@ -236,6 +237,14 @@ const RoofRunning: FC = () => {
 
     return (
         <>
+            <LeaderboardEligibleBadge
+                game="roof-running"
+                gameSettings={{
+                    rows,
+                    columns,
+                    timer,
+                }}
+            />
             <GameStatsTracker
                 game="roof-running"
                 gameStatus={gameStatus}

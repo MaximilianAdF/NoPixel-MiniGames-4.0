@@ -47,12 +47,14 @@ export default function LeaderboardsPage() {
   const [userRank, setUserRank] = useState<LeaderboardEntry | null>(null);
   const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [isSwitching, setIsSwitching] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['general']));
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const hasFetchedRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const requestIdRef = useRef(0);
 
   const fetchLeaderboard = useCallback(async () => {
     // Prevent duplicate fetches
@@ -62,32 +64,42 @@ export default function LeaderboardsPage() {
     }
     hasFetchedRef.current = true;
 
-    // Clear old data immediately to prevent flash
-    setUserRank(null);
-    setLeaderboard([]);
+    // Cancel any ongoing request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
     
-    // Only show skeleton on initial load, use fade transition for switches
+    // Generate unique request ID to track this specific request
+    const currentRequestId = ++requestIdRef.current;
+
+    // Don't clear old data - let new data replace it smoothly
+    // This prevents flickering when switching categories
+    
+    // Only show skeleton on initial load
     if (isInitialLoad) {
       setLoading(true);
-    } else {
-      setIsSwitching(true);
     }
     
     try {
-      const response = await fetch(`/api/stats/leaderboard?type=${activeLeaderboard}&limit=10&page=${currentPage}`);
+      const response = await fetch(`/api/stats/leaderboard?type=${activeLeaderboard}&limit=10&page=${currentPage}`, {
+        signal: abortControllerRef.current.signal,
+      });
       if (response.ok) {
         const data = await response.json();
+        
+        // Check if this is still the latest request
+        if (currentRequestId !== requestIdRef.current) {
+          // A newer request has been made, discard this data
+          return;
+        }
         
         // Update pagination info
         if (data.pagination) {
           setTotalPages(data.pagination.totalPages);
         }
         
-        // Small delay for smooth transition
-        if (!isInitialLoad) {
-          await new Promise(resolve => setTimeout(resolve, 150));
-        }
-        
+        // Update leaderboard immediately for snappy feel
         setLeaderboard(data.entries || []);
         
         // If user is logged in, fetch their rank
@@ -100,7 +112,9 @@ export default function LeaderboardsPage() {
           } else {
             // User not in top 10, fetch their specific rank
             try {
-              const userRankResponse = await fetch(`/api/stats/leaderboard?type=${activeLeaderboard}&userId=${user.id}`);
+              const userRankResponse = await fetch(`/api/stats/leaderboard?type=${activeLeaderboard}&userId=${user.id}`, {
+                signal: abortControllerRef.current.signal,
+              });
               if (userRankResponse.ok) {
                 const userRankData = await userRankResponse.json();
                 if (userRankData.entry) {
@@ -119,12 +133,15 @@ export default function LeaderboardsPage() {
         }
       }
     } catch (error) {
+      // Ignore abort errors - they're expected when switching categories
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
       console.error('Failed to fetch leaderboard:', error);
       setLeaderboard([]);
       setUserRank(null);
     } finally {
       setLoading(false);
-      setIsSwitching(false);
       setIsInitialLoad(false);
       // Reset the ref after a short delay to allow new fetches
       setTimeout(() => {
@@ -133,9 +150,30 @@ export default function LeaderboardsPage() {
     }
   }, [activeLeaderboard, currentPage, user?.id, isInitialLoad]);
 
-  // Fetch leaderboard when dependencies change
+  // Fetch leaderboard when dependencies change (with debouncing)
   useEffect(() => {
-    fetchLeaderboard();
+    // Clear any existing debounce timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    // For initial load, fetch immediately
+    if (isInitialLoad) {
+      fetchLeaderboard();
+      return;
+    }
+    
+    // For category/page changes, debounce by 100ms (fast but prevents spam)
+    debounceTimerRef.current = setTimeout(() => {
+      fetchLeaderboard();
+    }, 100);
+    
+    // Cleanup on unmount or dependency change
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeLeaderboard, currentPage, user?.id]);
 
@@ -371,7 +409,7 @@ export default function LeaderboardsPage() {
 
               {/* Table Body */}
               <div 
-                className={`divide-y-2 divide-[#54FFA4]/20 transition-all duration-300 ease-in-out ${isSwitching ? 'opacity-50' : 'opacity-100'}`}
+                className="divide-y-2 divide-[#54FFA4]/20"
               >
                 {leaderboard.length === 0 && loading ? (
                   // Show skeleton rows only on initial load (when there's no data yet)
@@ -407,10 +445,9 @@ export default function LeaderboardsPage() {
                       <Link
                         key={`${entry.userId}-${activeLeaderboard}`}
                         href={`/profile/${entry.userId}`}
-                        className={`block px-6 py-4 hover:bg-[#0F1B21]/60 transition-all duration-200 cursor-pointer animate-fade-in ${
+                        className={`block px-6 py-4 hover:bg-[#0F1B21]/60 transition-colors duration-150 cursor-pointer ${
                           entry.rank <= 3 ? 'bg-[#0F1B21]/30' : index % 2 === 0 ? 'bg-[#0F1B21]/10' : 'bg-[#0F1B21]/5'
                         } ${entry.userId === user?.id ? '!bg-[#54FFA4]/5 border-l-4 border-[#54FFA4]' : ''}`}
-                        style={{ animationDelay: `${index * 30}ms` }}
                       >
                         <div className="grid grid-cols-12 gap-4 items-center">
                           {/* Rank */}

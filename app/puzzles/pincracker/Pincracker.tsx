@@ -11,6 +11,7 @@ import useGame from "@/app/utils/useGame";
 import NPButton from "@/app/components/NPButton";
 import { useIsMobileOrTablet } from "@/app/utils/useMediaQuery";
 import GameStatsTracker from "@/app/components/GameStatsTracker";
+import LeaderboardEligibleBadge from "@/app/components/LeaderboardEligibleBadge";
 import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
 import { useSearchParams } from "next/navigation";
 
@@ -469,6 +470,13 @@ const Pincracker: FC = () => {
 
     return (
         <>
+            <LeaderboardEligibleBadge
+                game="pincracker"
+                gameSettings={{
+                    pinLength,
+                    timer,
+                }}
+            />
             <GameStatsTracker
                 game="pincracker"
                 gameStatus={gameStatus}

@@ -6,6 +6,7 @@ import usePersistantState from "@/app/utils/usePersistentState";
 import NPHackContainer from "@/app/components/NPHackContainer";
 import { NPSettingsRange } from "@/app/components/NPSettings";
 import GameStatsTracker from "@/app/components/GameStatsTracker";
+import LeaderboardEligibleBadge from "@/app/components/LeaderboardEligibleBadge";
 import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
 import React, { FC, useEffect, useState, useRef, useCallback, memo, useMemo, startTransition } from "react";
 import { useKeyDown } from "@/app/utils/useKeyDown";
@@ -547,6 +548,13 @@ const Chopping: FC = () => {
 
     return (
         <>
+            <LeaderboardEligibleBadge
+                game="chopping"
+                gameSettings={{
+                    letters: numLetters,
+                    timer: timer,
+                }}
+            />
             <GameStatsTracker
                 game="chopping"
                 gameStatus={gameStatus}

@@ -10,6 +10,7 @@ import usePersistantState from "@/app/utils/usePersistentState";
 import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
 import classNames from "classnames";
 import GameStatsTracker from "./GameStatsTracker";
+import LeaderboardEligibleBadge from "./LeaderboardEligibleBadge";
 
 type RingColor = "red" | "yellow" | "blue";
 
@@ -322,6 +323,13 @@ const NPLockpick: FC<NPLockpickProps> = ({
 
     return (
         <>
+            <LeaderboardEligibleBadge
+                game={gameId}
+                gameSettings={{
+                    levels: levels,
+                    timer: timer,
+                }}
+            />
             <GameStatsTracker
                 game={gameId as any}
                 gameStatus={gameStatus}
@@ -331,8 +339,8 @@ const NPLockpick: FC<NPLockpickProps> = ({
                 wonStatus={3}
                 lostStatus={2}
                 gameSettings={{
-                    numPhrases: levels,
-                    duration: timer,
+                    levels: levels,
+                    timer: timer,
                 }}
             />
             <NPHackContainer

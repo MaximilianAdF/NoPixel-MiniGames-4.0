@@ -6,6 +6,7 @@ import {useCallback, useEffect, useState} from "react";
 import useGame from "@/app/utils/useGame";
 import { generate } from "random-words";
 import GameStatsTracker from "@/app/components/GameStatsTracker";
+import LeaderboardEligibleBadge from "@/app/components/LeaderboardEligibleBadge";
 import { NPSettingsRange } from "@/app/components/NPSettings";
 import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
 import { useSearchParams } from "next/navigation";
@@ -184,6 +185,13 @@ export default function WordMemory() {
     
     return (
         <>
+            <LeaderboardEligibleBadge
+                game="word-memory"
+                gameSettings={{
+                    words: numWords,
+                    timer,
+                }}
+            />
             <GameStatsTracker
                 game="word-memory"
                 gameStatus={gameStatus}

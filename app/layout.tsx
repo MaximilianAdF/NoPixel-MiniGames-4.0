@@ -15,6 +15,7 @@ import { UserProvider } from './contexts/UserContext';
 import { LoadingProvider } from './contexts/LoadingContext';
 import { KeyboardShortcutsProvider } from './contexts/KeyboardShortcutsContext';
 import { GuideProvider } from './contexts/GuideContext';
+import GoogleTagManager, { GoogleTagManagerNoScript } from './components/GoogleTagManager';
 
 function Background() {
   return (
@@ -164,6 +165,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="color-scheme" content="dark" />
         
+        {/* Google Tag Manager - Replace GTM-XXXXXXX with your actual GTM ID */}
+        <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
+        
         {/* JSON-LD Structured Data for better SEO */}
         <script
           type="application/ld+json"
@@ -220,6 +224,9 @@ export default function RootLayout({
           paddingRight: 'env(safe-area-inset-right, 0px)',
         }}
       >
+        {/* Google Tag Manager NoScript Fallback */}
+        <GoogleTagManagerNoScript gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
+        
         <Background />
         <LoadingProvider>
           <UserProvider>

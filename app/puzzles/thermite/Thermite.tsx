@@ -28,6 +28,7 @@ import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChampagneGlasses } from "@fortawesome/free-solid-svg-icons";
 import GameStatsTracker from "@/app/components/GameStatsTracker";
+import LeaderboardEligibleBadge from "@/app/components/LeaderboardEligibleBadge";
 import { useSearchParams } from "next/navigation";
 
 const Thermite: FC = () => {
@@ -448,12 +449,23 @@ const Thermite: FC = () => {
 
   return (
     <>
+      <LeaderboardEligibleBadge
+        game="thermite"
+        gameSettings={{
+          timer,
+          targetScore,
+          rows,
+          columns,
+        }}
+      />
       <GameStatsTracker
         game="thermite"
         gameStatus={gameStatus}
         score={score}
         elapsedMs={elasped}
         targetScore={targetScore}
+        wonStatus={3}
+        lostStatus={2}
         gameSettings={{
           timer,
           targetScore,
