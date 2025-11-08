@@ -89,17 +89,32 @@ export default async function Image() {
         </div>
         <div
           style={{
-            fontSize: '24px',
-            fontFamily: 'sans-serif',
-            color: '#AAA',
-            textAlign: 'center',
-            maxWidth: '900px',
-            lineHeight: 1.4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '10px',
           }}
         >
-          Crack the code with the pin matching minigame
-          <br />
-          Pattern recognition • Speed typing • Climb the ranks
+          <div
+            style={{
+              fontSize: '24px',
+              fontFamily: 'sans-serif',
+              color: '#AAA',
+              textAlign: 'center',
+            }}
+          >
+            Crack the code with the pin matching minigame
+          </div>
+          <div
+            style={{
+              fontSize: '24px',
+              fontFamily: 'sans-serif',
+              color: '#AAA',
+              textAlign: 'center',
+            }}
+          >
+            Pattern recognition • Speed typing • Climb the ranks
+          </div>
         </div>
         <div
           style={{

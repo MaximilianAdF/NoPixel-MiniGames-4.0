@@ -89,17 +89,32 @@ export default async function Image() {
         </div>
         <div
           style={{
-            fontSize: '24px',
-            fontFamily: 'sans-serif',
-            color: '#AAA',
-            textAlign: 'center',
-            maxWidth: '900px',
-            lineHeight: 1.4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '10px',
           }}
         >
-          Train your memory with word pattern challenges
-          <br />
-          NEW or SEEN? • Mental agility • Score high
+          <div
+            style={{
+              fontSize: '24px',
+              fontFamily: 'sans-serif',
+              color: '#AAA',
+              textAlign: 'center',
+            }}
+          >
+            Train your memory with word pattern challenges
+          </div>
+          <div
+            style={{
+              fontSize: '24px',
+              fontFamily: 'sans-serif',
+              color: '#AAA',
+              textAlign: 'center',
+            }}
+          >
+            NEW or SEEN? • Mental agility • Score high
+          </div>
         </div>
         <div
           style={{

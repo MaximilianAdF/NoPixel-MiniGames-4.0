@@ -89,17 +89,32 @@ export default async function Image() {
         </div>
         <div
           style={{
-            fontSize: '24px',
-            fontFamily: 'sans-serif',
-            color: '#AAA',
-            textAlign: 'center',
-            maxWidth: '900px',
-            lineHeight: 1.4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '10px',
           }}
         >
-          Master the rapid-fire typing sequence
-          <br />
-          Lightning reflexes • Keyboard skills • Top the leaderboard
+          <div
+            style={{
+              fontSize: '24px',
+              fontFamily: 'sans-serif',
+              color: '#AAA',
+              textAlign: 'center',
+            }}
+          >
+            Master the rapid-fire typing sequence
+          </div>
+          <div
+            style={{
+              fontSize: '24px',
+              fontFamily: 'sans-serif',
+              color: '#AAA',
+              textAlign: 'center',
+            }}
+          >
+            Lightning reflexes • Keyboard skills • Top the leaderboard
+          </div>
         </div>
         <div
           style={{

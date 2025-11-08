@@ -117,17 +117,32 @@ export default async function Image() {
         {/* Description */}
         <div
           style={{
-            fontSize: '24px',
-            fontFamily: 'sans-serif',
-            color: '#AAA',
-            textAlign: 'center',
-            maxWidth: '900px',
-            lineHeight: 1.4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '10px',
           }}
         >
-          Practice the iconic thermite sequence minigame
-          <br />
-          Master timing • Compete on leaderboards • Free training
+          <div
+            style={{
+              fontSize: '24px',
+              fontFamily: 'sans-serif',
+              color: '#AAA',
+              textAlign: 'center',
+            }}
+          >
+            Practice the iconic thermite sequence minigame
+          </div>
+          <div
+            style={{
+              fontSize: '24px',
+              fontFamily: 'sans-serif',
+              color: '#AAA',
+              textAlign: 'center',
+            }}
+          >
+            Master timing • Compete on leaderboards • Free training
+          </div>
         </div>
 
         {/* Bottom Badge */}

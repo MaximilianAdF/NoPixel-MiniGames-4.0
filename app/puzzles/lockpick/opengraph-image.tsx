@@ -89,17 +89,32 @@ export default async function Image() {
         </div>
         <div
           style={{
-            fontSize: '24px',
-            fontFamily: 'sans-serif',
-            color: '#AAA',
-            textAlign: 'center',
-            maxWidth: '900px',
-            lineHeight: 1.4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '10px',
           }}
         >
-          Master the ring alignment lockpicking minigame
-          <br />
-          Perfect your timing • Global leaderboards • Free practice
+          <div
+            style={{
+              fontSize: '24px',
+              fontFamily: 'sans-serif',
+              color: '#AAA',
+              textAlign: 'center',
+            }}
+          >
+            Master the ring alignment lockpicking minigame
+          </div>
+          <div
+            style={{
+              fontSize: '24px',
+              fontFamily: 'sans-serif',
+              color: '#AAA',
+              textAlign: 'center',
+            }}
+          >
+            Perfect your timing • Global leaderboards • Free practice
+          </div>
         </div>
         <div
           style={{

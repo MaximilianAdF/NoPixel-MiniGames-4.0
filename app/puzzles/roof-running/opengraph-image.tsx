@@ -89,17 +89,32 @@ export default async function Image() {
         </div>
         <div
           style={{
-            fontSize: '24px',
-            fontFamily: 'sans-serif',
-            color: '#AAA',
-            textAlign: 'center',
-            maxWidth: '900px',
-            lineHeight: 1.4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '10px',
           }}
         >
-          Train your memory for the rooftop parkour sequence
-          <br />
-          Fast reflexes • Pattern recall • Race the leaderboards
+          <div
+            style={{
+              fontSize: '24px',
+              fontFamily: 'sans-serif',
+              color: '#AAA',
+              textAlign: 'center',
+            }}
+          >
+            Train your memory for the rooftop parkour sequence
+          </div>
+          <div
+            style={{
+              fontSize: '24px',
+              fontFamily: 'sans-serif',
+              color: '#AAA',
+              textAlign: 'center',
+            }}
+          >
+            Fast reflexes • Pattern recall • Race the leaderboards
+          </div>
         </div>
         <div
           style={{
