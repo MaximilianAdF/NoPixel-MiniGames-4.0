@@ -85,6 +85,4 @@ function getPresets<P extends Puzzle>(puzzle: P): Preset<P>[] {
         ]
     };
     return presetMap[puzzle] as Preset<P>[];
-}
-
-export { getPresets };
+ getPresets };

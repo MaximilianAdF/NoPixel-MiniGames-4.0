@@ -3,6 +3,44 @@
 @tailwind utilities;
 
 @layer base {
+  /* Custom text selection color - neon green */
+  ::selection {
+    background-color: #54FFA4;
+    color: #0F1B21;
+  }
+  
+  ::-moz-selection {
+    background-color: #54FFA4;
+    color: #0F1B21;
+  }
+  
+  /* Custom focus styles - neon green outline */
+  *:focus {
+    outline: 2px solid #54FFA4;
+    outline-offset: 2px;
+  }
+  
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+  
+  *:focus-visible {
+    outline: 2px solid #54FFA4;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(84, 255, 164, 0.1);
+  }
+  
+  /* Button focus states */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid #54FFA4;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(84, 255, 164, 0.1);
+  }
+  
   /* iOS Safe Area Support */
   :root {
     --safe-area-inset-top: env(safe-area-inset-top);
@@ -160,6 +198,17 @@
   }
 }
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Mobile instructions styling improvements */
 .mobile-instructions h3 {
   font-size: 1rem;
@@ -180,4 +229,666 @@
 
 .mobile-instructions li {
   margin-bottom: 0.5rem;
+}
+
+/* Slide-in animation for contextual hints */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out forwards;
+}
+
+/* Volume slider styling */
+input[type="range"].slider-track {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: #1a2930;
+  outline: none;
+}
+
+input[type="range"].slider-track::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, 
+    #54FFA4 0%, 
+    #54FFA4 var(--slider-value, 50%), 
+    #1a2930 var(--slider-value, 50%), 
+    #1a2930 100%);
+}
+
+input[type="range"].slider-track::-moz-range-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: #1a2930;
+}
+
+input[type="range"].slider-track::-moz-range-progress {
+  height: 8px;
+  border-radius: 4px;
+  background: #54FFA4;
+}
+
+input[type="range"].slider-track::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #54FFA4;
+  cursor: pointer;
+  border: 3px solid #0F1B21;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+  margin-top: -5px;
+}
+
+input[type="range"].slider-track::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 12px rgba(84, 255, 164, 0.6);
+  background: #6bffb4;
+}
+
+input[type="range"].slider-track::-webkit-slider-thumb:active {
+  transform: scale(1.05);
+}
+
+input[type="range"].slider-track::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #54FFA4;
+  cursor: pointer;
+  border: 3px solid #0F1B21;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+}
+
+input[type="range"].slider-track::-moz-range-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 12px rgba(84, 255, 164, 0.6);
+  background: #6bffb4;
+}
+
+input[type="range"].slider-track::-moz-range-thumb:active {
+  transform: scale(1.05);
+}
+
+/* Daily Challenge Success Banner Animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -100%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* Digital Clock Digit Flip Animation */
+@keyframes digitFlip {
+  0% {
+    transform: rotateX(0deg);
+  }
+  50% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+/* ============================================ */
+/* CYBERPUNK ANIMATIONS & EFFECTS */
+/* ============================================ */
+
+/* Scanline effect for cyberpunk feel */
+@keyframes scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+/* Shimmer effect for buttons */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Glitch effects */
+@keyframes glitch-1 {
+  0%, 100% {
+    transform: translate(0);
+    opacity: 0.7;
+  }
+  33% {
+    transform: translate(-2px, 2px);
+    opacity: 0.8;
+  }
+  66% {
+    transform: translate(2px, -2px);
+    opacity: 0.6;
+  }
+}
+
+@keyframes glitch-2 {
+  0%, 100% {
+    transform: translate(0);
+    opacity: 0.7;
+  }
+  33% {
+    transform: translate(2px, -2px);
+    opacity: 0.6;
+  }
+  66% {
+    transform: translate(-2px, 2px);
+    opacity: 0.8;
+  }
+}
+
+/* Pulse glow effect */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(84, 255, 164, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(84, 255, 164, 0.6);
+  }
+}
+
+/* Pulse glow for text */
+@keyframes pulse-glow-text {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(84, 255, 164, 0.3),
+                 0 0 20px rgba(84, 255, 164, 0.2);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(84, 255, 164, 0.6),
+                 0 0 30px rgba(84, 255, 164, 0.4);
+  }
+}
+
+/* Float animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Smooth spin animation for loading indicator */
+@keyframes spin-smooth {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Skeleton shimmer animation */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Matrix rain animation */
+@keyframes matrixRain {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+/* Screen flicker for glitch effect */
+@keyframes screen-flicker {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.03;
+  }
+}
+
+/* Pulse slow for ambient elements */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+/* Different glitch speeds */
+@keyframes glitch-slow {
+  0%, 90%, 100% {
+    transform: translate(0);
+    opacity: 0.5;
+  }
+  93% {
+    transform: translate(-2px, 2px);
+    opacity: 0.7;
+  }
+  96% {
+    transform: translate(2px, -2px);
+    opacity: 0.6;
+  }
+}
+
+@keyframes glitch-medium {
+  0%, 80%, 100% {
+    transform: translate(0);
+    opacity: 0.5;
+  }
+  85% {
+    transform: translate(-2px, 2px);
+    opacity: 0.8;
+  }
+  90% {
+    transform: translate(2px, -2px);
+    opacity: 0.6;
+  }
+}
+
+@keyframes glitch-fast {
+  0%, 70%, 100% {
+    transform: translate(0);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translate(-3px, 3px);
+    opacity: 0.9;
+  }
+  80% {
+    transform: translate(3px, -3px);
+    opacity: 0.7;
+  }
+}
+
+/* Ambient site-wide animations */
+@keyframes ambient-flicker {
+  0%, 95%, 100% {
+    opacity: 1;
+  }
+  96%, 97% {
+    opacity: 0.8;
+  }
+  98% {
+    opacity: 0.95;
+  }
+}
+
+@keyframes border-pulse {
+  0%, 100% {
+    border-color: rgba(84, 255, 164, 0.2);
+  }
+  50% {
+    border-color: rgba(84, 255, 164, 0.5);
+  }
+}
+
+/* Glitch bar animation for ambient effects */
+@keyframes glitchBar {
+  0%, 90%, 100% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  92% {
+    opacity: 1;
+    transform: scaleX(1) translateX(-10px);
+  }
+  94% {
+    opacity: 0.5;
+    transform: scaleX(0.8) translateX(5px);
+  }
+  96% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+}
+
+/* Corner glitch animation */
+@keyframes cornerGlitch {
+  0%, 95%, 100% {
+    opacity: 0;
+  }
+  96% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  97% {
+    opacity: 0.7;
+    transform: translate(2px, 2px);
+  }
+  98% {
+    opacity: 0.4;
+    transform: translate(-1px, -1px);
+  }
+}
+
+/* Vertical scan animation */
+@keyframes verticalScan {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+/* Utility animation classes */
+.animate-scan {
+  animation: scan 3s linear infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
+.animate-glitch-1 {
+  animation: glitch-1 0.3s infinite;
+}
+
+.animate-glitch-2 {
+  animation: glitch-2 0.3s infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-pulse-glow-text {
+  animation: pulse-glow-text 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+.animate-screen-flicker {
+  animation: screen-flicker 8s infinite;
+}
+
+.animate-glitch-slow {
+  animation: glitch-slow 10s infinite;
+}
+
+.animate-glitch-medium {
+  animation: glitch-medium 5s infinite;
+}
+
+.animate-glitch-fast {
+  animation: glitch-fast 3s infinite;
+}
+
+.animate-ambient-flicker {
+  animation: ambient-flicker 15s infinite;
+}
+
+.animate-border-pulse {
+  animation: border-pulse 3s ease-in-out infinite;
+}
+
+/* ============================================ */
+/* CYBERPUNK UTILITY CLASSES */
+/* ============================================ */
+
+/* Glow effects */
+.glow-green {
+  box-shadow: 0 0 20px rgba(84, 255, 164, 0.3);
+}
+
+.glow-green-strong {
+  box-shadow: 0 0 30px rgba(84, 255, 164, 0.6);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.glow-purple {
+  box-shadow: 0 0 20px rgba(185, 104, 199, 0.3);
+}
+
+.glow-pink {
+  box-shadow: 0 0 20px rgba(255, 0, 110, 0.3);
+}
+
+/* Neon text effects */
+.neon-text-green {
+  color: #54FFA4;
+  text-shadow: 0 0 10px rgba(84, 255, 164, 0.5),
+               0 0 20px rgba(84, 255, 164, 0.3),
+               0 0 30px rgba(84, 255, 164, 0.2);
+}
+
+.neon-text-cyan {
+  color: #00FFFF;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5),
+               0 0 20px rgba(0, 255, 255, 0.3),
+               0 0 30px rgba(0, 255, 255, 0.2);
+}
+
+.neon-text-purple {
+  color: #B968C7;
+  text-shadow: 0 0 10px rgba(185, 104, 199, 0.5),
+               0 0 20px rgba(185, 104, 199, 0.3),
+               0 0 30px rgba(185, 104, 199, 0.2);
+}
+
+/* Scanline effect container */
+.scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanlines::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(84, 255, 164, 0.05) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  animation: scan 8s linear infinite;
+  z-index: 1;
+}
+
+/* Cyber grid background */
+.cyber-grid {
+  background-image: 
+    linear-gradient(rgba(84, 255, 164, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(84, 255, 164, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Cyber container */
+.cyber-container {
+  position: relative;
+  background: linear-gradient(135deg, rgba(15, 27, 33, 0.8) 0%, rgba(26, 41, 48, 0.8) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(84, 255, 164, 0.2);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Cyber panel */
+.cyber-panel {
+  position: relative;
+  padding: 1.5rem;
+  background: rgba(15, 27, 33, 0.6);
+  border: 1px solid rgba(84, 255, 164, 0.15);
+  border-radius: 0.5rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Corner brackets */
+.corner-brackets {
+  position: relative;
+}
+
+.corner-brackets::before,
+.corner-brackets::after {
+  content: '';
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #54FFA4;
+  opacity: 0.6;
+}
+
+.corner-brackets::before {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+}
+
+.corner-brackets::after {
+  top: 0;
+  right: 0;
+  border-left: none;
+  border-bottom: none;
+}
+
+/* ============================================ */
+/* BUTTON SHAPES */
+/* ============================================ */
+
+/* Angled/clipped corners */
+.clip-angled {
+  clip-path: polygon(
+    0.5rem 0,
+    100% 0,
+    100% calc(100% - 0.5rem),
+    calc(100% - 0.5rem) 100%,
+    0 100%,
+    0 0.5rem
+  );
+}
+
+/* Hexagonal shape */
+.clip-hexagonal {
+  clip-path: polygon(
+    0.75rem 0,
+    calc(100% - 0.75rem) 0,
+    100% 50%,
+    calc(100% - 0.75rem) 100%,
+    0.75rem 100%,
+    0 50%
+  );
+}
+
+/* ============================================ */
+/* RESPONSIVE & PERFORMANCE OPTIMIZATIONS */
+/* ============================================ */
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Mobile optimizations - reduce intensive animations */
+@media (max-width: 768px) {
+  /* Reduce animation complexity on mobile */
+  .animate-scan,
+  .animate-shimmer,
+  .animate-glitch-1,
+  .animate-glitch-2 {
+    animation-duration: 1.5s !important;
+  }
+  
+  /* Simplify background effects on mobile */
+  .cyber-grid {
+    background-size: 100px 100px;
+    opacity: 0.5;
+  }
+  
+  /* Reduce glow intensity on mobile for performance */
+  .glow-green,
+  .glow-cyan,
+  .glow-purple,
+  .glow-pink {
+    box-shadow: none;
+  }
+  
+  /* Lighter scanlines on mobile */
+  .scanlines::before {
+    opacity: 0.3;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .cyber-grid {
+    background-size: 75px 75px;
+  }
+}
+
+/* High-performance devices - enable all effects */
+@media (min-width: 1025px) {
+  /* Full effects on desktop */
 }

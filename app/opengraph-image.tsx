@@ -12,126 +12,159 @@ export default async function Image() {
     (
       <div
         style={{
-          background: 'linear-gradient(135deg, #0F1B21 0%, #1a2930 50%, #0F1B21 100%)',
+          background: 'linear-gradient(to bottom right, #1e3a5f 0%, #2d4a73 50%, #1e3a5f 100%)',
           width: '100%',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '60px',
+          padding: '80px',
           position: 'relative',
         }}
       >
-        {/* Decorative border */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '30px',
-            left: '30px',
-            right: '30px',
-            bottom: '30px',
-            border: '3px solid rgba(84, 255, 164, 0.2)',
-            borderRadius: '20px',
-          }}
-        />
-
-        {/* Logo/Brand */}
         <div
           style={{
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            gap: '20px',
-            marginBottom: '40px',
+            justifyContent: 'center',
           }}
         >
           <div
             style={{
-              fontSize: '80px',
-              fontFamily: 'monospace',
-              fontWeight: 'bold',
+              fontSize: '140px',
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              fontWeight: '900',
               color: '#54FFA4',
-              letterSpacing: '-2px',
-              textShadow: '0 0 20px rgba(84, 255, 164, 0.5)',
+              letterSpacing: '12px',
+              marginBottom: '-20px',
+              textTransform: 'uppercase',
+              textShadow: '0 0 40px rgba(84, 255, 164, 0.5)',
             }}
           >
-            NP
+            NOPIXEL
           </div>
+
           <div
             style={{
-              fontSize: '48px',
-              fontFamily: 'sans-serif',
+              position: 'absolute',
+              top: '140px',
+              right: '180px',
+              fontSize: '72px',
+              fontFamily: 'system-ui, -apple-system, sans-serif',
               fontWeight: 'bold',
               color: 'white',
             }}
           >
-            NoPixel 4.0
+            4.0
+          </div>
+
+          <div
+            style={{
+              fontSize: '56px',
+              fontFamily: 'cursive',
+              fontStyle: 'italic',
+              color: '#b8c5d6',
+              marginTop: '10px',
+              marginBottom: '60px',
+              letterSpacing: '2px',
+            }}
+          >
+            Hacking Simulator
+          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '18px',
+              alignItems: 'center',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '28px',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                color: '#d4e0ed',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+              }}
+            >
+              <span style={{ color: '#54FFA4' }}>✓</span>
+              <span>8 Authentic NoPixel Minigames</span>
+            </div>
+            <div
+              style={{
+                fontSize: '28px',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                color: '#d4e0ed',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+              }}
+            >
+              <span style={{ color: '#54FFA4' }}>✓</span>
+              <span>Global Leaderboards & Daily Challenges</span>
+            </div>
+            <div
+              style={{
+                fontSize: '28px',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                color: '#d4e0ed',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+              }}
+            >
+              <span style={{ color: '#54FFA4' }}>✓</span>
+              <span>100% Free • No Login Required</span>
+            </div>
           </div>
         </div>
 
-        {/* Main Title */}
-        <div
-          style={{
-            fontSize: '64px',
-            fontFamily: 'sans-serif',
-            fontWeight: 'bold',
-            color: 'white',
-            textAlign: 'center',
-            marginBottom: '20px',
-            lineHeight: 1.2,
-          }}
-        >
-          Free GTA RP Practice Simulator
-        </div>
-
-        {/* Subtitle */}
-        <div
-          style={{
-            fontSize: '32px',
-            fontFamily: 'sans-serif',
-            color: '#54FFA4',
-            textAlign: 'center',
-            marginBottom: '40px',
-          }}
-        >
-          Master Thermite • Lockpick • VAR • Laundromat & More
-        </div>
-
-        {/* Features */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '40px',
-            fontSize: '24px',
-            color: '#9CA3AF',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ color: '#54FFA4', fontSize: '32px' }}>•</div>
-            <div>Global Leaderboards</div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ color: '#54FFA4', fontSize: '32px' }}>•</div>
-            <div>Expert Tips</div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ color: '#54FFA4', fontSize: '32px' }}>•</div>
-            <div>100% Free</div>
-          </div>
-        </div>
-
-        {/* Bottom domain */}
         <div
           style={{
             position: 'absolute',
             bottom: '40px',
-            fontSize: '28px',
-            fontFamily: 'monospace',
-            color: '#54FFA4',
-            opacity: 0.8,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '15px',
+            backgroundColor: 'rgba(84, 255, 164, 0.15)',
+            padding: '20px 40px',
+            borderRadius: '50px',
+            border: '2px solid rgba(84, 255, 164, 0.3)',
           }}
         >
-          no-px.vercel.app
+          <div
+            style={{
+              fontSize: '24px',
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              color: '#54FFA4',
+              fontWeight: 'bold',
+            }}
+          >
+            ⭐ START PRACTICING NOW
+          </div>
+          <div
+            style={{
+              fontSize: '24px',
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              color: '#666',
+            }}
+          >
+            •
+          </div>
+          <div
+            style={{
+              fontSize: '24px',
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              color: '#54FFA4',
+            }}
+          >
+            no-px.vercel.app
+          </div>
         </div>
       </div>
     ),

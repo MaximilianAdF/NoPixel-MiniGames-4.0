@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, BookOpen, X, GripVertical, GripHorizontal, Clock } from "lucide-react";
 import usePersistantState from "../utils/usePersistentState";
 import { useMediaQuery } from "../utils/useMediaQuery";
+import { useKeyboardShortcuts } from "../contexts/KeyboardShortcutsContext";
+import { useGuide } from "../contexts/GuideContext";
 
 interface GameInstructionsProps {
     gameId: string;
@@ -13,10 +15,26 @@ interface GameInstructionsProps {
 
 export default function GameInstructions({ gameId, title, children }: GameInstructionsProps) {
     const isMobile = useMediaQuery("(max-width: 768px)");
+    const { registerHandler, unregisterHandler } = useKeyboardShortcuts();
+    const { setIsOpen: setGlobalIsOpen, setWidth: setGlobalWidth } = useGuide();
     const [isOpen, setIsOpen] = usePersistantState<boolean>(
         `game-instructions-${gameId}`,
         true // Default to open for first-time visitors (AdSense requirement)
     );
+    
+    // Track if component has mounted (client-side only)
+    const [isMounted, setIsMounted] = useState(false);
+    
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+    
+    // Use ref to track current isOpen state for keyboard shortcuts (avoids closure issues)
+    const isOpenRef = useRef(isOpen);
+    useEffect(() => {
+        isOpenRef.current = isOpen;
+    }, [isOpen]);
+    
     const [activeSection, setActiveSection] = useState<string>("");
     const [scrollProgress, setScrollProgress] = useState(0);
     const desktopContentRef = useRef<HTMLDivElement>(null);
@@ -40,6 +58,51 @@ export default function GameInstructions({ gameId, title, children }: GameInstru
     const [swipeDistance, setSwipeDistance] = useState(0);
     const SWIPE_THRESHOLD = 50; // Minimum distance for swipe
     const VELOCITY_THRESHOLD = 0.3; // Minimum velocity (pixels per millisecond)
+
+    // Sync local state with global guide context (only on changes, not every render)
+    useEffect(() => {
+        setGlobalIsOpen(isOpen);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen]); // setGlobalIsOpen intentionally omitted to prevent loop
+
+    useEffect(() => {
+        if (!isMobile) {
+            setGlobalWidth(desktopWidth);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [desktopWidth, isMobile]); // setGlobalWidth intentionally omitted to prevent loop
+
+    // Register keyboard shortcuts for guide
+    useEffect(() => {
+        // Register handler to toggle guide (use ref to get current state)
+        registerHandler('openGuide', () => {
+            setIsOpen(!isOpenRef.current);
+        });
+
+        // Register handler to close guide
+        registerHandler('closeMenu', () => {
+            setIsOpen(false);
+        });
+
+        // Cleanup
+        return () => {
+            unregisterHandler('openGuide');
+            unregisterHandler('closeMenu');
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [registerHandler, unregisterHandler]); // setIsOpen is captured in closure, don't need in deps
+
+    // ESC key to close guide panel (now handled by keyboard shortcuts context)
+    useEffect(() => {
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isOpen) {
+                setIsOpen(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleEscape);
+        return () => window.removeEventListener('keydown', handleEscape);
+    }, [isOpen, setIsOpen]);
 
     // Calculate reading time on mount
     useEffect(() => {
@@ -217,14 +280,19 @@ export default function GameInstructions({ gameId, title, children }: GameInstru
                             ${isResizing ? '' : 'transition-all duration-300'}
                             z-30
                             group
+                            ${!isMounted ? '!transition-none' : ''}
                         `}
-                        style={{ right: isOpen ? `${desktopWidth}px` : '0px' }}
+                        style={isMounted ? { right: isOpen ? `${desktopWidth}px` : '0px' } : { right: '0px' }}
                         aria-label={isOpen ? "Hide instructions" : "Show instructions"}
                     >
-                        {isOpen ? (
-                            <ChevronRight className="w-6 h-6 text-[#54FFA4] group-hover:scale-110 transition-transform" />
-                        ) : (
-                            <BookOpen className="w-6 h-6 text-[#54FFA4] group-hover:scale-110 transition-transform" />
+                        {isMounted && (
+                            <>
+                                {isOpen ? (
+                                    <ChevronRight className="w-6 h-6 text-[#54FFA4] group-hover:scale-110 transition-transform" />
+                                ) : (
+                                    <BookOpen className="w-6 h-6 text-[#54FFA4] group-hover:scale-110 transition-transform" />
+                                )}
+                            </>
                         )}
                     </button>
 
@@ -234,12 +302,13 @@ export default function GameInstructions({ gameId, title, children }: GameInstru
                             fixed top-0 right-0 h-full
                             bg-gradient-to-br from-[#0F1B21]/95 to-[#1a2930]/95
                             backdrop-blur-sm
-                            border-l-2 border-[#54FFA4]/30
+                            ${isOpen ? 'border-l-2 border-[#54FFA4]/30' : ''}
                             ${isResizing ? '' : 'transition-all duration-300 ease-in-out'}
+                            ${!isMounted ? '!transition-none' : ''}
                             z-20
                             overflow-hidden
                         `}
-                        style={{ width: isOpen ? `${desktopWidth}px` : '0px' }}
+                        style={isMounted ? { width: isOpen ? `${desktopWidth}px` : '0px' } : { width: '0px' }}
                     >
                         {/* Resize Handle */}
                         {isOpen && (
@@ -303,20 +372,25 @@ export default function GameInstructions({ gameId, title, children }: GameInstru
                             z-30
                             group
                             shadow-lg
+                            ${!isMounted ? '!transition-none' : ''}
                         `}
-                        style={{ bottom: isOpen ? `${mobileHeight}vh` : '1rem' }}
+                        style={isMounted ? { bottom: isOpen ? `${mobileHeight}vh` : '1rem' } : { bottom: '1rem' }}
                         aria-label={isOpen ? "Hide instructions" : "Show instructions"}
                     >
-                        {isOpen ? (
+                        {isMounted && (
                             <>
-                                <ChevronDown className="w-5 h-5 text-[#54FFA4]" />
-                                <span className="text-white text-sm font-medium">Hide Guide</span>
-                                <X className="w-4 h-4 text-[#54FFA4]" />
-                            </>
-                        ) : (
-                            <>
-                                <BookOpen className="w-5 h-5 text-[#54FFA4]" />
-                                <span className="text-white text-sm font-medium">How to Play</span>
+                                {isOpen ? (
+                                    <>
+                                        <ChevronDown className="w-5 h-5 text-[#54FFA4]" />
+                                        <span className="text-white text-sm font-medium">Hide Guide</span>
+                                        <X className="w-4 h-4 text-[#54FFA4]" />
+                                    </>
+                                ) : (
+                                    <>
+                                        <BookOpen className="w-5 h-5 text-[#54FFA4]" />
+                                        <span className="text-white text-sm font-medium">How to Play</span>
+                                    </>
+                                )}
                             </>
                         )}
                     </button>
@@ -335,11 +409,12 @@ export default function GameInstructions({ gameId, title, children }: GameInstru
                             z-20
                             overflow-hidden
                             shadow-2xl
+                            ${!isMounted ? '!transition-none' : ''}
                         `}
-                        style={{ 
+                        style={isMounted ? { 
                             height: isOpen ? `${mobileHeight}vh` : '0vh',
                             transform: swipeDistance !== 0 ? `translateY(${-swipeDistance}px)` : undefined
-                        }}
+                        } : { height: '0vh' }}
                     >
                         {/* Resize Handle */}
                         {isOpen && (

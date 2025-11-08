@@ -3,15 +3,24 @@
 export class AudioPlayer {
   private audioElement: HTMLAudioElement | null = null;
   private readonly readyPromises: Array<() => void> = [];
+  private baseVolume: number;
 
   constructor(src: string, vol: number = 1.0) {
+    this.baseVolume = vol;
+    
     if (typeof window !== "undefined") {
       this.audioElement = new Audio(src);
       this.audioElement.preload = "auto";
-      this.audioElement.volume = vol;
+      this.audioElement.volume = this.getEffectiveVolume();
       this.audioElement.crossOrigin = "anonymous";
       this.audioElement.setAttribute("playsinline", "true");
       this.audioElement.load();
+
+      // Listen for global volume changes
+      window.addEventListener('volumeChange', (e: Event) => {
+        const customEvent = e as CustomEvent<{ volume: number }>;
+        this.updateVolume(customEvent.detail.volume);
+      });
 
       const unlock = () => {
         if (!this.audioElement) return;
@@ -49,6 +58,25 @@ export class AudioPlayer {
         },
         { once: true }
       );
+    }
+  }
+
+  private getEffectiveVolume(): number {
+    if (typeof window === 'undefined') return this.baseVolume;
+    
+    const savedVolume = localStorage.getItem('gameVolume');
+    const savedMuted = localStorage.getItem('gameMuted');
+    
+    if (savedMuted === 'true') return 0;
+    if (savedVolume) {
+      return this.baseVolume * (parseInt(savedVolume) / 100);
+    }
+    return this.baseVolume;
+  }
+
+  private updateVolume(globalVolume: number): void {
+    if (this.audioElement) {
+      this.audioElement.volume = this.baseVolume * globalVolume;
     }
   }
 

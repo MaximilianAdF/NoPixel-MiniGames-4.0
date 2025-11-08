@@ -8,9 +8,11 @@ import React, { FC, useEffect, useState, useRef, useCallback } from "react";
 import usePersistantState from "@/app/utils/usePersistentState";
 import { useKeyDown } from "@/app/utils/useKeyDown";
 import useGame from "@/app/utils/useGame";
-import StatHandler from "@/app/components/StatHandler";
 import NPButton from "@/app/components/NPButton";
 import { useIsMobileOrTablet } from "@/app/utils/useMediaQuery";
+import GameStatsTracker from "@/app/components/GameStatsTracker";
+import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
+import { useSearchParams } from "next/navigation";
 
 const defaultDuration = 20;
 const defaultPinLength = 4;
@@ -33,13 +35,21 @@ const getStatusMessage = (status: number | undefined) => {
 }
 
 const Pincracker: FC = () => {
-    const [timer, setTimer] = usePersistantState("chopping-timer", defaultDuration);
-    const [settingsDuration, setSettingsDuration] = useState(defaultDuration);
-    const [settingsPinLength, setSettingsPinLength] = useState(defaultPinLength);
+    const { isChallengeMode, challengeData } = useDailyChallenge();
+    const searchParams = useSearchParams();
+    const isCompetitive = searchParams?.get('competitive') === 'true';
+    
+    // Use challenge data for defaults if in challenge mode
+    const challengePinLength = challengeData?.pinLength || defaultPinLength;
+    const challengeDuration = challengeData?.targetTime ? Math.floor(challengeData.targetTime / 1000) : defaultDuration;
+    
+    const [timer, setTimer] = usePersistantState("chopping-timer", challengeDuration);
+    const [settingsDuration, setSettingsDuration] = useState(challengeDuration);
+    const [settingsPinLength, setSettingsPinLength] = useState(challengePinLength);
     const [activeIndex, setActiveIndex] = usePersistantState("pincracker-active-index", 0);
     const [allowKeyDown, setAllowKeyDown] = useState(true);
     const [autoClear, setAutoClear] = useState(true);
-    const [pinLength, setPinLength] = useState(4);
+    const [pinLength, setPinLength] = useState(challengePinLength);
     const [pin, setPin] = useState<Digit[]>();
     const [elapsed, setElapsed] = useState(0);
     const isMobileOrTablet = useIsMobileOrTablet();
@@ -49,6 +59,26 @@ const Pincracker: FC = () => {
     const hintDismissedRef = useRef(false);
     const [showMobileHint, setShowMobileHint] = useState(false);
     const hasInteractedRef = useRef(false);
+
+    // Reset to standard preset when in competitive mode
+    useEffect(() => {
+        if (isCompetitive) {
+            setPinLength(4); // Standard: 4 digits
+            setTimer(24); // Standard: 24 seconds
+            setSettingsPinLength(4);
+            setSettingsDuration(24);
+        }
+    }, [isCompetitive, setTimer]);
+
+    // Update settings when challenge data loads
+    useEffect(() => {
+        if (challengeData) {
+            setPinLength(challengeData.pinLength || defaultPinLength);
+            setTimer(challengeData.targetTime ? Math.floor(challengeData.targetTime / 1000) : defaultDuration);
+            setSettingsPinLength(challengeData.pinLength || defaultPinLength);
+            setSettingsDuration(challengeData.targetTime ? Math.floor(challengeData.targetTime / 1000) : defaultDuration);
+        }
+    }, [challengeData, setTimer]);
 
     useEffect(() => {
         checkBeepPlayer.whenReady();
@@ -439,8 +469,21 @@ const Pincracker: FC = () => {
 
     return (
         <>
+            <GameStatsTracker
+                game="pincracker"
+                gameStatus={gameStatus}
+                score={activeIndex}
+                elapsedMs={elapsed}
+                targetScore={pinLength}
+                wonStatus={3}
+                lostStatus={2}
+                gameSettings={{
+                    pinLength,
+                    duration: timer,
+                }}
+            />
             <div ref={outerContainerRef} className="flex flex-col gap-4">
-                <StatHandler
+                {/* <StatHandler
                     streak={streak}
                     elapsed={elapsed}
                     setKeyDown={setAllowKeyDown}
@@ -452,7 +495,7 @@ const Pincracker: FC = () => {
                             pinLength: pinLength,
                         }
                     }
-                />
+                /> */}
                 {isMobileOrTablet && showMobileHint && (
                     <div className="rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
                         Tap the puzzle, then start typing to enter the code.
@@ -478,7 +521,7 @@ const Pincracker: FC = () => {
             status={gameStatus}
             setStatus={setGameStatus}
             statusMessage={getStatusMessage(gameStatus)}
-            settings={settings}
+            settings={isChallengeMode ? undefined : settings}
             >
             {/* Hidden input for mobile keyboard - number pad */}
             {isMobileOrTablet && gameStatus === 1 && (

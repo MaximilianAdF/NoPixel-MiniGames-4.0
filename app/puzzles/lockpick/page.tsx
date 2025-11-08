@@ -2,6 +2,10 @@ import type { Metadata, Viewport } from "next";
 import Lockpick from "@/app/puzzles/lockpick/Lockpick";
 import GameInstructions from "@/app/components/GameInstructions";
 import LockpickInstructions from "./instructions";
+import PuzzleBackButton from "@/app/components/PuzzleBackButton";
+
+// Force dynamic rendering for daily challenges
+export const dynamic = 'force-dynamic';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -28,6 +32,7 @@ export const metadata: Metadata = {
 export default function Page() {
     return (
         <>
+            <PuzzleBackButton />
             <Lockpick />
             <GameInstructions gameId="lockpick" title="How to Play Lockpick">
                 <LockpickInstructions />

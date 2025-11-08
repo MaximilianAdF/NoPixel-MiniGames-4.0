@@ -17,6 +17,7 @@ import {
 import { NPSettingsRange } from "@/app/components/NPSettings";
 import NPButton from "@/app/components/NPButton";
 import usePersistantState from "@/app/utils/usePersistentState";
+import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
 
 import Image from "next/image";
 import crossImg from "@/public/images/thermite/cross.svg";
@@ -26,9 +27,20 @@ import "@/app/puzzles/thermite/style.css";
 import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChampagneGlasses } from "@fortawesome/free-solid-svg-icons";
-import StatHandler from "@/app/components/StatHandler";
+import GameStatsTracker from "@/app/components/GameStatsTracker";
+import { useSearchParams } from "next/navigation";
 
 const Thermite: FC = () => {
+  const { isChallengeMode, challengeData } = useDailyChallenge();
+  const searchParams = useSearchParams();
+  const isCompetitive = searchParams?.get('competitive') === 'true';
+  
+  // Use challenge data for defaults if in challenge mode
+  const defaultTargetScore = challengeData?.targetScore || presets[0].targetScore;
+  const defaultTimer = challengeData?.targetTime ? Math.floor(challengeData.targetTime / 1000) : presets[0].timer;
+  const defaultRows = challengeData?.rows || presets[0].rows;
+  const defaultColumns = challengeData?.columns || presets[0].columns;
+  
   const [board, setBoard] = useState<GridRow[]>(initialBoard);
   const [score, setScore] = useState<number>(0);
   const [elasped, setElapsed] = useState<number>(0);
@@ -38,26 +50,44 @@ const Thermite: FC = () => {
   const [resetAnimation, setResetAnimation] = useState<boolean>(false);
   const [showComboNotice, setShowComboNotice] = useState<boolean>(false);
   const [isOutOfMoves, setOutOfMoves] = useState<boolean>(false);
+  
   const [selectedPreset, setSelectedPreset] = usePersistantState(
     "np-thermite-preset",
     0
   );
   const [timer, setTimer] = usePersistantState(
     "np-thermite-timer",
-    presets[selectedPreset].timer
+    defaultTimer
   );
   const [targetScore, setTargetScore] = usePersistantState(
     "np-thermite-targetScore",
-    presets[selectedPreset].targetScore
+    defaultTargetScore
   );
   const [rows, setRows] = usePersistantState(
     "np-thermite-rows",
-    presets[selectedPreset].rows
+    defaultRows
   );
   const [columns, setColumns] = usePersistantState(
     "np-thermite-columns",
-    presets[selectedPreset].columns
+    defaultColumns
   );
+
+  // Update settings when challenge data loads or when competitive mode is enabled
+  useEffect(() => {
+    if (challengeData) {
+      setTargetScore(challengeData.targetScore);
+      setTimer(challengeData.targetTime ? Math.floor(challengeData.targetTime / 1000) : presets[0].timer);
+      setRows(challengeData.rows || presets[0].rows);
+      setColumns(challengeData.columns || presets[0].columns);
+    } else if (isCompetitive) {
+      // Set to standard preset for competitive play
+      setSelectedPreset(0);
+      setTargetScore(presets[0].targetScore);
+      setTimer(presets[0].timer);
+      setRows(presets[0].rows);
+      setColumns(presets[0].columns);
+    }
+  }, [challengeData, isCompetitive, setTargetScore, setTimer, setRows, setColumns, setSelectedPreset]);
 
   /**
    * Resets the board.
@@ -418,7 +448,20 @@ const Thermite: FC = () => {
 
   return (
     <>
-      <StatHandler
+      <GameStatsTracker
+        game="thermite"
+        gameStatus={gameStatus}
+        score={score}
+        elapsedMs={elasped}
+        targetScore={targetScore}
+        gameSettings={{
+          timer,
+          targetScore,
+          rows,
+          columns,
+        }}
+      />
+      {/* <StatHandler
         streak={streak}
         elapsed={elasped}
         minigame={{
@@ -429,7 +472,7 @@ const Thermite: FC = () => {
           rows: rows,
           columns: columns,
         }}
-      />
+      /> */}
       <NPHackContainer
         title="Mazer"
         description="Decrypt the required number of bytes"
@@ -441,7 +484,7 @@ const Thermite: FC = () => {
         status={gameStatus}
         setStatus={setGameStatus}
         statusMessage={getStatusMessage(gameStatus)}
-        settings={settings}
+        settings={isChallengeMode ? undefined : settings}
         score={score}
         targetScore={targetScore}
       >

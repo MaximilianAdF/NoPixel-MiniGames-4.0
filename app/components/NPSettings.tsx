@@ -37,6 +37,7 @@ export const NPSettingsRange: FC<NPSettingsRange> = ({
                 relative w-[calc(100%-20px)]
             ">
                 <span
+                    suppressHydrationWarning
                     className="
                     absolute text-center
                     size-[25px]
@@ -138,13 +139,15 @@ const NPSettings: FC<NPSettingsProps> = ({
             ></div>
             <div className={classNames(
                 `
-                    absolute
+                    fixed
                     w-[640px] max-w-[90%]
+                    max-h-[90vh]
+                    overflow-y-auto
                     p-4 gap-5
-                    top-[300px]
+                    top-[50%]
                     left-[50%]
-                    my-5
                     -translate-x-1/2
+                    -translate-y-1/2
                     flex flex-col
                     bg-radient-circle-c
                     from-[rgb(15_27_33/0.781)]

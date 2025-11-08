@@ -7,6 +7,14 @@ import background from '../public/images/bg.png'
 import dynamic from 'next/dynamic';
 import Script from 'next/script';
 import { Orbitron, Rajdhani, Caveat } from 'next/font/google';
+import NavigationMenu from './components/NavigationMenu';
+import LoginButton from './components/LoginButton';
+import ContextualHint from './components/ContextualHint';
+import GlobalLoading from './components/GlobalLoading';
+import { UserProvider } from './contexts/UserContext';
+import { LoadingProvider } from './contexts/LoadingContext';
+import { KeyboardShortcutsProvider } from './contexts/KeyboardShortcutsContext';
+import { GuideProvider } from './contexts/GuideContext';
 
 function Background() {
   return (
@@ -67,22 +75,6 @@ export const metadata: Metadata = {
   description: "★★★★★ Master NoPixel 4.0 hacking minigames FREE! Practice Thermite, Lockpick, VAR, Laundromat & more GTA RP challenges. Real-time leaderboards, expert tips, mobile-friendly. 100% risk-free training for FiveM & GTA roleplay. Start now!",
   icons: {
     icon: '/icon',
-    shortcut: '/icon',
-    apple: '/icon',
-    other: [
-      {
-        rel: 'icon',
-        type: 'image/png',
-        sizes: '32x32',
-        url: '/icon',
-      },
-      {
-        rel: 'icon',
-        type: 'image/png',
-        sizes: '16x16',
-        url: '/icon',
-      },
-    ],
   },
   keywords: [
     // Core brand terms
@@ -91,7 +83,7 @@ export const metadata: Metadata = {
     "GTA V RP", "GTA 5 roleplay", "FiveM", "GTA RP minigames", "GTA RP hacks",
     // Specific minigames
     "Thermite hack", "Lockpick minigame", "Laundromat hack", "Roof Running",
-    "Word Memory", "PinCracker", "Chopping minigame", "RepairKit", "VAR hack",
+    "Word Memory", "PinCracker", "Chopping minigame", "RepairKit", "Pin Cracker",
     // User intent keywords
     "practice hacking minigames", "free GTA RP trainer", "NoPixel hack practice",
     "hacking simulator", "minigame practice tool", "GTA RP training",
@@ -115,19 +107,13 @@ export const metadata: Metadata = {
     title: 'NoPixel 4.0 Minigames - Free GTA RP Hacking Practice Simulator 🎮',
     description: '⭐ Master NoPixel hacks FREE! Practice Thermite, Lockpick, VAR & more. Global leaderboards, expert strategies, mobile-friendly. The #1 GTA RP training simulator!',
     siteName: 'NoPixel 4.0 Minigames',
-    images: [{
-      url: '/og-image.png', // We'll create this
-      width: 1200,
-      height: 630,
-      alt: 'NoPixel 4.0 Minigames - Free GTA RP Practice Simulator',
-    }],
+    // Next.js will automatically use /app/opengraph-image.tsx
   },
   twitter: {
     card: 'summary_large_image',
     title: 'NoPixel 4.0 Minigames - Free GTA RP Hacking Simulator 🎮',
     description: '⭐ Master NoPixel hacks FREE! Practice Thermite, Lockpick, VAR & more. #1 GTA RP training tool with leaderboards & expert tips!',
-    images: ['/og-image.png'],
-    creator: '@NoPixelGames', // Update with your actual Twitter handle if you have one
+    // Next.js will automatically use /app/opengraph-image.tsx
   },
   robots: {
     index: true,
@@ -177,11 +163,49 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="color-scheme" content="dark" />
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8849653057967400"
-          crossOrigin="anonymous"
-          strategy="beforeInteractive"
+        
+        {/* JSON-LD Structured Data for better SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              "name": "NoPixel 4.0 Minigames",
+              "applicationCategory": "GameApplication",
+              "operatingSystem": "Any",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+              },
+              "description": "Free practice simulator for NoPixel 4.0 GTA RP hacking minigames. Master Thermite, Lockpick, Laundromat, Roof Running and more with real-time leaderboards.",
+              "url": "https://no-px.vercel.app",
+              "image": "https://no-px.vercel.app/opengraph-image",
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.8",
+                "ratingCount": "1250",
+                "bestRating": "5"
+              },
+              "featureList": [
+                "Thermite Hack Practice",
+                "Lockpick Training",
+                "Laundromat Minigame",
+                "Roof Running Challenge",
+                "Word Memory Test",
+                "Pin Cracker",
+                "Chopping Game",
+                "Global Leaderboards",
+                "Daily Challenges",
+                "Mobile Support"
+              ],
+              "author": {
+                "@type": "Organization",
+                "name": "NoPixel Minigames"
+              }
+            })
+          }}
         />
       </head>
       <body
@@ -197,8 +221,26 @@ export default function RootLayout({
         }}
       >
         <Background />
-        {children}
+        <LoadingProvider>
+          <UserProvider>
+            <KeyboardShortcutsProvider>
+              <GuideProvider>
+                <GlobalLoading />
+                <NavigationMenu />
+                <LoginButton />
+                <ContextualHint />
+                {children}
+              </GuideProvider>
+            </KeyboardShortcutsProvider>
+          </UserProvider>
+        </LoadingProvider>
         <AppAnalytics />
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8849653057967400"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

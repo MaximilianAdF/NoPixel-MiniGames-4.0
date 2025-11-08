@@ -12,5 +12,13 @@ Sitemap: https://no-px.vercel.app/sitemap.xml
 User-agent: *
 Disallow: /api/
 
+# Disallow old legacy HTML pages (replaced by /puzzles/* routes)
+Disallow: /SmokeCrack/
+Disallow: /LockPick/
+Disallow: /Thermite/
+Disallow: /RoofRunning/
+Disallow: /Laundromat/
+Disallow: /RepairKit/
+
 # Allow search engines to crawl all minigame pages
 Allow: /puzzles/

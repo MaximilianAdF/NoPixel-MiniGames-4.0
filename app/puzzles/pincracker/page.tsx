@@ -2,6 +2,10 @@ import type { Metadata, Viewport } from "next";
 import Pincracker from "@/app/puzzles/pincracker/Pincracker";
 import GameInstructions from "@/app/components/GameInstructions";
 import PincrackerInstructions from "./instructions";
+import PuzzleBackButton from "@/app/components/PuzzleBackButton";
+
+// Force dynamic rendering for daily challenges
+export const dynamic = 'force-dynamic';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -28,6 +32,7 @@ export const metadata: Metadata = {
 export default function Page() {
     return (
         <>
+            <PuzzleBackButton />
             <Pincracker />
             <GameInstructions gameId="pincracker" title="How to Play PIN Cracker">
                 <PincrackerInstructions />

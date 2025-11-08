@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import {useKeyDown} from "@/app/utils/useKeyDown";
 import {useInterval} from "@/app/utils/useInterval";
 import {useIsMobileOrTablet} from "@/app/utils/useMediaQuery";
-import StatHandler from "@/app/components/StatHandler";
+import GameStatsTracker from "@/app/components/GameStatsTracker";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSmile, faFaceMeh, faFaceAngry, faFaceDizzy} from "@fortawesome/free-solid-svg-icons";
 import {Hand} from "lucide-react";
@@ -117,7 +117,15 @@ export default function RepairKit() {
 
     return (
         <>
-            <StatHandler
+            <GameStatsTracker
+                game="repair-kit"
+                gameStatus={gameStatus}
+                score={streak}
+                elapsedMs={0}
+                wonStatus={3}
+                lostStatus={2}
+            />
+            {/* <StatHandler
                 streak={streak}
                 setKeyDown={setAllowKeyDown}
                 minigame={
@@ -126,7 +134,7 @@ export default function RepairKit() {
                         preset: 'Standard',
                     }
                 }
-            />
+            /> */}
             <div className={classNames(
                 "w-full m-auto p-2 sm:p-3 md:p-5 flex relative rounded-lg gap-2 sm:gap-3",
                 "bg-gradient-to-r from-[rgb(18_19_20)] to-[rgb(36_68_90)] shadow",

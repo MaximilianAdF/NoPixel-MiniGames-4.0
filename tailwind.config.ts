@@ -62,6 +62,22 @@ const config: Config = {
         notice: "notice 1.5s ease-out",
         binaryRain: "binaryRain linear infinite",
         scanLine: "scanLine 10s linear infinite",
+        // Cyberpunk animations
+        scan: "scan 3s linear infinite",
+        shimmer: "shimmer 2s linear infinite",
+        "glitch-1": "glitch-1 0.3s infinite",
+        "glitch-2": "glitch-2 0.3s infinite",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "pulse-glow-text": "pulse-glow-text 2s ease-in-out infinite",
+        float: "float 3s ease-in-out infinite",
+        // Smooth loading spinner
+        "spin-smooth": "spin-smooth 1s linear infinite",
+        // Page entry animations
+        "fade-in": "fadeIn 0.4s ease-out",
+        "fade-in-up": "fadeInUp 0.5s ease-out",
+        "fade-in-up-delay-1": "fadeInUp 0.5s ease-out 0.1s both",
+        "fade-in-up-delay-2": "fadeInUp 0.5s ease-out 0.2s both",
+        "fade-in-up-delay-3": "fadeInUp 0.5s ease-out 0.3s both",
       },
       keyframes: {
         winBounce: {
@@ -99,6 +115,43 @@ const config: Config = {
           "100%": {
             top: "100%",
           },
+        },
+        // Cyberpunk keyframes
+        scan: {
+          "0%": { transform: "translateY(-100%)" },
+          "100%": { transform: "translateY(100%)" },
+        },
+        shimmer: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" },
+        },
+        "glitch-1": {
+          "0%, 100%": { transform: "translate(0)", opacity: "0.7" },
+          "33%": { transform: "translate(-2px, 2px)", opacity: "0.8" },
+          "66%": { transform: "translate(2px, -2px)", opacity: "0.6" },
+        },
+        "glitch-2": {
+          "0%, 100%": { transform: "translate(0)", opacity: "0.7" },
+          "33%": { transform: "translate(2px, -2px)", opacity: "0.6" },
+          "66%": { transform: "translate(-2px, 2px)", opacity: "0.8" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { boxShadow: "0 0 20px rgba(84, 255, 164, 0.3)" },
+          "50%": { boxShadow: "0 0 30px rgba(84, 255, 164, 0.6)" },
+        },
+        "pulse-glow-text": {
+          "0%, 100%": {
+            textShadow:
+              "0 0 10px rgba(84, 255, 164, 0.3), 0 0 20px rgba(84, 255, 164, 0.2)",
+          },
+          "50%": {
+            textShadow:
+              "0 0 20px rgba(84, 255, 164, 0.6), 0 0 30px rgba(84, 255, 164, 0.4)",
+          },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" },
         },
       },
       backgroundImage: {

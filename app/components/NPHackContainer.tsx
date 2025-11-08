@@ -159,8 +159,59 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                                 hidden sm:block">
                                 {description}
                             </p>
+                            
+                            {/* Status Message - Compact design in header */}
+                            {status !== undefined && status !== 0 && status !== 1 && (
+                                <div className={classNames(
+                                    `
+                                        ml-auto
+                                        mr-3 sm:mr-4
+                                        flex items-center gap-1.5 sm:gap-2
+                                        px-3 sm:px-4 py-1.5 sm:py-2
+                                        rounded-md
+                                        text-xs sm:text-sm
+                                        font-bold
+                                        border-2
+                                        animate-fadeIn
+                                        transition-all
+                                    `,
+                                    status === 2 ? "bg-red-900/30 border-red-500/60 text-red-300" :
+                                    status === 3 ? "bg-emerald-900/30 border-emerald-500/60 text-emerald-300" :
+                                    status === 4 ? "bg-yellow-900/30 border-yellow-500/60 text-yellow-300" : "hidden"
+                                )}>
+                                    {/* Compact Status Icons */}
+                                    {status === 2 && (
+                                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
+                                        </svg>
+                                    )}
+                                    {status === 3 && (
+                                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                                        </svg>
+                                    )}
+                                    {status === 4 && (
+                                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd"/>
+                                        </svg>
+                                    )}
+                                    <span className="whitespace-nowrap">{statusMessage}</span>
+                                </div>
+                            )}
                         </div>
-                        {settings && <div className="flex justify-center items-center p-1 mr-4 sm:mr-7 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 shrink-0">
+                        {settings && <div 
+                            className="flex justify-center items-center p-1 mr-4 sm:mr-7 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 shrink-0"
+                            onClick={() => setSettingsVisible(true)}
+                            role="button"
+                            aria-label="Open Settings"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    setSettingsVisible(true);
+                                }
+                            }}
+                        >
                             <FontAwesomeIcon
                                 icon={faGear}
                                 className="
@@ -171,8 +222,6 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                                     transition-transform
                                 "
                                 style={{ WebkitTextSizeAdjust: '100%', textSizeAdjust: '100%' }}
-                                onClick={() => setSettingsVisible(true)}
-                                title={"Open Settings"}
                             />
                         </div>}
                         {targetScore && (
@@ -186,34 +235,7 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                             </div>
                         )}
                     </div>
-                    {status !== undefined && <div className={classNames(
-                        `
-                            gap-2 sm:gap-2.5
-                            absolute
-                            right-8 sm:right-14
-                            top-3 sm:top-4
-                            text-white
-                            px-2 sm:px-4 py-1 sm:py-2
-                            rounded
-                            flex items-center justify-center
-                        `,
-                        status === 2 ? "bg-[rgb(56_13_23)]" :
-                        status === 3 ? "bg-[rgb(23_95_88)]" :
-                        status === 4 ? "bg-[rgb(118_128_37)]" : "hidden"
-                    )}>
-                        {/* TODO: Refactor icons, they're completely broken */}
-                        {/*{status === 2 && <i className="fa-solid text-2xl fa-circle-xmark text-[rgb(255_84_84)]"></i>}*/}
-                        {/*{status === 3 && <i className="fa-solid text-2xl fa-circle-check text-[rgb(84_255_164)]"></i>}*/}
-                        {/*{status === 0 && <i className="fa-solid text-2xl fa-hourglass-start text-[rgb(118_128_37)]"></i>}*/}
-
-                        {/*<i className={classNames(*/}
-                        {/*    "fa-solid text-2xl",*/}
-                        {/*    status === 2 ? "fa-circle-xmark text-[rgb(255_84_84)]" :*/}
-                        {/*    status === 3 ? "fa-circle-check text-[rgb(84_255_164)]" :*/}
-                        {/*    status === 0 ? "fa-hourglass-start text-[rgb(118_128_37)]" : "hidden"  // TODO: Fix reset icon*/}
-                        {/*)}></i>*/}
-                        <p className="text-[10px] sm:text-xs font-medium">{statusMessage}</p>
-                    </div>}
+                    
                     {/* Main puzzle */}
                     <div className="w-full pb-2 flex-1">
                         {children}

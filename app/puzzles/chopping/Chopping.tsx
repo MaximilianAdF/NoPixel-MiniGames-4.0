@@ -5,12 +5,14 @@ import { Letter, Letters, LetterState } from "@/app/puzzles/chopping/utils";
 import usePersistantState from "@/app/utils/usePersistentState";
 import NPHackContainer from "@/app/components/NPHackContainer";
 import { NPSettingsRange } from "@/app/components/NPSettings";
-import StatHandler from "@/app/components/StatHandler";
+import GameStatsTracker from "@/app/components/GameStatsTracker";
+import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
 import React, { FC, useEffect, useState, useRef, useCallback, memo, useMemo, startTransition } from "react";
 import { useKeyDown } from "@/app/utils/useKeyDown";
 import useGame from "@/app/utils/useGame";
 import classNames from "classnames";
 import { useIsMobileOrTablet } from "@/app/utils/useMediaQuery";
+import { useSearchParams } from "next/navigation";
 
 
 import "../../../public/Chopping/Chopping.css";
@@ -149,14 +151,38 @@ const defaultDuration = 7;
 const defaultGridCols = 6;
 
 const Chopping: FC = () => {
-    const [timer, setTimer] = usePersistantState("chopping-timer", defaultDuration);
-    const [numLetters, setNumLetters] = usePersistantState("chopping-num-letters", defaultNumLetters);
+    const { isChallengeMode, challengeData } = useDailyChallenge();
+    const searchParams = useSearchParams();
+    const isCompetitive = searchParams?.get('competitive') === 'true';
+    
+    // Use challenge data for defaults if in challenge mode
+    const challengeNumLetters = challengeData?.numLetters || defaultNumLetters;
+    const challengeDuration = challengeData?.targetTime ? Math.floor(challengeData.targetTime / 1000) : defaultDuration;
+    
+    const [timer, setTimer] = usePersistantState("chopping-timer", challengeDuration);
+    const [numLetters, setNumLetters] = usePersistantState("chopping-num-letters", challengeNumLetters);
     const [activeIndex, setActiveIndex] = useState<number>(0);
-    const [board, setBoard] = useState<Letter[]>(new Array(defaultNumLetters));
-    const [stateBoard, setStateBoard] = useState<LetterState[]>(new Array(defaultNumLetters).fill(''));
+    const [board, setBoard] = useState<Letter[]>(new Array(challengeNumLetters));
+    const [stateBoard, setStateBoard] = useState<LetterState[]>(new Array(challengeNumLetters).fill(''));
     const [allowKeyDown, setAllowKeyDown] = useState(true);
     const [elapsed, setElapsed] = useState(0);
     const isMobileOrTablet = useIsMobileOrTablet();
+
+    // Reset to standard preset when in competitive mode
+    useEffect(() => {
+        if (isCompetitive) {
+            setNumLetters(defaultNumLetters); // 15
+            setTimer(defaultDuration); // 7
+        }
+    }, [isCompetitive, setNumLetters, setTimer]);
+
+    // Update settings when challenge data loads
+    useEffect(() => {
+        if (challengeData) {
+            setNumLetters(challengeData.numLetters || defaultNumLetters);
+            setTimer(challengeData.targetTime ? Math.floor(challengeData.targetTime / 1000) : defaultDuration);
+        }
+    }, [challengeData, setNumLetters, setTimer]);
     const mobileInputRef = useRef<HTMLInputElement>(null);
     const outerContainerRef = useRef<HTMLDivElement>(null);
     const gameWrapperRef = useRef<HTMLDivElement>(null);
@@ -521,8 +547,21 @@ const Chopping: FC = () => {
 
     return (
         <>
+            <GameStatsTracker
+                game="chopping"
+                gameStatus={gameStatus}
+                score={activeIndex}
+                elapsedMs={elapsed}
+                targetScore={numLetters}
+                wonStatus={3}
+                lostStatus={2}
+                gameSettings={{
+                    letters: numLetters,
+                    timer: timer,
+                }}
+            />
             <div ref={outerContainerRef} className="flex flex-col gap-4">
-                <StatHandler
+                {/* <StatHandler
                     streak={streak}
                     elapsed={elapsed}
                     setKeyDown={setAllowKeyDown}
@@ -534,7 +573,7 @@ const Chopping: FC = () => {
                             numLetters: numLetters,
                         }
                     }
-                />
+                /> */}
                 {isMobileOrTablet && showMobileHint && (
                     <div className="rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
                         Tap the puzzle, then type the letters to play.
@@ -551,7 +590,7 @@ const Chopping: FC = () => {
                         status={gameStatus}
                         setStatus={setGameStatus}
                         statusMessage={getStatusMessage(gameStatus)}
-                        settings={settings}
+                        settings={isChallengeMode ? undefined : settings}
                     >
                         {/* Hidden input for mobile keyboard */}
                         {isMobileOrTablet && gameStatus === 1 && (

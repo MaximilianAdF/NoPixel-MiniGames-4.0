@@ -1,14 +1,12 @@
 "use client";
 
-import StatHandler from "./components/StatHandler";
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
-
+import { Heart, Target, Trophy, Zap } from 'lucide-react';
 
 
 import { useEffect, useState, useRef } from "react";
-import Highscores from "./components/Highscores";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownLeftAndUpRightToCenter, faFileLines, faInfo, faUpRightAndDownLeftFromCenter, faXmark, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import DonateContainer from "@/app/components/DonateContainer";
@@ -68,7 +66,6 @@ const puzzles = [
 ];
 
 export default function Home() {
-  const [showHighscores, setShowHighscores] = useState(false);
   const [newsAlert, setNewsAlert] = useState(false);
   const [showRevampNotice, setShowRevampNotice] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Changed back to true to prevent FOUC
@@ -317,93 +314,6 @@ export default function Home() {
           }
         `}</style>
 
-        {/* Header Navigation */}
-        <div className="fixed top-0 right-0 p-5 flex flex-row gap-3 z-50 backdrop-blur-sm bg-mirage-950/30 rounded-bl-lg">
-          <StatHandler />
-          <FontAwesomeIcon
-            icon={faFileLines}
-            className="cursor-pointer size-8 text-spring-green-300 hover:text-spring-green-400 hover:scale-110 hover:rotate-12 transition-all duration-300"
-            onClick={() => window.open('https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0', '_blank')}
-            title="View Source Code"
-          />
-        </div>
-
-        {/* News Alert */}
-        {newsAlert && 
-        <div className="fixed top-0 left-0 p-5 z-50 animate-in slide-in-from-left duration-500">
-          <div className="bg-spring-green-600 pl-2 pr-3 rounded-lg flex flex-row justify-between shadow-lg">
-            <a href="https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0?tab=readme-ov-file#-highscores" target="_blank">
-              <div className="bg-spring-green-300 px-4 py-2 rounded flex flex-row gap-2 items-center hover:bg-spring-green-400 transition-colors duration-200">
-                <FontAwesomeIcon
-                  id="info-icon"
-                  className="text-spring-green-800 pb-1 hidden"
-                  icon={faInfo}
-                />
-                <span className="text-spring-green-800 underline underline-offset-2">Explore new highscore system</span>
-              </div>
-            </a>
-            <div className="ml-3 flex items-center">
-              <FontAwesomeIcon
-                className="text-spring-green-800 cursor-pointer hover:text-spring-green-900 transition-colors"
-                onClick={() => setNewsAlert(false)}
-                icon={faXmark}
-              />
-            </div>
-          </div>
-        </div>
-        }
-
-        {/* Revamp Notice - Shows once */}
-        {showRevampNotice && 
-        <div className="fixed bottom-6 right-6 p-5 z-50 max-w-md animate-in slide-in-from-bottom duration-700">
-          <div className="bg-gradient-to-br from-mirage-800 to-mirage-900 border border-spring-green-500/40 rounded-xl shadow-2xl shadow-spring-green-900/30 overflow-hidden">
-            {/* Top accent bar */}
-            <div className="h-1 bg-gradient-to-r from-spring-green-500 via-aquamarine-400 to-spring-green-500"></div>
-            
-            <div className="p-5">
-              {/* Header */}
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">✨</span>
-                  <h3 className="text-lg font-bold text-white">New Look!</h3>
-                </div>
-                <button 
-                  onClick={() => {
-                    setShowRevampNotice(false);
-                    localStorage.setItem('hasSeenRevampNotice', 'true');
-                  }}
-                  className="text-gray-400 hover:text-white transition-colors"
-                  aria-label="Close"
-                >
-                  <FontAwesomeIcon icon={faXmark} className="size-5" />
-                </button>
-              </div>
-              
-              {/* Content */}
-              <p className="text-gray-300 text-sm leading-relaxed mb-4">
-                We&apos;re redesigning the entire site with fresh visuals and new features. 
-                <strong className="text-spring-green-400"> Have ideas?</strong> We&apos;d love to hear them!
-              </p>
-              
-              {/* CTA Button */}
-              <a 
-                href="https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0#revamp" 
-                target="_blank"
-                onClick={() => {
-                  localStorage.setItem('hasSeenRevampNotice', 'true');
-                }}
-                className="group inline-flex items-center gap-2 px-4 py-2.5 bg-spring-green-600 hover:bg-spring-green-500 text-white text-sm font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-spring-green-900/50 w-full justify-center"
-              >
-                <span>Share Your Ideas</span>
-                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </div>
-        }
-
         <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
           {/* Hero Section */}
           <header className="relative pt-16 pb-8 px-2 sm:px-4">
@@ -479,8 +389,6 @@ export default function Home() {
 
           {/* Minigames Section - Moved to Top */}
           <div className="space-y-8">
-
-            {showHighscores && <Highscores />}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
               {isLoading ? 
@@ -607,7 +515,7 @@ export default function Home() {
             </div>
 
             {/* Scroll Indicator */}
-            {!showHighscores && !isLoading && (
+            {!isLoading && (
               <div className="flex justify-center pt-12 pb-4">
                 <div className="flex flex-col items-center gap-3">
                   <span className="text-gray-400 text-sm font-medium">Scroll for more</span>
@@ -622,22 +530,22 @@ export default function Home() {
 
           {/* Features Section */}
           <div className="grid md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom duration-1000">
-            <div className="group bg-mirage-900/70 backdrop-blur-sm rounded-xl p-6 border border-mirage-800 hover:border-spring-green-600 transition-all duration-500 hover:shadow-xl hover:shadow-spring-green-900/20 hover:-translate-y-2">
-              <div className="text-spring-green-400 text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">🎯</div>
+            <div className="group bg-gradient-to-br from-mirage-900/80 to-mirage-950/80 backdrop-blur-sm rounded-xl p-6 border-2 border-spring-green-500/30 hover:border-spring-green-600 transition-all duration-500 hover:shadow-xl hover:shadow-spring-green-900/20 hover:-translate-y-2">
+              <div className="mb-4"><Target className="w-12 h-12 text-spring-green-400 group-hover:scale-110 transition-transform duration-300" /></div>
               <h3 className="text-xl font-bold text-white mb-3 group-hover:text-spring-green-300 transition-colors duration-300">Authentic Experience</h3>
               <p className="text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
                 Pixel-perfect replicas of NoPixel 4.0 minigames with identical mechanics, visuals, and difficulty levels. Practice in an environment that mirrors the real thing.
               </p>
             </div>
-            <div className="group bg-mirage-900/70 backdrop-blur-sm rounded-xl p-6 border border-mirage-800 hover:border-spring-green-600 transition-all duration-500 hover:shadow-xl hover:shadow-spring-green-900/20 hover:-translate-y-2">
-              <div className="text-spring-green-400 text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">🏆</div>
+            <div className="group bg-gradient-to-br from-mirage-900/80 to-mirage-950/80 backdrop-blur-sm rounded-xl p-6 border-2 border-spring-green-500/30 hover:border-spring-green-600 transition-all duration-500 hover:shadow-xl hover:shadow-spring-green-900/20 hover:-translate-y-2">
+              <div className="mb-4"><Trophy className="w-12 h-12 text-spring-green-400 group-hover:scale-110 transition-transform duration-300" /></div>
               <h3 className="text-xl font-bold text-white mb-3 group-hover:text-spring-green-300 transition-colors duration-300">Global Leaderboards</h3>
               <p className="text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
                 Compete with players worldwide. Track your performance, set personal records, and climb to the top of the rankings for each minigame.
               </p>
             </div>
-            <div className="group bg-mirage-900/70 backdrop-blur-sm rounded-xl p-6 border border-mirage-800 hover:border-spring-green-600 transition-all duration-500 hover:shadow-xl hover:shadow-spring-green-900/20 hover:-translate-y-2">
-              <div className="text-spring-green-400 text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">💪</div>
+            <div className="group bg-gradient-to-br from-mirage-900/80 to-mirage-950/80 backdrop-blur-sm rounded-xl p-6 border-2 border-spring-green-500/30 hover:border-spring-green-600 transition-all duration-500 hover:shadow-xl hover:shadow-spring-green-900/20 hover:-translate-y-2">
+              <div className="mb-4"><Zap className="w-12 h-12 text-spring-green-400 group-hover:scale-110 transition-transform duration-300" /></div>
               <h3 className="text-xl font-bold text-white mb-3 group-hover:text-spring-green-300 transition-colors duration-300">Risk-Free Practice</h3>
               <p className="text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
                 Build muscle memory and improve reaction times without in-game consequences. Perfect your technique through unlimited practice attempts.
@@ -646,7 +554,7 @@ export default function Home() {
           </div>
 
           {/* About Section */}
-          <div className="bg-mirage-900/70 backdrop-blur-sm rounded-2xl shadow-2xl p-8 sm:p-10 border border-mirage-800 hover:border-mirage-700 transition-all duration-500 animate-in fade-in slide-in-from-bottom" style={{ animationDuration: '1000ms' }}>
+          <div className="bg-gradient-to-br from-mirage-900/80 to-mirage-950/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 sm:p-10 border-2 border-spring-green-500/30 hover:border-spring-green-400/60 transition-all duration-500 animate-in fade-in slide-in-from-bottom" style={{ animationDuration: '1000ms' }}>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6 bg-gradient-to-r from-spring-green-400 to-aquamarine-400 bg-clip-text text-transparent">
               About NoPixel Hacking Simulator
             </h2>
@@ -673,36 +581,17 @@ export default function Home() {
           </div>
 
           {/* Highscores Section */}
-          <div className="bg-mirage-900/70 backdrop-blur-sm rounded-2xl shadow-2xl p-8 sm:p-10 border border-mirage-800 text-center hover:border-mirage-700 transition-all duration-500 animate-in fade-in slide-in-from-bottom" style={{ animationDuration: '1000ms' }}>
+          <div className="bg-gradient-to-br from-mirage-900/80 to-mirage-950/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 sm:p-10 border-2 border-spring-green-500/30 text-center hover:border-spring-green-400/60 transition-all duration-500 animate-in fade-in slide-in-from-bottom" style={{ animationDuration: '1000ms' }}>
             <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4 bg-gradient-to-r from-spring-green-400 to-aquamarine-400 bg-clip-text text-transparent">
-              Global Highscores
+              Global Leaderboards
             </h2>
             <p className="text-gray-400 text-lg mb-6 max-w-2xl mx-auto hover:text-gray-300 transition-colors duration-300">
-              View the top performers for each minigame and see how your skills compare with players from around the world. 
-              Every completed challenge can be submitted to the leaderboard for eternal glory.
+              Compete with players worldwide! Visit the <Link href="/leaderboards" className="text-spring-green-400 hover:text-spring-green-300 font-semibold underline">Leaderboards</Link> page to see top performers for each minigame.
             </p>
-            {!showHighscores && (
-              <button 
-                onClick={() => setShowHighscores(true)}
-                className="group inline-flex items-center gap-2 px-8 py-4 bg-spring-green-600 hover:bg-spring-green-500 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-spring-green-900/50 hover:scale-105"
-              >
-                <FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter} className="size-5 group-hover:rotate-45 transition-transform duration-300" />
-                View Highscores
-              </button>
-            )}
-            {showHighscores && (
-              <button 
-                onClick={() => setShowHighscores(false)}
-                className="group inline-flex items-center gap-2 px-8 py-4 bg-mirage-700 hover:bg-mirage-600 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:scale-105"
-              >
-                <FontAwesomeIcon icon={faDownLeftAndUpRightToCenter} className="size-5 group-hover:-rotate-45 transition-transform duration-300" />
-                Hide Highscores
-              </button>
-            )}
           </div>
 
           {/* Community Section */}
-          <div className="bg-mirage-900/70 backdrop-blur-sm rounded-2xl shadow-2xl p-8 sm:p-10 border border-mirage-800 hover:border-mirage-700 transition-all duration-500 animate-in fade-in slide-in-from-bottom" style={{ animationDuration: '1000ms' }}>
+          <div className="bg-gradient-to-br from-mirage-900/80 to-mirage-950/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 sm:p-10 border-2 border-spring-green-500/30 hover:border-spring-green-400/60 transition-all duration-500 animate-in fade-in slide-in-from-bottom" style={{ animationDuration: '1000ms' }}>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6 bg-gradient-to-r from-spring-green-400 to-aquamarine-400 bg-clip-text text-transparent">
               Open Source & Community
             </h2>
@@ -731,7 +620,7 @@ export default function Home() {
           </div>
 
           {/* FAQ Section for SEO */}
-          <div className="bg-mirage-900/70 backdrop-blur-sm rounded-2xl shadow-2xl p-8 sm:p-10 border border-mirage-800 hover:border-mirage-700 transition-all duration-500">
+          <div className="bg-gradient-to-br from-mirage-900/80 to-mirage-950/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 sm:p-10 border-2 border-spring-green-500/30 hover:border-spring-green-400/60 transition-all duration-500">
             <Script
               id="faq-structured-data"
               type="application/ld+json"
@@ -842,12 +731,12 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <footer className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center text-gray-500 border-t border-mirage-800 mt-12">
+        <footer className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center text-gray-500 border-t-2 border-spring-green-500/30 mt-12">
           <p className="text-sm hover:text-gray-400 transition-colors duration-300">
             This is a fan-made simulator and is not affiliated with NoPixel or Rockstar Games. All trademarks belong to their respective owners.
           </p>
-          <p className="text-sm mt-2 hover:text-gray-400 transition-colors duration-300">
-            Built with ❤️ for the NoPixel community
+          <p className="text-sm mt-2 hover:text-gray-400 transition-colors duration-300 flex items-center justify-center gap-2">
+            Built with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> for the NoPixel community
           </p>
         </footer>
         

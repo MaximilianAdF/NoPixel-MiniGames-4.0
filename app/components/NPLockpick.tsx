@@ -7,8 +7,9 @@ import useGame from "@/app/utils/useGame";
 import {useKeyDown} from "@/app/utils/useKeyDown";
 import {NPSettingsRange} from "@/app/components/NPSettings";
 import usePersistantState from "@/app/utils/usePersistentState";
+import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
 import classNames from "classnames";
-import StatHandler from "./StatHandler";
+import GameStatsTracker from "./GameStatsTracker";
 
 type RingColor = "red" | "yellow" | "blue";
 
@@ -139,6 +140,8 @@ interface NPLockpickProps {
     countdownDuration: number,
     maxLevels: number,
     title: string,
+    gameId?: string, // Game ID for stats tracking
+    isCompetitive?: boolean, // Whether to use standard competitive preset
     // description: string,
 }
 
@@ -146,15 +149,40 @@ const NPLockpick: FC<NPLockpickProps> = ({
     countdownDuration,
     maxLevels,
     title,
+    gameId = 'lockpick', // Default to lockpick for backwards compatibility
+    isCompetitive = false,
     // description,
 }) => {
-    const [levels, setLevels] = usePersistantState(`np-lockpick-${title}-levels`, maxLevels);
-    const [timer, setTimer] = usePersistantState(`np-lockpick-${title}-timer`, countdownDuration);
+    const { isChallengeMode, challengeData } = useDailyChallenge();
+    
+    // Use challenge data for defaults if in challenge mode
+    const challengeLevels = challengeData?.levels || maxLevels;
+    const challengeDuration = challengeData?.targetTime ? Math.floor(challengeData.targetTime / 1000) : countdownDuration;
+    
+    const [levels, setLevels] = usePersistantState(`np-lockpick-${title}-levels`, challengeLevels);
+    const [timer, setTimer] = usePersistantState(`np-lockpick-${title}-timer`, challengeDuration);
     const [allowKeyDown, setAllowKeyDown] = useState(true);
     const [rings, setRings] = useState<Ring[]>([]);
     const [rotation, setRotation] = useState<number>(0);
     const [level, setLevel] = useState<number>(0);
     const [elapsed, setElapsed] = useState(0);
+
+    // Reset to standard preset when in competitive mode
+    useEffect(() => {
+        if (isCompetitive) {
+            // Use the default values passed to the component as the standard preset
+            setLevels(maxLevels);
+            setTimer(countdownDuration);
+        }
+    }, [isCompetitive, setLevels, setTimer, maxLevels, countdownDuration]);
+
+    // Update settings when challenge data loads
+    useEffect(() => {
+        if (challengeData) {
+            setLevels(challengeData.levels || maxLevels);
+            setTimer(challengeData.targetTime ? Math.floor(challengeData.targetTime / 1000) : countdownDuration);
+        }
+    }, [challengeData, setLevels, setTimer, maxLevels, countdownDuration]);
 
     useEffect(() => {
         checkBeepPlayer.whenReady();
@@ -294,18 +322,18 @@ const NPLockpick: FC<NPLockpickProps> = ({
 
     return (
         <>
-            <StatHandler
-                streak={streak}
-                elapsed={elapsed}
-                setKeyDown={setAllowKeyDown}
-                minigame={
-                    {
-                        puzzle: title,
-                        preset: (levels === maxLevels && timer === countdownDuration) ? 'Standard': 'Custom',
-                        duration: timer,
-                        levels: levels,
-                    }
-                }
+            <GameStatsTracker
+                game={gameId as any}
+                gameStatus={gameStatus}
+                score={level}
+                elapsedMs={elapsed}
+                targetScore={maxLevels}
+                wonStatus={3}
+                lostStatus={2}
+                gameSettings={{
+                    numPhrases: levels,
+                    duration: timer,
+                }}
             />
             <NPHackContainer
                 title={title}
@@ -341,7 +369,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
                 status={gameStatus}
                 setStatus={setGameStatus}
                 statusMessage={getStatusMessage(gameStatus)}
-                settings={settings}
+                settings={isChallengeMode ? undefined : settings}
                 // className="h-full"
             >
                 <div className={classNames(
@@ -419,9 +447,8 @@ const NPLockpick: FC<NPLockpickProps> = ({
                                 const slotRadius = radius + 15;
 
                                 return (
-                                    <>
+                                    <React.Fragment key={ringIndex}>
                                         <circle
-                                            key={ringIndex*3}
                                             className="
                                                 fill-none stroke-[3px]
                                             "
@@ -435,7 +462,6 @@ const NPLockpick: FC<NPLockpickProps> = ({
                                             r={radius}
                                         />
                                         <g
-                                            key={ringIndex*3+1}
                                             className="
                                                 *:ease-in-out *:transition-transform *:duration-200
                                             "
@@ -456,7 +482,6 @@ const NPLockpick: FC<NPLockpickProps> = ({
                                             />)}
                                         </g>
                                         <g
-                                            key={ringIndex*3+2}
                                             className="
                                                 *:fill-none *:stroke-[5px]
                                             "
@@ -479,7 +504,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
                                                 }}
                                             />)}
                                         </g>
-                                    </>
+                                    </React.Fragment>
                                 )
                             })}
                         </svg>

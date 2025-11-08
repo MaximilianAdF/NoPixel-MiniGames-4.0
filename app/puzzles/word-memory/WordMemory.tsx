@@ -4,8 +4,11 @@ import { successPlayer, checkBeepPlayer } from "@/public/audio/AudioManager";
 import NPHackContainer from "@/app/components/NPHackContainer";
 import {useCallback, useEffect, useState} from "react";
 import useGame from "@/app/utils/useGame";
-import {generate} from "random-words";
-import StatHandler from "@/app/components/StatHandler";
+import { generate } from "random-words";
+import GameStatsTracker from "@/app/components/GameStatsTracker";
+import { NPSettingsRange } from "@/app/components/NPSettings";
+import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
+import { useSearchParams } from "next/navigation";
 
 
 const getStatusMessage = (status: number | undefined) => {
@@ -23,46 +26,69 @@ const getStatusMessage = (status: number | undefined) => {
     }
 }
 
-// const availableWords = [
-//     "alleviations",
-//     "surfer",
-//     "depilate",
-//     "rondeaux",
-//     "valencias",
-//     "sorbitols",
-// ];
-//
-// const getRandomWord = () => {
-//     // TODO: How should a random word be selected? Is there a % chance of getting a new word?
-//     console.log("New word");
-//     return availableWords[Math.floor(Math.random() * availableWords.length)];
-// }
-
 export default function WordMemory() {
-    const countdownDuration = 25;  // TODO: Get the actual speed
-    const maxRounds = 25;
+    const { isChallengeMode, challengeData } = useDailyChallenge();
+    const searchParams = useSearchParams();
+    const isCompetitive = searchParams?.get('competitive') === 'true';
+    
+    const defaultWords = challengeData?.words || 25;
+    const defaultDuration = challengeData?.targetTime ? Math.floor(challengeData.targetTime / 1000) : 25;
+    
+    const [numWords, setNumWords] = useState(defaultWords);
+    const [timer, setTimer] = useState(defaultDuration);
+    
+    const [settingsNumWords, setSettingsNumWords] = useState(defaultWords);
+    const [settingsDuration, setSettingsDuration] = useState(defaultDuration);
+
+    // Reset to standard preset when in competitive mode
+    useEffect(() => {
+        if (isCompetitive) {
+            setNumWords(25); // Standard: 25 words
+            setTimer(25); // Standard: 25 seconds
+            setSettingsNumWords(25);
+            setSettingsDuration(25);
+        }
+    }, [isCompetitive]);
+
+    // Update defaults when challenge data loads
+    useEffect(() => {
+        if (challengeData) {
+            const words = challengeData.words || 25;
+            const duration = challengeData.targetTime ? Math.floor(challengeData.targetTime / 1000) : 25;
+            setNumWords(words);
+            setTimer(duration);
+            setSettingsNumWords(words);
+            setSettingsDuration(duration);
+        }
+    }, [challengeData]);
+
+    useEffect(() => {
+        setSettingsNumWords(numWords);
+        setSettingsDuration(timer);
+    }, [numWords, timer]);
 
     useEffect(() => {
         checkBeepPlayer.whenReady();
         successPlayer.whenReady();
     }, []);
 
-    const statusUpdateHandler = (newStatus: number) => {
-        switch (newStatus) {
-            case 1:
-                // Reset game
-                setRandomWord();
-                setCurrentRound(0);
-                setSeenWords([]);
-                setAvailableWords(getRandomWords());
-                break;
+    const statusUpdateHandler = useCallback((newStatus: number) => {
+        if (newStatus === 1) {
+            // Reset game - generate new words based on current numWords setting
+            const newWords = generate(Math.floor(numWords / 2)) as string[];
+            setAvailableWords(newWords);
+            setSeenWords([]);
+            setCurrentRound(0);
+            // Set initial random word from the new word list
+            setCurrentWord(newWords[Math.floor(Math.random() * newWords.length)]);
         }
-    }
+    }, [numWords]);
+    
     const getRandomWords = () => {
-        return generate(maxRounds / 2) as string[];  // half as many words as rounds
+        return generate(Math.floor(numWords / 2)) as string[];  // half as many words as rounds
     }
 
-    const [gameStatus, setGameStatus, streak] = useGame(countdownDuration, statusUpdateHandler);
+    const [gameStatus, setGameStatus, streak] = useGame(timer, statusUpdateHandler);
 
     const [currentRound, setCurrentRound] = useState(0);
     const [currentWord, setCurrentWord] = useState<string>();
@@ -94,7 +120,7 @@ export default function WordMemory() {
     }
 
     const nextRound = () => {
-        if (currentRound >= maxRounds) {
+        if (currentRound >= numWords) {
             handleWin("All rounds completed");
         } else {
             checkBeepPlayer.play();
@@ -119,20 +145,68 @@ export default function WordMemory() {
         }
     }
 
+    const settings = {
+        handleSave: () => {
+            setNumWords(settingsNumWords);
+            setTimer(settingsDuration);
+        },
+        handleReset: () => {
+            setSettingsNumWords(defaultWords);
+            setSettingsDuration(defaultDuration);
+        },
+        children: (
+            <>
+                <NPSettingsRange
+                    title={"Number of Words"}
+                    min={20}
+                    max={100}
+                    value={settingsNumWords}
+                    setValue={setSettingsNumWords}
+                />
+                <NPSettingsRange
+                    title={"Timer (seconds)"}
+                    min={20}
+                    max={50}
+                    value={settingsDuration}
+                    setValue={setSettingsDuration}
+                />
+            </>
+        )
+    };
+    
+    // Reset game when numWords or timer changes (after settings are saved)
+    useEffect(() => {
+        if (gameStatus !== 0) { // Don't reset on initial load (status 0)
+            resetGame();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [numWords, timer]);
     
     return (
         <>
-            <StatHandler
+            <GameStatsTracker
+                game="word-memory"
+                gameStatus={gameStatus}
+                score={currentRound}
+                elapsedMs={elasped}
+                wonStatus={3}
+                lostStatus={2}
+                gameSettings={{
+                    numWords,
+                    duration: timer,
+                }}
+            />
+            {/* <StatHandler
                 streak={streak}
                 elapsed={elasped}
                 minigame={
                     {
                         puzzle: "WordMemory",
                         preset: "Standard",
-                        duration: countdownDuration,
+                        duration: timer,
                     }
                 }
-            />
+            /> */}
             <NPHackContainer
                 title="Word Memory"
                 description="Memorize the words seen"
@@ -152,15 +226,16 @@ export default function WordMemory() {
                         }
                     ],
                 ]}
-                countdownDuration={countdownDuration * 1000}
+                countdownDuration={timer * 1000}
                 resetCallback={resetGame}
                 elapsedCallback={setElapsed}
                 resetDelay={3000}
                 status={gameStatus}
                 setStatus={setGameStatus}
                 statusMessage={getStatusMessage(gameStatus)}
+                settings={isChallengeMode ? undefined : settings}
             >
-                <p className="text-white text-2xl text-center w-full">{currentRound}/{maxRounds}</p>
+                <p className="text-white text-2xl text-center w-full">{currentRound}/{numWords}</p>
                 <div className="
                     h-32 w-[750px] max-w-full
                     rounded-lg

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NoPixel Icon Generator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #2f3136;
+            font-family: system-ui;
+            color: white;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+        }
+        canvas {
+            display: block;
+            margin: 20px auto;
+            border: 2px solid #54FFA4;
+            border-radius: 8px;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px 24px;
+            background: #54FFA4;
+            color: #0F1B21;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #45e88d;
+        }
+        .info {
+            text-align: center;
+            margin-top: 20px;
+            color: #b9bbbe;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NoPixel Discord App Icon</h1>
+        <canvas id="canvas" width="512" height="512"></canvas>
+        
+        <div class="buttons">
+            <button onclick="download(512)">Download 512x512 (Discord App)</button>
+            <button onclick="download(256)">Download 256x256</button>
+            <button onclick="download(128)">Download 128x128</button>
+        </div>
+        
+        <div class="info">
+            <p>Discord requires a minimum of 512x512px for app icons.</p>
+            <p>This icon matches your website's favicon design.</p>
+        </div>
+    </div>
+
+    <script>
+        function drawIcon(size) {
+            const canvas = document.getElementById('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#0F1B21');
+            gradient.addColorStop(1, '#1a2930');
+            
+            // Fill background
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Draw border
+            ctx.strokeStyle = '#54FFA4';
+            ctx.lineWidth = size * 0.0625; // 2px at 32px = 6.25% of size
+            ctx.beginPath();
+            const radius = size * 0.1875; // 6px at 32px = 18.75% of size
+            roundRect(ctx, 0, 0, size, size, radius);
+            ctx.stroke();
+            
+            // Draw "NP" text
+            ctx.fillStyle = '#54FFA4';
+            ctx.font = `bold ${size * 0.5625}px monospace`; // 18px at 32px = 56.25% of size
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.letterSpacing = '-1px';
+            ctx.fillText('NP', size / 2, size / 2);
+        }
+        
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+        
+        function download(size) {
+            // Create temporary canvas with desired size
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = size;
+            tempCanvas.height = size;
+            const ctx = tempCanvas.getContext('2d');
+            
+            // Draw icon at desired size
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#0F1B21');
+            gradient.addColorStop(1, '#1a2930');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            ctx.strokeStyle = '#54FFA4';
+            ctx.lineWidth = size * 0.0625;
+            ctx.beginPath();
+            const radius = size * 0.1875;
+            roundRect(ctx, 0, 0, size, size, radius);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#54FFA4';
+            ctx.font = `bold ${size * 0.5625}px monospace`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('NP', size / 2, size / 2);
+            
+            // Download
+            tempCanvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `nopixel-icon-${size}x${size}.png`;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+        
+        // Draw initial 512x512 icon
+        drawIcon(512);
+    </script>
+</body>
+</html>

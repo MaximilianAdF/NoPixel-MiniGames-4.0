@@ -2,6 +2,10 @@ import type { Metadata, Viewport } from "next";
 import Chopping from "@/app/puzzles/chopping/Chopping";
 import GameInstructions from "@/app/components/GameInstructions";
 import ChoppingInstructions from "./instructions";
+import PuzzleBackButton from "@/app/components/PuzzleBackButton";
+
+// Force dynamic rendering for daily challenges
+export const dynamic = 'force-dynamic';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -28,6 +32,7 @@ export const metadata: Metadata = {
 export default function Page() {
     return (
         <>
+            <PuzzleBackButton />
             <Chopping />
             <GameInstructions gameId="chopping" title="How to Play Chopping">
                 <ChoppingInstructions />

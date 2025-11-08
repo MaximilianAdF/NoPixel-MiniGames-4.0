@@ -7,7 +7,9 @@ import classNames from "classnames";
 import {getCluster, handleGravity, handleLeftShift, SquareColor, squareColors, SquareValue} from "@/app/puzzles/roof-running/utils";
 import {NPSettingsRange} from "@/app/components/NPSettings";
 import usePersistantState from "@/app/utils/usePersistentState";
-import StatHandler from "@/app/components/StatHandler";
+import GameStatsTracker from "@/app/components/GameStatsTracker";
+import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
+import { useSearchParams } from "next/navigation";
 
 
 const getStatusMessage = (status: number | undefined) => {
@@ -38,11 +40,34 @@ const defaultDuration = 25;
 
 
 const RoofRunning: FC = () => {
-    const [timer, setTimer] = usePersistantState("np-roofrunning-timer", defaultDuration);  // TODO: Get the actual speed
-    const [rows, setRows] = usePersistantState("np-roofrunning-rows", defaultRows);
-    const [columns, setColumns] = usePersistantState("np-roofrunning-columns", defaultColumns);
+    const { isChallengeMode, challengeData } = useDailyChallenge();
+    const searchParams = useSearchParams();
+    const isCompetitive = searchParams?.get('competitive') === 'true';
+    
+    // Use challenge data for defaults if in challenge mode, or standard preset if competitive
+    const challengeRows = challengeData?.rows || defaultRows;
+    const challengeColumns = challengeData?.columns || defaultColumns;
+    const challengeDuration = challengeData?.targetTime ? Math.floor(challengeData.targetTime / 1000) : defaultDuration;
+    
+    const [timer, setTimer] = usePersistantState("np-roofrunning-timer", challengeDuration);
+    const [rows, setRows] = usePersistantState("np-roofrunning-rows", challengeRows);
+    const [columns, setColumns] = usePersistantState("np-roofrunning-columns", challengeColumns);
     const [board, setBoard] = useState<SquareValue[]>(new Array(rows*columns).fill("empty"));
     const [elapsed, setElapsed] = useState(0);
+
+    // Update settings when challenge data loads or when competitive mode is enabled
+    useEffect(() => {
+        if (challengeData) {
+            setRows(challengeData.rows || defaultRows);
+            setColumns(challengeData.columns || defaultColumns);
+            setTimer(challengeData.targetTime ? Math.floor(challengeData.targetTime / 1000) : defaultDuration);
+        } else if (isCompetitive) {
+            // Set to standard preset for competitive play
+            setRows(defaultRows);
+            setColumns(defaultColumns);
+            setTimer(defaultDuration);
+        }
+    }, [challengeData, isCompetitive, setRows, setColumns, setTimer]);
 
     const resetBoard = useCallback(() => {
         const newBoard: SquareColor[] = [];
@@ -211,7 +236,21 @@ const RoofRunning: FC = () => {
 
     return (
         <>
-            <StatHandler
+            <GameStatsTracker
+                game="roof-running"
+                gameStatus={gameStatus}
+                score={board.filter(v => v === "empty").length}
+                elapsedMs={elapsed}
+                targetScore={rows * columns}
+                wonStatus={3}
+                lostStatus={2}
+                gameSettings={{
+                    rows,
+                    columns,
+                    timer,
+                }}
+            />
+            {/* <StatHandler
                 streak={streak}
                 elapsed={elapsed}
                 minigame={
@@ -223,7 +262,7 @@ const RoofRunning: FC = () => {
                         columns: columns,
                     }
                 }
-            />
+            /> */}
             <NPHackContainer
                 title="Same Game"
                 description="Click on matching groups of blocks"
@@ -235,7 +274,7 @@ const RoofRunning: FC = () => {
                 status={gameStatus}
                 setStatus={setGameStatus}
                 statusMessage={getStatusMessage(gameStatus)}
-                settings={settings}
+                settings={isChallengeMode ? undefined : settings}
             >
                 <div className={classNames(
                     `

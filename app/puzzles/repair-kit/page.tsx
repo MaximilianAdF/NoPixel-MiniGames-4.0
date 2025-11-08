@@ -2,6 +2,10 @@ import type { Metadata, Viewport } from "next";
 import RepairKit from "./RepairKit";
 import GameInstructions from "@/app/components/GameInstructions";
 import RepairKitInstructions from "./instructions";
+import PuzzleBackButton from "@/app/components/PuzzleBackButton";
+
+// Force dynamic rendering for daily challenges
+export const dynamic = 'force-dynamic';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -28,6 +32,7 @@ export const metadata: Metadata = {
 export default function Page() {
     return (
         <>
+            <PuzzleBackButton />
             <RepairKit/>
             <GameInstructions gameId="repair-kit" title="How to Play Repair Kit">
                 <RepairKitInstructions />

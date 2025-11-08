@@ -6,29 +6,30 @@ import { useState, useEffect } from 'react';
  * @returns boolean indicating if the query matches
  */
 export const useMediaQuery = (query: string): boolean => {
+  // Initialize to false to ensure server and first client render match
+  // This prevents hydration mismatches
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {
-    // Check if window is defined (client-side)
+    // Only run on client-side
     if (typeof window === 'undefined') {
       return;
     }
 
     const media = window.matchMedia(query);
     
-    // Set initial value
-    if (media.matches !== matches) {
-      setMatches(media.matches);
-    }
+    // Update to actual value after mount (won't cause hydration error)
+    setMatches(media.matches);
     
-    // Create listener
-    const listener = () => setMatches(media.matches);
+    // Create listener for changes
+    const listener = (e: MediaQueryListEvent) => setMatches(e.matches);
     
     // Modern browsers
     if (media.addEventListener) {
       media.addEventListener('change', listener);
     } else {
       // Fallback for older browsers
+      // @ts-ignore
       media.addListener(listener);
     }
     
@@ -37,10 +38,11 @@ export const useMediaQuery = (query: string): boolean => {
       if (media.removeEventListener) {
         media.removeEventListener('change', listener);
       } else {
+        // @ts-ignore
         media.removeListener(listener);
       }
     };
-  }, [matches, query]);
+  }, [query]);
 
   return matches;
 };
