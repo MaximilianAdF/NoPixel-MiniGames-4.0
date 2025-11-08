@@ -355,12 +355,35 @@ export default function ProfilePage() {
               {/* Quick Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-[#0F1B21]/50 rounded-lg p-3 border border-[#54FFA4]/20">
-                  <div className="flex items-center gap-2 text-[#54FFA4] mb-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2 text-[#54FFA4]">
+                      <Zap className="w-4 h-4" />
+                      <span className="text-xs font-medium">Level</span>
+                    </div>
+                    {formatRank(ranks.level, 'level')}
+                  </div>
+                  <div className="text-2xl font-bold text-white">
+                    {stats.user.level}
+                  </div>
+                </div>
+
+                <div className="bg-[#0F1B21]/50 rounded-lg p-3 border border-blue-500/20">
+                  <div className="flex items-center gap-2 text-blue-400 mb-1">
                     <Trophy className="w-4 h-4" />
                     <span className="text-xs font-medium">Games</span>
                   </div>
                   <div className="text-2xl font-bold text-white">
                     {stats.user.totalGamesPlayed}
+                  </div>
+                </div>
+
+                <div className="bg-[#0F1B21]/50 rounded-lg p-3 border border-purple-500/20">
+                  <div className="flex items-center gap-2 text-purple-400 mb-1">
+                    <Clock className="w-4 h-4" />
+                    <span className="text-xs font-medium">Played</span>
+                  </div>
+                  <div className="text-2xl font-bold text-white">
+                    {totalHoursPlayed}h
                   </div>
                 </div>
 
@@ -374,29 +397,6 @@ export default function ProfilePage() {
                   </div>
                   <div className="text-2xl font-bold text-white">
                     {stats.user.currentDailyStreak}
-                  </div>
-                </div>
-
-                <div className="bg-[#0F1B21]/50 rounded-lg p-3 border border-blue-500/20">
-                  <div className="flex items-center gap-2 text-blue-400 mb-1">
-                    <Clock className="w-4 h-4" />
-                    <span className="text-xs font-medium">Played</span>
-                  </div>
-                  <div className="text-2xl font-bold text-white">
-                    {totalHoursPlayed}h
-                  </div>
-                </div>
-
-                <div className="bg-[#0F1B21]/50 rounded-lg p-3 border border-purple-500/20">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2 text-purple-400">
-                      <Zap className="w-4 h-4" />
-                      <span className="text-xs font-medium">Level</span>
-                    </div>
-                    {formatRank(ranks.level, 'level')}
-                  </div>
-                  <div className="text-2xl font-bold text-white">
-                    {stats.user.level}
                   </div>
                 </div>
               </div>

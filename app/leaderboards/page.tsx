@@ -55,6 +55,13 @@ export default function LeaderboardsPage() {
   const hasFetchedRef = useRef(false);
 
   const fetchLeaderboard = useCallback(async () => {
+    // Prevent duplicate fetches
+    if (hasFetchedRef.current) {
+      hasFetchedRef.current = false;
+      return;
+    }
+    hasFetchedRef.current = true;
+
     // Clear old data immediately to prevent flash
     setUserRank(null);
     setLeaderboard([]);
@@ -119,13 +126,17 @@ export default function LeaderboardsPage() {
       setLoading(false);
       setIsSwitching(false);
       setIsInitialLoad(false);
+      // Reset the ref after a short delay to allow new fetches
+      setTimeout(() => {
+        hasFetchedRef.current = false;
+      }, 100);
     }
   }, [activeLeaderboard, currentPage, user?.id, isInitialLoad]);
 
-  // Fetch leaderboard when activeLeaderboard changes
+  // Fetch leaderboard when dependencies change
   useEffect(() => {
     fetchLeaderboard();
-  }, [fetchLeaderboard]);
+  }, [activeLeaderboard, currentPage, user?.id]);
 
   const handleLeaderboardChange = (newLeaderboard: LeaderboardType) => {
     setActiveLeaderboard(newLeaderboard);

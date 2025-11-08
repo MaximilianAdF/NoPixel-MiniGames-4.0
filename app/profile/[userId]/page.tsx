@@ -129,13 +129,21 @@ export default function PublicProfilePage({ params }: { params: { userId: string
         <div className="bg-gradient-to-br from-[#1a2930] to-[#0F1B21] border-2 border-[#54FFA4]/30 rounded-2xl p-8 mb-6 shadow-2xl">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
             
-            {/* Avatar */}
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#54FFA4] to-[#45e894] flex items-center justify-center text-[#0F1B21] text-5xl font-bold overflow-hidden">
-              {user.avatar ? (
-                <Image src={user.avatar} alt={user.displayName || user.username} width={128} height={128} className="w-full h-full object-cover" unoptimized />
-              ) : (
-                user.username.charAt(0).toUpperCase()
-              )}
+            {/* Avatar with Level Badge */}
+            <div className="relative">
+              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#54FFA4] to-[#45e894] p-1">
+                {user.avatar ? (
+                  <Image src={user.avatar} alt={user.displayName || user.username} width={128} height={128} className="w-full h-full object-cover rounded-full" unoptimized />
+                ) : (
+                  <div className="w-full h-full rounded-full bg-[#0F1B21] flex items-center justify-center text-[#54FFA4] text-4xl font-bold">
+                    {user.username.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+              {/* Level Badge */}
+              <div className="absolute -bottom-2 -right-2 bg-gradient-to-br from-[#54FFA4] to-[#45e894] text-[#0F1B21] px-4 py-1 rounded-full font-bold text-lg border-4 border-[#0F1B21]">
+                Lv. {user.level}
+              </div>
             </div>
 
             {/* Info */}
@@ -150,23 +158,15 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                 <div className="bg-[#0F1B21]/50 rounded-lg p-3 border border-[#54FFA4]/20">
                   <div className="flex items-center gap-2 text-[#54FFA4] mb-1">
                     <Zap className="w-4 h-4" />
-                    <span className="text-sm font-medium">Level</span>
+                    <span className="text-xs font-medium">Level</span>
                   </div>
                   <div className="text-2xl font-bold text-white">{user.level}</div>
-                </div>
-                
-                <div className="bg-[#0F1B21]/50 rounded-lg p-3 border border-orange-500/20">
-                  <div className="flex items-center gap-2 text-orange-400 mb-1">
-                    <Flame className="w-4 h-4" />
-                    <span className="text-sm font-medium">Streak</span>
-                  </div>
-                  <div className="text-2xl font-bold text-white">{user.currentDailyStreak}</div>
                 </div>
                 
                 <div className="bg-[#0F1B21]/50 rounded-lg p-3 border border-blue-500/20">
                   <div className="flex items-center gap-2 text-blue-400 mb-1">
                     <Gamepad2 className="w-4 h-4" />
-                    <span className="text-sm font-medium">Games</span>
+                    <span className="text-xs font-medium">Games</span>
                   </div>
                   <div className="text-2xl font-bold text-white">{user.totalGamesPlayed}</div>
                 </div>
@@ -174,9 +174,17 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                 <div className="bg-[#0F1B21]/50 rounded-lg p-3 border border-purple-500/20">
                   <div className="flex items-center gap-2 text-purple-400 mb-1">
                     <Clock className="w-4 h-4" />
-                    <span className="text-sm font-medium">Playtime</span>
+                    <span className="text-xs font-medium">Played</span>
                   </div>
                   <div className="text-2xl font-bold text-white">{formatTime(user.totalTimePlayedMs)}</div>
+                </div>
+                
+                <div className="bg-[#0F1B21]/50 rounded-lg p-3 border border-orange-500/20">
+                  <div className="flex items-center gap-2 text-orange-400 mb-1">
+                    <Flame className="w-4 h-4" />
+                    <span className="text-xs font-medium">Streak</span>
+                  </div>
+                  <div className="text-2xl font-bold text-white">{user.currentDailyStreak}</div>
                 </div>
               </div>
 
