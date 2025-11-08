@@ -17,6 +17,7 @@ import {
   Target,
   Zap,
   Star,
+  Medal,
   ChevronRight,
   ListTodo,
   TrendingUp
@@ -240,36 +241,48 @@ export default function ProfilePage() {
   const formatRank = (rank?: number, leaderboardType?: string) => {
     if (!rank) return null;
     
-    let bgColor = 'bg-gray-700/50';
+    let bgGradient = 'bg-gradient-to-r from-gray-700/50 to-gray-600/50';
     let textColor = 'text-gray-300';
     let borderColor = 'border-gray-600/30';
+    let icon = <TrendingUp className="w-3.5 h-3.5" />;
+    let shadowClass = 'shadow-sm';
     
     if (rank === 1) {
-      bgColor = 'bg-yellow-500/20';
+      bgGradient = 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/30';
       textColor = 'text-yellow-400';
-      borderColor = 'border-yellow-500/40';
+      borderColor = 'border-yellow-500/60';
+      icon = <Trophy className="w-3.5 h-3.5" />;
+      shadowClass = 'shadow-lg shadow-yellow-500/20';
     } else if (rank === 2) {
-      bgColor = 'bg-gray-400/20';
-      textColor = 'text-gray-300';
-      borderColor = 'border-gray-400/40';
+      bgGradient = 'bg-gradient-to-r from-gray-300/25 to-gray-400/25';
+      textColor = 'text-gray-200';
+      borderColor = 'border-gray-400/50';
+      icon = <Medal className="w-3.5 h-3.5" />;
+      shadowClass = 'shadow-lg shadow-gray-400/10';
     } else if (rank === 3) {
-      bgColor = 'bg-orange-600/20';
+      bgGradient = 'bg-gradient-to-r from-orange-600/25 to-orange-700/25';
       textColor = 'text-orange-400';
-      borderColor = 'border-orange-600/40';
+      borderColor = 'border-orange-600/50';
+      icon = <Award className="w-3.5 h-3.5" />;
+      shadowClass = 'shadow-lg shadow-orange-600/10';
     } else if (rank <= 10) {
-      bgColor = 'bg-[#54FFA4]/10';
+      bgGradient = 'bg-gradient-to-r from-[#54FFA4]/15 to-[#45e894]/15';
       textColor = 'text-[#54FFA4]';
-      borderColor = 'border-[#54FFA4]/30';
+      borderColor = 'border-[#54FFA4]/40';
+      icon = <Star className="w-3.5 h-3.5" />;
+      shadowClass = 'shadow-md shadow-[#54FFA4]/10';
     } else if (rank <= 50) {
-      bgColor = 'bg-blue-500/10';
+      bgGradient = 'bg-gradient-to-r from-blue-500/15 to-blue-600/15';
       textColor = 'text-blue-400';
-      borderColor = 'border-blue-500/30';
+      borderColor = 'border-blue-500/40';
+      icon = <TrendingUp className="w-3.5 h-3.5" />;
+      shadowClass = 'shadow-md shadow-blue-500/10';
     }
     
     const rankBadge = (
-      <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border ${bgColor} ${borderColor} ${textColor} text-xs font-semibold transition-all hover:scale-105 cursor-pointer`}>
-        <TrendingUp className="w-3 h-3" />
-        #{rank}
+      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border-2 ${bgGradient} ${borderColor} ${textColor} ${shadowClass} text-xs font-bold transition-all hover:scale-110 hover:brightness-110 cursor-pointer animate-in fade-in duration-300`}>
+        {icon}
+        <span className="font-mono">#{rank}</span>
       </div>
     );
 

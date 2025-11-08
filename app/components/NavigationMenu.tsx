@@ -22,6 +22,9 @@ import {
   VolumeX,
   Gamepad2,
   Settings,
+  Calendar,
+  CheckCircle2,
+  Clock,
 } from 'lucide-react';
 
 export default function NavigationMenu() {
@@ -38,6 +41,10 @@ export default function NavigationMenu() {
   const [hasLoadedUserPrefs, setHasLoadedUserPrefs] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Daily Challenge state
+  const [challengeCompleted, setChallengeCompleted] = useState(false);
+  const [timeUntilNext, setTimeUntilNext] = useState({ hours: '00', minutes: '00' });
   
   const pathname = usePathname();
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -78,6 +85,47 @@ export default function NavigationMenu() {
       setHasLoadedUserPrefs(true);
     }
   }, [user, hasLoadedUserPrefs, isClient]);
+
+  // Fetch daily challenge status
+  useEffect(() => {
+    const fetchChallengeStatus = async () => {
+      try {
+        const response = await fetch('/api/challenges/today');
+        if (response.ok) {
+          const data = await response.json();
+          setChallengeCompleted(data?.userProgress?.completed || false);
+        }
+      } catch (error) {
+        // Silently fail - not critical for nav menu
+      }
+    };
+
+    if (user) {
+      fetchChallengeStatus();
+    }
+  }, [user]);
+
+  // Update countdown timer
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setUTCHours(24, 0, 0, 0);
+      
+      const diff = tomorrow.getTime() - now.getTime();
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      
+      setTimeUntilNext({
+        hours: hours.toString().padStart(2, '0'),
+        minutes: minutes.toString().padStart(2, '0')
+      });
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, []);
 
   // Register keyboard shortcuts for navigation menu
   useEffect(() => {
@@ -313,6 +361,32 @@ export default function NavigationMenu() {
             >
               <Trophy className="w-5 h-5" />
               <span className="font-medium">Leaderboards</span>
+            </Link>
+
+            {/* Daily Challenge */}
+            <Link
+              href="/daily-challenge"
+              onClick={handleLinkClick}
+              className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 ${
+                pathname === '/daily-challenge'
+                  ? 'bg-[#54FFA4]/20 text-[#54FFA4] border border-[#54FFA4]/50'
+                  : 'text-gray-300 hover:bg-[#1a2930] hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                {challengeCompleted ? (
+                  <CheckCircle2 className="w-5 h-5 text-green-400" />
+                ) : (
+                  <Calendar className="w-5 h-5" />
+                )}
+                <span className="font-medium">Daily Challenge</span>
+              </div>
+              {!challengeCompleted && user && (
+                <div className="flex items-center gap-1 text-xs font-mono">
+                  <Clock className="w-3 h-3" />
+                  <span>{timeUntilNext.hours}h {timeUntilNext.minutes}m</span>
+                </div>
+              )}
             </Link>
           </div>
 

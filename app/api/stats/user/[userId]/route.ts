@@ -59,8 +59,17 @@ export async function GET(
       gameStats: gameStats.map(stat => ({
         game: stat.game,
         gamesPlayed: stat.gamesPlayed || 0,
+        gamesWon: stat.gamesWon || 0,
+        gamesLost: stat.gamesLost || 0,
+        // Best stats (leaderboard-eligible, standard preset only)
         bestScore: stat.bestScore || 0,
+        bestTime: stat.bestTime || 0,
+        // Overall best stats (all plays, any settings)
+        bestScoreOverall: stat.bestScoreOverall || 0,
+        bestTimeOverall: stat.bestTimeOverall || 0,
+        // Averages
         averageScore: stat.averageScore || 0,
+        averageTime: stat.averageTime || 0,
         totalTimePlayedMs: stat.totalTimePlayedMs || 0,
         currentStreak: stat.currentStreak || 0,
         longestStreak: stat.longestStreak || 0,

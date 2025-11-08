@@ -136,6 +136,7 @@ export default function LeaderboardsPage() {
   // Fetch leaderboard when dependencies change
   useEffect(() => {
     fetchLeaderboard();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeLeaderboard, currentPage, user?.id]);
 
   const handleLeaderboardChange = (newLeaderboard: LeaderboardType) => {

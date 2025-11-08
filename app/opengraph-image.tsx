@@ -92,7 +92,7 @@ export default async function Image() {
                 gap: '12px',
               }}
             >
-              <span style={{ color: '#54FFA4' }}>✓</span>
+              <span style={{ color: '#54FFA4' }}>•</span>
               <span>8 Authentic NoPixel Minigames</span>
             </div>
             <div
@@ -105,7 +105,7 @@ export default async function Image() {
                 gap: '12px',
               }}
             >
-              <span style={{ color: '#54FFA4' }}>✓</span>
+              <span style={{ color: '#54FFA4' }}>•</span>
               <span>Global Leaderboards & Daily Challenges</span>
             </div>
             <div
@@ -118,7 +118,7 @@ export default async function Image() {
                 gap: '12px',
               }}
             >
-              <span style={{ color: '#54FFA4' }}>✓</span>
+              <span style={{ color: '#54FFA4' }}>•</span>
               <span>100% Free • No Login Required</span>
             </div>
           </div>
