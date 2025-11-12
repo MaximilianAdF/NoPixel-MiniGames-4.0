@@ -11,6 +11,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSmile, faFaceMeh, faFaceAngry, faFaceDizzy} from "@fortawesome/free-solid-svg-icons";
 import {Hand} from "lucide-react";
 import type { FC } from 'react';
+import { trackGameStart, trackGameRetry } from "@/app/utils/gtm";
+import { useUser } from "@/app/contexts/UserContext";
 const HandIcon = Hand as unknown as FC<any>;
 
 
@@ -24,6 +26,22 @@ export default function RepairKit() {
     const [tickSpeed, setTickSpeed] = useState(5);
     const [streak, setStreak] = useState(0);
     const isMobileOrTablet = useIsMobileOrTablet();
+    const { user } = useUser();
+
+    // Track game start
+    useEffect(() => {
+        if (gameStatus === 1) {
+            const count = parseInt(sessionStorage.getItem('game_count') || '0') + 1;
+            sessionStorage.setItem('game_count', count.toString());
+            
+            trackGameStart({
+                game_name: 'repairkit',
+                is_logged_in: !!user,
+                user_level: user?.level || 0,
+                session_game_count: count,
+            });
+        }
+    }, [gameStatus, user]);
 
     const handleWin = (message: string) => {
         // Win
@@ -73,6 +91,17 @@ export default function RepairKit() {
             setGameStatus(1);
         }, 250);
     }, []);
+
+    const handleRetry = useCallback(() => {
+        if (gameStatus === 2 || gameStatus === 3) {
+            trackGameRetry({
+                game_name: 'repairkit',
+                previous_result: gameStatus === 3 ? 'win' : 'loss',
+                previous_score: streak,
+            });
+        }
+        resetGame();
+    }, [gameStatus, streak, resetGame]);
 
     const tick = () => {
         if (gameStatus !== 1) {
@@ -247,7 +276,7 @@ export default function RepairKit() {
                 <div className="flex justify-center items-center">
                     <button
                         onClick={ () => {
-                            resetGame();
+                            handleRetry();
                             setTickSpeed(tickSpeed < 10 ? 40 : tickSpeed / 2);
                             }
                         }

@@ -18,6 +18,8 @@ import { NPSettingsRange } from "@/app/components/NPSettings";
 import NPButton from "@/app/components/NPButton";
 import usePersistantState from "@/app/utils/usePersistentState";
 import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
+import { trackGameStart, trackGameRetry } from "@/app/utils/gtm";
+import { useUser } from "@/app/contexts/UserContext";
 
 import Image from "next/image";
 import crossImg from "@/public/images/thermite/cross.svg";
@@ -135,12 +137,43 @@ const Thermite: FC = () => {
     statusUpdateHandler
   );
 
+  const { user } = useUser();
+
+  // Track game start
+  useEffect(() => {
+    if (gameStatus === 1) {
+      const count = parseInt(sessionStorage.getItem('game_count') || '0') + 1;
+      sessionStorage.setItem('game_count', count.toString());
+      
+      trackGameStart({
+        game_name: 'thermite',
+        is_logged_in: !!user,
+        user_level: user?.level || 0,
+        session_game_count: count,
+      });
+    }
+  }, [gameStatus, user]);
+
   /**
    * Resets the game.
    */
   const resetGame = useCallback((): void => {
     setGameStatus(1);
   }, [setGameStatus]);
+
+  /**
+   * Handles game retry with tracking
+   */
+  const handleRetry = useCallback((): void => {
+    if (gameStatus === 2 || gameStatus === 3) {
+      trackGameRetry({
+        game_name: 'thermite',
+        previous_result: gameStatus === 3 ? 'win' : 'loss',
+        previous_score: score,
+      });
+    }
+    resetGame();
+  }, [gameStatus, score, resetGame]);
 
   /**
    * Sets a square's properties.
@@ -490,7 +523,7 @@ const Thermite: FC = () => {
         description="Decrypt the required number of bytes"
         buttons={[]}
         countdownDuration={timer * 1000}
-        resetCallback={resetGame}
+        resetCallback={handleRetry}
         elapsedCallback={setElapsed}
         resetDelay={3000}
         status={gameStatus}

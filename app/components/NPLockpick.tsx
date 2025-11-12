@@ -11,6 +11,8 @@ import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
 import classNames from "classnames";
 import GameStatsTracker from "./GameStatsTracker";
 import LeaderboardEligibleBadge from "./LeaderboardEligibleBadge";
+import { trackGameStart, trackGameRetry } from "@/app/utils/gtm";
+import { useUser } from "@/app/contexts/UserContext";
 
 type RingColor = "red" | "yellow" | "blue";
 
@@ -208,8 +210,36 @@ const NPLockpick: FC<NPLockpickProps> = ({
 
     const [gameStatus, setGameStatus, streak] = useGame(timer*1000, statusUpdateHandler);
 
+    const { user } = useUser();
+
+    // Track game start
+    useEffect(() => {
+        if (gameStatus === 1) {
+            const count = parseInt(sessionStorage.getItem('game_count') || '0') + 1;
+            sessionStorage.setItem('game_count', count.toString());
+            
+            trackGameStart({
+                game_name: gameId,
+                is_logged_in: !!user,
+                user_level: user?.level || 0,
+                session_game_count: count,
+            });
+        }
+    }, [gameStatus, user, gameId]);
+
     const resetGame = () => {
         setGameStatus(1);
+    };
+
+    const handleRetry = () => {
+        if (gameStatus === 2 || gameStatus === 3) {
+            trackGameRetry({
+                game_name: gameId,
+                previous_result: gameStatus === 3 ? 'win' : 'loss',
+                previous_score: level,
+            });
+        }
+        resetGame();
     };
 
     const handleWin = (message: string) => {
@@ -371,7 +401,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
                     ]
                 ]}
                 countdownDuration={timer*1000}
-                resetCallback={resetGame}
+                resetCallback={handleRetry}
                 elapsedCallback={setElapsed}
                 resetDelay={3000}
                 status={gameStatus}

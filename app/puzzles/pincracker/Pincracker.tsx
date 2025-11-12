@@ -14,6 +14,8 @@ import GameStatsTracker from "@/app/components/GameStatsTracker";
 import LeaderboardEligibleBadge from "@/app/components/LeaderboardEligibleBadge";
 import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
 import { useSearchParams } from "next/navigation";
+import { trackGameStart, trackGameRetry } from "@/app/utils/gtm";
+import { useUser } from "@/app/contexts/UserContext";
 
 const defaultDuration = 20;
 const defaultPinLength = 4;
@@ -308,8 +310,36 @@ const Pincracker: FC = () => {
         }
     }, [gameStatus, isMobileOrTablet]);
 
+    const { user } = useUser();
+
+    // Track game start
+    useEffect(() => {
+        if (gameStatus === 1) {
+            const count = parseInt(sessionStorage.getItem('game_count') || '0') + 1;
+            sessionStorage.setItem('game_count', count.toString());
+            
+            trackGameStart({
+                game_name: 'pincracker',
+                is_logged_in: !!user,
+                user_level: user?.level || 0,
+                session_game_count: count,
+            });
+        }
+    }, [gameStatus, user]);
+
     const resetGame = () => {
         setGameStatus(1);
+    }
+
+    const handleRetry = () => {
+        if (gameStatus === 2 || gameStatus === 3) {
+            trackGameRetry({
+                game_name: 'pincracker',
+                previous_result: gameStatus === 3 ? 'win' : 'loss',
+                previous_score: activeIndex,
+            });
+        }
+        resetGame();
     }
 
     const removeDigit = (idx: number) => {
@@ -523,7 +553,7 @@ const Pincracker: FC = () => {
                 ]
             ]}
             countdownDuration={timer * 1000}
-            resetCallback={resetGame}
+            resetCallback={handleRetry}
             elapsedCallback={setElapsed}
             resetDelay={3000}
             status={gameStatus}

@@ -168,6 +168,16 @@ export default function RootLayout({
         {/* Google Tag Manager - Replace GTM-XXXXXXX with your actual GTM ID */}
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
         
+        {/* Session Tracking */}
+        <Script id="session-tracker" strategy="afterInteractive">
+          {`
+            if (!sessionStorage.getItem('session_start')) {
+              sessionStorage.setItem('session_start', Date.now());
+              sessionStorage.setItem('game_count', '0');
+            }
+          `}
+        </Script>
+        
         {/* JSON-LD Structured Data for better SEO */}
         <script
           type="application/ld+json"

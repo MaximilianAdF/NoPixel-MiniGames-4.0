@@ -14,6 +14,8 @@ import useGame from "@/app/utils/useGame";
 import classNames from "classnames";
 import { useIsMobileOrTablet } from "@/app/utils/useMediaQuery";
 import { useSearchParams } from "next/navigation";
+import { trackGameStart, trackGameRetry } from "@/app/utils/gtm";
+import { useUser } from "@/app/contexts/UserContext";
 
 
 import "../../../public/Chopping/Chopping.css";
@@ -324,6 +326,23 @@ const Chopping: FC = () => {
 
     const [gameStatus, setGameStatus, streak] = useGame(timer*1000, statusUpdateHandler);
 
+    const { user } = useUser();
+
+    // Track game start
+    useEffect(() => {
+        if (gameStatus === 1) {
+            const count = parseInt(sessionStorage.getItem('game_count') || '0') + 1;
+            sessionStorage.setItem('game_count', count.toString());
+            
+            trackGameStart({
+                game_name: 'chopping',
+                is_logged_in: !!user,
+                user_level: user?.level || 0,
+                session_game_count: count,
+            });
+        }
+    }, [gameStatus, user]);
+
     // Auto-scroll when game starts on mobile
     useEffect(() => {
         if (isMobileOrTablet && gameStatus === 1) {
@@ -345,6 +364,18 @@ const Chopping: FC = () => {
 
     const resetGame = () => {
         setGameStatus(1);
+    }
+
+    const handleRetry = () => {
+        // Track retry event (user clicking "Play Again" after game end)
+        if (gameStatus === 2 || gameStatus === 3) {
+            trackGameRetry({
+                game_name: 'chopping',
+                previous_result: gameStatus === 3 ? 'win' : 'loss',
+                previous_score: activeIndex,
+            });
+        }
+        resetGame();
     }
 
     const handleWin = useCallback((message: string) => {
@@ -593,7 +624,7 @@ const Chopping: FC = () => {
                         buttons={[]}
                         countdownDuration={timer * 1000}
                         elapsedCallback={setElapsed}
-                        resetCallback={resetGame}
+                        resetCallback={handleRetry}
                         resetDelay={3000}
                         status={gameStatus}
                         setStatus={setGameStatus}

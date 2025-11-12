@@ -10,6 +10,8 @@ import LeaderboardEligibleBadge from "@/app/components/LeaderboardEligibleBadge"
 import { NPSettingsRange } from "@/app/components/NPSettings";
 import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
 import { useSearchParams } from "next/navigation";
+import { trackGameStart, trackGameRetry } from "@/app/utils/gtm";
+import { useUser } from "@/app/contexts/UserContext";
 
 
 const getStatusMessage = (status: number | undefined) => {
@@ -97,6 +99,23 @@ export default function WordMemory() {
     const [availableWords, setAvailableWords] = useState(getRandomWords);
     const [elasped, setElapsed] = useState<number>(0);
 
+    const { user } = useUser();
+
+    // Track game start
+    useEffect(() => {
+        if (gameStatus === 1) {
+            const count = parseInt(sessionStorage.getItem('game_count') || '0') + 1;
+            sessionStorage.setItem('game_count', count.toString());
+            
+            trackGameStart({
+                game_name: 'word-memory',
+                is_logged_in: !!user,
+                user_level: user?.level || 0,
+                session_game_count: count,
+            });
+        }
+    }, [gameStatus, user]);
+
     const setRandomWord = useCallback(() => {
         setSeenWords((v) => v.concat([currentWord as string]));
         setCurrentWord(availableWords[Math.floor(Math.random() * availableWords.length)]);
@@ -104,6 +123,17 @@ export default function WordMemory() {
 
     const resetGame = () => {
         setGameStatus(1);
+    };
+
+    const handleRetry = () => {
+        if (gameStatus === 2 || gameStatus === 3) {
+            trackGameRetry({
+                game_name: 'word-memory',
+                previous_result: gameStatus === 3 ? 'win' : 'loss',
+                previous_score: currentRound,
+            });
+        }
+        resetGame();
     };
 
     const handleWin = (message: string) => {
@@ -235,7 +265,7 @@ export default function WordMemory() {
                     ],
                 ]}
                 countdownDuration={timer * 1000}
-                resetCallback={resetGame}
+                resetCallback={handleRetry}
                 elapsedCallback={setElapsed}
                 resetDelay={3000}
                 status={gameStatus}

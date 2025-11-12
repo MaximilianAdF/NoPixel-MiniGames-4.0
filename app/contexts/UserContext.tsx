@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode, useRef } from 'react';
 import { UserSession } from '@/interfaces/user';
+import { trackLoginSuccess } from '../utils/gtm';
 
 interface DailyChallengeStatus {
   completed: boolean;
@@ -30,11 +31,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const lastSessionFetchRef = useRef<number>(0);
   const sessionFetchingRef = useRef<boolean>(false);
   const challengeFetchingRef = useRef<boolean>(false);
+  const loginSuccessTrackedRef = useRef<boolean>(false);
   const SESSION_CACHE_DURATION = 30000; // 30 seconds cache
 
   // Fetch session on mount
   useEffect(() => {
     fetchSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch daily challenge status when user logs in
@@ -65,10 +68,23 @@ export function UserProvider({ children }: { children: ReactNode }) {
       const response = await fetch('/api/auth/session');
       const data = await response.json();
       
+      const wasLoggedOut = !user;
+      
       if (data.user) {
         setUser(data.user);
+        
+        // Track login success only on first login (not on refreshes)
+        if (wasLoggedOut && !loginSuccessTrackedRef.current) {
+          loginSuccessTrackedRef.current = true;
+          trackLoginSuccess({
+            method: 'discord',
+            user_level: data.user.level || 0,
+          });
+        }
       } else {
         setUser(null);
+        // Reset tracking flag when user logs out
+        loginSuccessTrackedRef.current = false;
       }
       
       lastSessionFetchRef.current = now;

@@ -10,6 +10,7 @@ import { useUser } from '../contexts/UserContext';
 import { useGuide } from '../contexts/GuideContext';
 import { useMediaQuery } from '../utils/useMediaQuery';
 import { useKeyboardShortcuts } from '../contexts/KeyboardShortcutsContext';
+import { trackLoginAttempt } from '../utils/gtm';
 
 // Discord logo as SVG component
 const DiscordIcon = ({ className }: { className?: string }) => (
@@ -97,6 +98,13 @@ export default function LoginButton() {
 
   const handleLogin = () => {
     const returnTo = pathname || '/';
+    
+    // Track login attempt
+    trackLoginAttempt({
+      method: 'discord',
+      page: returnTo,
+    });
+    
     login(returnTo);
   };
 

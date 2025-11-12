@@ -5,6 +5,28 @@
  */
 
 // Type definitions for common events
+export interface GameStartEvent {
+  game_name: string;
+  is_logged_in: boolean;
+  user_level?: number;
+  session_game_count?: number;
+}
+
+export interface GameCompleteEvent {
+  game_name: string;
+  result: 'win' | 'loss';
+  score: number;
+  time: number;
+  is_standard_preset: boolean;
+  is_logged_in: boolean;
+}
+
+export interface GameRetryEvent {
+  game_name: string;
+  previous_result: 'win' | 'loss';
+  previous_score: number;
+}
+
 export interface GamePlayEvent {
   game_name: string;
   game_result: 'win' | 'loss';
@@ -22,6 +44,16 @@ export interface ChallengeCompleteEvent {
   challenge_id: string;
   completion_time: number;
   stars?: number;
+}
+
+export interface LoginAttemptEvent {
+  method: 'discord' | 'guest';
+  page?: string;
+}
+
+export interface LoginSuccessEvent {
+  method: 'discord' | 'guest';
+  user_level?: number;
 }
 
 export interface UserLoginEvent {
@@ -42,7 +74,37 @@ function pushToDataLayer(data: Record<string, any>) {
 }
 
 /**
- * Track when a user plays a game
+ * Track when a user starts a game
+ */
+export function trackGameStart(data: GameStartEvent) {
+  pushToDataLayer({
+    event: 'game_start',
+    ...data,
+  });
+}
+
+/**
+ * Track when a user completes a game
+ */
+export function trackGameComplete(data: GameCompleteEvent) {
+  pushToDataLayer({
+    event: 'game_complete',
+    ...data,
+  });
+}
+
+/**
+ * Track when a user retries a game
+ */
+export function trackGameRetry(data: GameRetryEvent) {
+  pushToDataLayer({
+    event: 'game_retry',
+    ...data,
+  });
+}
+
+/**
+ * Track when a user plays a game (legacy - use trackGameComplete instead)
  */
 export function trackGamePlay(data: GamePlayEvent) {
   pushToDataLayer({
@@ -72,7 +134,27 @@ export function trackChallengeComplete(data: ChallengeCompleteEvent) {
 }
 
 /**
- * Track when a user logs in
+ * Track when a user attempts to login
+ */
+export function trackLoginAttempt(data: LoginAttemptEvent) {
+  pushToDataLayer({
+    event: 'login_attempt',
+    ...data,
+  });
+}
+
+/**
+ * Track when a user successfully logs in
+ */
+export function trackLoginSuccess(data: LoginSuccessEvent) {
+  pushToDataLayer({
+    event: 'login_success',
+    ...data,
+  });
+}
+
+/**
+ * Track when a user logs in (legacy - use trackLoginSuccess instead)
  */
 export function trackUserLogin(data: UserLoginEvent) {
   pushToDataLayer({

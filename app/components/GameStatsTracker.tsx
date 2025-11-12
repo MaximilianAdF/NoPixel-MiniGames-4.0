@@ -5,6 +5,8 @@ import { useUser } from '../contexts/UserContext';
 import { Zap, Trophy, Flame } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { trackGameEvent } from '../utils/analytics';
+import { trackGameComplete } from '../utils/gtm';
+import { isStandardPreset } from '../utils/gamePresets';
 
 interface GameStatsTrackerProps {
   game: string;
@@ -55,8 +57,8 @@ export default function GameStatsTracker({
   const alreadyCompletedChallenge = challengeId && dailyChallengeStatus?.challengeId === challengeId && dailyChallengeStatus?.completed;
 
   useEffect(() => {
-    // Only save stats when game ends (won or lost) and user is logged in
-    if (!isLoggedIn || (gameStatus !== wonStatus && gameStatus !== lostStatus)) {
+    // Only process when game ends (won or lost)
+    if (gameStatus !== wonStatus && gameStatus !== lostStatus) {
       return;
     }
 
@@ -65,12 +67,22 @@ export default function GameStatsTracker({
     // Create a unique identifier for this game completion
     const gameId = `${game}-${Date.now()}-${score}`;
     
-    // Prevent duplicate saves
+    // Prevent duplicate tracking
     if (lastSavedGame.current === gameId) {
       return;
     }
 
     lastSavedGame.current = gameId;
+    
+    // Track game completion in GA4 (always, regardless of login status)
+    trackGameComplete({
+      game_name: game,
+      result: won ? 'win' : 'loss',
+      score: score,
+      time: elapsedMs / 1000, // Convert to seconds
+      is_standard_preset: isStandardPreset(game, gameSettings || {}),
+      is_logged_in: isLoggedIn,
+    });
     
     // Track analytics event
     trackGameEvent({
@@ -81,7 +93,10 @@ export default function GameStatsTracker({
       userId: user?.id,
     });
     
-    saveGameStats(won);
+    // Save stats only if logged in
+    if (isLoggedIn) {
+      saveGameStats(won);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameStatus, isLoggedIn, wonStatus, lostStatus]);
 

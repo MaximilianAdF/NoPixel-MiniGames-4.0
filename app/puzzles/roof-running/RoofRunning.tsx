@@ -11,6 +11,8 @@ import GameStatsTracker from "@/app/components/GameStatsTracker";
 import LeaderboardEligibleBadge from "@/app/components/LeaderboardEligibleBadge";
 import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
 import { useSearchParams } from "next/navigation";
+import { trackGameStart, trackGameRetry } from "@/app/utils/gtm";
+import { useUser } from "@/app/contexts/UserContext";
 
 
 const getStatusMessage = (status: number | undefined) => {
@@ -91,9 +93,37 @@ const RoofRunning: FC = () => {
 
     const [gameStatus, setGameStatus, streak] = useGame(timer*1000, statusUpdateHandler);
 
+    const { user } = useUser();
+
+    // Track game start
+    useEffect(() => {
+        if (gameStatus === 1) {
+            const count = parseInt(sessionStorage.getItem('game_count') || '0') + 1;
+            sessionStorage.setItem('game_count', count.toString());
+            
+            trackGameStart({
+                game_name: 'roof-running',
+                is_logged_in: !!user,
+                user_level: user?.level || 0,
+                session_game_count: count,
+            });
+        }
+    }, [gameStatus, user]);
+
     const resetGame = useCallback(() => {
         setGameStatus(1);
     }, [setGameStatus]);
+
+    const handleRetry = useCallback(() => {
+        if (gameStatus === 2 || gameStatus === 3) {
+            trackGameRetry({
+                game_name: 'roof-running',
+                previous_result: gameStatus === 3 ? 'win' : 'loss',
+                previous_score: board.filter(v => v === "empty").length,
+            });
+        }
+        resetGame();
+    }, [gameStatus, board, resetGame]);
 
     const handleWin = useCallback((message: string) => {
         // Win
@@ -277,7 +307,7 @@ const RoofRunning: FC = () => {
                 description="Click on matching groups of blocks"
                 buttons={[]}
                 countdownDuration={timer*1000}
-                resetCallback={resetGame}
+                resetCallback={handleRetry}
                 elapsedCallback={setElapsed}
                 resetDelay={3000}
                 status={gameStatus}
