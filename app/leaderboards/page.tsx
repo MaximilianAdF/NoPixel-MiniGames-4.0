@@ -44,9 +44,11 @@ export default function LeaderboardsPage() {
   const { user } = useUser();
   const [activeLeaderboard, setActiveLeaderboard] = useState<LeaderboardType>('level');
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [nextLeaderboard, setNextLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [userRank, setUserRank] = useState<LeaderboardEntry | null>(null);
   const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['general']));
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -55,6 +57,7 @@ export default function LeaderboardsPage() {
   const abortControllerRef = useRef<AbortController | null>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const requestIdRef = useRef(0);
+  const pendingUpdateRef = useRef<{ leaderboard: string; page: number } | null>(null);
 
   const fetchLeaderboard = useCallback(async () => {
     // Prevent duplicate fetches
@@ -73,8 +76,10 @@ export default function LeaderboardsPage() {
     // Generate unique request ID to track this specific request
     const currentRequestId = ++requestIdRef.current;
 
-    // Don't clear old data - let new data replace it smoothly
-    // This prevents flickering when switching categories
+    // Start transition for smooth fade effect (but not on initial load)
+    if (!isInitialLoad && leaderboard.length > 0) {
+      setIsTransitioning(true);
+    }
     
     // Only show skeleton on initial load
     if (isInitialLoad) {
@@ -99,8 +104,26 @@ export default function LeaderboardsPage() {
           setTotalPages(data.pagination.totalPages);
         }
         
-        // Update leaderboard immediately for snappy feel
-        setLeaderboard(data.entries || []);
+        // Store new data in next state for smooth transition
+        const newEntries = data.entries || [];
+        
+        // If transitioning, wait for fade out before updating
+        if (isTransitioning && !isInitialLoad) {
+          setNextLeaderboard(newEntries);
+          // Wait for fade out animation (150ms)
+          await new Promise(resolve => setTimeout(resolve, 150));
+          // Check again if still the latest request
+          if (currentRequestId !== requestIdRef.current) {
+            return;
+          }
+          setLeaderboard(newEntries);
+          setNextLeaderboard([]);
+          // Wait a tick for DOM update then fade in
+          setTimeout(() => setIsTransitioning(false), 10);
+        } else {
+          // Immediate update on initial load
+          setLeaderboard(newEntries);
+        }
         
         // If user is logged in, fetch their rank
         if (user?.id) {
@@ -135,6 +158,7 @@ export default function LeaderboardsPage() {
     } catch (error) {
       // Ignore abort errors - they're expected when switching categories
       if (error instanceof Error && error.name === 'AbortError') {
+        setIsTransitioning(false);
         return;
       }
       console.error('Failed to fetch leaderboard:', error);
@@ -143,19 +167,26 @@ export default function LeaderboardsPage() {
     } finally {
       setLoading(false);
       setIsInitialLoad(false);
+      setIsTransitioning(false);
       // Reset the ref after a short delay to allow new fetches
       setTimeout(() => {
         hasFetchedRef.current = false;
       }, 100);
     }
-  }, [activeLeaderboard, currentPage, user?.id, isInitialLoad]);
+  }, [activeLeaderboard, currentPage, user?.id, isInitialLoad, isTransitioning, leaderboard.length]);
 
-  // Fetch leaderboard when dependencies change (with debouncing)
+  // Fetch leaderboard when dependencies change (with smart debouncing)
   useEffect(() => {
     // Clear any existing debounce timer
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
+    
+    // Store pending update info
+    pendingUpdateRef.current = {
+      leaderboard: activeLeaderboard,
+      page: currentPage
+    };
     
     // For initial load, fetch immediately
     if (isInitialLoad) {
@@ -163,10 +194,15 @@ export default function LeaderboardsPage() {
       return;
     }
     
-    // For category/page changes, debounce by 100ms (fast but prevents spam)
+    // For category/page changes, use minimal debounce (50ms) 
+    // This is fast enough to feel instant but prevents rapid-fire duplicates
     debounceTimerRef.current = setTimeout(() => {
-      fetchLeaderboard();
-    }, 100);
+      // Only fetch if this is still the pending update (handles rapid switching)
+      if (pendingUpdateRef.current?.leaderboard === activeLeaderboard && 
+          pendingUpdateRef.current?.page === currentPage) {
+        fetchLeaderboard();
+      }
+    }, 50);
     
     // Cleanup on unmount or dependency change
     return () => {
@@ -264,13 +300,14 @@ export default function LeaderboardsPage() {
                         <button
                           key={option.id}
                           onClick={() => handleLeaderboardChange(option.id as LeaderboardType)}
-                          className={`w-full px-6 py-3 flex items-center gap-3 transition-all ${
+                          disabled={isTransitioning && activeLeaderboard !== option.id}
+                          className={`w-full px-6 py-3 flex items-center gap-3 transition-all duration-200 ${
                             activeLeaderboard === option.id
                               ? 'bg-gradient-to-r from-[#54FFA4]/20 to-[#45e894]/20 border-l-4 border-[#54FFA4] text-white'
                               : 'text-gray-300 hover:bg-[#0F1B21]/30'
-                          }`}
+                          } ${isTransitioning && activeLeaderboard !== option.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                          <Icon className={`w-4 h-4 ${activeLeaderboard === option.id ? 'text-[#54FFA4]' : 'text-gray-400'}`} />
+                          <Icon className={`w-4 h-4 transition-colors duration-200 ${activeLeaderboard === option.id ? 'text-[#54FFA4]' : 'text-gray-400'}`} />
                           <span className="text-sm font-medium">{option.name}</span>
                         </button>
                       );
@@ -310,13 +347,15 @@ export default function LeaderboardsPage() {
                         <button
                           key={option.id}
                           onClick={() => handleLeaderboardChange(option.id as LeaderboardType)}
-                          className={`w-full px-6 py-3 flex items-center gap-3 transition-all ${
+                          disabled={isTransitioning && activeLeaderboard !== option.id}
+                          className={`w-full px-6 py-3 flex items-center gap-3 transition-all duration-200 ${
                             activeLeaderboard === option.id
                               ? 'bg-gradient-to-r from-[#54FFA4]/20 to-[#45e894]/20 border-l-4 border-[#54FFA4] text-white'
                               : 'text-gray-300 hover:bg-[#0F1B21]/30'
+                          } ${isTransitioning && activeLeaderboard !== option.id ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
                         >
-                          <div className={`${activeLeaderboard === option.id ? 'text-[#54FFA4]' : 'text-gray-400'}`}>
+                          <div className={`transition-colors duration-200 ${activeLeaderboard === option.id ? 'text-[#54FFA4]' : 'text-gray-400'}`}>
                             {renderIcon()}
                           </div>
                           <span className="text-sm font-medium">{option.name}</span>
@@ -334,7 +373,14 @@ export default function LeaderboardsPage() {
           <div className="lg:col-span-3">
             
             {/* Active Leaderboard Header */}
-            <div className="mb-4 bg-gradient-to-br from-[#1a2930] to-[#0F1B21] border-2 border-[#54FFA4]/30 rounded-2xl p-6 shadow-2xl">
+            <div className="mb-4 bg-gradient-to-br from-[#1a2930] to-[#0F1B21] border-2 border-[#54FFA4]/30 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+              {/* Loading bar indicator during transitions */}
+              {isTransitioning && (
+                <div className="absolute top-0 left-0 right-0 h-1 bg-[#54FFA4]/20">
+                  <div className="h-full bg-[#54FFA4] animate-loading-bar"></div>
+                </div>
+              )}
+              
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -409,7 +455,9 @@ export default function LeaderboardsPage() {
 
               {/* Table Body */}
               <div 
-                className="divide-y-2 divide-[#54FFA4]/20"
+                className={`divide-y-2 divide-[#54FFA4]/20 transition-opacity duration-150 ${
+                  isTransitioning ? 'opacity-0' : 'opacity-100'
+                }`}
               >
                 {leaderboard.length === 0 && loading ? (
                   // Show skeleton rows only on initial load (when there's no data yet)
@@ -443,9 +491,9 @@ export default function LeaderboardsPage() {
                   <>
                     {leaderboard.slice(0, 10).map((entry, index) => (
                       <Link
-                        key={`${entry.userId}-${activeLeaderboard}`}
+                        key={`${entry.userId}-${activeLeaderboard}-${currentPage}`}
                         href={`/profile/${entry.userId}`}
-                        className={`block px-6 py-4 hover:bg-[#0F1B21]/60 transition-colors duration-150 cursor-pointer ${
+                        className={`block px-6 py-4 hover:bg-[#0F1B21]/60 transition-all duration-200 cursor-pointer ${
                           entry.rank <= 3 ? 'bg-[#0F1B21]/30' : index % 2 === 0 ? 'bg-[#0F1B21]/10' : 'bg-[#0F1B21]/5'
                         } ${entry.userId === user?.id ? '!bg-[#54FFA4]/5 border-l-4 border-[#54FFA4]' : ''}`}
                       >
@@ -557,12 +605,14 @@ export default function LeaderboardsPage() {
 
             {/* Pagination Controls */}
             {!loading && totalPages > 1 && (
-              <div className="mt-6 flex items-center justify-center gap-4">
+              <div className={`mt-6 flex items-center justify-center gap-4 transition-opacity duration-150 ${
+                isTransitioning ? 'opacity-50 pointer-events-none' : 'opacity-100'
+              }`}>
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
+                  disabled={currentPage === 1 || isTransitioning}
                   className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    currentPage === 1
+                    currentPage === 1 || isTransitioning
                       ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed'
                       : 'bg-[#0F1B21]/80 border border-[#54FFA4]/30 text-gray-300 hover:text-[#54FFA4] hover:border-[#54FFA4] hover:shadow-lg'
                   }`}
@@ -576,9 +626,9 @@ export default function LeaderboardsPage() {
                 
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
+                  disabled={currentPage === totalPages || isTransitioning}
                   className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    currentPage === totalPages
+                    currentPage === totalPages || isTransitioning
                       ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed'
                       : 'bg-[#0F1B21]/80 border border-[#54FFA4]/30 text-gray-300 hover:text-[#54FFA4] hover:border-[#54FFA4] hover:shadow-lg'
                   }`}
@@ -717,9 +767,22 @@ export default function LeaderboardsPage() {
           }
         }
 
+        @keyframes loading-bar {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+
         .animate-fade-in {
           animation: fade-in 0.3s ease-out forwards;
           opacity: 0;
+        }
+
+        .animate-loading-bar {
+          animation: loading-bar 0.8s ease-in-out infinite;
         }
       `}</style>
     </div>
