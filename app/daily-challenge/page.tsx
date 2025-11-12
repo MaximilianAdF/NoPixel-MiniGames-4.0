@@ -33,6 +33,70 @@ interface DailyChallenge {
   };
 }
 
+// Calculate the actual XP reward with difficulty multiplier
+function calculateActualXP(challenge: DailyChallenge): number {
+  const baseXPMap: Record<string, number> = {
+    'thermite': 1000,
+    'roof-running': 800,
+    'laundromat': 700,
+    'lockpick': 400,
+    'word-memory': 600,
+    'pincracker': 500,
+    'chopping': 400,
+  };
+  
+  const baseXP = baseXPMap[challenge.game] || challenge.xpReward || 100;
+  let difficultyMultiplier = 1.0;
+  
+  switch (challenge.game) {
+    case 'thermite': {
+      const scoreFactor = (challenge.targetScore || 24) / 24;
+      const timeFactor = 50 / (challenge.targetTime / 1000);
+      difficultyMultiplier = (scoreFactor + timeFactor) / 2;
+      break;
+    }
+    case 'roof-running': {
+      const tileFactor = ((challenge.rows || 8) * (challenge.columns || 11)) / 88;
+      const timeFactor = 27 / (challenge.targetTime / 1000);
+      difficultyMultiplier = (tileFactor + timeFactor) / 2;
+      break;
+    }
+    case 'laundromat': {
+      const levelFactor = (challenge.levels || 5) / 5;
+      const timeFactor = 60 / (challenge.targetTime / 1000);
+      difficultyMultiplier = (levelFactor + timeFactor) / 2;
+      break;
+    }
+    case 'lockpick': {
+      const levelFactor = (challenge.levels || 4) / 4;
+      const timeFactor = 80 / (challenge.targetTime / 1000);
+      difficultyMultiplier = (levelFactor + timeFactor) / 2;
+      break;
+    }
+    case 'word-memory': {
+      const wordFactor = (challenge.words || 25) / 25;
+      const timeFactor = 25 / (challenge.targetTime / 1000);
+      difficultyMultiplier = (wordFactor + timeFactor) / 2;
+      break;
+    }
+    case 'pincracker': {
+      const pinFactor = (challenge.pinLength || 4) / 4;
+      const timeFactor = 20 / (challenge.targetTime / 1000);
+      difficultyMultiplier = (pinFactor + timeFactor) / 2;
+      break;
+    }
+    case 'chopping': {
+      const letterFactor = ((challenge.numLetters || 15) / 15);
+      const timeFactor = 60 / (challenge.targetTime / 1000);
+      difficultyMultiplier = (letterFactor + timeFactor) / 2;
+      break;
+    }
+  }
+  
+  difficultyMultiplier = Math.max(0.5, Math.min(2.0, difficultyMultiplier));
+  return Math.round(baseXP * difficultyMultiplier);
+}
+
 export default function DailyChallengePage() {
   const { isLoggedIn, isLoading } = useUser();
   const [challenge, setChallenge] = useState<DailyChallenge | null>(null);
@@ -191,7 +255,7 @@ export default function DailyChallengePage() {
         <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 animate-[slideDown_0.3s_ease-out]">
           <div className="bg-gradient-to-r from-[#54FFA4] to-[#45e894] text-[#0F1B21] px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3 border-2 border-[#54FFA4]">
             <Trophy className="w-5 h-5" />
-            <span className="font-bold">Challenge Completed! +{challenge.xpReward} XP</span>
+            <span className="font-bold">Challenge Completed!</span>
           </div>
         </div>
       )}
@@ -289,7 +353,7 @@ export default function DailyChallengePage() {
                     <Zap className="w-5 h-5 text-[#54FFA4]" />
                     <span className="text-sm text-gray-400">XP Reward</span>
                   </div>
-                  <div className="text-2xl font-bold text-white">+{challenge.xpReward}</div>
+                  <div className="text-2xl font-bold text-white">+{calculateActualXP(challenge)}</div>
                 </div>
               </div>
             </div>

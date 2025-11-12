@@ -84,11 +84,23 @@ export async function POST(request: Request) {
         break;
         
       case 'roof-running':
+        // Roof running: must clear entire board (score === targetScore) within time limit
+        completed = body.score >= challenge.targetScore && body.timeMs <= challenge.targetTime;
+        break;
+        
       case 'word-memory':
+        // Word memory: must complete all rounds (score >= words) within time limit
+        completed = body.score >= (challenge.words || challenge.targetScore) && body.timeMs <= challenge.targetTime;
+        break;
+        
       case 'pincracker':
+        // PinCracker: must crack entire PIN (score >= pinLength) within time limit
+        completed = body.score >= (challenge.pinLength || challenge.targetScore) && body.timeMs <= challenge.targetTime;
+        break;
+        
       case 'chopping':
-        // These games: just need to complete within time limit (score is always pass/fail)
-        completed = body.timeMs <= challenge.targetTime;
+        // Chopping: must chop all trees (score >= numLetters) within time limit
+        completed = body.score >= (challenge.numLetters || challenge.targetScore) && body.timeMs <= challenge.targetTime;
         break;
         
       default:
