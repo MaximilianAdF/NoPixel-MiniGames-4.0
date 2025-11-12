@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useUser } from '../contexts/UserContext';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import ErrorBoundary from '../components/ErrorBoundary';
@@ -77,7 +76,6 @@ const LEADERBOARD_GAMES = [...TIME_BASED_GAMES, ...SCORE_BASED_GAMES];
 
 export default function ProfilePage() {
   const { user, isLoggedIn, isLoading, hasInitialized, login } = useUser();
-  const router = useRouter();
   const [stats, setStats] = useState<UserStats | null>(null);
   const [ranks, setRanks] = useState<LeaderboardRanks>({});
   const [loading, setLoading] = useState(true);
