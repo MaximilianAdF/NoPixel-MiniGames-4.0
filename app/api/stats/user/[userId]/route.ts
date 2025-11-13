@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { TIME_BASED_GAMES, SCORE_BASED_GAMES } from '@/app/utils/gamePresets';
 
 /**
  * GET /api/stats/user/[userId]
@@ -29,6 +30,51 @@ export async function GET(
     
     // Get all game stats for this user
     const gameStats = await db.collection('gameStats').find({ userId }).toArray();
+    
+    // Get leaderboard rankings for this user
+    const ranks: { level?: number; streak?: number; games?: { [key: string]: number } } = { games: {} };
+    
+    // Get level rank
+    const levelRank = await db.collection('users').countDocuments({
+      $or: [
+        { level: { $gt: user.level || 1 } },
+        { level: user.level || 1, totalXP: { $gt: user.totalXP || 0 } }
+      ]
+    }) + 1;
+    ranks.level = levelRank;
+    
+    // Get streak rank
+    const streakRank = await db.collection('users').countDocuments({
+      $or: [
+        { currentDailyStreak: { $gt: user.currentDailyStreak || 0 } },
+        { currentDailyStreak: user.currentDailyStreak || 0, longestDailyStreak: { $gt: user.longestDailyStreak || 0 } }
+      ]
+    }) + 1;
+    ranks.streak = streakRank;
+    
+    // Get game-specific ranks (only for games with leaderboards)
+    const LEADERBOARD_GAMES = [...TIME_BASED_GAMES, ...SCORE_BASED_GAMES];
+    for (const stat of gameStats) {
+      if (LEADERBOARD_GAMES.includes(stat.game)) {
+        const isTimeBased = TIME_BASED_GAMES.includes(stat.game);
+        
+        // For time-based games, lower is better; for score-based, higher is better
+        if (isTimeBased) {
+          // Only count users who have a valid time (> 0)
+          const gameRank = await db.collection('gameStats').countDocuments({
+            game: stat.game,
+            bestTime: { $gt: 0, $lt: stat.bestTime || Infinity }
+          }) + 1;
+          ranks.games![stat.game] = gameRank;
+        } else {
+          const gameRank = await db.collection('gameStats').countDocuments({
+            game: stat.game,
+            bestScore: { $gt: stat.bestScore || 0 }
+          }) + 1;
+          ranks.games![stat.game] = gameRank;
+        }
+      }
+    }
     
     // Get recent challenge history (last 30 days)
     const thirtyDaysAgo = new Date();
@@ -82,6 +128,7 @@ export async function GET(
         bestScore: challenge.bestAttempt?.score || 0,
         xpEarned: challenge.xpEarned || 0,
       })),
+      ranks,
     });
 
   } catch (error) {

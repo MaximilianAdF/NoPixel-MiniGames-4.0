@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Trophy, Zap, Flame, Calendar, Clock, TrendingUp, Award, Gamepad2, ArrowLeft, ChevronRight, ListTodo, Star } from 'lucide-react';
+import { Trophy, Zap, Flame, Calendar, Clock, TrendingUp, Award, Gamepad2, ArrowLeft, ChevronRight, ListTodo, Star, Medal } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getGameName, getGameIcon, getGameTailwindGradient } from '../../utils/gameIcons';
@@ -43,6 +43,11 @@ interface UserProfile {
     bestScore: number;
     xpEarned: number;
   }[];
+  ranks?: {
+    level?: number;
+    streak?: number;
+    games?: { [key: string]: number };
+  };
 }
 
 export default function PublicProfilePage({ params }: { params: { userId: string } }) {
@@ -93,6 +98,66 @@ export default function PublicProfilePage({ params }: { params: { userId: string
       day: 'numeric',
       year: 'numeric',
     });
+  };
+
+  const formatRank = (rank?: number, leaderboardType?: string) => {
+    if (!rank) return null;
+    
+    let bgGradient = 'bg-gradient-to-r from-gray-700/50 to-gray-600/50';
+    let textColor = 'text-gray-300';
+    let borderColor = 'border-gray-600/30';
+    let icon = <TrendingUp className="w-3.5 h-3.5" />;
+    let shadowClass = 'shadow-sm';
+    
+    if (rank === 1) {
+      bgGradient = 'bg-gradient-to-r from-yellow-500/30 to-yellow-600/30';
+      textColor = 'text-yellow-400';
+      borderColor = 'border-yellow-500/60';
+      icon = <Trophy className="w-3.5 h-3.5" />;
+      shadowClass = 'shadow-lg shadow-yellow-500/20';
+    } else if (rank === 2) {
+      bgGradient = 'bg-gradient-to-r from-gray-300/25 to-gray-400/25';
+      textColor = 'text-gray-200';
+      borderColor = 'border-gray-400/50';
+      icon = <Medal className="w-3.5 h-3.5" />;
+      shadowClass = 'shadow-lg shadow-gray-400/10';
+    } else if (rank === 3) {
+      bgGradient = 'bg-gradient-to-r from-orange-600/25 to-orange-700/25';
+      textColor = 'text-orange-400';
+      borderColor = 'border-orange-600/50';
+      icon = <Award className="w-3.5 h-3.5" />;
+      shadowClass = 'shadow-lg shadow-orange-600/10';
+    } else if (rank <= 10) {
+      bgGradient = 'bg-gradient-to-r from-[#54FFA4]/15 to-[#45e894]/15';
+      textColor = 'text-[#54FFA4]';
+      borderColor = 'border-[#54FFA4]/40';
+      icon = <Star className="w-3.5 h-3.5" />;
+      shadowClass = 'shadow-md shadow-[#54FFA4]/10';
+    } else if (rank <= 50) {
+      bgGradient = 'bg-gradient-to-r from-blue-500/15 to-blue-600/15';
+      textColor = 'text-blue-400';
+      borderColor = 'border-blue-500/40';
+      icon = <TrendingUp className="w-3.5 h-3.5" />;
+      shadowClass = 'shadow-md shadow-blue-500/10';
+    }
+    
+    const rankBadge = (
+      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border-2 ${bgGradient} ${borderColor} ${textColor} ${shadowClass} text-xs font-bold transition-all hover:scale-110 hover:brightness-110 cursor-pointer animate-in fade-in duration-300`}>
+        {icon}
+        <span className="font-mono">#{rank}</span>
+      </div>
+    );
+
+    // If leaderboardType provided, wrap in Link
+    if (leaderboardType) {
+      return (
+        <Link href={`/leaderboards?type=${leaderboardType}`} className="inline-block">
+          {rankBadge}
+        </Link>
+      );
+    }
+
+    return rankBadge;
   };
 
   if (loading) {
@@ -208,6 +273,11 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                     <span className="text-xs font-medium">Level</span>
                   </div>
                   <div className="text-2xl font-bold text-white">{user.level}</div>
+                  {profile?.ranks?.level && (
+                    <div className="mt-2">
+                      {formatRank(profile.ranks.level, 'level')}
+                    </div>
+                  )}
                 </div>
                 
                 <div className="bg-[#0F1B21]/50 rounded-lg p-3 border border-blue-500/20">
@@ -232,6 +302,11 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                     <span className="text-xs font-medium">Streak</span>
                   </div>
                   <div className="text-2xl font-bold text-white">{user.currentDailyStreak}</div>
+                  {profile?.ranks?.streak && (
+                    <div className="mt-2">
+                      {formatRank(profile.ranks.streak, 'streak')}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -319,6 +394,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                           <span className="flex items-center justify-center">{getGameIcon(gameStat.game, 'md')}</span>
                           <h3 className="text-xl font-bold text-white">{getGameName(gameStat.game)}</h3>
                         </div>
+                        {profile?.ranks?.games?.[gameStat.game] && formatRank(profile.ranks.games[gameStat.game], gameStat.game)}
                       </div>
                     </div>
 

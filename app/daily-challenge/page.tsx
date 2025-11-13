@@ -93,8 +93,10 @@ function calculateActualXP(challenge: DailyChallenge): number {
     }
   }
   
-  difficultyMultiplier = Math.max(0.5, Math.min(2.0, difficultyMultiplier));
-  return Math.round(baseXP * difficultyMultiplier);
+  // Apply multiplier and round up to nearest 100, with minimum of base XP
+  // This matches the backend calculation in /api/challenges/complete/route.ts
+  const rawXP = baseXP * difficultyMultiplier;
+  return Math.max(baseXP, Math.ceil(rawXP / 100) * 100);
 }
 
 export default function DailyChallengePage() {

@@ -172,7 +172,7 @@ function generateDailyChallenge(date: string) {
       challenge.rows = rows;
       challenge.columns = columns;
       challenge.targetTime = timer * 1000;
-      challenge.targetScore = rows * columns * 50; // Points per tile
+      challenge.targetScore = rows * columns; // Score is number of tiles cleared
       challenge.description = `Navigate ${rows}x${columns} grid in ${timer}s`;
       challenge.xpReward = 800; // Base XP
       break;
