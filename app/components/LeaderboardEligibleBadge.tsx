@@ -32,7 +32,7 @@ export default function LeaderboardEligibleBadge({
 
   return (
     <div className={`
-      fixed top-20 right-4 z-40
+      fixed top-20 right-4 z-10
       bg-gradient-to-br from-yellow-500/20 to-amber-600/20
       backdrop-blur-sm
       border border-yellow-500/50

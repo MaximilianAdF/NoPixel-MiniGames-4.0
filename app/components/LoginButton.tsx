@@ -44,8 +44,12 @@ export default function LoginButton() {
     return () => clearTimeout(timeout);
   }, []);
 
-  // Calculate right position based on guide state
-  const rightPosition = !isMobile && guideIsOpen ? `${guideWidth + 16}px` : '16px';
+  // Check if current page has a guide (puzzle pages only)
+  const isPuzzlePage = pathname?.startsWith('/puzzles/');
+  
+  // Calculate right position based on guide state AND page type
+  // Only adjust position if guide is open AND we're on a puzzle page
+  const rightPosition = !isMobile && guideIsOpen && isPuzzlePage ? `${guideWidth + 16}px` : '16px';
 
   // Register keyboard shortcuts for profile dropdown
   useEffect(() => {
