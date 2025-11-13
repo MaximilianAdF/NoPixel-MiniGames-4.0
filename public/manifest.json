@@ -1,0 +1,48 @@
+{
+  "name": "NoPixel 4.0 Minigames - GTA RP Hacking Practice Simulator",
+  "short_name": "NoPixel Minigames",
+  "description": "Master NoPixel 4.0 hacking minigames FREE! Practice Thermite, Lockpick, VAR, Laundromat & more GTA RP challenges with real-time leaderboards.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F1B21",
+  "theme_color": "#54FFA4",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["games", "education", "entertainment"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Daily Challenge",
+      "short_name": "Daily",
+      "description": "Complete today's daily challenge",
+      "url": "/daily-challenge",
+      "icons": [{ "src": "/icon", "sizes": "96x96" }]
+    },
+    {
+      "name": "Leaderboards",
+      "short_name": "Leaderboards",
+      "description": "View global leaderboards",
+      "url": "/leaderboards",
+      "icons": [{ "src": "/icon", "sizes": "96x96" }]
+    }
+  ]
+}

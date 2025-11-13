@@ -11,6 +11,7 @@ import NavigationMenu from './components/NavigationMenu';
 import LoginButton from './components/LoginButton';
 import ContextualHint from './components/ContextualHint';
 import GlobalLoading from './components/GlobalLoading';
+import CookieConsent from './components/CookieConsent';
 import { UserProvider } from './contexts/UserContext';
 import { LoadingProvider } from './contexts/LoadingContext';
 import { KeyboardShortcutsProvider } from './contexts/KeyboardShortcutsContext';
@@ -68,7 +69,7 @@ const caveat = Caveat({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://no-px.vercel.app'),
-  applicationName: 'NoPixel Minigames',
+  applicationName: 'NoPixel 4.0 Minigames',
   title: {
     default: "NoPixel 4.0 Minigames - Free Practice Simulator for GTA RP Hacking 🎮",
     template: "%s | NoPixel 4.0 Practice"
@@ -76,7 +77,10 @@ export const metadata: Metadata = {
   description: "★★★★★ Master NoPixel 4.0 hacking minigames FREE! Practice Thermite, Lockpick, VAR, Laundromat & more GTA RP challenges. Real-time leaderboards, expert tips, mobile-friendly. 100% risk-free training for FiveM & GTA roleplay. Start now!",
   icons: {
     icon: '/icon',
+    shortcut: '/icon',
+    apple: '/icon',
   },
+  manifest: '/manifest.json',
   keywords: [
     // Core brand terms
     "NoPixel", "NoPixel 4.0", "NoPixel minigames", "NoPixel hacking simulator",
@@ -247,6 +251,7 @@ export default function RootLayout({
                 <LoginButton />
                 <ContextualHint />
                 {children}
+                <CookieConsent />
               </GuideProvider>
             </KeyboardShortcutsProvider>
           </UserProvider>

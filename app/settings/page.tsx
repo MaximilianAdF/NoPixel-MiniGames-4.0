@@ -1,10 +1,203 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useKeyboardShortcuts } from '../contexts/KeyboardShortcutsContext';
 import { useUser } from '../contexts/UserContext';
-import { Keyboard, RotateCcw, Check, X, Info, AlertCircle, ArrowLeft, ShieldAlert, Trash2, AlertTriangle, Loader2, User, Settings as SettingsIcon } from 'lucide-react';
+import { Keyboard, RotateCcw, Check, X, Info, AlertCircle, ArrowLeft, ShieldAlert, Trash2, AlertTriangle, Loader2, User, Settings as SettingsIcon, Cookie, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
+
+// Cookie Preferences Component
+function CookiePreferencesSettings() {
+  const [consent, setConsent] = useState<'accepted' | 'rejected' | null>(null);
+  const [consentDate, setConsentDate] = useState<string | null>(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  useEffect(() => {
+    // Load current cookie consent status
+    const savedConsent = localStorage.getItem('cookieConsent') as 'accepted' | 'rejected' | null;
+    const savedDate = localStorage.getItem('cookieConsentDate');
+    setConsent(savedConsent);
+    setConsentDate(savedDate);
+  }, []);
+
+  const handleAcceptAll = () => {
+    localStorage.setItem('cookieConsent', 'accepted');
+    localStorage.setItem('cookieConsentDate', new Date().toISOString());
+    setConsent('accepted');
+    setConsentDate(new Date().toISOString());
+    setShowSuccessMessage(true);
+    setTimeout(() => setShowSuccessMessage(false), 3000);
+  };
+
+  const handleRejectNonEssential = () => {
+    localStorage.setItem('cookieConsent', 'rejected');
+    localStorage.setItem('cookieConsentDate', new Date().toISOString());
+    setConsent('rejected');
+    setConsentDate(new Date().toISOString());
+    setShowSuccessMessage(true);
+    setTimeout(() => setShowSuccessMessage(false), 3000);
+
+    // Disable analytics
+    if (typeof window !== 'undefined') {
+      (window as any)['ga-disable-GA_MEASUREMENT_ID'] = true;
+    }
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'Not set';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Current Status */}
+      <div className="bg-gradient-to-br from-[#1a2930] to-[#0F1B21] border-2 border-[#54FFA4]/30 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="p-6 border-b-2 border-[#54FFA4]/20">
+          <div className="flex items-start gap-3">
+            <Cookie className="w-8 h-8 text-[#54FFA4] flex-shrink-0" />
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-1">Cookie Preferences</h2>
+              <p className="text-gray-400">Manage how we use cookies on this site</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 space-y-4">
+          {/* Success Message */}
+          {showSuccessMessage && (
+            <div className="p-4 bg-green-500/10 border-2 border-green-500/30 rounded-lg flex items-center gap-3 animate-fade-in">
+              <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+              <p className="text-green-300 text-sm font-semibold">Cookie preferences updated successfully!</p>
+            </div>
+          )}
+
+          {/* Current Status */}
+          <div className="p-4 bg-[#0F1B21]/50 border border-[#54FFA4]/20 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-gray-300 font-semibold">Current Status:</span>
+              <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+                consent === 'accepted' 
+                  ? 'bg-green-500/20 text-green-400' 
+                  : consent === 'rejected'
+                  ? 'bg-red-500/20 text-red-400'
+                  : 'bg-gray-500/20 text-gray-400'
+              }`}>
+                {consent === 'accepted' ? '✓ All Cookies Accepted' : consent === 'rejected' ? '✗ Non-Essential Rejected' : 'Not Set'}
+              </span>
+            </div>
+            <div className="text-gray-400 text-xs">
+              Last updated: {formatDate(consentDate)}
+            </div>
+          </div>
+
+          {/* Cookie Categories */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-bold text-white">Cookie Categories</h3>
+
+            {/* Essential Cookies */}
+            <div className="p-4 bg-[#0F1B21]/50 border border-[#54FFA4]/20 rounded-lg">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="text-white font-semibold">Essential Cookies</h4>
+                    <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-bold rounded">Always Active</span>
+                  </div>
+                  <p className="text-gray-400 text-sm">
+                    Required for basic site functionality like login, settings, and navigation. Cannot be disabled.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Analytics Cookies */}
+            <div className="p-4 bg-[#0F1B21]/50 border border-[#54FFA4]/20 rounded-lg">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="text-white font-semibold">Analytics Cookies</h4>
+                    <span className={`px-2 py-0.5 text-xs font-bold rounded ${
+                      consent === 'accepted' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'
+                    }`}>
+                      {consent === 'accepted' ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
+                  <p className="text-gray-400 text-sm mb-2">
+                    Help us understand how visitors use our site (Google Analytics). Used to improve user experience.
+                  </p>
+                  <p className="text-gray-500 text-xs">
+                    Provider: Google Analytics
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Advertising Cookies */}
+            <div className="p-4 bg-[#0F1B21]/50 border border-[#54FFA4]/20 rounded-lg">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="text-white font-semibold">Advertising Cookies</h4>
+                    <span className={`px-2 py-0.5 text-xs font-bold rounded ${
+                      consent === 'accepted' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'
+                    }`}>
+                      {consent === 'accepted' ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
+                  <p className="text-gray-400 text-sm mb-2">
+                    Used to show personalized advertisements based on your interests (Google AdSense).
+                  </p>
+                  <p className="text-gray-500 text-xs">
+                    Provider: Google AdSense
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <button
+              onClick={handleAcceptAll}
+              className="flex-1 px-6 py-3 bg-[#54FFA4] text-[#0F1B21] rounded-lg font-bold hover:bg-[#45e894] transition-all shadow-lg hover:shadow-xl"
+            >
+              Accept All Cookies
+            </button>
+            <button
+              onClick={handleRejectNonEssential}
+              className="flex-1 px-6 py-3 bg-transparent text-white border-2 border-white/30 rounded-lg font-semibold hover:bg-white/10 transition-all"
+            >
+              Reject Non-Essential
+            </button>
+          </div>
+
+          {/* Additional Info */}
+          <div className="p-4 bg-blue-500/5 border border-blue-500/20 rounded-lg">
+            <div className="flex items-start gap-3">
+              <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-gray-300">
+                <p className="mb-2">
+                  Your cookie preferences are stored locally in your browser. Clearing your browser data will reset these settings.
+                </p>
+                <p>
+                  For more information, read our{' '}
+                  <Link href="/privacy" className="text-[#54FFA4] hover:text-[#45e894] underline">
+                    Privacy Policy
+                  </Link>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const RESERVED_KEYS = [
   'q', 'w', 'e', 'r', 'a', 's', 'd',
@@ -12,11 +205,12 @@ const RESERVED_KEYS = [
   'backspace', 'enter',
 ];
 
-type SettingsTab = 'shortcuts' | 'account';
+type SettingsTab = 'shortcuts' | 'account' | 'cookies';
 
 const settingsCategories = [
   { id: 'shortcuts', name: 'Keyboard Shortcuts', icon: Keyboard, description: 'Customize your keyboard shortcuts' },
   { id: 'account', name: 'Account Management', icon: ShieldAlert, description: 'Manage your account and data' },
+  { id: 'cookies', name: 'Cookie Preferences', icon: Cookie, description: 'Manage your cookie settings' },
 ];
 
 export default function SettingsPage() {
@@ -386,6 +580,13 @@ export default function SettingsPage() {
                     <p className="text-gray-400">Please log in to manage your account settings.</p>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Cookie Preferences Tab */}
+            {activeTab === 'cookies' && (
+              <div className="flex-1">
+                <CookiePreferencesSettings />
               </div>
             )}
           </div>

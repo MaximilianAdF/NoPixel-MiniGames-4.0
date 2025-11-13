@@ -738,6 +738,29 @@ export default function Home() {
           <p className="text-sm mt-2 hover:text-gray-400 transition-colors duration-300 flex items-center justify-center gap-2">
             Built with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> for the NoPixel community
           </p>
+          
+          {/* Footer Links */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm">
+            <Link href="/about" className="hover:text-spring-green-400 transition-colors duration-300">
+              About
+            </Link>
+            <span className="text-gray-700">•</span>
+            <Link href="/privacy" className="hover:text-spring-green-400 transition-colors duration-300">
+              Privacy Policy
+            </Link>
+            <span className="text-gray-700">•</span>
+            <Link href="/terms" className="hover:text-spring-green-400 transition-colors duration-300">
+              Terms of Service
+            </Link>
+            <span className="text-gray-700">•</span>
+            <Link href="/contact" className="hover:text-spring-green-400 transition-colors duration-300">
+              Contact
+            </Link>
+            <span className="text-gray-700">•</span>
+            <Link href="/faq" className="hover:text-spring-green-400 transition-colors duration-300">
+              FAQ
+            </Link>
+          </div>
         </footer>
         
         {/* <DonateContainer title="Donate" description="If you like this project, consider donating to support development" className="absolute bottom-0 left-0 px-5 py-5 w-80">

@@ -25,6 +25,9 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Mail,
+  FileText,
+  Shield,
 } from 'lucide-react';
 
 export default function NavigationMenu() {
@@ -492,6 +495,55 @@ export default function NavigationMenu() {
             >
               <Code className="w-5 h-5" />
               <span className="font-medium">Open Source</span>
+            </Link>
+
+            {/* Contact */}
+            <Link
+              href="/contact"
+              onClick={handleLinkClick}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                pathname === '/contact'
+                  ? 'bg-[#54FFA4]/20 text-[#54FFA4] border border-[#54FFA4]/50'
+                  : 'text-gray-300 hover:bg-[#1a2930] hover:text-white'
+              }`}
+            >
+              <Mail className="w-5 h-5" />
+              <span className="font-medium">Contact</span>
+            </Link>
+          </div>
+
+          {/* Legal Section */}
+          <div className="space-y-1">
+            <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Legal
+            </div>
+
+            {/* Privacy Policy */}
+            <Link
+              href="/privacy"
+              onClick={handleLinkClick}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                pathname === '/privacy'
+                  ? 'bg-[#54FFA4]/20 text-[#54FFA4] border border-[#54FFA4]/50'
+                  : 'text-gray-300 hover:bg-[#1a2930] hover:text-white'
+              }`}
+            >
+              <Shield className="w-5 h-5" />
+              <span className="font-medium">Privacy Policy</span>
+            </Link>
+
+            {/* Terms of Service */}
+            <Link
+              href="/terms"
+              onClick={handleLinkClick}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                pathname === '/terms'
+                  ? 'bg-[#54FFA4]/20 text-[#54FFA4] border border-[#54FFA4]/50'
+                  : 'text-gray-300 hover:bg-[#1a2930] hover:text-white'
+              }`}
+            >
+              <FileText className="w-5 h-5" />
+              <span className="font-medium">Terms of Service</span>
             </Link>
           </div>
           </nav>
