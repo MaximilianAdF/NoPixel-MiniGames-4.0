@@ -110,13 +110,13 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
             <div className={classNames(
                 `
                     max-h-full max-w-full
+                    min-h-[400px]
                     rounded-lg
                     overflow-hidden
                     touch-manipulation
                 `,
                 props.className
-            )}>
-                <div className="
+            )}>                <div className="
                     max-h-full max-w-full
                     relative
                     p-2 sm:p-3
@@ -160,12 +160,11 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                                 {description}
                             </p>
                             
-                            {/* Status Message - Compact design in header */}
+                            {/* Status Message - Overlay to prevent container expansion */}
                             {status !== undefined && status !== 0 && status !== 1 && (
                                 <div className={classNames(
                                     `
-                                        ml-auto
-                                        mr-3 sm:mr-4
+                                        absolute top-3 right-3
                                         flex items-center gap-1.5 sm:gap-2
                                         px-3 sm:px-4 py-1.5 sm:py-2
                                         rounded-md
@@ -174,28 +173,32 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
                                         border-2
                                         animate-fadeIn
                                         transition-all
+                                        z-10
+                                        shadow-lg
+                                        backdrop-blur-sm
+                                        max-w-[calc(100%-1.5rem)]
                                     `,
-                                    status === 2 ? "bg-red-900/30 border-red-500/60 text-red-300" :
-                                    status === 3 ? "bg-emerald-900/30 border-emerald-500/60 text-emerald-300" :
-                                    status === 4 ? "bg-yellow-900/30 border-yellow-500/60 text-yellow-300" : "hidden"
+                                    status === 2 ? "bg-red-900/90 border-red-500/60 text-red-300" :
+                                    status === 3 ? "bg-emerald-900/90 border-emerald-500/60 text-emerald-300" :
+                                    status === 4 ? "bg-yellow-900/90 border-yellow-500/60 text-yellow-300" : "hidden"
                                 )}>
                                     {/* Compact Status Icons */}
                                     {status === 2 && (
-                                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
                                         </svg>
                                     )}
                                     {status === 3 && (
-                                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
                                         </svg>
                                     )}
                                     {status === 4 && (
-                                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd"/>
                                         </svg>
                                     )}
-                                    <span className="whitespace-nowrap">{statusMessage}</span>
+                                    <span className="truncate">{statusMessage}</span>
                                 </div>
                             )}
                         </div>
