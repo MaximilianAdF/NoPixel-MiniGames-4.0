@@ -189,15 +189,6 @@ export default function RootLayout({
           }}
         />
         
-        {/* PropellerAds - Zone 3: Vignette Banner (Page transitions) */}
-        <Script 
-          id="propellerads-vignette"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(s){s.dataset.zone='10452049',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`,
-          }}
-        />
-        
         {/* Session Tracking */}
         <Script id="session-tracker" strategy="afterInteractive">
           {`
