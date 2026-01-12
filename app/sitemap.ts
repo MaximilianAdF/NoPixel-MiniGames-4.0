@@ -23,6 +23,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
+  // Generate sitemap entries for each guide (high priority for SEO)
+  const guideUrls = minigames.map((game) => ({
+    url: `${baseUrl}/guides/${game}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.85,
+  }));
+
   // Other important pages
   const otherPages = [
     {
@@ -100,6 +108,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
+    {
+      url: `${baseUrl}/guides`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    ...guideUrls,
     ...minigameUrls,
     ...otherPages,
   ];

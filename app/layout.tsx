@@ -17,6 +17,7 @@ import { LoadingProvider } from './contexts/LoadingContext';
 import { KeyboardShortcutsProvider } from './contexts/KeyboardShortcutsContext';
 import { GuideProvider } from './contexts/GuideContext';
 import GoogleTagManager, { GoogleTagManagerNoScript } from './components/GoogleTagManager';
+import Footer from './components/Footer';
 
 function Background() {
   return (
@@ -178,22 +179,6 @@ export default function RootLayout({
         {/* Google Tag Manager - Replace GTM-XXXXXXX with your actual GTM ID */}
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
         
-        {/* PropellerAds - Zone 1: Main Tag - Lazy load */}
-        <Script 
-          src="https://3nbf4.com/act/files/tag.min.js?z=10452043" 
-          data-cfasync="false" 
-          strategy="lazyOnload"
-        />
-        
-        {/* PropellerAds - Zone 2: In-Page Push - Lazy load */}
-        <Script 
-          id="propellerads-push"
-          strategy="lazyOnload"
-          dangerouslySetInnerHTML={{
-            __html: `(function(s){s.dataset.zone='10452047',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`,
-          }}
-        />
-        
         {/* Session Tracking - Load after page is interactive */}
         <Script id="session-tracker" strategy="lazyOnload">
           {`
@@ -214,6 +199,7 @@ export default function RootLayout({
               "name": "NoPixel 4.0 Minigames",
               "applicationCategory": "GameApplication",
               "operatingSystem": "Any",
+              "browserRequirements": "Requires JavaScript. Requires HTML5.",
               "offers": {
                 "@type": "Offer",
                 "price": "0",
@@ -222,6 +208,7 @@ export default function RootLayout({
               "description": "Free practice simulator for NoPixel 4.0 GTA RP hacking minigames. Master Thermite, Lockpick, Laundromat, Roof Running and more with real-time leaderboards.",
               "url": "https://no-px.vercel.app",
               "image": "https://no-px.vercel.app/opengraph-image",
+              "screenshot": "https://no-px.vercel.app/opengraph-image",
               "aggregateRating": {
                 "@type": "AggregateRating",
                 "ratingValue": "4.8",
@@ -236,14 +223,93 @@ export default function RootLayout({
                 "Word Memory Test",
                 "Pin Cracker",
                 "Chopping Game",
+                "Repair Kit",
                 "Global Leaderboards",
                 "Daily Challenges",
+                "Expert Guides",
                 "Mobile Support"
               ],
               "author": {
                 "@type": "Organization",
-                "name": "NoPixel Minigames"
+                "name": "NoPixel Minigames",
+                "url": "https://no-px.vercel.app"
               }
+            })
+          }}
+        />
+        
+        {/* FAQ Schema for rich snippets */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "What is NoPixel 4.0 Minigames?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "NoPixel 4.0 Minigames is a free practice simulator for GTA RP hacking minigames. It lets you master hacks like Thermite, Lockpick, and more before attempting them in-game."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Is this practice tool free?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, NoPixel Minigames is completely free to use with unlimited practice attempts, global leaderboards, and daily challenges."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "What minigames can I practice?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "You can practice 8 different minigames: Thermite (memory patterns), Lockpick (timing), PIN Cracker (logic), Laundromat (symbol matching), Roof Running (tile clearing), Word Memory (recognition), Chopping (typing), and Repair Kit (precision timing)."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Does this work on mobile?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, all minigames are fully optimized for mobile devices with touch controls and responsive design."
+                  }
+                }
+              ]
+            })
+          }}
+        />
+        
+        {/* BreadcrumbList Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://no-px.vercel.app"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Guides",
+                  "item": "https://no-px.vercel.app/guides"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": "Minigames",
+                  "item": "https://no-px.vercel.app/puzzles/thermite"
+                }
+              ]
             })
           }}
         />
@@ -274,6 +340,7 @@ export default function RootLayout({
                 <ContextualHint />
                 {children}
                 <CookieConsent />
+                <Footer />
               </GuideProvider>
             </KeyboardShortcutsProvider>
           </UserProvider>

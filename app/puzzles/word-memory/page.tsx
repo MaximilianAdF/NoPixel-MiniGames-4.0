@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import WordMemory from "@/app/puzzles/word-memory/WordMemory";
-import GameInstructions from "@/app/components/GameInstructions";
-import WordMemoryInstructions from "./instructions";
 import PuzzleBackButton from "@/app/components/PuzzleBackButton";
 
 // Force dynamic rendering for daily challenges
@@ -34,9 +32,6 @@ export default function Page() {
         <>
             <PuzzleBackButton />
             <WordMemory />
-            <GameInstructions gameId="word-memory" title="How to Play Word Memory">
-                <WordMemoryInstructions />
-            </GameInstructions>
         </>
     );
 }

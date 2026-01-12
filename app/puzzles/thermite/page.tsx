@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import Thermite from "@/app/puzzles/thermite/Thermite";
-import GameInstructions from "@/app/components/GameInstructions";
-import ThermiteInstructions from "./instructions";
 import PuzzleBackButton from "@/app/components/PuzzleBackButton";
 
 // Force dynamic rendering for daily challenges
@@ -34,9 +32,6 @@ export default function Page() {
     <>
       <PuzzleBackButton />
       <Thermite />
-      <GameInstructions gameId="thermite" title="How to Play Thermite">
-        <ThermiteInstructions />
-      </GameInstructions>
     </>
   );
 }

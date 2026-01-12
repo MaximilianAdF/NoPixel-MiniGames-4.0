@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import RoofRunning from "@/app/puzzles/roof-running/RoofRunning";
-import GameInstructions from "@/app/components/GameInstructions";
-import RoofRunningInstructions from "./instructions";
 import PuzzleBackButton from "@/app/components/PuzzleBackButton";
 
 // Force dynamic rendering for daily challenges
@@ -34,9 +32,6 @@ export default function Page() {
         <>
             <PuzzleBackButton />
             <RoofRunning />
-            <GameInstructions gameId="roof-running" title="How to Play Roof Running">
-                <RoofRunningInstructions />
-            </GameInstructions>
         </>
     );
 }

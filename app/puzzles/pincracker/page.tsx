@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import Pincracker from "@/app/puzzles/pincracker/Pincracker";
-import GameInstructions from "@/app/components/GameInstructions";
-import PincrackerInstructions from "./instructions";
 import PuzzleBackButton from "@/app/components/PuzzleBackButton";
 
 // Force dynamic rendering for daily challenges
@@ -34,9 +32,6 @@ export default function Page() {
         <>
             <PuzzleBackButton />
             <Pincracker />
-            <GameInstructions gameId="pincracker" title="How to Play PIN Cracker">
-                <PincrackerInstructions />
-            </GameInstructions>
         </>
     );
 }

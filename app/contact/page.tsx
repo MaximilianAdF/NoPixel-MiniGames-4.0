@@ -137,6 +137,26 @@ export default function ContactPage() {
           </div>
         </div>
 
+        {/* Email Contact */}
+        <div className="bg-[#1a2930] border-2 border-[#54FFA4]/30 rounded-xl p-8 mb-8">
+          <div className="flex items-start gap-4">
+            <Mail className="w-10 h-10 text-[#54FFA4] flex-shrink-0" />
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-white mb-4">Email Contact</h2>
+              <p className="text-gray-300 leading-relaxed mb-4">
+                For general inquiries, bug reports, or feedback, you can reach us directly via email:
+              </p>
+              <a 
+                href="mailto:maximilian.adf@gmail.com" 
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[#54FFA4] text-[#0F1B21] rounded-lg font-bold hover:bg-[#45e894] transition-all"
+              >
+                <Mail className="w-5 h-5" />
+                maximilian.adf@gmail.com
+              </a>
+            </div>
+          </div>
+        </div>
+
         {/* GitHub Main Repository */}
         <div className="bg-[#1a2930] border-2 border-[#54FFA4]/30 rounded-xl p-8 mb-8">
           <div className="flex items-start gap-4">
