@@ -908,3 +908,44 @@ body > div[style*="position: fixed"] {
   right: auto !important;
   left: 20px !important;
 }
+
+/* Performance optimizations */
+/* GPU acceleration for animations */
+.group-hover\\:scale-105,
+.hover\\:scale-105,
+[class*="transition"] {
+  will-change: transform;
+}
+
+.hover\\:brightness-110,
+.group-hover\\:brightness-110 {
+  will-change: filter;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Optimize font rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Contain layout shifts */
+img,
+picture,
+video,
+canvas {
+  height: auto;
+  max-width: 100%;
+}

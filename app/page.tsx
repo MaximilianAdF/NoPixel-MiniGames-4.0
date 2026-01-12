@@ -12,6 +12,14 @@ import { faDownLeftAndUpRightToCenter, faFileLines, faInfo, faUpRightAndDownLeft
 import DonateContainer from "@/app/components/DonateContainer";
 import bmcLogo from "./utils/bmc-logo.png";
 
+// Preload critical images
+const preloadImages = [
+  'https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/0674273c-43da-4d39-a98e-1443517a4eac',
+  'https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/e8387474-4a34-4f02-842f-195484160a60',
+  'https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/23371a81-fd85-49b5-819b-de1207a5a4f8',
+  'https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/assets/63980031/472d8447-c69b-4474-aaeb-474516b8f014',
+];
+
 
 // NoPixel 4.0 Minigames
 const puzzles = [
@@ -105,7 +113,7 @@ export default function Home() {
         setIsLoading(false);
         hasLoadedRef.current = true;
         sessionStorage.setItem('homePageVisited', 'true');
-      }, 800);
+      }, 300);
 
       return () => {
         clearTimeout(loadTimer);
@@ -469,12 +477,15 @@ export default function Home() {
                       {/* Top Data Bar */}
                       <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-spring-green-500/20 to-transparent group-hover:via-spring-green-400/40 transition-colors duration-300" />
                       
-                      <div className="aspect-video relative overflow-hidden flex-shrink-0">
+                      <div className="aspect-video relative overflow-hidden flex-shrink-0 bg-mirage-800/60">
                         <Image
                           src={puzzle.img}
                           alt={puzzle.title}
                           width={400}
                           height={225}
+                          priority={index < 4}
+                          placeholder="blur"
+                          blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgZmlsbD0iIzFhMjkzMCIvPjwvc3ZnPg=="
                           className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105 group-hover:brightness-110"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-mirage-950 via-mirage-950/30 to-transparent opacity-70 group-hover:opacity-50 transition-opacity duration-300"></div>
