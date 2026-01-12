@@ -892,3 +892,19 @@ input[type="range"].slider-track::-moz-range-thumb:active {
 @media (min-width: 1025px) {
   /* Full effects on desktop */
 }
+
+/* PropellerAds - Move push notifications to left side */
+/* Targets the push notification container */
+div[id*="propeller-root"],
+div[class*="propeller-"],
+div[style*="position: fixed"][style*="right: 0"],
+div[style*="position: fixed"][style*="right:0"] {
+  right: auto !important;
+  left: 20px !important;
+}
+
+/* Specific targeting for common ad containers */
+body > div[style*="position: fixed"] {
+  right: auto !important;
+  left: 20px !important;
+}
