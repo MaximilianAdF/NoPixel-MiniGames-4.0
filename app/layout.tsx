@@ -172,13 +172,30 @@ export default function RootLayout({
         {/* Google Tag Manager - Replace GTM-XXXXXXX with your actual GTM ID */}
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
         
-        {/* PropellerAds Multitag */}
+        {/* PropellerAds - Zone 1: Main Tag */}
         <Script 
-          src="https://quge5.com/88/tag.min.js" 
-          data-zone="201218" 
-          async 
-          data-cfasync="false"
+          src="https://3nbf4.com/act/files/tag.min.js?z=10452043" 
+          data-cfasync="false" 
+          async
           strategy="afterInteractive"
+        />
+        
+        {/* PropellerAds - Zone 2: In-Page Push (Bottom positioned) */}
+        <Script 
+          id="propellerads-push"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(s){s.dataset.zone='10452047',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`,
+          }}
+        />
+        
+        {/* PropellerAds - Zone 3: Vignette Banner (Page transitions) */}
+        <Script 
+          id="propellerads-vignette"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(s){s.dataset.zone='10452049',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`,
+          }}
         />
         
         {/* Session Tracking */}
