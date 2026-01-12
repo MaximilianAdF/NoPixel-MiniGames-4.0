@@ -47,25 +47,28 @@ function Background() {
 const orbitron = Orbitron({
   weight: '900',
   subsets: ['latin'],
-  display: 'optional',
+  display: 'swap',
   variable: '--font-orbitron',
   adjustFontFallback: true,
+  preload: true,
 });
 
 const rajdhani = Rajdhani({
   weight: '700',
   subsets: ['latin'],
-  display: 'optional',
+  display: 'swap',
   variable: '--font-rajdhani',
   adjustFontFallback: true,
+  preload: true,
 });
 
 const caveat = Caveat({
   weight: '600',
   subsets: ['latin'],
-  display: 'optional',
+  display: 'swap',
   variable: '--font-caveat',
   adjustFontFallback: true,
+  preload: true,
 });
 
 
@@ -175,25 +178,24 @@ export default function RootLayout({
         {/* Google Tag Manager - Replace GTM-XXXXXXX with your actual GTM ID */}
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
         
-        {/* PropellerAds - Zone 1: Main Tag */}
+        {/* PropellerAds - Zone 1: Main Tag - Lazy load */}
         <Script 
           src="https://3nbf4.com/act/files/tag.min.js?z=10452043" 
           data-cfasync="false" 
-          async
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
         
-        {/* PropellerAds - Zone 2: In-Page Push (Bottom positioned) */}
+        {/* PropellerAds - Zone 2: In-Page Push - Lazy load */}
         <Script 
           id="propellerads-push"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `(function(s){s.dataset.zone='10452047',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`,
           }}
         />
         
-        {/* Session Tracking */}
-        <Script id="session-tracker" strategy="afterInteractive">
+        {/* Session Tracking - Load after page is interactive */}
+        <Script id="session-tracker" strategy="lazyOnload">
           {`
             if (!sessionStorage.getItem('session_start')) {
               sessionStorage.setItem('session_start', Date.now());
@@ -277,11 +279,11 @@ export default function RootLayout({
           </UserProvider>
         </LoadingProvider>
         <AppAnalytics />
+        {/* AdSense - Load lazily to not block initial render */}
         <Script
-          async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8849653057967400"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
       </body>
     </html>

@@ -40,25 +40,18 @@ export default function GlobalLoading() {
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-[#0F1B21]/60 backdrop-blur-sm transition-opacity duration-200 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-[#0F1B21]/60 transition-opacity duration-200 ${
         isVisible ? 'opacity-100' : 'opacity-0'
       }`}
-      style={{ 
-        willChange: 'opacity',
-      }}
+      aria-hidden="true"
     >
-      {/* Simple rotating lockpick ring */}
+      {/* Simple rotating lockpick ring - optimized for performance */}
       <div className="relative w-16 h-16">
         {/* Outer ring with 4 slots */}
         <div className="absolute inset-0 rounded-full border-2 border-[#54FFA4]/20" />
         
         {/* Rotating balls - using CSS animation for better performance */}
-        <div 
-          className="absolute inset-0 animate-spin-smooth"
-          style={{
-            willChange: 'transform',
-          }}
-        >
+        <div className="absolute inset-0 animate-spin-smooth">
           {[0, 90, 180, 270].map((angle) => (
             <div
               key={angle}

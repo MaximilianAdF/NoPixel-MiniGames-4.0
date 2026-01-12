@@ -39,9 +39,8 @@ export default function LoginButton() {
 
   // Track mount state to prevent flash
   useEffect(() => {
-    // Delay to prevent flash on fast auth checks - increased to 200ms
-    const timeout = setTimeout(() => setMounted(true), 200);
-    return () => clearTimeout(timeout);
+    // Mount immediately to prevent CLS
+    setMounted(true);
   }, []);
 
   // Check if current page has a guide (puzzle pages only)
@@ -118,8 +117,24 @@ export default function LoginButton() {
   };
 
   // Don't show anything while loading OR before mount to prevent flash
+  // Show a placeholder skeleton to prevent CLS
   if (isLoading || !mounted) {
-    return null;
+    return (
+      <div 
+        className="fixed top-4 z-50 transition-all duration-300 ease-in-out" 
+        style={{ right: '16px' }}
+      >
+        {/* Skeleton placeholder matching Discord login button dimensions */}
+        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#5865F2]/20 border border-[#5865F2]/30">
+          {/* Discord icon placeholder */}
+          <div className="w-5 h-5 rounded bg-[#5865F2]/30 animate-pulse" />
+          {/* Text placeholder - hidden on mobile like the real button */}
+          <div className="hidden sm:block w-[130px] h-5 rounded bg-[#5865F2]/30 animate-pulse" />
+          {/* Mobile text placeholder */}
+          <div className="sm:hidden w-[40px] h-5 rounded bg-[#5865F2]/30 animate-pulse" />
+        </div>
+      </div>
+    );
   }
 
   if (isLoggedIn && user) {

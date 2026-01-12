@@ -449,6 +449,10 @@ input[type="range"].slider-track::-moz-range-thumb:active {
   }
 }
 
+.animate-spin-smooth {
+  animation: spin-smooth 1s linear infinite;
+}
+
 /* Skeleton shimmer animation */
 @keyframes skeleton-shimmer {
   0% {
@@ -631,6 +635,22 @@ input[type="range"].slider-track::-moz-range-thumb:active {
 
 .animate-shimmer {
   animation: shimmer 2s linear infinite;
+}
+
+.animate-gradient-flow {
+  animation: gradientFlow 4s ease-in-out infinite;
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .animate-glitch-1 {
@@ -910,16 +930,17 @@ body > div[style*="position: fixed"] {
 }
 
 /* Performance optimizations */
-/* GPU acceleration for animations */
-.group-hover\\:scale-105,
-.hover\\:scale-105,
-[class*="transition"] {
-  will-change: transform;
-}
+/* Only apply will-change on hover, not permanently */
+@media (hover: hover) {
+  .group:hover .group-hover\\:scale-105,
+  .hover\\:scale-105:hover {
+    will-change: transform;
+  }
 
-.hover\\:brightness-110,
-.group-hover\\:brightness-110 {
-  will-change: filter;
+  .hover\\:brightness-110:hover,
+  .group:hover .group-hover\\:brightness-110 {
+    will-change: filter;
+  }
 }
 
 /* Reduce motion for users who prefer it */
@@ -948,4 +969,36 @@ video,
 canvas {
   height: auto;
   max-width: 100%;
+}
+
+/* Reserve space for dynamic content to prevent CLS */
+.nav-button-placeholder {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Font loading optimization */
+.font-loading-fallback {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Aspect ratio containers for images to prevent CLS */
+.aspect-video-container {
+  aspect-ratio: 16 / 9;
+  contain: layout;
+}
+
+/* Optimize will-change usage - only apply when needed */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+/* Content visibility for below-fold content */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
 }
