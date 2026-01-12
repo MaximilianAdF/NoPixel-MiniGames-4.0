@@ -172,6 +172,15 @@ export default function RootLayout({
         {/* Google Tag Manager - Replace GTM-XXXXXXX with your actual GTM ID */}
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
         
+        {/* PropellerAds Multitag */}
+        <Script 
+          src="https://quge5.com/88/tag.min.js" 
+          data-zone="201218" 
+          async 
+          data-cfasync="false"
+          strategy="afterInteractive"
+        />
+        
         {/* Session Tracking */}
         <Script id="session-tracker" strategy="afterInteractive">
           {`
