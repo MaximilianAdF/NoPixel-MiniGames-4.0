@@ -47,22 +47,25 @@ function Background() {
 const orbitron = Orbitron({
   weight: '900',
   subsets: ['latin'],
-  display: 'swap',
+  display: 'optional',
   variable: '--font-orbitron',
+  adjustFontFallback: true,
 });
 
 const rajdhani = Rajdhani({
   weight: '700',
   subsets: ['latin'],
-  display: 'swap',
+  display: 'optional',
   variable: '--font-rajdhani',
+  adjustFontFallback: true,
 });
 
 const caveat = Caveat({
   weight: '600',
   subsets: ['latin'],
-  display: 'swap',
+  display: 'optional',
   variable: '--font-caveat',
+  adjustFontFallback: true,
 });
 
 
