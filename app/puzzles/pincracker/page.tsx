@@ -20,10 +20,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: "PinCracker Practice - NoPixel 4.0",
     description: "Master the PinCracker hack from NoPixel 4.0. Practice the Maze Bank security minigame.",
-    url: "https://no-px.vercel.app/puzzles/pincracker",
+    url: "https://nphacks.net/puzzles/pincracker",
   },
   alternates: {
-    canonical: "https://no-px.vercel.app/puzzles/pincracker",
+    canonical: "https://nphacks.net/puzzles/pincracker",
   },
 };
 

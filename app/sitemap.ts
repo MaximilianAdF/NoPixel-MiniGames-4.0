@@ -1,7 +1,8 @@
 import { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/siteConfig";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://no-px.vercel.app";
+  const baseUrl = SITE_URL;
 
   // Define all minigame routes
   const minigames = [

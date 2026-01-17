@@ -264,7 +264,7 @@ vercel --prod
 🎨 Complete design overhaul
 
 Practice your NoPixel hacks for FREE!
-🔗 https://no-px.vercel.app
+🔗 https://nphacks.net
 
 #NoPixel #GTA5 #GTARP #FiveM #Gaming
 ```
@@ -287,7 +287,7 @@ Thermite, Lockpick, PinCracker, Laundromat, Roof Running, Word Memory, Chopping,
 
 **Completely FREE** - No ads, no login required (login optional for leaderboards/profiles)
 
-Try it out: https://no-px.vercel.app
+Try it out: https://nphacks.net
 
 Open source on GitHub: https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0
 ```

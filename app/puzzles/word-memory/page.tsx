@@ -20,10 +20,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Word Memory Practice - NoPixel 4.0",
     description: "Master the Word Memory hack from NoPixel 4.0. Practice the Maze Bank memory minigame.",
-    url: "https://no-px.vercel.app/puzzles/word-memory",
+    url: "https://nphacks.net/puzzles/word-memory",
   },
   alternates: {
-    canonical: "https://no-px.vercel.app/puzzles/word-memory",
+    canonical: "https://nphacks.net/puzzles/word-memory",
   },
 };
 

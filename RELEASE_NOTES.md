@@ -265,7 +265,7 @@ Before deploying to production:
 
 ### For Players
 
-1. Visit **https://no-px.vercel.app**
+1. Visit **https://nphacks.net**
 2. Choose a game to practice
 3. (Optional) Login with Discord to track your stats and compete on leaderboards
 4. Play in **competitive mode** to qualify for rankings
@@ -348,7 +348,7 @@ MIT License - See [LICENSE](LICENSE) for details
 
 ## 🔗 Links
 
-- **Live Site**: https://no-px.vercel.app
+- **Live Site**: https://nphacks.net
 - **GitHub**: https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0
 - **Issues**: https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/issues
 - **Discussions**: https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0/discussions

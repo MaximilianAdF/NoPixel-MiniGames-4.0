@@ -238,7 +238,7 @@ can train on all 8 NoPixel 4.0 hacks without the pressure of losing everything.
 ✓ 100% free, no login required
 ✓ Same mechanics as the server
 
-[Link: no-px.vercel.app]
+[Link: nphacks.net]
 
 I'm actively developing this and would love your feedback! What features 
 would make this more useful for you?

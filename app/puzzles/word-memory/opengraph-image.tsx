@@ -142,7 +142,7 @@ export default async function Image() {
             •
           </div>
           <div style={{ fontSize: '20px', fontFamily: 'sans-serif', color: '#54FFA4' }}>
-            no-px.vercel.app
+            nphacks.net
           </div>
         </div>
       </div>

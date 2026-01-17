@@ -95,7 +95,7 @@ export default function Home() {
               "@type": "WebApplication",
               "name": "NoPixel 4.0 Hacking Simulator",
               "description": "Free practice simulator for NoPixel 4.0 GTA RP hacking minigames including Thermite, Lockpick, Laundromat, Roof Running, Word Memory, and more.",
-              "url": "https://no-px.vercel.app",
+              "url": "https://nphacks.net",
               "applicationCategory": "GameApplication",
               "operatingSystem": "Web Browser",
               "offers": {
@@ -110,7 +110,7 @@ export default function Home() {
                 "bestRating": "5",
                 "worstRating": "1"
               },
-              "screenshot": "https://no-px.vercel.app/images/og-image.png",
+              "screenshot": "https://nphacks.net/images/og-image.png",
               "featureList": [
                 "Thermite Hacking Practice",
                 "Lockpick Training",

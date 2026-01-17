@@ -221,7 +221,7 @@ Make sure these are set in Vercel:
 NEXTAUTH_SECRET=<your-secret>
 DISCORD_CLIENT_ID=<your-client-id>
 DISCORD_CLIENT_SECRET=<your-client-secret>
-DISCORD_REDIRECT_URI=https://no-px.vercel.app/api/auth/discord/callback
+DISCORD_REDIRECT_URI=https://nphacks.net/api/auth/discord/callback
 MONGODB_URI=<your-mongodb-uri>
 ```
 
@@ -240,7 +240,7 @@ MONGODB_URI=<your-mongodb-uri>
 🎨 Complete design overhaul
 
 Practice NoPixel hacks FREE!
-🔗 https://no-px.vercel.app
+🔗 https://nphacks.net
 
 #NoPixel #GTA5 #GTARP #FiveM #Gaming
 ```
@@ -260,7 +260,7 @@ After months of development, I'm excited to release the first major version!
 
 **All 8 NoPixel minigames** - Completely FREE to use
 
-Try it: https://no-px.vercel.app
+Try it: https://nphacks.net
 Open source: https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0
 ```
 
@@ -284,7 +284,7 @@ Thermite, Lockpick, PinCracker, Laundromat, Roof Running, Word Memory, Chopping,
 
 🆓 **Completely FREE** - No ads, no paywalls
 
-🔗 **https://no-px.vercel.app**
+🔗 **https://nphacks.net**
 
 Practice your hacks, compete on leaderboards, and climb the ranks!
 ```

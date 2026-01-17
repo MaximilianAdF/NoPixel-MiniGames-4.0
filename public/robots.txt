@@ -6,7 +6,7 @@ Allow: /
 Crawl-delay: 0.5
 
 # Sitemap location
-Sitemap: https://no-px.vercel.app/sitemap.xml
+Sitemap: https://nphacks.net/sitemap.xml
 
 # Disallow admin/api routes if any
 User-agent: *

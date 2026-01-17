@@ -75,7 +75,7 @@ const caveat = Caveat({
 
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://no-px.vercel.app'),
+  metadataBase: new URL('https://nphacks.net'),
   applicationName: 'NoPixel 4.0 Minigames',
   title: {
     default: "NoPixel 4.0 Minigames - Free Practice Simulator for GTA RP Hacking 🎮",
@@ -104,7 +104,7 @@ export const metadata: Metadata = {
     "NoPixel 4.0 hack trainer", "GTA RP skill improvement", "FiveM minigame trainer",
     "free NoPixel practice", "NoPixel tutorial", "GTA RP minigame guide"
   ],
-  authors: [{ name: "NoPixel Minigames", url: "https://no-px.vercel.app" }],
+  authors: [{ name: "NoPixel Minigames", url: "https://nphacks.net" }],
   creator: "NoPixel Minigames",
   publisher: "NoPixel Minigames",
   formatDetection: {
@@ -115,7 +115,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://no-px.vercel.app',
+    url: 'https://nphacks.net',
     title: 'NoPixel 4.0 Minigames - Free GTA RP Hacking Practice Simulator 🎮',
     description: '⭐ Master NoPixel hacks FREE! Practice Thermite, Lockpick, VAR & more. Global leaderboards, expert strategies, mobile-friendly. The #1 GTA RP training simulator!',
     siteName: 'NoPixel 4.0 Minigames',
@@ -206,9 +206,9 @@ export default function RootLayout({
                 "priceCurrency": "USD"
               },
               "description": "Free practice simulator for NoPixel 4.0 GTA RP hacking minigames. Master Thermite, Lockpick, Laundromat, Roof Running and more with real-time leaderboards.",
-              "url": "https://no-px.vercel.app",
-              "image": "https://no-px.vercel.app/opengraph-image",
-              "screenshot": "https://no-px.vercel.app/opengraph-image",
+              "url": "https://nphacks.net",
+              "image": "https://nphacks.net/opengraph-image",
+              "screenshot": "https://nphacks.net/opengraph-image",
               "aggregateRating": {
                 "@type": "AggregateRating",
                 "ratingValue": "4.8",
@@ -232,7 +232,7 @@ export default function RootLayout({
               "author": {
                 "@type": "Organization",
                 "name": "NoPixel Minigames",
-                "url": "https://no-px.vercel.app"
+                "url": "https://nphacks.net"
               }
             })
           }}
@@ -295,19 +295,19 @@ export default function RootLayout({
                   "@type": "ListItem",
                   "position": 1,
                   "name": "Home",
-                  "item": "https://no-px.vercel.app"
+                  "item": "https://nphacks.net"
                 },
                 {
                   "@type": "ListItem",
                   "position": 2,
                   "name": "Guides",
-                  "item": "https://no-px.vercel.app/guides"
+                  "item": "https://nphacks.net/guides"
                 },
                 {
                   "@type": "ListItem",
                   "position": 3,
                   "name": "Minigames",
-                  "item": "https://no-px.vercel.app/puzzles/thermite"
+                  "item": "https://nphacks.net/puzzles/thermite"
                 }
               ]
             })
