@@ -282,7 +282,8 @@ export default function Home() {
                 <span className="text-gray-400 text-sm font-medium">Scroll for more</span>
                 <FontAwesomeIcon 
                   icon={faChevronDown} 
-                  className="text-spring-green-400 text-2xl"
+                  className="text-spring-green-400"
+                  style={{ width: '24px', height: '24px' }}
                 />
               </div>
             </div>

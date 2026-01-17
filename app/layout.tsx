@@ -171,6 +171,7 @@ export default function RootLayout({
     >
       <head>
         <meta name="theme-color" content="#020617" />
+        <meta name="google-adsense-account" content="ca-pub-8849653057967400" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />

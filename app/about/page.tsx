@@ -1,5 +1,18 @@
 import { Info, Target, Heart, Zap, Users, TrendingUp } from 'lucide-react';
 
+export const metadata = {
+  title: 'About Us - NoPixel 4.0 Minigames Trainer',
+  description: 'Learn about NoPixel 4.0 Minigames Trainer - A free, open-source practice tool for GTA RP players to master Thermite, Lockpick, PinCracker and other heist minigames.',
+  openGraph: {
+    title: 'About NoPixel 4.0 Minigames Trainer',
+    description: 'Free practice tools for the GTA RP community. Learn about our mission to help players master NoPixel minigames.',
+    url: 'https://nphacks.net/about',
+  },
+  alternates: {
+    canonical: 'https://nphacks.net/about',
+  },
+};
+
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">

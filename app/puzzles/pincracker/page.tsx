@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Pincracker from "@/app/puzzles/pincracker/Pincracker";
 import PuzzleBackButton from "@/app/components/PuzzleBackButton";
+import PuzzlePageWrapper from "@/app/puzzles/PuzzlePageWrapper";
 
 // Force dynamic rendering for daily challenges
 export const dynamic = 'force-dynamic';
@@ -28,10 +29,32 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-    return (
-        <>
-            <PuzzleBackButton />
-            <Pincracker />
-        </>
-    );
+  return (
+    <PuzzlePageWrapper
+      title="PinCracker Hack"
+      gameName="PinCracker"
+      description="PinCracker is a logic-based deduction puzzle used to bypass security systems during Maze Bank heists in NoPixel 4.0. Similar to the classic Mastermind game, you must guess a numeric PIN code using feedback from previous attempts. Each guess reveals how many digits are correct and in the right position versus correct but misplaced. Use logical deduction to crack the code before running out of attempts. This hack rewards methodical thinking over raw speed."
+      difficulty="Hard"
+      avgTime="30-60 seconds"
+      inGameUse="Maze Bank"
+      howToPlay={[
+        "Enter a 4-digit PIN guess using the number pad",
+        "Green indicators show digits that are correct AND in the right position",
+        "Yellow indicators show digits that exist but are in the wrong position",
+        "Use the feedback to narrow down the correct combination",
+        "Crack the code within the limited number of attempts"
+      ]}
+      tips={[
+        "Start with digits that cover a wide range (e.g., 1234, then 5678)",
+        "Track which digits have been confirmed or eliminated",
+        "Pay close attention to position feedback - it's crucial",
+        "Use process of elimination systematically",
+        "Practice logical deduction puzzles to improve your skills"
+      ]}
+      guideUrl="/guides/pincracker"
+    >
+      <PuzzleBackButton />
+      <Pincracker />
+    </PuzzlePageWrapper>
+  );
 }
