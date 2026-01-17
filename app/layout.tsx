@@ -176,6 +176,14 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="color-scheme" content="dark" />
         
+        {/* Google AdSense Verification for nphacks.net */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8849653057967400"
+          crossOrigin="anonymous"
+          strategy="beforeInteractive"
+        />
+        
         {/* Google Tag Manager - Replace GTM-XXXXXXX with your actual GTM ID */}
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
         
@@ -346,12 +354,6 @@ export default function RootLayout({
           </UserProvider>
         </LoadingProvider>
         <AppAnalytics />
-        {/* AdSense - Load lazily to not block initial render */}
-        <Script
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8849653057967400"
-          crossOrigin="anonymous"
-          strategy="lazyOnload"
-        />
       </body>
     </html>
   );
