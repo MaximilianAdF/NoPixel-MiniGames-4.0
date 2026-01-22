@@ -3,6 +3,8 @@ import { getSession } from '@/lib/auth/session';
 import clientPromise from '@/lib/mongodb';
 import { GameType } from '@/interfaces/user';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/challenges/today
  * 
@@ -16,15 +18,8 @@ export async function GET() {
     const client = await clientPromise;
     const db = client.db('nopixel');
     
-    // Try to create unique index (will silently fail if already exists)
-    try {
-      await db.collection('dailyChallenges').createIndex({ date: 1 }, { unique: true });
-    } catch (indexError: any) {
-      // Ignore if index already exists or there are duplicates
-      if (indexError.code !== 11000 && indexError.code !== 85) {
-        console.error('Index creation warning:', indexError.message);
-      }
-    }
+    // Index creation is handled during initialization/deployment
+    // await db.collection('dailyChallenges').createIndex({ date: 1 }, { unique: true });
     
     // Check if today's challenge exists (limit 1 in case of duplicates)
     let challenge = await db.collection('dailyChallenges').findOne({ date: today });
@@ -73,15 +68,27 @@ export async function GET() {
       );
     }
 
-    // Get stats for this challenge
-    const allProgress = await db.collection('userChallengeProgress').find({
-      challengeId: challenge._id.toString(),
-    }).toArray();
+    // Get stats for this challenge efficiently
+    const challengeIdStr = challenge._id.toString();
+    
+    const [totalAttemptsResult, totalCompletions, uniquePlayers] = await Promise.all([
+      db.collection('userChallengeProgress').aggregate([
+        { $match: { challengeId: challengeIdStr } },
+        { $group: { _id: null, total: { $sum: "$attempts" } } }
+      ]).toArray(),
+      db.collection('userChallengeProgress').countDocuments({
+        challengeId: challengeIdStr,
+        completed: true
+      }),
+      db.collection('userChallengeProgress').countDocuments({
+        challengeId: challengeIdStr
+      })
+    ]);
 
     const stats = {
-      totalAttempts: allProgress.reduce((sum, p) => sum + (p.attempts || 0), 0),
-      totalCompletions: allProgress.filter(p => p.completed).length,
-      uniquePlayers: allProgress.length,
+      totalAttempts: totalAttemptsResult[0]?.total || 0,
+      totalCompletions,
+      uniquePlayers,
     };
     
     return NextResponse.json({

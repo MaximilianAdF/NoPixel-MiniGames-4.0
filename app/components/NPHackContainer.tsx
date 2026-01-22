@@ -65,16 +65,32 @@ const NPHackContainer: FC<NPHackContainerProps> = ({
     // This can be decreased if you need to call a func every frame
     // For now, 1s per frame seems reasonable
 
+    const [isPaused, setIsPaused] = useState(false);
+
+    // Listen for global pause events (e.g. from Level Up modals)
+    useEffect(() => {
+        const handlePause = () => setIsPaused(true);
+        const handleResume = () => setIsPaused(false);
+
+        window.addEventListener('nphacks:pause', handlePause);
+        window.addEventListener('nphacks:resume', handleResume);
+
+        return () => {
+            window.removeEventListener('nphacks:pause', handlePause);
+            window.removeEventListener('nphacks:resume', handleResume);
+        };
+    }, []);
+
     const resetTimeout = useTimeout(() => {
         resetCallback();
         resetCountdown();
     }, resetDelay);
 
     useEffect(() => {
-        if (status !== 1 && status !== 0) {
+        if (status !== 1 && status !== 0 && !isPaused) {
             resetTimeout();
         }
-    }, [resetTimeout, status]);
+    }, [resetTimeout, status, isPaused]);
 
     const timerReset = () => {
         setStatus(2); 

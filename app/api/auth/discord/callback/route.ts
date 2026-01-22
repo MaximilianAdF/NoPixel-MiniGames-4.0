@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { exchangeCodeForToken, getDiscordUser, getDiscordAvatarUrl } from '@/lib/auth/discord';
-import { createSessionToken, setSessionCookie } from '@/lib/auth/session';
+import { createSessionToken, setSessionCookie, getSession } from '@/lib/auth/session';
 import { UserSession } from '@/interfaces/user';
 import clientPromise from '@/lib/mongodb';
+import { ObjectId } from 'mongodb';
 
 // Force this route to be dynamic
 export const dynamic = 'force-dynamic';
@@ -39,13 +40,71 @@ export async function GET(request: NextRequest) {
     const db = client.db('nopixel');
     const usersCollection = db.collection('users');
 
-    // Find or create user in database
+    // Check for existing guest session
+    const currentSession = await getSession();
+    const isGuest = currentSession && !currentSession.user.discordId;
+
+    // Find existing Discord user
     let user = await usersCollection.findOne({ discordId: discordUser.id });
 
     const now = new Date();
 
-    if (!user) {
-      // Create new user
+    if (user) {
+      // User with this Discord ID already exists
+      
+      // If we were logged in as a guest, we could merge stats here
+      // For now, we'll just switch to the Discord user, but we could add logic to 
+      // transfer XP/Games from the guest account to the main account
+      if (isGuest) {
+        // Optional: Transfer guest stats to main user
+        // await usersCollection.updateOne({ _id: user._id }, { $inc: { totalXP: currentSession.user.xp } });
+        // await usersCollection.deleteOne({ _id: new ObjectId(currentSession.user.id) });
+      }
+
+      // Update existing user with latest Discord info
+      await usersCollection.updateOne(
+        { discordId: discordUser.id },
+        {
+          $set: {
+            username: discordUser.username,
+            discriminator: discordUser.discriminator,
+            avatar: getDiscordAvatarUrl(discordUser.id, discordUser.avatar),
+            email: discordUser.email,
+            lastSeenAt: now,
+            updatedAt: now,
+          },
+        }
+      );
+    } else if (isGuest) {
+      // No existing Discord user, but we have a Guest session
+      // Upgrade the Guest user to a full User
+      const guestUserId = new ObjectId(currentSession!.user.id);
+      
+      await usersCollection.updateOne(
+        { _id: guestUserId },
+        {
+          $set: {
+            discordId: discordUser.id,
+            username: discordUser.username, // Overwrite "Guest"
+            discriminator: discordUser.discriminator,
+            avatar: getDiscordAvatarUrl(discordUser.id, discordUser.avatar),
+            email: discordUser.email,
+            displayName: discordUser.username, // Set default display name
+            verified: true, // Now verified
+            updatedAt: now,
+            lastSeenAt: now,
+          },
+          $unset: {
+            guestDeviceId: "", // Remove guest ID as they are now registered
+          }
+        }
+      );
+      
+      // Fetch the updated user
+      user = await usersCollection.findOne({ _id: guestUserId });
+    } else {
+      // No existing Discord user AND no Guest session
+      // Create brand new user
       const newUser = {
         discordId: discordUser.id,
         username: discordUser.username,
@@ -81,21 +140,11 @@ export async function GET(request: NextRequest) {
 
       const result = await usersCollection.insertOne(newUser);
       user = { ...newUser, _id: result.insertedId };
-    } else {
-      // Update existing user
-      await usersCollection.updateOne(
-        { discordId: discordUser.id },
-        {
-          $set: {
-            username: discordUser.username,
-            discriminator: discordUser.discriminator,
-            avatar: getDiscordAvatarUrl(discordUser.id, discordUser.avatar),
-            email: discordUser.email,
-            lastSeenAt: now,
-            updatedAt: now,
-          },
-        }
-      );
+    }
+
+    // Ensure user is not null (should satisfy TypeScript)
+    if (!user) {
+      throw new Error("Failed to find or create user");
     }
 
     // Create session

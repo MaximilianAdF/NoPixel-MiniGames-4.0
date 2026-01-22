@@ -38,21 +38,23 @@ const getStatusMessage = (status: number | undefined) => {
 }
 
 const Pincracker: FC = () => {
-    const { isChallengeMode, challengeData } = useDailyChallenge();
+    const { isChallengeMode, challengeData, isLoading: isChallengeLoading } = useDailyChallenge();
     const searchParams = useSearchParams();
     const isCompetitive = searchParams?.get('competitive') === 'true';
     
-    // Use challenge data for defaults if in challenge mode
-    const challengePinLength = challengeData?.pinLength || defaultPinLength;
-    const challengeDuration = challengeData?.targetTime ? Math.floor(challengeData.targetTime / 1000) : defaultDuration;
-    
-    const [timer, setTimer] = usePersistantState("chopping-timer", challengeDuration);
-    const [settingsDuration, setSettingsDuration] = useState(challengeDuration);
-    const [settingsPinLength, setSettingsPinLength] = useState(challengePinLength);
+    // Persistent state for standard play
+    const [savedTimer, setSavedTimer] = usePersistantState("pincracker-timer", defaultDuration);
+    const [savedPinLength, setSavedPinLength] = usePersistantState("pincracker-pin-length", defaultPinLength);
+
+    // Derived state for active game configuration
+    const activePinLength = isChallengeMode && challengeData ? (challengeData.pinLength || defaultPinLength) : (isCompetitive ? 4 : savedPinLength);
+    const activeTimer = isChallengeMode && challengeData ? (challengeData.targetTime ? Math.floor(challengeData.targetTime / 1000) : defaultDuration) : (isCompetitive ? 24 : savedTimer);
+
+    const [settingsDuration, setSettingsDuration] = useState(defaultDuration);
+    const [settingsPinLength, setSettingsPinLength] = useState(defaultPinLength);
     const [activeIndex, setActiveIndex] = usePersistantState("pincracker-active-index", 0);
     const [allowKeyDown, setAllowKeyDown] = useState(true);
     const [autoClear, setAutoClear] = useState(true);
-    const [pinLength, setPinLength] = useState(challengePinLength);
     const [pin, setPin] = useState<Digit[]>();
     const [elapsed, setElapsed] = useState(0);
     const isMobileOrTablet = useIsMobileOrTablet();
@@ -63,25 +65,13 @@ const Pincracker: FC = () => {
     const [showMobileHint, setShowMobileHint] = useState(false);
     const hasInteractedRef = useRef(false);
 
-    // Reset to standard preset when in competitive mode
+    // Reset game when configuration changes
     useEffect(() => {
-        if (isCompetitive) {
-            setPinLength(4); // Standard: 4 digits
-            setTimer(24); // Standard: 24 seconds
-            setSettingsPinLength(4);
-            setSettingsDuration(24);
+        if (!isChallengeMode || challengeData) {
+            resetBoard();
         }
-    }, [isCompetitive, setTimer]);
-
-    // Update settings when challenge data loads
-    useEffect(() => {
-        if (challengeData) {
-            setPinLength(challengeData.pinLength || defaultPinLength);
-            setTimer(challengeData.targetTime ? Math.floor(challengeData.targetTime / 1000) : defaultDuration);
-            setSettingsPinLength(challengeData.pinLength || defaultPinLength);
-            setSettingsDuration(challengeData.targetTime ? Math.floor(challengeData.targetTime / 1000) : defaultDuration);
-        }
-    }, [challengeData, setTimer]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activePinLength, activeTimer]);
 
     useEffect(() => {
         checkBeepPlayer.whenReady();
@@ -179,7 +169,7 @@ const Pincracker: FC = () => {
 
 
     const handleCrack = () => {
-        if (activeIndex < pinLength) {
+        if (activeIndex < activePinLength) {
             // Incomplete pin
         } else {
             const wrappers = document.querySelectorAll('.wrapper');
@@ -188,8 +178,35 @@ const Pincracker: FC = () => {
             const guess = Array.from(digits).map(d => (d.innerHTML as Digit));
             setAllowKeyDown(false);
 
+            // Calculate feedback first to determine colors
+            const feedback = new Array(activePinLength).fill('red'); // Default to red (incorrect)
+            const pinMatched = new Array(activePinLength).fill(false); // Track matched PIN digits
 
-            for (let i = 0; i < pinLength; i++) {
+            // Phase 1: Identify Greens (Correct position)
+            if (pin) {
+                for (let i = 0; i < activePinLength; i++) {
+                    if (guess[i] === pin[i]) {
+                        feedback[i] = 'green';
+                        pinMatched[i] = true;
+                    }
+                }
+
+                // Phase 2: Identify Yellows (Wrong position, but present)
+                for (let i = 0; i < activePinLength; i++) {
+                    if (feedback[i] !== 'green') {
+                        // Look for this digit in the PIN, but only if that PIN digit hasn't been matched yet
+                        const pinIndex = pin.findIndex((p, idx) => p === guess[i] && !pinMatched[idx]);
+                        
+                        if (pinIndex !== -1) {
+                            feedback[i] = 'yellow';
+                            pinMatched[pinIndex] = true; // Consume this PIN digit
+                        }
+                    }
+                }
+            }
+
+
+            for (let i = 0; i < activePinLength; i++) {
                 setTimeout(() => {
                     // Play the check beep audio
                     checkBeepPlayer.play();
@@ -206,15 +223,13 @@ const Pincracker: FC = () => {
                     markers[i].classList.remove('bg-green-400');
                     markers[i].classList.remove('bg-yellow-400');
                     markers[i].classList.remove('bg-red-400');
-                    // Process the guess and set marker colors
-                    if (pin && guess[i] === pin[i]) {
-                        // Correct digit, set it green
+                    
+                    // Apply calculated feedback color
+                    if (feedback[i] === 'green') {
                         markers[i].classList.add('bg-green-400');
-                    } else if (pin && pin.includes(guess[i])) {
-                        // Incorrect position, but digit is in pin
+                    } else if (feedback[i] === 'yellow') {
                         markers[i].classList.add('bg-yellow-400');
                     } else {
-                        // Incorrect digit
                         markers[i].classList.add('bg-red-400');
                     }
             
@@ -241,15 +256,15 @@ const Pincracker: FC = () => {
 
     const clearBoard = (delay: number) => {
         const digits = document.querySelectorAll('.digit');
-        for (let i = pinLength-1; i > -1; i--) {
+        for (let i = activePinLength-1; i > -1; i--) {
             setTimeout(() => {
                 digits[i].innerHTML = '';
-            }, (pinLength-i) * delay);
+            }, (activePinLength-i) * delay);
         }
 
         setTimeout(() => {
             setAllowKeyDown(true);
-        }, delay * pinLength);
+        }, delay * activePinLength);
     }
 
     const clearMarkings = () => {
@@ -263,12 +278,14 @@ const Pincracker: FC = () => {
     }
 
     function generatePin() {
-        for (let i = Digits.length - 1; i > 0; i--) {
+        // Create a copy to avoid side effects on the global Digits array
+        const digitsCopy = [...Digits];
+        for (let i = digitsCopy.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [Digits[i], Digits[j]] = [Digits[j], Digits[i]];
+            [digitsCopy[i], digitsCopy[j]] = [digitsCopy[j], digitsCopy[i]];
         }
     
-        const newPin = Digits.slice(0, pinLength);
+        const newPin = digitsCopy.slice(0, activePinLength);
         setPin(newPin);
     }
 
@@ -290,7 +307,12 @@ const Pincracker: FC = () => {
         }
     }
 
-    const [gameStatus, setGameStatus, streak] = useGame(timer*1000, statusUpdateHandler);
+    const [gameStatus, setGameStatus, streak] = useGame(activeTimer*1000, statusUpdateHandler);
+
+    // Reset game when pinLength changes to ensure PIN is regenerated with correct length
+    useEffect(() => {
+        resetGame();
+    }, [activePinLength]);
 
     // Auto-scroll when game starts on mobile
     useEffect(() => {
@@ -360,7 +382,7 @@ const Pincracker: FC = () => {
         }
 
         else {
-            if (activeIndex < pinLength) {
+            if (activeIndex < activePinLength) {
                 const digits = document.querySelectorAll('.digit');
                 digits[activeIndex].innerHTML = key.toString();
                 setActiveIndex(activeIndex + 1);
@@ -441,26 +463,26 @@ const Pincracker: FC = () => {
     };
 
     useEffect(() => {
-        setSettingsPinLength(pinLength);
-        setSettingsDuration(timer);
+        setSettingsPinLength(savedPinLength);
+        setSettingsDuration(savedTimer);
 
         if (gameStatus === 3) {
             successPlayer.play();
         }
-    }, [gameStatus, pinLength, timer])
+    }, [gameStatus, savedPinLength, savedTimer])
 
     const settings = {
         handleSave: () => {
-            setPinLength(settingsPinLength);
-            setTimer(settingsDuration);
+            setSavedPinLength(settingsPinLength);
+            setSavedTimer(settingsDuration);
             setGameStatus(4);
         },
 
         handleReset: () => {
             setSettingsDuration(defaultDuration);
             setSettingsPinLength(defaultPinLength);
-            setPinLength(defaultPinLength);
-            setTimer(defaultDuration);
+            setSavedPinLength(defaultPinLength);
+            setSavedTimer(defaultDuration);
             setGameStatus(4);
         },
 
@@ -498,13 +520,21 @@ const Pincracker: FC = () => {
         )   
     }
 
+    if (isChallengeLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#54FFA4]"></div>
+            </div>
+        );
+    }
+
     return (
         <>
             <LeaderboardEligibleBadge
                 game="pincracker"
                 gameSettings={{
-                    pinLength,
-                    timer,
+                    pinLength: activePinLength,
+                    timer: activeTimer,
                 }}
             />
             <GameStatsTracker
@@ -512,12 +542,12 @@ const Pincracker: FC = () => {
                 gameStatus={gameStatus}
                 score={activeIndex}
                 elapsedMs={elapsed}
-                targetScore={pinLength}
+                targetScore={activePinLength}
                 wonStatus={3}
                 lostStatus={2}
                 gameSettings={{
-                    pinLength,
-                    duration: timer,
+                    pinLength: activePinLength,
+                    duration: activeTimer,
                 }}
             />
             <div ref={outerContainerRef} className="flex flex-col gap-4">
@@ -552,7 +582,7 @@ const Pincracker: FC = () => {
                 }
                 ]
             ]}
-            countdownDuration={timer * 1000}
+            countdownDuration={activeTimer * 1000}
             resetCallback={handleRetry}
             elapsedCallback={setElapsed}
             resetDelay={3000}
@@ -615,8 +645,8 @@ const Pincracker: FC = () => {
                 onPointerDownCapture={focusInputOnInteraction}
                 style={{ scrollMarginTop: '15vh' }}
             >
-                {[...Array(pinLength)].map((_, index) => (
-                <div key={index} className="flex flex-col items-center justify-center w-3/12 h-full gap-5 sm:gap-6 md:gap-7 rounded-md wrapper">
+                {[...Array(activePinLength)].map((_, index) => (
+                <div key={index} className="flex flex-col items-center justify-center flex-1 h-full gap-5 sm:gap-6 md:gap-7 rounded-md wrapper">
                     <div className='h-20 sm:h-24 md:h-28 digit'></div>
                     <div className="px-4 sm:px-6 md:px-7 h-1.5 bg-slate-400 marker"/>
                 </div>

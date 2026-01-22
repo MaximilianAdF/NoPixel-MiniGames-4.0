@@ -24,44 +24,6 @@ export default function DailyChallengePage() {
         className="flex flex-col pt-16"
         style={{ minHeight: '100vh' }}
       >
-        {/* SSR SEO Header Content */}
-        <div className="pt-4 pb-6 px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 flex items-center justify-center gap-3">
-              <Calendar className="w-10 h-10 text-[#54FFA4]" />
-              Daily Challenge
-            </h1>
-            <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-6">
-              Test your skills with a new challenge every day! Complete the daily minigame to earn bonus XP,
-              build your streak, and compete on the global daily leaderboards.
-            </p>
-
-            {/* Feature Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-              <div className="bg-[#1a2930]/80 border border-[#54FFA4]/20 rounded-xl p-3 text-center">
-                <Zap className="w-6 h-6 text-yellow-400 mx-auto mb-1" />
-                <p className="text-gray-400 text-xs">Bonus XP</p>
-                <p className="text-white font-bold">Up to 2x</p>
-              </div>
-              <div className="bg-[#1a2930]/80 border border-orange-400/20 rounded-xl p-3 text-center">
-                <Flame className="w-6 h-6 text-orange-400 mx-auto mb-1" />
-                <p className="text-gray-400 text-xs">Streak Bonus</p>
-                <p className="text-white font-bold">+10% per day</p>
-              </div>
-              <div className="bg-[#1a2930]/80 border border-purple-400/20 rounded-xl p-3 text-center">
-                <Target className="w-6 h-6 text-purple-400 mx-auto mb-1" />
-                <p className="text-gray-400 text-xs">New Challenge</p>
-                <p className="text-white font-bold">Every Day</p>
-              </div>
-              <div className="bg-[#1a2930]/80 border border-blue-400/20 rounded-xl p-3 text-center">
-                <Trophy className="w-6 h-6 text-blue-400 mx-auto mb-1" />
-                <p className="text-gray-400 text-xs">Leaderboard</p>
-                <p className="text-white font-bold">Global</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Client-side Dynamic Challenge Content */}
         <div className="flex-1">
           <DailyChallengeClient />

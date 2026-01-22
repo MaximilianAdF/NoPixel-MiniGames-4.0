@@ -9,6 +9,8 @@ import { useEffect, useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileLines, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
+import DailyChallengeHero from "./components/DailyChallengeHero";
+
 // NoPixel 4.0 Minigames - Static data to prevent re-renders
 const puzzles = [
   {
@@ -201,6 +203,9 @@ export default function Home() {
               </span>
             </div>
           </header>
+
+          {/* Daily Challenge Hero Card */}
+          <DailyChallengeHero />
 
           {/* Minigames Section - Moved to Top */}
           <div className="space-y-8">

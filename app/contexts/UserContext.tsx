@@ -65,7 +65,19 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
       sessionFetchingRef.current = true;
       setIsLoading(true);
-      const response = await fetch('/api/auth/session');
+
+      // Get or generate guest device ID
+      let guestId = localStorage.getItem('guest_device_id');
+      if (!guestId) {
+        guestId = crypto.randomUUID();
+        localStorage.setItem('guest_device_id', guestId);
+      }
+
+      const response = await fetch('/api/auth/session', {
+        headers: {
+          'x-guest-device-id': guestId
+        }
+      });
       const data = await response.json();
       
       const wasLoggedOut = !user;
@@ -74,7 +86,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         setUser(data.user);
         
         // Track login success only on first login (not on refreshes)
-        if (wasLoggedOut && !loginSuccessTrackedRef.current) {
+        // Only track for actual Discord logins (having discordId), not guest sessions
+        if (wasLoggedOut && !loginSuccessTrackedRef.current && data.user.discordId) {
           loginSuccessTrackedRef.current = true;
           trackLoginSuccess({
             method: 'discord',
