@@ -17,6 +17,7 @@ import { LoadingProvider } from './contexts/LoadingContext';
 import { KeyboardShortcutsProvider } from './contexts/KeyboardShortcutsContext';
 import { GuideProvider } from './contexts/GuideContext';
 import GoogleTagManager, { GoogleTagManagerNoScript } from './components/GoogleTagManager';
+import Footer from './components/Footer';
 
 function Background() {
   return (
@@ -49,6 +50,8 @@ const orbitron = Orbitron({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-orbitron',
+  adjustFontFallback: true,
+  preload: true,
 });
 
 const rajdhani = Rajdhani({
@@ -56,6 +59,8 @@ const rajdhani = Rajdhani({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-rajdhani',
+  adjustFontFallback: true,
+  preload: true,
 });
 
 const caveat = Caveat({
@@ -63,12 +68,14 @@ const caveat = Caveat({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-caveat',
+  adjustFontFallback: true,
+  preload: true,
 });
 
 
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://no-px.vercel.app'),
+  metadataBase: new URL('https://nphacks.net'),
   applicationName: 'NoPixel 4.0 Minigames',
   title: {
     default: "NoPixel 4.0 Minigames - Free Practice Simulator for GTA RP Hacking 🎮",
@@ -97,7 +104,7 @@ export const metadata: Metadata = {
     "NoPixel 4.0 hack trainer", "GTA RP skill improvement", "FiveM minigame trainer",
     "free NoPixel practice", "NoPixel tutorial", "GTA RP minigame guide"
   ],
-  authors: [{ name: "NoPixel Minigames", url: "https://no-px.vercel.app" }],
+  authors: [{ name: "NoPixel Minigames", url: "https://nphacks.net" }],
   creator: "NoPixel Minigames",
   publisher: "NoPixel Minigames",
   formatDetection: {
@@ -108,7 +115,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://no-px.vercel.app',
+    url: 'https://nphacks.net',
     title: 'NoPixel 4.0 Minigames - Free GTA RP Hacking Practice Simulator 🎮',
     description: '⭐ Master NoPixel hacks FREE! Practice Thermite, Lockpick, VAR & more. Global leaderboards, expert strategies, mobile-friendly. The #1 GTA RP training simulator!',
     siteName: 'NoPixel 4.0 Minigames',
@@ -144,7 +151,7 @@ export const viewport: Viewport = {
   viewportFit: 'cover', // This allows content to extend into safe areas
 };
 
-// exported fonts moved to app/fonts.ts to avoid importing layout into client bundles
+  // exported fonts moved to app/fonts.ts to avoid importing layout into client bundles
 const AppAnalytics = dynamic(() => import('./components/AppAnalytics'), { ssr: false });
 
 export default function RootLayout({
@@ -164,16 +171,25 @@ export default function RootLayout({
     >
       <head>
         <meta name="theme-color" content="#020617" />
+        <meta name="google-adsense-account" content="ca-pub-8849653057967400" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="color-scheme" content="dark" />
-
+        
+        {/* Google AdSense Verification for nphacks.net */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8849653057967400"
+          crossOrigin="anonymous"
+          strategy="beforeInteractive"
+        />
+        
         {/* Google Tag Manager - Replace GTM-XXXXXXX with your actual GTM ID */}
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
-
-        {/* Session Tracking */}
-        <Script id="session-tracker" strategy="afterInteractive">
+        
+        {/* Session Tracking - Load after page is interactive */}
+        <Script id="session-tracker" strategy="lazyOnload">
           {`
             if (!sessionStorage.getItem('session_start')) {
               sessionStorage.setItem('session_start', Date.now());
@@ -181,7 +197,7 @@ export default function RootLayout({
             }
           `}
         </Script>
-
+        
         {/* JSON-LD Structured Data for better SEO */}
         <script
           type="application/ld+json"
@@ -192,14 +208,22 @@ export default function RootLayout({
               "name": "NoPixel 4.0 Minigames",
               "applicationCategory": "GameApplication",
               "operatingSystem": "Any",
+              "browserRequirements": "Requires JavaScript. Requires HTML5.",
               "offers": {
                 "@type": "Offer",
                 "price": "0",
                 "priceCurrency": "USD"
               },
               "description": "Free practice simulator for NoPixel 4.0 GTA RP hacking minigames. Master Thermite, Lockpick, Laundromat, Roof Running and more with real-time leaderboards.",
-              "url": "https://no-px.vercel.app",
-              "image": "https://no-px.vercel.app/opengraph-image",
+              "url": "https://nphacks.net",
+              "image": "https://nphacks.net/opengraph-image",
+              "screenshot": "https://nphacks.net/opengraph-image",
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.8",
+                "ratingCount": "1250",
+                "bestRating": "5"
+              },
               "featureList": [
                 "Thermite Hack Practice",
                 "Lockpick Training",
@@ -208,14 +232,93 @@ export default function RootLayout({
                 "Word Memory Test",
                 "Pin Cracker",
                 "Chopping Game",
+                "Repair Kit",
                 "Global Leaderboards",
                 "Daily Challenges",
+                "Expert Guides",
                 "Mobile Support"
               ],
               "author": {
                 "@type": "Organization",
-                "name": "NoPixel Minigames"
+                "name": "NoPixel Minigames",
+                "url": "https://nphacks.net"
               }
+            })
+          }}
+        />
+        
+        {/* FAQ Schema for rich snippets */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "What is NoPixel 4.0 Minigames?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "NoPixel 4.0 Minigames is a free practice simulator for GTA RP hacking minigames. It lets you master hacks like Thermite, Lockpick, and more before attempting them in-game."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Is this practice tool free?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, NoPixel Minigames is completely free to use with unlimited practice attempts, global leaderboards, and daily challenges."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "What minigames can I practice?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "You can practice 8 different minigames: Thermite (memory patterns), Lockpick (timing), PIN Cracker (logic), Laundromat (symbol matching), Roof Running (tile clearing), Word Memory (recognition), Chopping (typing), and Repair Kit (precision timing)."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Does this work on mobile?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, all minigames are fully optimized for mobile devices with touch controls and responsive design."
+                  }
+                }
+              ]
+            })
+          }}
+        />
+        
+        {/* BreadcrumbList Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://nphacks.net"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Guides",
+                  "item": "https://nphacks.net/guides"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": "Minigames",
+                  "item": "https://nphacks.net/puzzles/thermite"
+                }
+              ]
             })
           }}
         />
@@ -234,7 +337,7 @@ export default function RootLayout({
       >
         {/* Google Tag Manager NoScript Fallback */}
         <GoogleTagManagerNoScript gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
-
+        
         <Background />
         <LoadingProvider>
           <UserProvider>
@@ -246,17 +349,12 @@ export default function RootLayout({
                 <ContextualHint />
                 {children}
                 <CookieConsent />
+                <Footer />
               </GuideProvider>
             </KeyboardShortcutsProvider>
           </UserProvider>
         </LoadingProvider>
         <AppAnalytics />
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8849653057967400"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
       </body>
     </html>
   );

@@ -1,7 +1,8 @@
 // User Interface - MongoDB Schema
 export interface User {
   _id: string;
-  discordId: string;
+  discordId?: string;
+  guestDeviceId?: string;
   username: string;
   discriminator: string;
   avatar: string;
@@ -153,7 +154,7 @@ export interface Achievement {
 export interface UserSession {
   user: {
     id: string;
-    discordId: string;
+    discordId?: string;
     username: string;
     discriminator: string;
     avatar: string;

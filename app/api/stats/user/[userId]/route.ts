@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
-import { ObjectId } from 'mongodb';
-import { TIME_BASED_GAMES, SCORE_BASED_GAMES } from '@/app/utils/gamePresets';
+import { NextResponse } from "next/server";
+import clientPromise from "@/lib/mongodb";
+import { ObjectId } from "mongodb";
+import { TIME_BASED_GAMES, SCORE_BASED_GAMES } from "@/app/utils/gamePresets";
 
 /**
  * GET /api/stats/user/[userId]
- * 
+ *
  * Get public profile and stats for any user
  */
 export async function GET(
@@ -14,80 +14,94 @@ export async function GET(
 ) {
   try {
     const { userId } = await params;
-    
+
     const client = await clientPromise;
-    const db = client.db('nopixel');
-    
+    const db = client.db("nopixel");
+
     // Get user data
-    const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
-    
+    const user = await db
+      .collection("users")
+      .findOne({ _id: new ObjectId(userId) });
+
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-    
+
     // Get all game stats for this user
-    const gameStats = await db.collection('gameStats').find({ userId }).toArray();
-    
+    const gameStats = await db
+      .collection("gameStats")
+      .find({ userId })
+      .toArray();
+
     // Get leaderboard rankings for this user
-    const ranks: { level?: number; streak?: number; games?: { [key: string]: number } } = { games: {} };
-    
+    const ranks: {
+      level?: number;
+      streak?: number;
+      games?: { [key: string]: number };
+    } = { games: {} };
+
     // Get level rank
-    const levelRank = await db.collection('users').countDocuments({
-      $or: [
-        { level: { $gt: user.level || 1 } },
-        { level: user.level || 1, totalXP: { $gt: user.totalXP || 0 } }
-      ]
-    }) + 1;
+    const levelRank =
+      (await db.collection("users").countDocuments({
+        $or: [
+          { level: { $gt: user.level || 1 } },
+          { level: user.level || 1, totalXP: { $gt: user.totalXP || 0 } },
+        ],
+      })) + 1;
     ranks.level = levelRank;
-    
-    // Get streak rank
-    const streakRank = await db.collection('users').countDocuments({
-      $or: [
-        { currentDailyStreak: { $gt: user.currentDailyStreak || 0 } },
-        { currentDailyStreak: user.currentDailyStreak || 0, longestDailyStreak: { $gt: user.longestDailyStreak || 0 } }
-      ]
-    }) + 1;
+
+    // Get streak rank (ranked by longest streak ever achieved)
+    const streakRank =
+      (await db.collection("users").countDocuments({
+        $or: [
+          { longestDailyStreak: { $gt: user.longestDailyStreak || 0 } },
+          {
+            longestDailyStreak: user.longestDailyStreak || 0,
+            currentDailyStreak: { $gt: user.currentDailyStreak || 0 },
+          },
+        ],
+      })) + 1;
     ranks.streak = streakRank;
-    
+
     // Get game-specific ranks (only for games with leaderboards)
     const LEADERBOARD_GAMES = [...TIME_BASED_GAMES, ...SCORE_BASED_GAMES];
     for (const stat of gameStats) {
       if (LEADERBOARD_GAMES.includes(stat.game)) {
         const isTimeBased = TIME_BASED_GAMES.includes(stat.game);
-        
+
         // For time-based games, lower is better; for score-based, higher is better
         if (isTimeBased) {
           // Only count users who have a valid time (> 0)
-          const gameRank = await db.collection('gameStats').countDocuments({
-            game: stat.game,
-            bestTime: { $gt: 0, $lt: stat.bestTime || Infinity }
-          }) + 1;
+          const gameRank =
+            (await db.collection("gameStats").countDocuments({
+              game: stat.game,
+              bestTime: { $gt: 0, $lt: stat.bestTime || Infinity },
+            })) + 1;
           ranks.games![stat.game] = gameRank;
         } else {
-          const gameRank = await db.collection('gameStats').countDocuments({
-            game: stat.game,
-            bestScore: { $gt: stat.bestScore || 0 }
-          }) + 1;
+          const gameRank =
+            (await db.collection("gameStats").countDocuments({
+              game: stat.game,
+              bestScore: { $gt: stat.bestScore || 0 },
+            })) + 1;
           ranks.games![stat.game] = gameRank;
         }
       }
     }
-    
+
     // Get recent challenge history (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const challengeHistory = await db.collection('userChallengeProgress')
+    const challengeHistory = await db
+      .collection("userChallengeProgress")
       .find({
         userId,
-        date: { $gte: thirtyDaysAgo.toISOString().split('T')[0] },
+        date: { $gte: thirtyDaysAgo.toISOString().split("T")[0] },
       })
       .sort({ date: -1 })
       .limit(30)
       .toArray();
-    
+
     return NextResponse.json({
       user: {
         id: user._id.toString(),
@@ -102,7 +116,7 @@ export async function GET(
         longestDailyStreak: user.longestDailyStreak || 0,
         joinedAt: user.joinedAt || user.createdAt,
       },
-      gameStats: gameStats.map(stat => ({
+      gameStats: gameStats.map((stat) => ({
         game: stat.game,
         gamesPlayed: stat.gamesPlayed || 0,
         gamesWon: stat.gamesWon || 0,
@@ -121,7 +135,7 @@ export async function GET(
         longestStreak: stat.longestStreak || 0,
         lastPlayedAt: stat.lastPlayedAt,
       })),
-      challengeHistory: challengeHistory.map(challenge => ({
+      challengeHistory: challengeHistory.map((challenge) => ({
         date: challenge.date,
         completed: challenge.completed || false,
         attempts: challenge.attempts || 0,
@@ -130,11 +144,10 @@ export async function GET(
       })),
       ranks,
     });
-
   } catch (error) {
-    console.error('Error getting user profile:', error);
+    console.error("Error getting user profile:", error);
     return NextResponse.json(
-      { error: 'Failed to get user profile' },
+      { error: "Failed to get user profile" },
       { status: 500 }
     );
   }

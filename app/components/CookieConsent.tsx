@@ -81,18 +81,31 @@ export default function CookieConsent() {
               </div>
               <div className="flex-1 pr-8">
                 <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
-                  🍪 Cookie Settings
+                  🍪 Cookie & Advertising Notice
                 </h3>
                 <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-3">
-                  We use cookies to enhance your experience, analyze site traffic, and serve personalized advertisements. 
-                  By clicking <strong className="text-white">&quot;Accept All&quot;</strong>, you consent to our use of cookies including those from third-party services like Google Analytics and Google AdSense.
+                  We use cookies and third-party services to enhance your experience, analyze site traffic, and display personalized advertisements through <strong className="text-white">Google AdSense</strong>. 
+                  This includes <strong className="text-white">Google Analytics</strong> for understanding how you use our site, and <strong className="text-white">advertising cookies</strong> that may track your browsing across websites to show relevant ads.
                 </p>
+                <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-3">
+                  By clicking <strong className="text-white">&quot;Accept All&quot;</strong>, you consent to:
+                </p>
+                <ul className="text-gray-300 text-xs md:text-sm space-y-1 mb-3 ml-4 list-disc">
+                  <li>Functional cookies for site features and preferences</li>
+                  <li>Google Analytics tracking for site analytics</li>
+                  <li>Google AdSense personalized advertising cookies</li>
+                  <li>Third-party cookies from ad partners</li>
+                </ul>
                 <p className="text-gray-400 text-xs md:text-sm">
-                  You can manage your preferences at any time through your browser settings. For more information, please read our{' '}
+                  You can manage preferences in your browser or visit our{' '}
                   <Link href="/privacy" className="text-[#54FFA4] hover:text-[#45e894] underline">
                     Privacy Policy
                   </Link>
-                  .
+                  {' '}and{' '}
+                  <Link href="/advertising" className="text-[#54FFA4] hover:text-[#45e894] underline">
+                    Advertising Policy
+                  </Link>
+                  {' '}for details.
                 </p>
               </div>
             </div>

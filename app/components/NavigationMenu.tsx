@@ -28,6 +28,9 @@ import {
   Mail,
   FileText,
   Shield,
+  BookOpen,
+  Github,
+  ExternalLink,
 } from 'lucide-react';
 
 export default function NavigationMenu() {
@@ -366,6 +369,20 @@ export default function NavigationMenu() {
               <span className="font-medium">Leaderboards</span>
             </Link>
 
+            {/* Guides */}
+            <Link
+              href="/guides"
+              onClick={handleLinkClick}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                pathname?.startsWith('/guides')
+                  ? 'bg-[#54FFA4]/20 text-[#54FFA4] border border-[#54FFA4]/50'
+                  : 'text-gray-300 hover:bg-[#1a2930] hover:text-white'
+              }`}
+            >
+              <BookOpen className="w-5 h-5" />
+              <span className="font-medium">Guides</span>
+            </Link>
+
             {/* Daily Challenge */}
             <Link
               href="/daily-challenge"
@@ -449,10 +466,10 @@ export default function NavigationMenu() {
           {/* Divider */}
           <div className="h-px bg-[#54FFA4]/20 my-4" />
 
-          {/* Info Section */}
+          {/* Help & Info Section */}
           <div className="space-y-1">
             <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Information
+              Help & Info
             </div>
 
             {/* FAQ */}
@@ -483,20 +500,6 @@ export default function NavigationMenu() {
               <span className="font-medium">About</span>
             </Link>
 
-            {/* Open Source */}
-            <Link
-              href="/open-source"
-              onClick={handleLinkClick}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                pathname === '/open-source'
-                  ? 'bg-[#54FFA4]/20 text-[#54FFA4] border border-[#54FFA4]/50'
-                  : 'text-gray-300 hover:bg-[#1a2930] hover:text-white'
-              }`}
-            >
-              <Code className="w-5 h-5" />
-              <span className="font-medium">Open Source</span>
-            </Link>
-
             {/* Contact */}
             <Link
               href="/contact"
@@ -512,39 +515,41 @@ export default function NavigationMenu() {
             </Link>
           </div>
 
-          {/* Legal Section */}
-          <div className="space-y-1">
-            <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Legal
+          {/* Footer Links - Compact row at bottom of nav */}
+          <div className="mt-6 pt-4 border-t border-[#54FFA4]/10">
+            <div className="px-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-xs text-gray-500">
+              <Link 
+                href="/open-source" 
+                onClick={handleLinkClick}
+                className={`hover:text-[#54FFA4] transition-colors ${pathname === '/open-source' ? 'text-[#54FFA4]' : ''}`}
+              >
+                Open Source
+              </Link>
+              <span className="text-gray-700">•</span>
+              <Link 
+                href="/privacy" 
+                onClick={handleLinkClick}
+                className={`hover:text-[#54FFA4] transition-colors ${pathname === '/privacy' ? 'text-[#54FFA4]' : ''}`}
+              >
+                Privacy
+              </Link>
+              <span className="text-gray-700">•</span>
+              <Link 
+                href="/terms" 
+                onClick={handleLinkClick}
+                className={`hover:text-[#54FFA4] transition-colors ${pathname === '/terms' ? 'text-[#54FFA4]' : ''}`}
+              >
+                Terms
+              </Link>
+              <span className="text-gray-700">•</span>
+              <Link 
+                href="/advertising" 
+                onClick={handleLinkClick}
+                className={`hover:text-[#54FFA4] transition-colors ${pathname === '/advertising' ? 'text-[#54FFA4]' : ''}`}
+              >
+                Ads
+              </Link>
             </div>
-
-            {/* Privacy Policy */}
-            <Link
-              href="/privacy"
-              onClick={handleLinkClick}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                pathname === '/privacy'
-                  ? 'bg-[#54FFA4]/20 text-[#54FFA4] border border-[#54FFA4]/50'
-                  : 'text-gray-300 hover:bg-[#1a2930] hover:text-white'
-              }`}
-            >
-              <Shield className="w-5 h-5" />
-              <span className="font-medium">Privacy Policy</span>
-            </Link>
-
-            {/* Terms of Service */}
-            <Link
-              href="/terms"
-              onClick={handleLinkClick}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                pathname === '/terms'
-                  ? 'bg-[#54FFA4]/20 text-[#54FFA4] border border-[#54FFA4]/50'
-                  : 'text-gray-300 hover:bg-[#1a2930] hover:text-white'
-              }`}
-            >
-              <FileText className="w-5 h-5" />
-              <span className="font-medium">Terms of Service</span>
-            </Link>
           </div>
           </nav>
 

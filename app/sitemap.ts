@@ -1,7 +1,8 @@
 import { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/siteConfig";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://no-px.vercel.app";
+  const baseUrl = SITE_URL;
 
   // Define all minigame routes
   const minigames = [
@@ -21,6 +22,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.8,
+  }));
+
+  // Generate sitemap entries for each guide (high priority for SEO)
+  const guideUrls = minigames.map((game) => ({
+    url: `${baseUrl}/guides/${game}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.85,
   }));
 
   // Other important pages
@@ -124,6 +133,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
+    {
+      url: `${baseUrl}/guides`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    ...guideUrls,
     ...minigameUrls,
     ...otherPages,
   ];

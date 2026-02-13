@@ -184,7 +184,7 @@ export default async function Image() {
               color: '#54FFA4',
             }}
           >
-            no-px.vercel.app
+            nphacks.net
           </div>
         </div>
       </div>

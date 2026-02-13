@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { User, LogOut, Settings, ChevronDown, Flame, Zap, Trophy } from 'lucide-react';
+import { User, LogOut, Settings, ChevronDown, Flame, Zap, Trophy, Link as LinkIcon } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import { useGuide } from '../contexts/GuideContext';
 import { useMediaQuery } from '../utils/useMediaQuery';
@@ -29,6 +29,9 @@ export default function LoginButton() {
   const pathname = usePathname();
   const router = useRouter();
   
+  // Check if user is a guest (has no discordId)
+  const isGuest = isLoggedIn && user && !user.discordId;
+  
   // Refs for keyboard shortcuts and focus management
   const dropdownOpenRef = useRef(dropdownOpen);
   const firstDropdownItemRef = useRef<HTMLAnchorElement>(null);
@@ -39,9 +42,8 @@ export default function LoginButton() {
 
   // Track mount state to prevent flash
   useEffect(() => {
-    // Delay to prevent flash on fast auth checks - increased to 200ms
-    const timeout = setTimeout(() => setMounted(true), 200);
-    return () => clearTimeout(timeout);
+    // Mount immediately to prevent CLS
+    setMounted(true);
   }, []);
 
   // Check if current page has a guide (puzzle pages only)
@@ -118,108 +120,174 @@ export default function LoginButton() {
   };
 
   // Don't show anything while loading OR before mount to prevent flash
+  // Show a placeholder skeleton to prevent CLS
   if (isLoading || !mounted) {
-    return null;
+    return (
+      <div 
+        className="fixed top-4 z-50 transition-all duration-300 ease-in-out" 
+        style={{ right: '16px' }}
+      >
+        {/* Skeleton placeholder matching Discord login button dimensions */}
+        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#5865F2]/20 border border-[#5865F2]/30">
+          {/* Discord icon placeholder */}
+          <div className="w-5 h-5 rounded bg-[#5865F2]/30 animate-pulse" />
+          {/* Text placeholder - hidden on mobile like the real button */}
+          <div className="hidden sm:block w-[130px] h-5 rounded bg-[#5865F2]/30 animate-pulse" />
+          {/* Mobile text placeholder */}
+          <div className="sm:hidden w-[40px] h-5 rounded bg-[#5865F2]/30 animate-pulse" />
+        </div>
+      </div>
+    );
   }
 
   if (isLoggedIn && user) {
     return (
       <div 
-        className="fixed top-4 z-50 user-menu transition-all duration-300 ease-in-out" 
+        className="fixed top-4 z-50 user-menu transition-all duration-300 ease-in-out flex flex-col items-end gap-2" 
         style={{ right: rightPosition }}
       >
-        <button
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="flex items-center gap-3 px-4 py-2 rounded-lg bg-gradient-to-br from-[#0F1B21] to-[#1a2930] border-2 border-[#54FFA4]/30 hover:border-[#54FFA4] transition-all duration-300 shadow-lg"
-        >
-          {/* Avatar */}
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#54FFA4] to-[#45e894] flex items-center justify-center text-[#0F1B21] font-bold overflow-hidden">
-            {user.avatar ? (
-              <Image src={user.avatar} alt={user.displayName || user.username} width={32} height={32} className="w-full h-full rounded-full object-cover" unoptimized />
-            ) : (
-              user.username.charAt(0).toUpperCase()
-            )}
-          </div>
+        <div className="relative">
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className={`
+              flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-300 shadow-lg border-2
+              ${isGuest 
+                ? 'bg-[#1a2930] border-slate-600/50 hover:border-slate-400 text-gray-300' 
+                : 'bg-gradient-to-br from-[#0F1B21] to-[#1a2930] border-[#54FFA4]/30 hover:border-[#54FFA4] text-white'
+              }
+            `}
+          >
+            {/* Avatar */}
+            <div className={`
+              w-8 h-8 rounded-full flex items-center justify-center font-bold overflow-hidden
+              ${isGuest ? 'bg-slate-700 text-gray-400' : 'bg-gradient-to-br from-[#54FFA4] to-[#45e894] text-[#0F1B21]'}
+            `}>
+              {user.avatar ? (
+                <Image src={user.avatar} alt={user.displayName || user.username} width={32} height={32} className="w-full h-full rounded-full object-cover" unoptimized />
+              ) : (
+                <User className="w-5 h-5" />
+              )}
+            </div>
 
-          {/* Username */}
-          <span className="text-white font-medium hidden sm:block">
-            {user.displayName || user.username}
-          </span>
+            {/* Username */}
+            <span className="font-medium hidden sm:block">
+              {isGuest ? `Guest #${user.discriminator}` : (user.displayName || user.username)}
+            </span>
 
-          {/* Dropdown Arrow */}
-          <ChevronDown className={`w-4 h-4 text-[#54FFA4] transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
-        </button>
+            {/* Dropdown Arrow */}
+            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''} ${isGuest ? 'text-gray-400' : 'text-[#54FFA4]'}`} />
+          </button>
 
-        {/* Dropdown Menu */}
-        {dropdownOpen && (
-          <div className="absolute top-full right-0 mt-2 w-64 bg-gradient-to-br from-[#0F1B21] to-[#1a2930] border-2 border-[#54FFA4]/30 rounded-lg shadow-2xl overflow-hidden">
-            {/* User Info */}
-            <div className="px-4 py-3 border-b-2 border-[#54FFA4]/30">
-              <div className="text-white font-medium mb-2">{user.displayName || user.username}</div>
-              <div className="flex items-center gap-3 text-sm">
-                <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#54FFA4]/20 to-[#45e894]/20 px-2.5 py-1 rounded-md border border-[#54FFA4]/40">
-                  <Zap className="w-3.5 h-3.5 text-[#54FFA4]" />
-                  <span className="text-white font-semibold">Lv {user.level}</span>
+          {/* Dropdown Menu */}
+          {dropdownOpen && (
+            <div className="absolute top-full right-0 mt-2 w-72 bg-[#0F1B21] border-2 border-[#54FFA4]/30 rounded-xl shadow-2xl overflow-hidden z-50">
+              {/* User Info Header */}
+              <div className={`px-5 py-4 border-b-2 ${isGuest ? 'border-slate-700/50 bg-slate-800/20' : 'border-[#54FFA4]/20 bg-[#54FFA4]/5'}`}>
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <div className="text-white font-bold text-lg">
+                      {isGuest ? 'Guest User' : (user.displayName || user.username)}
+                    </div>
+                    <div className="text-xs text-gray-400">
+                      {isGuest ? 'Stats not permanently saved' : 'Verified Agent'}
+                    </div>
+                  </div>
+                  {isGuest ? (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                      UNSAVED
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#54FFA4]/20 text-[#54FFA4] border border-[#54FFA4]/30">
+                      VERIFIED
+                    </span>
+                  )}
                 </div>
+                
+                <div className="flex items-center gap-3 text-sm mt-3">
+                  <div className="flex items-center gap-1.5 bg-[#0F1B21] px-2.5 py-1 rounded-md border border-white/10">
+                    <Zap className="w-3.5 h-3.5 text-[#54FFA4]" />
+                    <span className="text-white font-semibold">Lv {user.level}</span>
+                  </div>
+                  <Link
+                    href="/daily-challenge"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center gap-1.5 bg-[#0F1B21] px-2.5 py-1 rounded-md border border-white/10 hover:border-orange-500/50 transition-colors"
+                  >
+                    <Flame className="w-3.5 h-3.5 text-orange-400" />
+                    <span className="text-white font-semibold">{user.currentDailyStreak}</span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Menu Items */}
+              <div className="p-2 space-y-1">
+                {/* Guest CTA - Mobile/Tablet fallback or extra prominence */}
+                {isGuest && (
+                  <button
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      handleLogin();
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-3 bg-[#5865F2]/10 hover:bg-[#5865F2] text-[#5865F2] hover:text-white font-bold rounded-lg transition-all mb-2 group border border-[#5865F2]/20"
+                  >
+                    <div className="bg-[#5865F2] text-white p-1 rounded group-hover:bg-white group-hover:text-[#5865F2] transition-colors">
+                      <LinkIcon className="w-4 h-4" />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-sm">Link Discord</div>
+                      <div className="text-[10px] opacity-80 font-normal">Save your progress forever</div>
+                    </div>
+                  </button>
+                )}
+
                 <Link
-                  href="/daily-challenge"
+                  ref={firstDropdownItemRef}
+                  href="/profile"
                   onClick={() => setDropdownOpen(false)}
-                  className="flex items-center gap-1.5 bg-gradient-to-r from-orange-500/20 to-red-500/20 px-2.5 py-1 rounded-md border border-orange-500/40 hover:from-orange-500/30 hover:to-red-500/30 transition-all cursor-pointer"
-                  title="View Daily Challenge"
+                  className="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:bg-[#1a2930] hover:text-white rounded-lg transition-colors"
                 >
-                  <Flame className="w-3.5 h-3.5 text-orange-400" />
-                  <span className="text-white font-semibold">{user.currentDailyStreak}</span>
+                  <User className="w-4 h-4 text-[#54FFA4]" />
+                  <span>View Profile</span>
                 </Link>
+
+                <Link
+                  href="/settings"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:bg-[#1a2930] hover:text-white rounded-lg transition-colors"
+                >
+                  <Settings className="w-4 h-4 text-gray-400" />
+                  <span>Settings</span>
+                </Link>
+
+                <div className="h-px bg-white/10 my-1 mx-2" />
+
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 px-4 py-2.5 text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-lg transition-colors w-full text-left"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>{isGuest ? 'Delete Guest Data' : 'Logout'}</span>
+                </button>
               </div>
             </div>
+          )}
+        </div>
 
-            {/* Menu Items */}
-            <div className="py-2">
-              <Link
-                ref={firstDropdownItemRef}
-                href="/daily-challenge"
-                onClick={() => setDropdownOpen(false)}
-                className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-[#1a2930] hover:text-white transition-colors"
-              >
-                <Trophy className="w-4 h-4" />
-                <span>Daily Challenge</span>
-              </Link>
-
-              <Link
-                href="/profile"
-                onClick={() => setDropdownOpen(false)}
-                className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-[#1a2930] hover:text-white transition-colors"
-              >
-                <User className="w-4 h-4" />
-                <span>View Profile</span>
-              </Link>
-
-              <Link
-                href="/settings"
-                onClick={() => setDropdownOpen(false)}
-                className="flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-[#1a2930] hover:text-white transition-colors"
-              >
-                <Settings className="w-4 h-4" />
-                <span>Settings</span>
-              </Link>
-
-              <div className="border-t-2 border-[#54FFA4]/30 my-2" />
-
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-3 px-4 py-2 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors w-full text-left"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
-            </div>
-          </div>
+        {/* Guest: Prominent Login Button */}
+        {isGuest && (
+          <button
+            onClick={handleLogin}
+            className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-[#5865F2] text-white font-bold text-sm transition-all duration-300 shadow-lg border-2 border-transparent hover:border-white"
+          >
+            <DiscordIcon className="w-4 h-4" />
+            <span>Login to Save</span>
+          </button>
         )}
       </div>
     );
   }
 
-  // Logged Out - Show Discord Login
+  // Logged Out - Show Discord Login (Fallback if guest logic fails)
   return (
     <button
       onClick={handleLogin}

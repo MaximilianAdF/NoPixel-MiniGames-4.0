@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { clearSession, getSession } from '@/lib/auth/session';
 import { revokeDiscordToken } from '@/lib/auth/discord';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Logout Route
  * POST /api/auth/logout

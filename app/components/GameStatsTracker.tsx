@@ -7,6 +7,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { trackGameEvent } from '../utils/analytics';
 import { trackGameComplete } from '../utils/gtm';
 import { isStandardPreset } from '../utils/gamePresets';
+import ClientPortal from './ClientPortal';
 
 interface GameStatsTrackerProps {
   game: string;
@@ -55,6 +56,23 @@ export default function GameStatsTracker({
   
   // Check if user has already completed today's challenge
   const alreadyCompletedChallenge = challengeId && dailyChallengeStatus?.challengeId === challengeId && dailyChallengeStatus?.completed;
+
+  // Dispatch pause events when modals are open to stop game auto-resets
+  useEffect(() => {
+    const isModalOpen = showChallengeCompleteDialog || showLevelUpNotification;
+    if (isModalOpen) {
+      window.dispatchEvent(new CustomEvent('nphacks:pause'));
+    } else {
+      window.dispatchEvent(new CustomEvent('nphacks:resume'));
+    }
+    
+    // Cleanup on unmount - ensure we resume
+    return () => {
+      if (isModalOpen) {
+        window.dispatchEvent(new CustomEvent('nphacks:resume'));
+      }
+    };
+  }, [showChallengeCompleteDialog, showLevelUpNotification]);
 
   useEffect(() => {
     // Only process when game ends (won or lost)
@@ -198,11 +216,11 @@ export default function GameStatsTracker({
   }
 
   return (
-    <>
+    <ClientPortal selector="body">
       {/* Challenge Complete Dialog - Stops game interaction */}
       {showChallengeCompleteDialog && challengeCompleteData && (
         <div 
-          className="fixed inset-0 bg-black/90 backdrop-blur-md z-[9999] flex items-center justify-center animate-fade-in"
+          className="fixed inset-0 bg-black/90 backdrop-blur-md z-[10000] flex items-center justify-center animate-fade-in"
           onClick={(e) => {
             // Prevent clicks from reaching the game behind
             e.stopPropagation();
@@ -298,7 +316,7 @@ export default function GameStatsTracker({
       {/* Level Up Notification */}
       {showLevelUpNotification && (
         <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in"
+          className="fixed inset-0 bg-black/90 backdrop-blur-md z-[10000] flex items-center justify-center animate-fade-in"
           onClick={dismissLevelUp}
         >
           <div 
@@ -358,6 +376,6 @@ export default function GameStatsTracker({
           animation: scale-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
       `}</style>
-    </>
+    </ClientPortal>
   );
 }

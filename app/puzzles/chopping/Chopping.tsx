@@ -154,38 +154,35 @@ const defaultDuration = 7;
 const defaultGridCols = 6;
 
 const Chopping: FC = () => {
-    const { isChallengeMode, challengeData } = useDailyChallenge();
+    const { isChallengeMode, challengeData, isLoading: isChallengeLoading } = useDailyChallenge();
     const searchParams = useSearchParams();
     const isCompetitive = searchParams?.get('competitive') === 'true';
     
-    // Use challenge data for defaults if in challenge mode
-    const challengeNumLetters = challengeData?.numLetters || defaultNumLetters;
-    const challengeDuration = challengeData?.targetTime ? Math.floor(challengeData.targetTime / 1000) : defaultDuration;
-    
-    const [timer, setTimer] = usePersistantState("chopping-timer", challengeDuration);
-    const [numLetters, setNumLetters] = usePersistantState("chopping-num-letters", challengeNumLetters);
+    // Persistent state for standard play
+    const [savedTimer, setSavedTimer] = usePersistantState("chopping-timer", defaultDuration);
+    const [savedNumLetters, setSavedNumLetters] = usePersistantState("chopping-num-letters", defaultNumLetters);
+
+    // Derived state for active game configuration
+    const activeNumLetters = isChallengeMode && challengeData ? (challengeData.numLetters || defaultNumLetters) : (isCompetitive ? defaultNumLetters : savedNumLetters);
+    const activeTimer = isChallengeMode && challengeData ? (challengeData.targetTime ? Math.floor(challengeData.targetTime / 1000) : defaultDuration) : (isCompetitive ? defaultDuration : savedTimer);
+
     const [activeIndex, setActiveIndex] = useState<number>(0);
-    const [board, setBoard] = useState<Letter[]>(new Array(challengeNumLetters));
-    const [stateBoard, setStateBoard] = useState<LetterState[]>(new Array(challengeNumLetters).fill(''));
+    // Initialize board with activeNumLetters
+    const [board, setBoard] = useState<Letter[]>(new Array(activeNumLetters));
+    const [stateBoard, setStateBoard] = useState<LetterState[]>(new Array(activeNumLetters).fill(''));
     const [allowKeyDown, setAllowKeyDown] = useState(true);
     const [elapsed, setElapsed] = useState(0);
     const isMobileOrTablet = useIsMobileOrTablet();
 
-    // Reset to standard preset when in competitive mode
+    // Reset board when configuration changes
     useEffect(() => {
-        if (isCompetitive) {
-            setNumLetters(defaultNumLetters); // 15
-            setTimer(defaultDuration); // 7
+        // Only reset if we have data or are not in challenge mode
+        if (!isChallengeMode || challengeData) {
+            resetBoard();
         }
-    }, [isCompetitive, setNumLetters, setTimer]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeNumLetters, activeTimer]);
 
-    // Update settings when challenge data loads
-    useEffect(() => {
-        if (challengeData) {
-            setNumLetters(challengeData.numLetters || defaultNumLetters);
-            setTimer(challengeData.targetTime ? Math.floor(challengeData.targetTime / 1000) : defaultDuration);
-        }
-    }, [challengeData, setNumLetters, setTimer]);
     const mobileInputRef = useRef<HTMLInputElement>(null);
     const outerContainerRef = useRef<HTMLDivElement>(null);
     const gameWrapperRef = useRef<HTMLDivElement>(null);
@@ -301,7 +298,7 @@ const Chopping: FC = () => {
     const resetBoard = () => {
         const newBoard: Letter[] = [];
         // Resetting board
-        for (let i = 0; i < numLetters; i++) {
+        for (let i = 0; i < activeNumLetters; i++) {
             newBoard.push(getRandomLetter());
         }
     setBoard(newBoard);
@@ -309,7 +306,7 @@ const Chopping: FC = () => {
     setActiveIndex(0);
     activeIndexRef.current = 0;
 
-        const newStateBoard = new Array(numLetters).fill('');
+        const newStateBoard = new Array(activeNumLetters).fill('');
         setStateBoard(newStateBoard);
         stateBoardRef.current = newStateBoard;
     }
@@ -324,7 +321,7 @@ const Chopping: FC = () => {
         }
     }
 
-    const [gameStatus, setGameStatus, streak] = useGame(timer*1000, statusUpdateHandler);
+    const [gameStatus, setGameStatus, streak] = useGame(activeTimer*1000, statusUpdateHandler);
 
     const { user } = useUser();
 
@@ -453,14 +450,14 @@ const Chopping: FC = () => {
     const [settingsDuration, setSettingsDuration] = useState(defaultDuration);
 
     useEffect(() => {
-        setSettingsNumLetters(numLetters);
-        setSettingsDuration(timer);
+        setSettingsNumLetters(savedNumLetters);
+        setSettingsDuration(savedTimer);
 
         if (gameStatus !== 4) {
             resetGame();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [numLetters, timer]);
+        }, [savedNumLetters, savedTimer]);
 
     useEffect(() => {
         if (!isMobileOrTablet || typeof window === 'undefined' || !window.visualViewport) return;
@@ -544,16 +541,16 @@ const Chopping: FC = () => {
 
     const settings = {
         handleSave: () => {
-            setNumLetters(settingsNumLetters);
-            setTimer(settingsDuration);
+            setSavedNumLetters(settingsNumLetters);
+            setSavedTimer(settingsDuration);
             setGameStatus(4);
         },
 
         handleReset: () => {
             setSettingsNumLetters(defaultNumLetters);
             setSettingsDuration(defaultDuration);
-            setNumLetters(defaultNumLetters);
-            setTimer(defaultDuration);
+            setSavedNumLetters(defaultNumLetters);
+            setSavedTimer(defaultDuration);
             setGameStatus(4);
         },
 
@@ -577,13 +574,21 @@ const Chopping: FC = () => {
         )
     }
 
+    if (isChallengeLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#54FFA4]"></div>
+            </div>
+        );
+    }
+
     return (
         <>
             <LeaderboardEligibleBadge
                 game="chopping"
                 gameSettings={{
-                    letters: numLetters,
-                    timer: timer,
+                    letters: activeNumLetters,
+                    timer: activeTimer,
                 }}
             />
             <GameStatsTracker
@@ -591,12 +596,12 @@ const Chopping: FC = () => {
                 gameStatus={gameStatus}
                 score={activeIndex}
                 elapsedMs={elapsed}
-                targetScore={numLetters}
+                targetScore={activeNumLetters}
                 wonStatus={3}
                 lostStatus={2}
                 gameSettings={{
-                    letters: numLetters,
-                    timer: timer,
+                    letters: activeNumLetters,
+                    timer: activeTimer,
                 }}
             />
             <div ref={outerContainerRef} className="flex flex-col gap-4">
@@ -622,7 +627,7 @@ const Chopping: FC = () => {
                         title="Alphabet"
                         description="Tap the letters in order"
                         buttons={[]}
-                        countdownDuration={timer * 1000}
+                        countdownDuration={activeTimer * 1000}
                         elapsedCallback={setElapsed}
                         resetCallback={handleRetry}
                         resetDelay={3000}
@@ -688,14 +693,14 @@ const Chopping: FC = () => {
                         >
                             <div className='game-grid' style={{ height: '100%', width: '100%' }}>
                                 {/* Memoized grid rows - only affected rows re-render */}
-                                {Array.from({ length: Math.ceil(numLetters / defaultGridCols) }).map((_, rowIndex) => (
+                                {Array.from({ length: Math.ceil(activeNumLetters / defaultGridCols) }).map((_, rowIndex) => (
                                     <GridRow
                                         key={rowIndex}
                                         rowIndex={rowIndex}
                                         board={board}
                                         stateBoard={stateBoard}
                                         activeIndex={activeIndex}
-                                        numLetters={numLetters}
+                                        numLetters={activeNumLetters}
                                         gridCols={defaultGridCols}
                                     />
                                 ))}

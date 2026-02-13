@@ -9,6 +9,16 @@ export const gilroy = localFont({
     },
   ],
   variable: "--font-gilroy",
+  display: "swap",
+  preload: true,
+  fallback: [
+    "system-ui",
+    "-apple-system",
+    "BlinkMacSystemFont",
+    "Segoe UI",
+    "Roboto",
+    "sans-serif",
+  ],
 });
 
 export const gilroyNpTitle = localFont({
@@ -20,6 +30,16 @@ export const gilroyNpTitle = localFont({
     },
   ],
   variable: "--font-gilroy-np-title",
+  display: "swap",
+  preload: true,
+  fallback: [
+    "system-ui",
+    "-apple-system",
+    "BlinkMacSystemFont",
+    "Segoe UI",
+    "Roboto",
+    "sans-serif",
+  ],
 });
 
 export default gilroy;
