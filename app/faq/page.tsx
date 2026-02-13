@@ -1,4 +1,13 @@
 import { HelpCircle, Gamepad2, Trophy, Shield, Zap, Users } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'FAQ - Frequently Asked Questions About NoPixel 4.0 Minigames',
+  description: 'Find answers to common questions about the NoPixel 4.0 Minigames practice simulator. Learn about our free hacking practice tools, leaderboards, mobile support, and more.',
+  alternates: {
+    canonical: 'https://no-px.vercel.app/faq',
+  },
+};
 
 export default function FAQPage() {
   const faqs = [

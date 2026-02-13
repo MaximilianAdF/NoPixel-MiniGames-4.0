@@ -144,7 +144,7 @@ export const viewport: Viewport = {
   viewportFit: 'cover', // This allows content to extend into safe areas
 };
 
-  // exported fonts moved to app/fonts.ts to avoid importing layout into client bundles
+// exported fonts moved to app/fonts.ts to avoid importing layout into client bundles
 const AppAnalytics = dynamic(() => import('./components/AppAnalytics'), { ssr: false });
 
 export default function RootLayout({
@@ -168,10 +168,10 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="color-scheme" content="dark" />
-        
+
         {/* Google Tag Manager - Replace GTM-XXXXXXX with your actual GTM ID */}
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
-        
+
         {/* Session Tracking */}
         <Script id="session-tracker" strategy="afterInteractive">
           {`
@@ -181,7 +181,7 @@ export default function RootLayout({
             }
           `}
         </Script>
-        
+
         {/* JSON-LD Structured Data for better SEO */}
         <script
           type="application/ld+json"
@@ -200,12 +200,6 @@ export default function RootLayout({
               "description": "Free practice simulator for NoPixel 4.0 GTA RP hacking minigames. Master Thermite, Lockpick, Laundromat, Roof Running and more with real-time leaderboards.",
               "url": "https://no-px.vercel.app",
               "image": "https://no-px.vercel.app/opengraph-image",
-              "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": "4.8",
-                "ratingCount": "1250",
-                "bestRating": "5"
-              },
               "featureList": [
                 "Thermite Hack Practice",
                 "Lockpick Training",
@@ -240,7 +234,7 @@ export default function RootLayout({
       >
         {/* Google Tag Manager NoScript Fallback */}
         <GoogleTagManagerNoScript gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
-        
+
         <Background />
         <LoadingProvider>
           <UserProvider>
