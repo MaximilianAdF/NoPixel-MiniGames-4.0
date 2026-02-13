@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { Trophy, Medal, Award, Flame, Zap, TrendingUp, Gamepad2, ChevronDown, ChevronRight, User, Play, Info } from 'lucide-react';
+import { Trophy, Medal, Award, Flame, Zap, TrendingUp, Gamepad2, ChevronDown, ChevronRight, User, Play, Info, Filter, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useUser } from '../contexts/UserContext';
@@ -22,6 +22,7 @@ interface LeaderboardEntry {
   value: number;
   secondaryValue?: number;
   verified?: boolean;
+  isGuest?: boolean;
 }
 
 const leaderboardCategories = {
@@ -58,6 +59,8 @@ export default function LeaderboardsClient() {
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const requestIdRef = useRef(0);
   const pendingUpdateRef = useRef<{ leaderboard: string; page: number } | null>(null);
+  const [filterMode, setFilterMode] = useState<'all' | 'players' | 'guests'>('all');
+  const [jumpToPage, setJumpToPage] = useState('');
 
   const fetchLeaderboard = useCallback(async () => {
     // Prevent duplicate fetches
@@ -72,7 +75,7 @@ export default function LeaderboardsClient() {
       abortControllerRef.current.abort();
     }
     abortControllerRef.current = new AbortController();
-    
+
     // Generate unique request ID to track this specific request
     const currentRequestId = ++requestIdRef.current;
 
@@ -80,33 +83,33 @@ export default function LeaderboardsClient() {
     if (!isInitialLoad && leaderboard.length > 0) {
       setIsTransitioning(true);
     }
-    
+
     // Only show skeleton on initial load
     if (isInitialLoad) {
       setLoading(true);
     }
-    
+
     try {
-      const response = await fetch(`/api/stats/leaderboard?type=${activeLeaderboard}&limit=10&page=${currentPage}`, {
+      const response = await fetch(`/api/stats/leaderboard?type=${activeLeaderboard}&limit=10&page=${currentPage}&filter=${filterMode}`, {
         signal: abortControllerRef.current.signal,
       });
       if (response.ok) {
         const data = await response.json();
-        
+
         // Check if this is still the latest request
         if (currentRequestId !== requestIdRef.current) {
           // A newer request has been made, discard this data
           return;
         }
-        
+
         // Update pagination info
         if (data.pagination) {
           setTotalPages(data.pagination.totalPages);
         }
-        
+
         // Store new data in next state for smooth transition
         const newEntries = data.entries || [];
-        
+
         // If transitioning, wait for fade out before updating
         if (isTransitioning && !isInitialLoad) {
           setNextLeaderboard(newEntries);
@@ -124,11 +127,11 @@ export default function LeaderboardsClient() {
           // Immediate update on initial load
           setLeaderboard(newEntries);
         }
-        
+
         // If user is logged in, fetch their rank
         if (user?.id) {
           const userEntry = (data.entries || []).find((entry: LeaderboardEntry) => entry.userId === user.id);
-          
+
           if (userEntry) {
             // User is in top 10
             setUserRank(null); // User is already visible
@@ -173,7 +176,7 @@ export default function LeaderboardsClient() {
         hasFetchedRef.current = false;
       }, 100);
     }
-  }, [activeLeaderboard, currentPage, user?.id, isInitialLoad, isTransitioning, leaderboard.length]);
+  }, [activeLeaderboard, currentPage, user?.id, isInitialLoad, isTransitioning, leaderboard.length, filterMode]);
 
   // Fetch leaderboard when dependencies change (with smart debouncing)
   useEffect(() => {
@@ -181,29 +184,29 @@ export default function LeaderboardsClient() {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
-    
+
     // Store pending update info
     pendingUpdateRef.current = {
       leaderboard: activeLeaderboard,
       page: currentPage
     };
-    
+
     // For initial load, fetch immediately
     if (isInitialLoad) {
       fetchLeaderboard();
       return;
     }
-    
+
     // For category/page changes, use minimal debounce (50ms) 
     // This is fast enough to feel instant but prevents rapid-fire duplicates
     debounceTimerRef.current = setTimeout(() => {
       // Only fetch if this is still the pending update (handles rapid switching)
-      if (pendingUpdateRef.current?.leaderboard === activeLeaderboard && 
-          pendingUpdateRef.current?.page === currentPage) {
+      if (pendingUpdateRef.current?.leaderboard === activeLeaderboard &&
+        pendingUpdateRef.current?.page === currentPage) {
         fetchLeaderboard();
       }
     }, 50);
-    
+
     // Cleanup on unmount or dependency change
     return () => {
       if (debounceTimerRef.current) {
@@ -211,16 +214,32 @@ export default function LeaderboardsClient() {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeLeaderboard, currentPage, user?.id]);
+  }, [activeLeaderboard, currentPage, user?.id, filterMode]);
 
   const handleLeaderboardChange = (newLeaderboard: LeaderboardType) => {
     setActiveLeaderboard(newLeaderboard);
-    setCurrentPage(1); // Reset to first page when changing leaderboards
+    setCurrentPage(1);
+    setJumpToPage('');
   };
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
+      setJumpToPage('');
+    }
+  };
+
+  const handleFilterChange = (newFilter: 'all' | 'players' | 'guests') => {
+    setFilterMode(newFilter);
+    setCurrentPage(1);
+    setJumpToPage('');
+  };
+
+  const handleJumpToPage = () => {
+    const page = parseInt(jumpToPage);
+    if (!isNaN(page) && page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      setJumpToPage('');
     }
   };
 
@@ -245,13 +264,13 @@ export default function LeaderboardsClient() {
   const formatLeaderboardValue = (value: number) => {
     // Time-based games (all except word-memory)
     const timeBasedGames = ['thermite', 'lockpick', 'laundromat', 'pincracker', 'chopping', 'roof-running'];
-    
+
     if (timeBasedGames.includes(activeLeaderboard)) {
       // Convert ms to seconds with 2 decimal places
       const seconds = (value / 1000).toFixed(2);
       return `${seconds}s`;
     }
-    
+
     // Score-based (word-memory) or level/streak
     return value.toLocaleString();
   };
@@ -266,7 +285,7 @@ export default function LeaderboardsClient() {
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Header - hidden since SSR page has it */}
         <div className="mb-8 animate-fade-in sr-only">
           <h1 className="text-4xl font-bold text-white mb-2">Leaderboards</h1>
@@ -274,11 +293,11 @@ export default function LeaderboardsClient() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-fade-in-up-delay-1">
-          
+
           {/* Sidebar - Category Navigation */}
           <div className="lg:col-span-1">
             <div className="bg-gradient-to-br from-[#1a2930] to-[#0F1B21] border-2 border-[#54FFA4]/30 rounded-2xl overflow-hidden shadow-2xl sticky top-4">
-              
+
               {/* General Category */}
               <div>
                 <button
@@ -291,7 +310,7 @@ export default function LeaderboardsClient() {
                   </div>
                   {expandedCategories.has('general') ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                 </button>
-                
+
                 {expandedCategories.has('general') && (
                   <div className="divide-y divide-[#54FFA4]/20">
                     {leaderboardCategories.general.map((option) => {
@@ -301,11 +320,10 @@ export default function LeaderboardsClient() {
                           key={option.id}
                           onClick={() => handleLeaderboardChange(option.id as LeaderboardType)}
                           disabled={isTransitioning && activeLeaderboard !== option.id}
-                          className={`w-full px-6 py-3 flex items-center gap-3 transition-all duration-200 ${
-                            activeLeaderboard === option.id
+                          className={`w-full px-6 py-3 flex items-center gap-3 transition-all duration-200 ${activeLeaderboard === option.id
                               ? 'bg-gradient-to-r from-[#54FFA4]/20 to-[#45e894]/20 border-l-4 border-[#54FFA4] text-white'
                               : 'text-gray-300 hover:bg-[#0F1B21]/30'
-                          } ${isTransitioning && activeLeaderboard !== option.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            } ${isTransitioning && activeLeaderboard !== option.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                           <Icon className={`w-4 h-4 transition-colors duration-200 ${activeLeaderboard === option.id ? 'text-[#54FFA4]' : 'text-gray-400'}`} />
                           <span className="text-sm font-medium">{option.name}</span>
@@ -328,7 +346,7 @@ export default function LeaderboardsClient() {
                   </div>
                   {expandedCategories.has('minigames') ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                 </button>
-                
+
                 {expandedCategories.has('minigames') && (
                   <div className="divide-y divide-[#54FFA4]/20">
                     {leaderboardCategories.minigames.map((option) => {
@@ -342,18 +360,17 @@ export default function LeaderboardsClient() {
                         }
                         return null;
                       };
-                      
+
                       return (
                         <button
                           key={option.id}
                           onClick={() => handleLeaderboardChange(option.id as LeaderboardType)}
                           disabled={isTransitioning && activeLeaderboard !== option.id}
-                          className={`w-full px-6 py-3 flex items-center gap-3 transition-all duration-200 ${
-                            activeLeaderboard === option.id
+                          className={`w-full px-6 py-3 flex items-center gap-3 transition-all duration-200 ${activeLeaderboard === option.id
                               ? 'bg-gradient-to-r from-[#54FFA4]/20 to-[#45e894]/20 border-l-4 border-[#54FFA4] text-white'
                               : 'text-gray-300 hover:bg-[#0F1B21]/30'
-                          } ${isTransitioning && activeLeaderboard !== option.id ? 'opacity-50 cursor-not-allowed' : ''
-                          }`}
+                            } ${isTransitioning && activeLeaderboard !== option.id ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                         >
                           <div className={`transition-colors duration-200 ${activeLeaderboard === option.id ? 'text-[#54FFA4]' : 'text-gray-400'}`}>
                             {renderIcon()}
@@ -371,7 +388,7 @@ export default function LeaderboardsClient() {
 
           {/* Main Content - Leaderboard Table */}
           <div className="lg:col-span-3">
-            
+
             {/* Active Leaderboard Header */}
             <div className="mb-4 bg-gradient-to-br from-[#1a2930] to-[#0F1B21] border-2 border-[#54FFA4]/30 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
               {/* Loading bar indicator during transitions */}
@@ -380,7 +397,7 @@ export default function LeaderboardsClient() {
                   <div className="h-full bg-[#54FFA4] animate-loading-bar"></div>
                 </div>
               )}
-              
+
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -406,7 +423,7 @@ export default function LeaderboardsClient() {
                   </div>
                   <p className="text-gray-400">{activeOption?.description}</p>
                 </div>
-                
+
                 {/* Play Competitively Button (for minigames only) */}
                 {!['level', 'streak'].includes(activeLeaderboard) && (
                   <Link
@@ -417,7 +434,7 @@ export default function LeaderboardsClient() {
                     Play Competitively
                   </Link>
                 )}
-                
+
                 {/* Play Daily Challenge Button (for streak leaderboard) */}
                 {activeLeaderboard === 'streak' && (
                   <Link
@@ -431,6 +448,30 @@ export default function LeaderboardsClient() {
               </div>
             </div>
 
+            {/* Filter Bar */}
+            <div className="mb-4 flex items-center gap-3">
+              <Filter className="w-4 h-4 text-gray-400" />
+              <div className="flex gap-2">
+                {[
+                  { value: 'all' as const, label: 'All Players' },
+                  { value: 'players' as const, label: 'Discord Users' },
+                  { value: 'guests' as const, label: 'Guests Only' },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => handleFilterChange(option.value)}
+                    disabled={isTransitioning}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${filterMode === option.value
+                        ? 'bg-[#54FFA4]/20 text-[#54FFA4] border border-[#54FFA4]/50'
+                        : 'bg-[#0F1B21]/50 text-gray-400 border border-white/10 hover:border-[#54FFA4]/30 hover:text-gray-200'
+                      } ${isTransitioning ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Leaderboard Table */}
             <div className="bg-gradient-to-br from-[#1a2930] to-[#0F1B21] border-2 border-[#54FFA4]/30 rounded-2xl overflow-hidden shadow-2xl">
               {/* Table Header */}
@@ -439,13 +480,13 @@ export default function LeaderboardsClient() {
                   <div className="col-span-1">Rank</div>
                   <div className="col-span-6 md:col-span-5">Player</div>
                   <div className="col-span-3 md:col-span-3 text-right">
-                    {activeLeaderboard === 'level' 
-                      ? 'Level' 
-                      : activeLeaderboard === 'streak' 
-                      ? 'Streak' 
-                      : activeLeaderboard === 'word-memory'
-                      ? 'Words'
-                      : 'Time'}
+                    {activeLeaderboard === 'level'
+                      ? 'Level'
+                      : activeLeaderboard === 'streak'
+                        ? 'Streak'
+                        : activeLeaderboard === 'word-memory'
+                          ? 'Words'
+                          : 'Time'}
                   </div>
                   <div className="hidden md:block md:col-span-3 text-right">
                     {activeLeaderboard === 'level' ? 'Total XP' : activeLeaderboard === 'streak' ? 'Best Streak' : 'Games Played'}
@@ -454,10 +495,9 @@ export default function LeaderboardsClient() {
               </div>
 
               {/* Table Body */}
-              <div 
-                className={`divide-y-2 divide-[#54FFA4]/20 transition-opacity duration-150 ${
-                  isTransitioning ? 'opacity-0' : 'opacity-100'
-                }`}
+              <div
+                className={`divide-y-2 divide-[#54FFA4]/20 transition-opacity duration-150 ${isTransitioning ? 'opacity-0' : 'opacity-100'
+                  }`}
               >
                 {leaderboard.length === 0 && loading ? (
                   // Show skeleton rows only on initial load (when there's no data yet)
@@ -493,9 +533,8 @@ export default function LeaderboardsClient() {
                       <Link
                         key={`${entry.userId}-${activeLeaderboard}-${currentPage}`}
                         href={`/profile/${entry.userId}`}
-                        className={`block px-6 py-4 hover:bg-[#0F1B21]/60 transition-all duration-200 cursor-pointer ${
-                          entry.rank <= 3 ? 'bg-[#0F1B21]/30' : index % 2 === 0 ? 'bg-[#0F1B21]/10' : 'bg-[#0F1B21]/5'
-                        } ${entry.userId === user?.id ? '!bg-[#54FFA4]/5 border-l-4 border-[#54FFA4]' : ''}`}
+                        className={`block px-6 py-4 hover:bg-[#0F1B21]/60 transition-all duration-200 cursor-pointer ${entry.rank <= 3 ? 'bg-[#0F1B21]/30' : index % 2 === 0 ? 'bg-[#0F1B21]/10' : 'bg-[#0F1B21]/5'
+                          } ${entry.userId === user?.id ? '!bg-[#54FFA4]/5 border-l-4 border-[#54FFA4]' : ''}`}
                       >
                         <div className="grid grid-cols-12 gap-4 items-center">
                           {/* Rank */}
@@ -524,6 +563,9 @@ export default function LeaderboardsClient() {
                               </div>
                               <div className="text-gray-400 text-sm">@{entry.username}</div>
                             </div>
+                            {entry.isGuest && (
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 self-center">GUEST</span>
+                            )}
                           </div>
 
                           {/* Score/Level/Streak */}
@@ -541,7 +583,7 @@ export default function LeaderboardsClient() {
                         </div>
                       </Link>
                     ))}
-                    
+
                     {/* User's Rank (if not in top 10) */}
                     {userRank && (
                       <>
@@ -605,35 +647,77 @@ export default function LeaderboardsClient() {
 
             {/* Pagination Controls */}
             {!loading && totalPages > 1 && (
-              <div className={`mt-6 flex items-center justify-center gap-4 transition-opacity duration-150 ${
-                isTransitioning ? 'opacity-50 pointer-events-none' : 'opacity-100'
-              }`}>
+              <div className={`mt-6 flex items-center justify-center gap-3 flex-wrap transition-opacity duration-150 ${isTransitioning ? 'opacity-50 pointer-events-none' : 'opacity-100'
+                }`}>
+                {/* First Page */}
+                <button
+                  onClick={() => handlePageChange(1)}
+                  disabled={currentPage === 1 || isTransitioning}
+                  className={`p-2 rounded-lg transition-all ${currentPage === 1 || isTransitioning
+                      ? 'text-gray-600 cursor-not-allowed'
+                      : 'text-gray-300 hover:text-[#54FFA4] hover:bg-[#0F1B21]/80'
+                    }`}
+                  title="First page"
+                >
+                  <ChevronsLeft className="w-5 h-5" />
+                </button>
+
+                {/* Previous */}
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1 || isTransitioning}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    currentPage === 1 || isTransitioning
+                  className={`px-4 py-2 rounded-lg font-medium transition-all ${currentPage === 1 || isTransitioning
                       ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed'
                       : 'bg-[#0F1B21]/80 border border-[#54FFA4]/30 text-gray-300 hover:text-[#54FFA4] hover:border-[#54FFA4] hover:shadow-lg'
-                  }`}
+                    }`}
                 >
                   Previous
                 </button>
-                
-                <div className="text-gray-300 font-medium">
-                  Page {currentPage} of {totalPages}
+
+                {/* Jump to Page */}
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400 text-sm">Page</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={totalPages}
+                    value={jumpToPage || currentPage}
+                    onChange={(e) => setJumpToPage(e.target.value)}
+                    onFocus={() => setJumpToPage(String(currentPage))}
+                    onBlur={() => {
+                      if (jumpToPage) handleJumpToPage();
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleJumpToPage();
+                    }}
+                    className="w-16 px-2 py-1.5 text-center text-sm bg-[#0F1B21] border border-[#54FFA4]/30 rounded-lg text-white focus:outline-none focus:border-[#54FFA4] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <span className="text-gray-400 text-sm">of {totalPages}</span>
                 </div>
-                
+
+                {/* Next */}
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages || isTransitioning}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    currentPage === totalPages || isTransitioning
+                  className={`px-4 py-2 rounded-lg font-medium transition-all ${currentPage === totalPages || isTransitioning
                       ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed'
                       : 'bg-[#0F1B21]/80 border border-[#54FFA4]/30 text-gray-300 hover:text-[#54FFA4] hover:border-[#54FFA4] hover:shadow-lg'
-                  }`}
+                    }`}
                 >
                   Next
+                </button>
+
+                {/* Last Page */}
+                <button
+                  onClick={() => handlePageChange(totalPages)}
+                  disabled={currentPage === totalPages || isTransitioning}
+                  className={`p-2 rounded-lg transition-all ${currentPage === totalPages || isTransitioning
+                      ? 'text-gray-600 cursor-not-allowed'
+                      : 'text-gray-300 hover:text-[#54FFA4] hover:bg-[#0F1B21]/80'
+                    }`}
+                  title="Last page"
+                >
+                  <ChevronsRight className="w-5 h-5" />
                 </button>
               </div>
             )}
@@ -644,11 +728,11 @@ export default function LeaderboardsClient() {
 
         {/* Info Modal */}
         {showInfoModal && (
-          <div 
+          <div
             className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
             onClick={() => setShowInfoModal(false)}
           >
-            <div 
+            <div
               className="bg-gradient-to-br from-[#1a2930] to-[#0F1B21] border-2 border-[#54FFA4]/30 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
@@ -754,7 +838,7 @@ export default function LeaderboardsClient() {
         )}
 
       </div>
-      
+
       <style jsx>{`
         @keyframes fade-in {
           from {

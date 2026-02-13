@@ -29,11 +29,14 @@ export async function GET(request: NextRequest) {
       // If not found, create new guest user
       if (!user) {
         const now = new Date();
+        const discriminator = crypto.randomUUID().slice(0, 6).toUpperCase();
         const guestUser = {
-          username: 'Guest',
-          discriminator: Math.floor(1000 + Math.random() * 9000).toString(),
+          username: `Guest#${discriminator}`,
+          displayName: `Guest#${discriminator}`,
+          discriminator: discriminator,
           avatar: '', // Default avatar
           guestDeviceId: guestDeviceId,
+          isGuest: true,
           verified: false,
           level: 1,
           totalXP: 0,
@@ -57,7 +60,20 @@ export async function GET(request: NextRequest) {
 
         const result = await db.collection('users').insertOne(guestUser);
         user = { ...guestUser, _id: result.insertedId };
+      } else {
+        // Update lastSeenAt for returning guest
+        await db.collection('users').updateOne(
+          { _id: user._id },
+          { $set: { lastSeenAt: new Date() } }
+        );
+        user.lastSeenAt = new Date();
       }
+
+      // Calculate days until cleanup for guest warning
+      const lastSeen = new Date(user.lastSeenAt || user.createdAt);
+      const cleanupThresholdDays = (user.totalGamesPlayed || 0) > 0 ? 90 : 30;
+      const daysSinceLastSeen = Math.floor((Date.now() - lastSeen.getTime()) / (1000 * 60 * 60 * 24));
+      const daysUntilCleanup = Math.max(0, cleanupThresholdDays - daysSinceLastSeen);
 
       // Create session for guest
       const sessionPayload = {
@@ -79,13 +95,15 @@ export async function GET(request: NextRequest) {
 
       const token = await createSessionToken(sessionPayload);
       await setSessionCookie(token);
-      
+
       return NextResponse.json({
         user: {
           ...sessionPayload.user,
+          isGuest: true,
           verified: false,
           totalXP: user.totalXP || 0,
           longestDailyStreak: user.longestDailyStreak || 0,
+          daysUntilCleanup,
         },
       });
     }
@@ -97,7 +115,7 @@ export async function GET(request: NextRequest) {
     // Fetch fresh user data from database
     const client = await clientPromise;
     const db = client.db('nopixel');
-    
+
     const user = await db.collection('users').findOne({
       _id: new ObjectId(session.user.id),
     });
@@ -110,20 +128,20 @@ export async function GET(request: NextRequest) {
     let currentDailyStreak = user.currentDailyStreak || 0;
     const now = new Date();
     const today = now.toISOString().split('T')[0];
-    
+
     // Only check streak once per UTC day to avoid unnecessary DB writes
     const lastStreakCheck = user.lastStreakCheck;
     const needsStreakCheck = !lastStreakCheck || lastStreakCheck !== today;
-    
+
     if (needsStreakCheck && currentDailyStreak > 0 && user.lastDailyChallengeDate) {
       const yesterday = new Date(now);
       yesterday.setDate(yesterday.getDate() - 1);
       const yesterdayStr = yesterday.toISOString().split('T')[0];
-      
+
       // Reset streak if last challenge was not completed today or yesterday
       if (user.lastDailyChallengeDate !== today && user.lastDailyChallengeDate !== yesterdayStr) {
         currentDailyStreak = 0;
-        
+
         // Update the database to reset the streak and mark today as checked
         await db.collection('users').updateOne(
           { _id: new ObjectId(session.user.id) },

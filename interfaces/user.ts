@@ -3,17 +3,18 @@ export interface User {
   _id: string;
   discordId?: string;
   guestDeviceId?: string;
+  isGuest?: boolean;
   username: string;
   discriminator: string;
   avatar: string;
   email?: string;
-  
+
   // Profile
   displayName?: string;
   bio?: string;
   joinedAt: Date;
   lastSeenAt: Date;
-  
+
   // Stats (aggregated)
   totalGamesPlayed: number;
   totalTimePlayedMs: number;
@@ -22,7 +23,7 @@ export interface User {
   currentDailyStreak: number;
   longestDailyStreak: number;
   lastDailyChallengeDate?: string; // YYYY-MM-DD
-  
+
   // Preferences
   preferences: {
     volume: number;
@@ -36,11 +37,11 @@ export interface User {
       description: string;
     }>;
   };
-  
+
   // Achievements & Badges
   achievements: string[]; // Achievement IDs
   badges: string[]; // Badge IDs
-  
+
   // Meta
   createdAt: Date;
   updatedAt: Date;
@@ -51,33 +52,33 @@ export interface GameStats {
   _id: string;
   userId: string;
   game: GameType;
-  
+
   // Performance
   gamesPlayed: number;
   bestScore: number;
   averageScore: number;
   totalTimePlayedMs: number;
-  
+
   // Progress
   firstPlayedAt: Date;
   lastPlayedAt: Date;
   currentStreak: number; // Days in a row
   longestStreak: number;
-  
+
   // Recent games (last 10)
   recentScores: number[];
   recentDates: Date[];
-  
+
   // Trends
   improvementRate: number; // Percentage
   consistencyScore: number; // 0-100
-  
+
   // Meta
   updatedAt: Date;
 }
 
 // Game Types
-export type GameType = 
+export type GameType =
   | 'thermite'
   | 'lockpick'
   | 'pincracker'
@@ -92,17 +93,17 @@ export interface DailyChallenge {
   _id: string;
   date: string; // YYYY-MM-DD
   game: GameType;
-  
+
   // Challenge parameters
   preset: 'easy' | 'medium' | 'hard' | 'extreme';
   targetScore: number;
   targetTime?: number; // milliseconds
   specialCondition?: string;
-  
+
   // Rewards
   xpReward: number;
   badgeReward?: string;
-  
+
   // Metadata
   createdAt: Date;
 }
@@ -113,20 +114,20 @@ export interface UserChallengeProgress {
   userId: string;
   challengeId: string;
   date: string; // YYYY-MM-DD
-  
+
   completed: boolean;
   completedAt?: Date;
-  
+
   attempts: number;
   bestAttempt: {
     score: number;
     time: number;
     mistakes: number;
   };
-  
+
   xpEarned: number;
   badgeEarned?: string;
-  
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -139,14 +140,14 @@ export interface Achievement {
   icon: string;
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
   category: 'performance' | 'consistency' | 'volume' | 'special' | 'challenge';
-  
+
   // Unlock conditions
   condition: {
     type: string; // 'score', 'streak', 'games_played', etc.
     game?: GameType;
     threshold: number;
   };
-  
+
   xpReward: number;
 }
 
@@ -162,6 +163,8 @@ export interface UserSession {
     level: number;
     xp: number;
     currentDailyStreak: number;
+    isGuest?: boolean;
+    daysUntilCleanup?: number;
     preferences?: {
       volume: number;
       notifications: boolean;

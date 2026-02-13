@@ -151,7 +151,7 @@ export const viewport: Viewport = {
   viewportFit: 'cover', // This allows content to extend into safe areas
 };
 
-  // exported fonts moved to app/fonts.ts to avoid importing layout into client bundles
+// exported fonts moved to app/fonts.ts to avoid importing layout into client bundles
 const AppAnalytics = dynamic(() => import('./components/AppAnalytics'), { ssr: false });
 
 export default function RootLayout({
@@ -176,7 +176,7 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="color-scheme" content="dark" />
-        
+
         {/* Google AdSense Verification for nphacks.net */}
         <Script
           async
@@ -184,10 +184,10 @@ export default function RootLayout({
           crossOrigin="anonymous"
           strategy="beforeInteractive"
         />
-        
+
         {/* Google Tag Manager - Replace GTM-XXXXXXX with your actual GTM ID */}
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
-        
+
         {/* Session Tracking - Load after page is interactive */}
         <Script id="session-tracker" strategy="lazyOnload">
           {`
@@ -197,7 +197,7 @@ export default function RootLayout({
             }
           `}
         </Script>
-        
+
         {/* JSON-LD Structured Data for better SEO */}
         <script
           type="application/ld+json"
@@ -246,7 +246,7 @@ export default function RootLayout({
             })
           }}
         />
-        
+
         {/* FAQ Schema for rich snippets */}
         <script
           type="application/ld+json"
@@ -291,7 +291,7 @@ export default function RootLayout({
             })
           }}
         />
-        
+
         {/* BreadcrumbList Schema */}
         <script
           type="application/ld+json"
@@ -337,7 +337,7 @@ export default function RootLayout({
       >
         {/* Google Tag Manager NoScript Fallback */}
         <GoogleTagManagerNoScript gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
-        
+
         <Background />
         <LoadingProvider>
           <UserProvider>

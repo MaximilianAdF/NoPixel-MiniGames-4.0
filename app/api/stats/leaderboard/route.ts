@@ -20,12 +20,21 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get("limit") || "10");
     const page = parseInt(searchParams.get("page") || "1");
     const userId = searchParams.get("userId");
+    const filter = searchParams.get("filter") || "all"; // all, players, guests
 
     // Calculate offset for pagination
     const skip = (page - 1) * limit;
 
     const client = await clientPromise;
     const db = client.db("nopixel");
+
+    // Build user filter based on filter param
+    let userFilter: Record<string, any> = {};
+    if (filter === "players") {
+      userFilter = { discordId: { $exists: true, $ne: null } };
+    } else if (filter === "guests") {
+      userFilter = { $or: [{ discordId: { $exists: false } }, { discordId: null }] };
+    }
 
     let leaderboard;
 
@@ -59,16 +68,17 @@ export async function GET(request: Request) {
               value: user.level || 1,
               secondaryValue: user.totalXP || 0,
               verified: user.verified || false,
+              isGuest: !user.discordId,
             },
           });
         }
 
         // Ranked by level, then by totalXP
-        const levelTotalCount = await db.collection("users").countDocuments({});
+        const levelTotalCount = await db.collection("users").countDocuments(userFilter);
 
         leaderboard = await db
           .collection("users")
-          .find({})
+          .find(userFilter)
           .sort({ level: -1, totalXP: -1 })
           .skip(skip)
           .limit(limit)
@@ -85,6 +95,7 @@ export async function GET(request: Request) {
             value: user.level || 1,
             secondaryValue: user.totalXP || 0,
             verified: user.verified || false,
+            isGuest: !user.discordId,
           })),
           pagination: {
             currentPage: page,
@@ -126,6 +137,7 @@ export async function GET(request: Request) {
               value: user.longestDailyStreak || 0,
               secondaryValue: user.currentDailyStreak || 0,
               verified: user.verified || false,
+              isGuest: !user.discordId,
             },
           });
         }
@@ -133,11 +145,11 @@ export async function GET(request: Request) {
         // Ranked by longest daily streak (highest streak ever achieved)
         const streakTotalCount = await db
           .collection("users")
-          .countDocuments({});
+          .countDocuments(userFilter);
 
         leaderboard = await db
           .collection("users")
-          .find({})
+          .find(userFilter)
           .sort({ longestDailyStreak: -1, currentDailyStreak: -1 })
           .skip(skip)
           .limit(limit)
@@ -154,6 +166,7 @@ export async function GET(request: Request) {
             value: user.longestDailyStreak || 0,
             secondaryValue: user.currentDailyStreak || 0,
             verified: user.verified || false,
+            isGuest: !user.discordId,
           })),
           pagination: {
             currentPage: page,
@@ -219,6 +232,7 @@ export async function GET(request: Request) {
               value: isTimeBased ? userStat.bestTime : userStat.bestScore,
               secondaryValue: userStat.gamesPlayed || 0,
               verified: user?.verified || false,
+              isGuest: !user?.discordId,
             },
           });
         }
@@ -227,17 +241,27 @@ export async function GET(request: Request) {
         const sortField = isTimeBased ? "bestTime" : "bestScore";
         const sortOrder = isTimeBased ? 1 : -1; // Ascending for time, descending for score
 
-        const gameTotalCount = await db.collection("gameStats").countDocuments({
+        // Build game stats filter
+        let gameFilter: Record<string, any> = {
           game: type,
           isLeaderboardEligible: true,
-        });
+        };
+
+        // If filtering by player type, get eligible userIds first
+        if (filter !== "all") {
+          const filteredUsers = await db
+            .collection("users")
+            .find(userFilter, { projection: { _id: 1 } })
+            .toArray();
+          const filteredUserIds = filteredUsers.map((u) => u._id.toString());
+          gameFilter.userId = { $in: filteredUserIds };
+        }
+
+        const gameTotalCount = await db.collection("gameStats").countDocuments(gameFilter);
 
         const gameStats = await db
           .collection("gameStats")
-          .find({
-            game: type,
-            isLeaderboardEligible: true,
-          })
+          .find(gameFilter)
           .sort({ [sortField]: sortOrder })
           .skip(skip)
           .limit(limit)
@@ -265,6 +289,7 @@ export async function GET(request: Request) {
               value: isTimeBased ? stat.bestTime : stat.bestScore,
               secondaryValue: stat.gamesPlayed || 0,
               verified: user?.verified || false,
+              isGuest: !user?.discordId,
             };
           }),
           pagination: {
