@@ -7,12 +7,12 @@ export const metadata: Metadata = {
     description: 'Science-backed techniques to improve your reaction speed, hand-eye coordination, and cognitive performance for NoPixel 4.0 minigames. Practical exercises and lifestyle tips.',
     keywords: ['improve reaction time', 'reaction speed training', 'GTA RP skills', 'gaming performance', 'hand-eye coordination', 'cognitive performance gaming'],
     alternates: {
-        canonical: 'https://no-px.vercel.app/guides/improving-reaction-time',
+        canonical: 'https://nphacks.net/guides/improving-reaction-time',
     },
     openGraph: {
         title: 'How to Improve Reaction Time for GTA RP Minigames',
         description: 'Science-backed techniques to boost your reaction speed and cognitive performance for NoPixel minigames.',
-        url: 'https://no-px.vercel.app/guides/improving-reaction-time',
+        url: 'https://nphacks.net/guides/improving-reaction-time',
     },
 };
 

@@ -2,14 +2,6 @@ import { HelpCircle, Gamepad2, Trophy, Shield, Zap, Users } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'FAQ - Frequently Asked Questions About NoPixel 4.0 Minigames',
-  description: 'Find answers to common questions about the NoPixel 4.0 Minigames practice simulator. Learn about our free hacking practice tools, leaderboards, mobile support, and more.',
-  alternates: {
-    canonical: 'https://no-px.vercel.app/faq',
-  },
-};
-
-export const metadata = {
   title: 'FAQ - NoPixel 4.0 Minigames Trainer',
   description: 'Frequently asked questions about NoPixel 4.0 Minigames Trainer. Learn how to practice Thermite, Lockpick, PinCracker and other GTA RP heist minigames.',
   openGraph: {

@@ -7,12 +7,12 @@ export const metadata: Metadata = {
     description: 'Everything you need to know about NoPixel 4.0 heists. Learn which hacking minigames each heist requires, how to plan crew roles, and strategies for successful bank robberies.',
     keywords: ['NoPixel heist guide', 'GTA RP bank robbery', 'NoPixel 4.0 heists', 'Fleeca bank hack', 'Pacific Standard heist', 'NoPixel criminal guide'],
     alternates: {
-        canonical: 'https://no-px.vercel.app/guides/nopixel-heist-guide',
+        canonical: 'https://nphacks.net/guides/nopixel-heist-guide',
     },
     openGraph: {
         title: 'Complete Guide to NoPixel 4.0 Heists - Planning, Hacks & Execution',
         description: 'Everything you need to plan and execute successful heists in NoPixel 4.0, from Fleeca Banks to the Pacific Standard vault.',
-        url: 'https://no-px.vercel.app/guides/nopixel-heist-guide',
+        url: 'https://nphacks.net/guides/nopixel-heist-guide',
     },
 };
 

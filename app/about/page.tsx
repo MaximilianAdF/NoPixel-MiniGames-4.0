@@ -3,14 +3,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'About NoPixel 4.0 Minigames - Free GTA RP Hacking Practice Simulator',
-  description: 'Learn about the NoPixel 4.0 Minigames practice simulator — a free, open-source platform helping GTA RP players master hacking minigames like Thermite, Lockpick, PinCracker, and more.',
-  alternates: {
-    canonical: 'https://no-px.vercel.app/about',
-  },
-};
-
-export const metadata = {
   title: 'About Us - NoPixel 4.0 Minigames Trainer',
   description: 'Learn about NoPixel 4.0 Minigames Trainer - A free, open-source practice tool for GTA RP players to master Thermite, Lockpick, PinCracker and other heist minigames.',
   openGraph: {

@@ -7,12 +7,12 @@ export const metadata: Metadata = {
     description: 'Learn how to master the Thermite hacking minigame in NoPixel 4.0. Expert memory techniques, pattern recognition strategies, and pro tips for conquering bank heist laser systems.',
     keywords: ['thermite hack guide', 'NoPixel thermite tutorial', 'thermite strategy', 'NoPixel bank heist', 'thermite tips', 'GTA RP thermite hack'],
     alternates: {
-        canonical: 'https://no-px.vercel.app/guides/mastering-thermite',
+        canonical: 'https://nphacks.net/guides/mastering-thermite',
     },
     openGraph: {
         title: 'Mastering Thermite Hacks in NoPixel 4.0 - Complete Strategy Guide',
         description: 'Expert strategies and memory techniques to conquer the hardest hacking minigame in NoPixel 4.0.',
-        url: 'https://no-px.vercel.app/guides/mastering-thermite',
+        url: 'https://nphacks.net/guides/mastering-thermite',
     },
 };
 
