@@ -60,7 +60,8 @@
     /* Prevent iOS text size adjustment */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
-    overflow-x: hidden;
+    /* `clip` (not `hidden`) — `hidden` implicitly promotes overflow-y to `auto`, breaking scroll. */
+    overflow-x: clip;
     /* Enable GPU acceleration for smoother scrolling */
     -webkit-overflow-scrolling: touch;
   }
@@ -75,7 +76,7 @@
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     position: relative;
-    overflow-x: hidden;
+    overflow-x: clip;
     /* Improve rendering performance */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
