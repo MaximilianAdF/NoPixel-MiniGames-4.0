@@ -106,12 +106,12 @@ export default function GameStatsTracker({
     
     // Save stats only if logged in
     if (isLoggedIn) {
-      saveGameStats(won);
+      recordGame(won);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameStatus, isLoggedIn, wonStatus, lostStatus]);
 
-  const saveGameStats = async (won: boolean) => {
+  const recordGame = async (won: boolean) => {
     try {
       // If this is a daily challenge
       if (challengeId) {
@@ -161,7 +161,7 @@ export default function GameStatsTracker({
       }
 
       // Save regular game stats (only when NOT a daily challenge)
-      const response = await fetch('/api/stats/save', {
+      const response = await fetch('/api/stats/record-game', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -6,7 +6,7 @@ import { ObjectId } from 'mongodb';
 import { calculateDifficultyMultiplier } from '@/app/utils/difficultyCalculator';
 import { rateLimit } from '@/lib/rateLimit';
 
-export interface SaveGameStatsRequest {
+export interface RecordGameRequest {
   game: GameType;
   score: number;
   timePlayedMs: number; // Changed from timeMs to match GameStatsTracker
@@ -17,7 +17,7 @@ export interface SaveGameStatsRequest {
 }
 
 /**
- * POST /api/stats/save
+ * POST /api/stats/record-game
  *
  * Records a game completion against the player's account: increments the
  * lifetime games/time totals, awards XP, and recomputes the player's level.
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       return rateLimitResult;
     }
 
-    const body: SaveGameStatsRequest = await request.json();
+    const body: RecordGameRequest = await request.json();
 
     // Validate request
     if (!body.game || body.score === undefined || body.timePlayedMs === undefined) {

@@ -428,7 +428,7 @@ export default function ProfilePage() {
 }
 
 function calculateXPForLevel(level: number): number {
-  // This must match the inverse of the server's formula in /app/api/stats/save/route.ts
+  // This must match the inverse of the server's formula in /app/api/stats/record-game/route.ts
   // Server formula: level = floor(cbrt(xp / 25)) + 1
   // Inverse: xp = (level - 1)³ * 25
   if (level === 1) return 0;
