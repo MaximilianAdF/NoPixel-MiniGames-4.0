@@ -38,6 +38,7 @@ interface GameShellProps {
   targetScore?: number;
   hideTimer?: boolean;
   className?: string;
+  minHeight?: string;
   children: ReactNode;
 }
 
@@ -57,6 +58,7 @@ export default function GameShell({
   targetScore,
   hideTimer,
   className,
+  minHeight = 'min-h-[400px]',
   children,
 }: GameShellProps) {
   const [settingsVisible, setSettingsVisible] = useState(false);
@@ -75,11 +77,12 @@ export default function GameShell({
       )}
       <div
         className={classNames(
-          'max-h-full max-w-full min-h-[400px] rounded-lg overflow-hidden touch-manipulation',
+          'max-h-full max-w-full rounded-lg overflow-hidden touch-manipulation flex flex-col',
+          minHeight,
           className,
         )}
       >
-        <div className="max-h-full max-w-full relative p-2 sm:p-3 flex flex-col justify-center bg-[rgb(7_19_32)]">
+        <div className="max-h-full max-w-full relative p-2 sm:p-3 flex flex-col justify-center bg-[rgb(7_19_32)] flex-1">
           <div className="grid grid-cols-[auto_min-content] mb-3 sm:mb-4">
             <div className="flex items-center gap-2 sm:gap-4">
               <Image
@@ -166,7 +169,7 @@ export default function GameShell({
               </div>
             )}
           </div>
-          <div className="w-full pb-2 flex-1">{children}</div>
+          <div className="w-full pb-2 flex-1 flex flex-col">{children}</div>
           <div className="flex flex-col w-full gap-1">
             {buttons.map((row, rowIndex) => (
               <div className="flex gap-1 *:flex-1" key={rowIndex}>

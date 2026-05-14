@@ -249,15 +249,14 @@ const NPLockpick: FC<NPLockpickProps> = ({
       >
         <div
           className={classNames(
-            'aspect-square max-h-full max-w-full rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-center relative',
+            'w-full rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-center',
             phase === 'idle' && 'blur',
           )}
-          style={{
-            maxWidth: `calc(100vh - 298px)`,
-            width: `calc(100vw - 64px)`,
-          }}
         >
-          <div className="aspect-square flex items-center justify-center size-full absolute">
+          <div
+            className="aspect-square flex items-center justify-center relative"
+            style={{ width: '100%', maxWidth: `calc(100vh - 298px)` }}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               version="1.1"

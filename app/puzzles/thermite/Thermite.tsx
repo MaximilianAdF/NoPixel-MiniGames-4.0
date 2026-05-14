@@ -290,7 +290,7 @@ const Thermite: FC = () => {
           className={classNames('thermite', phase === 'idle' && 'blur')}
           style={{
             maxWidth: `calc(calc(calc(calc(calc(100vh - 236px) - ${4 * (state.rows - 1)}px) / ${state.rows}) * ${state.columns}) + ${2 * (state.columns - 1)}px)`,
-            width: `calc(100vw - 64px)`,
+            width: '100%',
             gridTemplateRows: `repeat(${state.rows}, minmax(0, 1fr))`,
             gridTemplateColumns: `repeat(${state.columns}, minmax(0, 1fr))`,
           }}

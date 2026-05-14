@@ -185,6 +185,7 @@ const WordMemory: FC = () => {
       <GameShell
         title="Word Memory"
         description="Memorize the words seen"
+        minHeight="min-h-[280px]"
         phase={phase}
         result={result}
         durationMs={activeTimer * 1000}
@@ -208,11 +209,13 @@ const WordMemory: FC = () => {
         ]}
         settings={isChallengeMode ? undefined : settings}
       >
-        <p className="text-white text-2xl text-center w-full">
-          {state.round}/{state.numWords}
-        </p>
-        <div className="h-32 w-[750px] max-w-full rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-center text-white text-5xl">
-          <p>{currentWord}</p>
+        <div className="flex w-full flex-col flex-1 rounded-lg bg-[rgba(0,28,49,0.3)] text-white">
+          <p className="pt-4 text-center text-2xl">
+            {state.round}/{state.numWords}
+          </p>
+          <div className="flex flex-1 items-center justify-center text-5xl">
+            <p>{currentWord}</p>
+          </div>
         </div>
       </GameShell>
     </>
