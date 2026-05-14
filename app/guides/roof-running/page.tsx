@@ -6,6 +6,14 @@ export const metadata: Metadata = {
   title: 'Roof Running Guide - Master NoPixel 4.0 Tile Clearing Puzzle | Expert Tips',
   description: 'Complete guide to mastering the Roof Running minigame in NoPixel 4.0. Learn tile group clearing, gravity mechanics, and strategic color matching techniques.',
   keywords: ['roof running guide', 'NoPixel roof running', 'tile clearing tutorial', 'color matching tips', 'GTA RP puzzle hack'],
+  alternates: {
+    canonical: 'https://nphacks.net/guides/roof-running',
+  },
+  openGraph: {
+    title: 'Roof Running Guide - Master NoPixel 4.0 Tile Clearing Puzzle | Expert Tips',
+    description: 'Complete guide to mastering the Roof Running minigame in NoPixel 4.0. Learn tile group clearing, gravity mechanics, and strategic color matching techniques.',
+    url: 'https://nphacks.net/guides/roof-running',
+  },
 };
 
 export default function RoofRunningGuidePage() {

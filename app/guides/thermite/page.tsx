@@ -8,6 +8,14 @@ export const metadata: Metadata = {
   title: 'Thermite Hack Guide - Master NoPixel 4.0 Memory Pattern Grid | Expert Tips',
   description: 'Complete guide to mastering the Thermite hack in NoPixel 4.0. Learn pattern memorization, sequence recall strategies, and pro tips for bank heist laser security.',
   keywords: ['thermite hack guide', 'NoPixel thermite', 'memory pattern hack', 'thermite tips', 'GTA RP thermite strategy', 'bank heist hack'],
+  alternates: {
+    canonical: 'https://nphacks.net/guides/thermite',
+  },
+  openGraph: {
+    title: 'Thermite Hack Guide - Master NoPixel 4.0 Memory Pattern Grid | Expert Tips',
+    description: 'Complete guide to mastering the Thermite hack in NoPixel 4.0. Learn pattern memorization, sequence recall strategies, and pro tips for bank heist laser security.',
+    url: 'https://nphacks.net/guides/thermite',
+  },
 };
 
 export default function ThermiteGuidePage() {

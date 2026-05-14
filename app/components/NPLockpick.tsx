@@ -10,7 +10,6 @@ import { trackGameStart, trackGameRetry } from '@/app/utils/gtm';
 import { useUser } from '@/app/contexts/UserContext';
 import { NPSettingsRange } from '@/app/components/NPSettings';
 import GameStatsTracker from './GameStatsTracker';
-import LeaderboardEligibleBadge from './LeaderboardEligibleBadge';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
@@ -36,7 +35,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
   gameId = 'lockpick',
   isCompetitive = false,
 }) => {
-  const { isChallengeMode, challengeData, isLoading: isChallengeLoading } = useDailyChallenge();
+  const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const { user } = useUser();
 
   const [savedLevels, setSavedLevels, levelsHydrated] = usePersistantState(
@@ -64,7 +63,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
         ? countdownDuration
         : savedTimer;
 
-  const mode: GameMode = isChallengeMode
+  const mode: GameMode = isChallengeMode && !isCompleted
     ? 'daily-challenge'
     : isCompetitive
       ? 'competitive'
@@ -200,10 +199,6 @@ const NPLockpick: FC<NPLockpickProps> = ({
 
   return (
     <>
-      <LeaderboardEligibleBadge
-        game={gameId}
-        gameSettings={{ levels: activeLevels, timer: activeTimer }}
-      />
       <GameStatsTracker
         game={gameId as any}
         gameStatus={legacyStatus}

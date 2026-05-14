@@ -6,7 +6,6 @@ import { Zap, Trophy, Flame } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { trackGameEvent } from '../utils/analytics';
 import { trackGameComplete } from '../utils/gtm';
-import { isStandardPreset } from '../utils/gamePresets';
 import ClientPortal from './ClientPortal';
 
 interface GameStatsTrackerProps {
@@ -25,11 +24,6 @@ interface StatsResponse {
   xpEarned: number;
   leveledUp: boolean;
   newLevel?: number;
-  stats: {
-    bestScore: number;
-    averageScore: number;
-    gamesPlayed: number;
-  };
 }
 
 export default function GameStatsTracker({
@@ -98,7 +92,6 @@ export default function GameStatsTracker({
       result: won ? 'win' : 'loss',
       score: score,
       time: elapsedMs / 1000, // Convert to seconds
-      is_standard_preset: isStandardPreset(game, gameSettings || {}),
       is_logged_in: isLoggedIn,
     });
     
@@ -113,12 +106,12 @@ export default function GameStatsTracker({
     
     // Save stats only if logged in
     if (isLoggedIn) {
-      saveGameStats(won);
+      recordGame(won);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameStatus, isLoggedIn, wonStatus, lostStatus]);
 
-  const saveGameStats = async (won: boolean) => {
+  const recordGame = async (won: boolean) => {
     try {
       // If this is a daily challenge
       if (challengeId) {
@@ -168,7 +161,7 @@ export default function GameStatsTracker({
       }
 
       // Save regular game stats (only when NOT a daily challenge)
-      const response = await fetch('/api/stats/save', {
+      const response = await fetch('/api/stats/record-game', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -288,10 +281,7 @@ export default function GameStatsTracker({
             </div>
             
             <button
-              onClick={() => {
-                setShowChallengeCompleteDialog(false);
-                router.push('/daily-challenge');
-              }}
+              onClick={() => router.push('/daily-challenge')}
               className="w-full bg-gradient-to-r from-[#54FFA4] to-[#45e894] text-[#0F1B21] font-bold py-3 px-6 rounded-lg hover:from-[#45e894] hover:to-[#54FFA4] transition-all duration-300 transform hover:scale-105"
             >
               Back to Daily Challenges

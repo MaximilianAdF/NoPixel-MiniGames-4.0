@@ -17,7 +17,6 @@ export interface GameCompleteEvent {
   result: 'win' | 'loss';
   score: number;
   time: number;
-  is_standard_preset: boolean;
   is_logged_in: boolean;
 }
 

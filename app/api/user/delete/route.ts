@@ -41,7 +41,6 @@ export async function DELETE() {
       userDeleted = true;
 
       await Promise.all([
-        db.collection('gameStats').deleteMany({ userId }, { session: mongoSession }),
         db.collection('userChallengeProgress').deleteMany({ userId }, { session: mongoSession }),
         db.collection('analyticsEvents').deleteMany({ userId }, { session: mongoSession }),
       ]);

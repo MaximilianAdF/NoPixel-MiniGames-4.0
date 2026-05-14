@@ -12,7 +12,6 @@ import { useUser } from '@/app/contexts/UserContext';
 import { NPSettingsRange } from '@/app/components/NPSettings';
 import NPButton from '@/app/components/NPButton';
 import GameStatsTracker from '@/app/components/GameStatsTracker';
-import LeaderboardEligibleBadge from '@/app/components/LeaderboardEligibleBadge';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
@@ -26,7 +25,7 @@ const defaultDuration = 20;
 const defaultPinLength = 4;
 
 const Pincracker: FC = () => {
-  const { isChallengeMode, challengeData, isLoading: isChallengeLoading } = useDailyChallenge();
+  const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const searchParams = useSearchParams();
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
@@ -56,7 +55,7 @@ const Pincracker: FC = () => {
         ? 24
         : savedTimer;
 
-  const mode: GameMode = isChallengeMode
+  const mode: GameMode = isChallengeMode && !isCompleted
     ? 'daily-challenge'
     : isCompetitive
       ? 'competitive'
@@ -269,10 +268,6 @@ const Pincracker: FC = () => {
 
   return (
     <>
-      <LeaderboardEligibleBadge
-        game="pincracker"
-        gameSettings={{ pinLength: activePinLength, timer: activeTimer }}
-      />
       <GameStatsTracker
         game="pincracker"
         gameStatus={legacyStatus}

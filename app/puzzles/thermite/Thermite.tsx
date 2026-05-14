@@ -12,7 +12,6 @@ import { useUser } from '@/app/contexts/UserContext';
 import { NPSettingsRange } from '@/app/components/NPSettings';
 import NPButton from '@/app/components/NPButton';
 import GameStatsTracker from '@/app/components/GameStatsTracker';
-import LeaderboardEligibleBadge from '@/app/components/LeaderboardEligibleBadge';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
@@ -23,7 +22,7 @@ import backgroundImg from '@/public/images/thermite/background.svg';
 import './style.css';
 
 const Thermite: FC = () => {
-  const { isChallengeMode, challengeData, isLoading: isChallengeLoading } = useDailyChallenge();
+  const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const searchParams = useSearchParams();
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
@@ -75,7 +74,7 @@ const Thermite: FC = () => {
         ? presets[0].columns
         : savedColumns;
 
-  const mode: GameMode = isChallengeMode
+  const mode: GameMode = isChallengeMode && !isCompleted
     ? 'daily-challenge'
     : isCompetitive
       ? 'competitive'
@@ -250,15 +249,6 @@ const Thermite: FC = () => {
 
   return (
     <>
-      <LeaderboardEligibleBadge
-        game="thermite"
-        gameSettings={{
-          timer: activeTimer,
-          targetScore: activeTargetScore,
-          rows: activeRows,
-          columns: activeColumns,
-        }}
-      />
       <GameStatsTracker
         game="thermite"
         gameStatus={legacyStatus}

@@ -3,9 +3,6 @@ import RoofRunning from "@/app/puzzles/roof-running/RoofRunning";
 import PuzzleBackButton from "@/app/components/PuzzleBackButton";
 import PuzzlePageWrapper from "@/app/puzzles/PuzzlePageWrapper";
 
-// Force dynamic rendering for daily challenges
-export const dynamic = 'force-dynamic';
-
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -15,12 +12,12 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "🏃 Roof Running Trainer - Perfect Your NoPixel 4.0 Timing (FREE)",
-  description: "💨 Nail every AC-Unit jump! Practice NoPixel Roof Running with authentic mechanics. Used by pro criminals for house robberies. Global leaderboards • Expert guides • Mobile-friendly. Train your timing now!",
+  title: "Roof Running Minigame",
+  description: "Practice the Roof Running minigame from NoPixel 4.0 GTA RP. Clear the board by removing groups of matching coloured blocks. Free browser trainer, no download required.",
   keywords: ["roof running", "NoPixel roof running", "GTA RP roof running", "AC unit hack", "NoPixel 4.0 roof running", "parkour minigame", "house robbery", "roof running timing"],
   openGraph: {
-    title: "🏃 Master NoPixel Roof Running - FREE Parkour Trainer",
-    description: "💨 Nail every AC-Unit jump! Practice authentic NoPixel mechanics. Join criminals perfecting their house robbery timing.",
+    title: "Roof Running Minigame - NoPixel 4.0 Practice",
+    description: "Practice the Roof Running minigame from NoPixel 4.0 GTA RP. Clear the board by removing groups of matching coloured blocks. Free browser trainer, no download required.",
     url: "https://nphacks.net/puzzles/roof-running",
   },
   alternates: {
@@ -30,29 +27,7 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <PuzzlePageWrapper
-      title="Roof Running Puzzle"
-      gameName="Roof Running"
-      description="Roof Running is a unique color-matching puzzle used when stealing AC units from rooftops in NoPixel 4.0. This minigame features an 11x8 grid filled with colored cubes (red, green, blue) that you must clear by clicking groups of connected same-colored blocks. The physics-based mechanics cause remaining cubes to fall and shift left, creating new groupings. Clear the entire board before time runs out to successfully steal the AC unit and escape with your loot."
-      difficulty="Medium"
-      avgTime="30-45 seconds"
-      inGameUse="AC Unit Theft"
-      howToPlay={[
-        "Survey the 11x8 grid of colored cubes (red, green, blue)",
-        "Click on groups of 2+ connected same-colored cubes to remove them",
-        "Watch as remaining cubes fall down and shift left",
-        "Plan ahead - new groupings form after each move",
-        "Clear all cubes from the board before time expires"
-      ]}
-      tips={[
-        "Start from the bottom to create larger chain reactions",
-        "Look for the largest connected groups first",
-        "Single cubes cannot be removed - plan to avoid orphans",
-        "Work from right to left as cubes shift leftward",
-        "Take a moment to scan the board before making moves"
-      ]}
-      guideUrl="/guides/roof-running"
-    >
+    <PuzzlePageWrapper>
       <PuzzleBackButton />
       <RoofRunning />
     </PuzzlePageWrapper>

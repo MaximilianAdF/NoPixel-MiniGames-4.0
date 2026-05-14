@@ -170,7 +170,7 @@ export default function RepairKitInstructions() {
                     <li><strong>Mistake neutrality</strong> - Don&apos;t dwell on misses, immediately reset mental state</li>
                     <li><strong>Breathing control</strong> - Deep breaths between stages maintain calm focus</li>
                     <li><strong>Confidence building</strong> - Track improvement over time to build self-belief</li>
-                    <li><strong>Pressure inoculation</strong> - Practice with stakes (compete on leaderboards) to handle stress</li>
+                    <li><strong>Pressure inoculation</strong> - Practice with stakes to handle stress</li>
                     <li><strong>Autopilot trust</strong> - Let muscle memory execute, don&apos;t overthink</li>
                 </ul>
                 <p className="mt-2">

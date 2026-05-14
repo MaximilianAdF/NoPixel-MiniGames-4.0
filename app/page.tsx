@@ -105,13 +105,6 @@ export default function Home() {
                 "price": "0",
                 "priceCurrency": "USD"
               },
-              "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": "4.8",
-                "ratingCount": "1250",
-                "bestRating": "5",
-                "worstRating": "1"
-              },
               "screenshot": "https://nphacks.net/images/og-image.png",
               "featureList": [
                 "Thermite Hacking Practice",
@@ -161,7 +154,9 @@ export default function Home() {
             <div className="relative flex flex-col sm:flex-row items-center sm:items-start justify-center gap-2 sm:gap-4">
               {/* NoPixel - Large on the left */}
               <h1 className="relative group cursor-pointer text-center sm:text-left">
-                <span 
+                <span className="sr-only">NoPixel 4.0 Minigames — Hacking Simulator</span>
+                <span
+                  aria-hidden="true"
                   className="inline-block text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black bg-clip-text text-transparent transition-transform duration-500 group-hover:translate-x-2 animate-gradient-flow"
                   style={{ 
                     fontFamily: 'var(--font-orbitron)', 
@@ -352,7 +347,7 @@ export default function Home() {
               Global Leaderboards
             </h2>
             <p className="text-gray-400 text-lg mb-6 max-w-2xl mx-auto hover:text-gray-300 transition-colors duration-300">
-              Compete with players worldwide! Visit the <Link href="/leaderboards" className="text-spring-green-400 hover:text-spring-green-300 font-semibold underline">Leaderboards</Link> page to see top performers for each minigame.
+              Compete with players worldwide! Visit the <Link href="/leaderboards" className="text-spring-green-400 hover:text-spring-green-300 font-semibold underline">Leaderboards</Link> page to see the top players by level and daily streak.
             </p>
           </div>
 
@@ -432,7 +427,7 @@ export default function Home() {
                       "name": "Can I compete with other players?",
                       "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Absolutely! Each minigame features global leaderboards where you can track your performance, compare scores, and compete with players worldwide."
+                        "text": "Absolutely! Our global leaderboards rank players by level and daily challenge streak. Earn XP and build your streak to climb the rankings and compete with players worldwide."
                       }
                     },
                     {
@@ -482,7 +477,7 @@ export default function Home() {
               <div className="border-l-4 border-spring-green-500/30 pl-6 hover:border-spring-green-500 transition-colors duration-300">
                 <h3 className="text-xl font-bold text-white mb-2">Can I compete with other players?</h3>
                 <p className="leading-relaxed">
-                  Absolutely! Each minigame features global leaderboards where you can track your performance, compare scores, and compete with players worldwide.
+                  Absolutely! Our global leaderboards rank players by level and daily challenge streak. Earn XP and build your streak to climb the rankings and compete with players worldwide.
                 </p>
               </div>
               

@@ -78,10 +78,10 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://nphacks.net'),
   applicationName: 'NoPixel 4.0 Minigames',
   title: {
-    default: "NoPixel 4.0 Minigames - Free Practice Simulator for GTA RP Hacking 🎮",
+    default: "NoPixel 4.0 Minigames - Free Practice Trainer for GTA RP Hacking",
     template: "%s | NoPixel 4.0 Practice"
   },
-  description: "★★★★★ Master NoPixel 4.0 hacking minigames FREE! Practice Thermite, Lockpick, VAR, Laundromat & more GTA RP challenges. Real-time leaderboards, expert tips, mobile-friendly. 100% risk-free training for FiveM & GTA roleplay. Start now!",
+  description: "Free practice trainers for the NoPixel 4.0 GTA RP hacking minigames - Thermite, Lockpick, Laundromat, Roof Running and more. Authentic mechanics, no download required.",
   icons: {
     icon: '/icon',
     shortcut: '/icon',
@@ -116,15 +116,15 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://nphacks.net',
-    title: 'NoPixel 4.0 Minigames - Free GTA RP Hacking Practice Simulator 🎮',
-    description: '⭐ Master NoPixel hacks FREE! Practice Thermite, Lockpick, VAR & more. Global leaderboards, expert strategies, mobile-friendly. The #1 GTA RP training simulator!',
+    title: 'NoPixel 4.0 Minigames - Free GTA RP Hacking Practice',
+    description: 'Free practice trainers for NoPixel 4.0 GTA RP hacking minigames. Authentic mechanics, daily challenges, and in-depth guides.',
     siteName: 'NoPixel 4.0 Minigames',
     // Next.js will automatically use /app/opengraph-image.tsx
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NoPixel 4.0 Minigames - Free GTA RP Hacking Simulator 🎮',
-    description: '⭐ Master NoPixel hacks FREE! Practice Thermite, Lockpick, VAR & more. #1 GTA RP training tool with leaderboards & expert tips!',
+    title: 'NoPixel 4.0 Minigames - Free GTA RP Hacking Practice',
+    description: 'Free practice trainers for NoPixel 4.0 GTA RP hacking minigames. Authentic mechanics, daily challenges, and in-depth guides.',
     // Next.js will automatically use /app/opengraph-image.tsx
   },
   robots: {
@@ -198,125 +198,29 @@ export default function RootLayout({
           `}
         </Script>
 
-        {/* JSON-LD Structured Data for better SEO */}
+        {/* JSON-LD: site-wide Organization + WebSite */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "WebApplication",
-              "name": "NoPixel 4.0 Minigames",
-              "applicationCategory": "GameApplication",
-              "operatingSystem": "Any",
-              "browserRequirements": "Requires JavaScript. Requires HTML5.",
-              "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "USD"
-              },
-              "description": "Free practice simulator for NoPixel 4.0 GTA RP hacking minigames. Master Thermite, Lockpick, Laundromat, Roof Running and more with real-time leaderboards.",
-              "url": "https://nphacks.net",
-              "image": "https://nphacks.net/opengraph-image",
-              "screenshot": "https://nphacks.net/opengraph-image",
-              "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": "4.8",
-                "ratingCount": "1250",
-                "bestRating": "5"
-              },
-              "featureList": [
-                "Thermite Hack Practice",
-                "Lockpick Training",
-                "Laundromat Minigame",
-                "Roof Running Challenge",
-                "Word Memory Test",
-                "Pin Cracker",
-                "Chopping Game",
-                "Repair Kit",
-                "Global Leaderboards",
-                "Daily Challenges",
-                "Expert Guides",
-                "Mobile Support"
-              ],
-              "author": {
-                "@type": "Organization",
-                "name": "NoPixel Minigames",
-                "url": "https://nphacks.net"
-              }
-            })
-          }}
-        />
-
-        {/* FAQ Schema for rich snippets */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              "mainEntity": [
+              "@graph": [
                 {
-                  "@type": "Question",
-                  "name": "What is NoPixel 4.0 Minigames?",
-                  "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "NoPixel 4.0 Minigames is a free practice simulator for GTA RP hacking minigames. It lets you master hacks like Thermite, Lockpick, and more before attempting them in-game."
-                  }
+                  "@type": "Organization",
+                  "@id": "https://nphacks.net/#organization",
+                  "name": "NoPixel Minigames",
+                  "url": "https://nphacks.net",
+                  "logo": "https://nphacks.net/icon",
+                  "sameAs": [
+                    "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0"
+                  ]
                 },
                 {
-                  "@type": "Question",
-                  "name": "Is this practice tool free?",
-                  "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes, NoPixel Minigames is completely free to use with unlimited practice attempts, global leaderboards, and daily challenges."
-                  }
-                },
-                {
-                  "@type": "Question",
-                  "name": "What minigames can I practice?",
-                  "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "You can practice 8 different minigames: Thermite (memory patterns), Lockpick (timing), PIN Cracker (logic), Laundromat (symbol matching), Roof Running (tile clearing), Word Memory (recognition), Chopping (typing), and Repair Kit (precision timing)."
-                  }
-                },
-                {
-                  "@type": "Question",
-                  "name": "Does this work on mobile?",
-                  "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes, all minigames are fully optimized for mobile devices with touch controls and responsive design."
-                  }
-                }
-              ]
-            })
-          }}
-        />
-
-        {/* BreadcrumbList Schema */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              "itemListElement": [
-                {
-                  "@type": "ListItem",
-                  "position": 1,
-                  "name": "Home",
-                  "item": "https://nphacks.net"
-                },
-                {
-                  "@type": "ListItem",
-                  "position": 2,
-                  "name": "Guides",
-                  "item": "https://nphacks.net/guides"
-                },
-                {
-                  "@type": "ListItem",
-                  "position": 3,
-                  "name": "Minigames",
-                  "item": "https://nphacks.net/puzzles/thermite"
+                  "@type": "WebSite",
+                  "@id": "https://nphacks.net/#website",
+                  "name": "NoPixel 4.0 Minigames",
+                  "url": "https://nphacks.net",
+                  "publisher": { "@id": "https://nphacks.net/#organization" }
                 }
               ]
             })

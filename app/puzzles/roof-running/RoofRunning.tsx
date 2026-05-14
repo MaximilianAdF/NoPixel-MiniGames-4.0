@@ -10,7 +10,6 @@ import { trackGameStart, trackGameRetry } from '@/app/utils/gtm';
 import { useUser } from '@/app/contexts/UserContext';
 import { NPSettingsRange } from '@/app/components/NPSettings';
 import GameStatsTracker from '@/app/components/GameStatsTracker';
-import LeaderboardEligibleBadge from '@/app/components/LeaderboardEligibleBadge';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
@@ -22,7 +21,7 @@ const defaultColumns = 11;
 const defaultDuration = 25;
 
 const RoofRunning: FC = () => {
-  const { isChallengeMode, challengeData, isLoading: isChallengeLoading } = useDailyChallenge();
+  const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const searchParams = useSearchParams();
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
@@ -62,7 +61,7 @@ const RoofRunning: FC = () => {
         ? defaultDuration
         : savedTimer;
 
-  const mode: GameMode = isChallengeMode
+  const mode: GameMode = isChallengeMode && !isCompleted
     ? 'daily-challenge'
     : isCompetitive
       ? 'competitive'
@@ -208,10 +207,6 @@ const RoofRunning: FC = () => {
 
   return (
     <>
-      <LeaderboardEligibleBadge
-        game="roof-running"
-        gameSettings={{ rows: activeRows, columns: activeColumns, timer: activeTimer }}
-      />
       <GameStatsTracker
         game="roof-running"
         gameStatus={legacyStatus}

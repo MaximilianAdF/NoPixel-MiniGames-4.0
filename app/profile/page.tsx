@@ -5,8 +5,6 @@ import { useUser } from '../contexts/UserContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import ErrorBoundary from '../components/ErrorBoundary';
-import { getGameName, getGameTailwindGradient, getGameIcon } from '../utils/gameIcons';
-import { TIME_BASED_GAMES, SCORE_BASED_GAMES } from '../utils/gamePresets';
 import { ArrowLeft } from 'lucide-react';
 import { 
   Trophy, 
@@ -22,25 +20,6 @@ import {
   TrendingUp
 } from 'lucide-react';
 
-interface GameStat {
-  game: string;
-  gamesPlayed: number;
-  gamesWon: number;
-  gamesLost: number;
-  // Leaderboard-eligible stats (standard preset only)
-  bestScore?: number;
-  bestTime?: number;
-  // Overall stats (all plays)
-  bestScoreOverall?: number;
-  bestTimeOverall?: number;
-  averageScore?: number;
-  averageTime?: number;
-  totalTimePlayedMs: number;
-  currentStreak: number;
-  longestStreak: number;
-  lastPlayedAt: string;
-}
-
 interface UserStats {
   user: {
     id: string;
@@ -55,7 +34,6 @@ interface UserStats {
     longestDailyStreak: number;
     joinedAt: string;
   };
-  gameStats: GameStat[];
   challengeHistory: Array<{
     date: string;
     completed: boolean;
@@ -68,11 +46,7 @@ interface UserStats {
 interface LeaderboardRanks {
   level?: number;
   streak?: number;
-  games?: { [key: string]: number };
 }
-
-// Get all games that have leaderboards (only games with standard presets)
-const LEADERBOARD_GAMES = [...TIME_BASED_GAMES, ...SCORE_BASED_GAMES];
 
 export default function ProfilePage() {
   const { user, isLoggedIn, isLoading, hasInitialized, login } = useUser();
@@ -81,23 +55,15 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const hasFetchedRef = useRef(false);
 
-  const fetchLeaderboardRanks = useCallback(async (userId: string, gameStats: GameStat[]) => {
+  const fetchLeaderboardRanks = useCallback(async (userId: string) => {
     try {
-      const rankData: LeaderboardRanks = { games: {} };
+      const rankData: LeaderboardRanks = {};
 
-      // Only fetch ranks for games that have leaderboards
-      const leaderboardGameStats = gameStats.filter(gs => LEADERBOARD_GAMES.includes(gs.game));
-
-      // Fetch all ranks in parallel for better performance
-      const [levelResponse, streakResponse, ...gameResponses] = await Promise.all([
+      const [levelResponse, streakResponse] = await Promise.all([
         fetch(`/api/stats/leaderboard?type=level&userId=${userId}`),
         fetch(`/api/stats/leaderboard?type=streak&userId=${userId}`),
-        ...leaderboardGameStats.map(gameStat => 
-          fetch(`/api/stats/leaderboard?type=${gameStat.game}&userId=${userId}`)
-        )
       ]);
 
-      // Process level rank
       if (levelResponse.ok) {
         const levelData = await levelResponse.json();
         if (levelData.entry) {
@@ -105,22 +71,10 @@ export default function ProfilePage() {
         }
       }
 
-      // Process streak rank
       if (streakResponse.ok) {
         const streakData = await streakResponse.json();
         if (streakData.entry) {
           rankData.streak = streakData.entry.rank;
-        }
-      }
-
-      // Process game-specific ranks
-      for (let i = 0; i < leaderboardGameStats.length; i++) {
-        const gameResponse = gameResponses[i];
-        if (gameResponse.ok) {
-          const gameData = await gameResponse.json();
-          if (gameData.entry) {
-            rankData.games![leaderboardGameStats[i].game] = gameData.entry.rank;
-          }
         }
       }
 
@@ -137,7 +91,7 @@ export default function ProfilePage() {
         const data = await response.json();
         setStats(data);
         // Fetch leaderboard ranks after stats are loaded
-        fetchLeaderboardRanks(data.user.id, data.gameStats);
+        fetchLeaderboardRanks(data.user.id);
       }
     } catch (error) {
       console.error('Failed to fetch stats:', error);
@@ -467,98 +421,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Game Statistics Grid */}
-        <div className="animate-fade-in-up-delay-2">
-          <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-            <Star className="w-6 h-6 text-[#54FFA4]" />
-            Game Statistics
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {stats.gameStats.filter(gs => LEADERBOARD_GAMES.includes(gs.game)).length === 0 ? (
-              <div className="col-span-full text-center py-12 bg-gradient-to-br from-[#1a2930] to-[#0F1B21] border-2 border-[#54FFA4]/20 rounded-xl">
-                <Trophy className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400 text-lg">No games played yet</p>
-                <p className="text-gray-500 text-sm mt-2">Start playing to see your stats!</p>
-              </div>
-            ) : (
-              stats.gameStats
-                .filter(gameStat => LEADERBOARD_GAMES.includes(gameStat.game))
-                .map((gameStat) => (
-                <div 
-                  key={gameStat.game}
-                  className="bg-gradient-to-br from-[#1a2930] to-[#0F1B21] border-2 border-[#54FFA4]/30 rounded-xl p-6 hover:border-[#54FFA4]/60 transition-all duration-300 hover:transform hover:scale-105"
-                >
-                  {/* Game Header */}
-                  <div className="mb-4">
-                    <div className={`h-2 w-full bg-gradient-to-r ${getGameTailwindGradient(gameStat.game)} rounded-full mb-3`} />
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="flex items-center justify-center">{getGameIcon(gameStat.game, 'md')}</span>
-                        <h3 className="text-xl font-bold text-white">{getGameName(gameStat.game)}</h3>
-                      </div>
-                      {formatRank(ranks.games?.[gameStat.game], gameStat.game)}
-                    </div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm">
-                        {TIME_BASED_GAMES.includes(gameStat.game) ? 'Best Time' : 'Best Score'}
-                      </span>
-                      <span className="text-[#54FFA4] font-bold">
-                        {TIME_BASED_GAMES.includes(gameStat.game) 
-                          ? ((gameStat.bestTimeOverall || gameStat.bestTime) && (gameStat.bestTimeOverall || gameStat.bestTime)! > 0
-                              ? `${((gameStat.bestTimeOverall || gameStat.bestTime)! / 1000).toFixed(2)}s`
-                              : 'N/A')
-                          : ((gameStat.bestScoreOverall || gameStat.bestScore) && (gameStat.bestScoreOverall || gameStat.bestScore)! > 0
-                              ? (gameStat.bestScoreOverall || gameStat.bestScore)!.toLocaleString()
-                              : 'N/A')}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm">Average</span>
-                      <span className="text-white font-medium">
-                        {TIME_BASED_GAMES.includes(gameStat.game) 
-                          ? (gameStat.averageTime && gameStat.averageTime > 0
-                              ? `${(gameStat.averageTime / 1000).toFixed(2)}s`
-                              : 'N/A')
-                          : (gameStat.averageScore && gameStat.averageScore > 0
-                              ? gameStat.averageScore.toLocaleString()
-                              : 'N/A')}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm">Games Played</span>
-                      <span className="flex items-center gap-1.5 font-medium">
-                        <span className="text-emerald-400">{gameStat.gamesWon}</span>
-                        <span className="text-gray-500">|</span>
-                        <span className="text-red-400">{gameStat.gamesLost}</span>
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm">Time Played</span>
-                      <span className="text-white font-medium">
-                        {Math.floor(gameStat.totalTimePlayedMs / 1000 / 60)}m
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Play Button */}
-                  <Link 
-                    href={`/puzzles/${gameStat.game}`}
-                    className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#54FFA4] to-[#45e894] text-[#0F1B21] rounded-lg font-bold hover:opacity-90 transition-opacity"
-                  >
-                    Play Now
-                    <ChevronRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
       </div>
     </div>
     </ErrorBoundary>
@@ -566,7 +428,7 @@ export default function ProfilePage() {
 }
 
 function calculateXPForLevel(level: number): number {
-  // This must match the inverse of the server's formula in /app/api/stats/save/route.ts
+  // This must match the inverse of the server's formula in /app/api/stats/record-game/route.ts
   // Server formula: level = floor(cbrt(xp / 25)) + 1
   // Inverse: xp = (level - 1)³ * 25
   if (level === 1) return 0;

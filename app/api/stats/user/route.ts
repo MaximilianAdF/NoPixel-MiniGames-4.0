@@ -33,9 +33,6 @@ export async function GET() {
       );
     }
     
-    // Get all game stats for this user
-    const gameStats = await db.collection('gameStats').find({ userId }).toArray();
-    
     // Get recent challenge history (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -62,24 +59,6 @@ export async function GET() {
         longestDailyStreak: user.longestDailyStreak,
         joinedAt: user.joinedAt,
       },
-      gameStats: gameStats.map(stat => ({
-        game: stat.game,
-        gamesPlayed: stat.gamesPlayed,
-        gamesWon: stat.gamesWon || 0,
-        gamesLost: stat.gamesLost || 0,
-        // Leaderboard-eligible stats (standard preset only)
-        bestScore: stat.bestScore,
-        bestTime: stat.bestTime,
-        // Overall stats (all plays)
-        bestScoreOverall: stat.bestScoreOverall,
-        bestTimeOverall: stat.bestTimeOverall,
-        averageScore: stat.averageScore,
-        averageTime: stat.averageTime,
-        totalTimePlayedMs: stat.totalTimePlayedMs,
-        currentStreak: stat.currentStreak,
-        longestStreak: stat.longestStreak,
-        lastPlayedAt: stat.lastPlayedAt,
-      })),
       challengeHistory: challengeHistory.map(challenge => ({
         date: challenge.date,
         completed: challenge.completed,

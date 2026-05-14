@@ -6,6 +6,14 @@ export const metadata: Metadata = {
   title: 'Repair Kit Guide - Master NoPixel 4.0 Precision Timing | Expert Tips',
   description: 'Complete guide to mastering the Repair Kit minigame in NoPixel 4.0. Learn indicator timing, sweet spot targeting, and pro tips for equipment repairs.',
   keywords: ['repair kit guide', 'NoPixel repair', 'timing minigame tutorial', 'precision clicking tips', 'GTA RP repair hack'],
+  alternates: {
+    canonical: 'https://nphacks.net/guides/repair-kit',
+  },
+  openGraph: {
+    title: 'Repair Kit Guide - Master NoPixel 4.0 Precision Timing | Expert Tips',
+    description: 'Complete guide to mastering the Repair Kit minigame in NoPixel 4.0. Learn indicator timing, sweet spot targeting, and pro tips for equipment repairs.',
+    url: 'https://nphacks.net/guides/repair-kit',
+  },
 };
 
 export default function RepairKitGuidePage() {

@@ -150,7 +150,6 @@ export default function PincrackerInstructions() {
                     <li><strong>Track your average attempts</strong> - Aim to consistently crack in 4-5 guesses or less</li>
                     <li><strong>Practice without time pressure</strong> - Focus on perfect logic before adding speed</li>
                     <li><strong>Study failed attempts</strong> - Review what went wrong and how to avoid it</li>
-                    <li><strong>Compete on leaderboards</strong> - Compare your efficiency with top crackers</li>
                     <li><strong>Increase difficulty gradually</strong> - Move to 5-6 digits only after consistent 4-digit success</li>
                     <li><strong>Pen and paper practice</strong> - Write out elimination tables for complex codes</li>
                 </ul>
