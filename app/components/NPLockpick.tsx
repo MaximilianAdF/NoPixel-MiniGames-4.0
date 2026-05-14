@@ -1,558 +1,313 @@
-"use client";
+'use client';
 
-import { checkBeepPlayer, successPlayer } from "@/public/audio/AudioManager";
-import NPHackContainer from "@/app/components/NPHackContainer";
-import React, {FC, useEffect, useState} from "react";
-import useGame from "@/app/utils/useGame";
-import {useKeyDown} from "@/app/utils/useKeyDown";
-import {NPSettingsRange} from "@/app/components/NPSettings";
-import usePersistantState from "@/app/utils/usePersistentState";
-import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
-import classNames from "classnames";
-import GameStatsTracker from "./GameStatsTracker";
-import LeaderboardEligibleBadge from "./LeaderboardEligibleBadge";
-import { trackGameStart, trackGameRetry } from "@/app/utils/gtm";
-import { useUser } from "@/app/contexts/UserContext";
-
-type RingColor = "red" | "yellow" | "blue";
-
-
-const degInterval = 30;
-const positions = 360 / degInterval;
-const colors: RingColor[] = [
-    "red",
-    "yellow",
-    "blue",
-]
-
-
-// TODO: Should the laundromat have different messages?
-const getStatusMessage = (status: number | undefined) => {
-    switch (status) {
-        case 0:
-            return "";
-        case 1:
-            return "";
-        case 2:
-            return "The lockpick bent out of shape.";
-        case 3:
-            return "The lock was picked successfully.";
-        case 4:
-            return "Reset!";
-        default:
-            return `Error: Unknown game status ${status}`;
-    }
-}
-
-
-const shuffle = <T,>(array: T[]): T[] => {
-    // Create a copy of the array
-    const result = [...array];
-
-    let currentIndex = result.length,  randomIndex;
-
-    // While there remain elements to shuffle.
-    while (currentIndex > 0) {
-
-        // Pick a remaining element.
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-
-        // And swap it with the current element.
-        [result[currentIndex], result[randomIndex]] = [
-            result[randomIndex], result[currentIndex]];
-    }
-
-    return result;
-}
-
-const getRandomN = <T,>(array: T[], n: number): T[] => {
-    // Shuffle the array
-    const result = shuffle(array);
-
-    // Reset the length to n (deletes the rest)
-    result.length = n;
-
-    return result;
-}
-
-const unsigned = (n: number, size: number = positions) => {
-    while (n < 0) {
-        n += size;
-    }
-    return n % size;
-}
-
-interface Ring {
-    color: RingColor[],
-    balls: number[],
-    slots: number[],
-    rotation: number,
-}
-
-const generateRing = (difficulty: "normal" | "hard" = "normal"): Ring => {
-    // We want to generate:
-    // 1. An array of random colors, one per position
-    // 2. An array of random indexes for ball positions, >=5
-    // 3. An array of random indexes for slot rings, >=4, <total-4
-    // 4. A random index for initial ball rotation
-
-    const initialPositions: number[] = [];  // All possible slot indexes
-    const resultColors: RingColor[] = [];
-
-    // Generate slot colors and initial indexes array
-    for (let i = 0; i < positions; i++) {
-        initialPositions.push(i);
-        resultColors.push(colors[Math.floor(Math.random() * colors.length)]);
-    }
-
-    // Generate indexes
-    const amountBalls = Math.floor(Math.random() * (positions+1 - 5) + 5)  // 5 <= i <= max
-    const amountSlots = Math.floor(Math.random() * (positions-4 - 4) + 4)  // 4 <= i < max - 4
-
-    let resultBalls: number[];
-    let resultSlots: number[];
-
-    switch (difficulty) {
-        case "normal":
-            const shuffledPositions = shuffle(initialPositions);
-            resultBalls = shuffledPositions.slice(0, amountBalls);
-            resultSlots = shuffledPositions.slice(0, amountSlots);
-            break;
-
-        // I initially misunderstood how these positions should be generated, and this is the first implementation I
-        // made. It's not correct, but I thought it was kinda fun, so I added it as a "hard" difficulty.
-        // Basically, this version shuffles the balls and slots separately, but they should be shuffled together.
-        case "hard":
-            resultBalls = getRandomN(initialPositions, amountBalls);
-            resultSlots = getRandomN(initialPositions, amountSlots);
-            break;
-    }
-
-    const resultRotation = Math.floor(Math.random() * positions);
-
-    return {
-        color: resultColors,
-        balls: resultBalls,
-        slots: resultSlots,
-        rotation: resultRotation,
-    };
-}
+import { useCallback, useEffect, useRef, useState, type FC } from 'react';
+import classNames from 'classnames';
+import { checkBeepPlayer, successPlayer, timerBeepPlayer } from '@/public/audio/AudioManager';
+import usePersistantState from '@/app/utils/usePersistentState';
+import { useKeyDown } from '@/app/utils/useKeyDown';
+import { useDailyChallenge } from '@/app/utils/useDailyChallenge';
+import { trackGameStart, trackGameRetry } from '@/app/utils/gtm';
+import { useUser } from '@/app/contexts/UserContext';
+import { NPSettingsRange } from '@/app/components/NPSettings';
+import GameStatsTracker from './GameStatsTracker';
+import LeaderboardEligibleBadge from './LeaderboardEligibleBadge';
+import { useGameHost } from '@/app/game/useGameHost';
+import GameShell from '@/app/game/GameShell';
+import type { GameMode, GameResult } from '@/app/game/types';
+import { lockpickEngine, degInterval, positions } from './lockpickEngine';
+import { LockpickRing } from './LockpickRing';
 
 interface NPLockpickProps {
-    countdownDuration: number,
-    maxLevels: number,
-    title: string,
-    gameId?: string, // Game ID for stats tracking
-    isCompetitive?: boolean, // Whether to use standard competitive preset
-    // description: string,
+  countdownDuration: number;
+  maxLevels: number;
+  title: string;
+  gameId?: string;
+  isCompetitive?: boolean;
 }
+
+const ROTATE_LEFT_KEYS = ['ArrowLeft', 'a', 'A'];
+const ROTATE_RIGHT_KEYS = ['ArrowRight', 'd', 'D'];
+const UNLOCK_KEYS = ['Enter', ' '];
 
 const NPLockpick: FC<NPLockpickProps> = ({
-    countdownDuration,
-    maxLevels,
-    title,
-    gameId = 'lockpick', // Default to lockpick for backwards compatibility
-    isCompetitive = false,
-    // description,
+  countdownDuration,
+  maxLevels,
+  title,
+  gameId = 'lockpick',
+  isCompetitive = false,
 }) => {
-    const { isChallengeMode, challengeData } = useDailyChallenge();
-    
-    // Use challenge data for defaults if in challenge mode
-    const challengeLevels = challengeData?.levels || maxLevels;
-    const challengeDuration = challengeData?.targetTime ? Math.floor(challengeData.targetTime / 1000) : countdownDuration;
-    
-    const [levels, setLevels] = usePersistantState(`np-lockpick-${title}-levels`, challengeLevels);
-    const [timer, setTimer] = usePersistantState(`np-lockpick-${title}-timer`, challengeDuration);
-    const [allowKeyDown, setAllowKeyDown] = useState(true);
-    const [rings, setRings] = useState<Ring[]>([]);
-    const [rotation, setRotation] = useState<number>(0);
-    const [level, setLevel] = useState<number>(0);
-    const [elapsed, setElapsed] = useState(0);
+  const { isChallengeMode, challengeData, isLoading: isChallengeLoading } = useDailyChallenge();
+  const { user } = useUser();
 
-    // Reset to standard preset when in competitive mode
-    useEffect(() => {
-        if (isCompetitive) {
-            // Use the default values passed to the component as the standard preset
-            setLevels(maxLevels);
-            setTimer(countdownDuration);
-        }
-    }, [isCompetitive, setLevels, setTimer, maxLevels, countdownDuration]);
+  const [savedLevels, setSavedLevels, levelsHydrated] = usePersistantState(
+    `np-lockpick-${title}-levels`,
+    maxLevels,
+  );
+  const [savedTimer, setSavedTimer, timerHydrated] = usePersistantState(
+    `np-lockpick-${title}-timer`,
+    countdownDuration,
+  );
+  const settingsHydrated = levelsHydrated && timerHydrated;
 
-    // Update settings when challenge data loads
-    useEffect(() => {
-        if (challengeData) {
-            setLevels(challengeData.levels || maxLevels);
-            setTimer(challengeData.targetTime ? Math.floor(challengeData.targetTime / 1000) : countdownDuration);
-        }
-    }, [challengeData, setLevels, setTimer, maxLevels, countdownDuration]);
+  const activeLevels =
+    isChallengeMode && challengeData
+      ? challengeData.levels || maxLevels
+      : isCompetitive
+        ? maxLevels
+        : savedLevels;
+  const activeTimer =
+    isChallengeMode && challengeData
+      ? challengeData.targetTime
+        ? Math.floor(challengeData.targetTime / 1000)
+        : countdownDuration
+      : isCompetitive
+        ? countdownDuration
+        : savedTimer;
 
-    useEffect(() => {
-        checkBeepPlayer.whenReady();
-        successPlayer.whenReady();
-    }, []);
+  const mode: GameMode = isChallengeMode
+    ? 'daily-challenge'
+    : isCompetitive
+      ? 'competitive'
+      : 'practice';
 
-    const statusUpdateHandler = (newStatus: number) => {
-        switch (newStatus) {
-            case 1:
-                // Reset game
-                const newRings: Ring[] = [];
-                for (let i = 0; i < levels; i++) {
-                    // TODO: Add config for difficulty
-                    newRings.push(generateRing());
-                }
-                setRings(newRings);
-                setLevel(0);
-                setRotation(newRings[0].rotation);
-                break;
-        }
+  const lastResultRef = useRef<GameResult | null>(null);
+  const userRef = useRef(user);
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
+  const { phase, state, result, runId, submitInput } = useGameHost({
+    engine: lockpickEngine,
+    config: { levels: activeLevels },
+    durationMs: activeTimer * 1000,
+    mode,
+    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
+    onTick: () => timerBeepPlayer.play(),
+    onResult: (gameResult) => {
+      lastResultRef.current = gameResult;
+    },
+  });
+
+  const prevLevelRef = useRef(0);
+
+  // Preload sound effects.
+  useEffect(() => {
+    checkBeepPlayer.whenReady();
+    successPlayer.whenReady();
+    timerBeepPlayer.whenReady();
+  }, []);
+
+  // Fire start (and retry, when following a finished round) analytics once per round.
+  useEffect(() => {
+    if (runId === 0) return;
+    if (lastResultRef.current) {
+      trackGameRetry({
+        game_name: gameId,
+        previous_result: lastResultRef.current.won ? 'win' : 'loss',
+        previous_score: lastResultRef.current.score,
+      });
+      lastResultRef.current = null;
     }
+    const count = parseInt(sessionStorage.getItem('game_count') || '0', 10) + 1;
+    sessionStorage.setItem('game_count', count.toString());
+    trackGameStart({
+      game_name: gameId,
+      is_logged_in: !!userRef.current,
+      user_level: userRef.current?.level || 0,
+      session_game_count: count,
+    });
+  }, [runId, gameId]);
 
-    const [gameStatus, setGameStatus, streak] = useGame(timer*1000, statusUpdateHandler);
+  // Success sound on each cleared ring.
+  useEffect(() => {
+    if (state.level > prevLevelRef.current) successPlayer.play();
+    prevLevelRef.current = state.level;
+  }, [state.level]);
 
-    const { user } = useUser();
+  // Success on a win; fail beep on a failed unlock (not on a timer expiry).
+  useEffect(() => {
+    if (phase === 'won') successPlayer.play();
+    else if (phase === 'lost' && state.failedUnlock) checkBeepPlayer.play();
+  }, [phase, state.failedUnlock]);
 
-    // Track game start
-    useEffect(() => {
-        if (gameStatus === 1) {
-            const count = parseInt(sessionStorage.getItem('game_count') || '0') + 1;
-            sessionStorage.setItem('game_count', count.toString());
-            
-            trackGameStart({
-                game_name: gameId,
-                is_logged_in: !!user,
-                user_level: user?.level || 0,
-                session_game_count: count,
-            });
-        }
-    }, [gameStatus, user, gameId]);
+  const rotateLeft = useCallback(
+    () => submitInput({ type: 'rotate', direction: -1 }),
+    [submitInput],
+  );
+  const rotateRight = useCallback(
+    () => submitInput({ type: 'rotate', direction: 1 }),
+    [submitInput],
+  );
+  const unlock = useCallback(() => submitInput({ type: 'unlock' }), [submitInput]);
 
-    const resetGame = () => {
-        setGameStatus(1);
-    };
+  useKeyDown(rotateLeft, ROTATE_LEFT_KEYS, true);
+  useKeyDown(rotateRight, ROTATE_RIGHT_KEYS, true);
+  useKeyDown(unlock, UNLOCK_KEYS, true);
 
-    const handleRetry = () => {
-        if (gameStatus === 2 || gameStatus === 3) {
-            trackGameRetry({
-                game_name: gameId,
-                previous_result: gameStatus === 3 ? 'win' : 'loss',
-                previous_score: level,
-            });
-        }
-        resetGame();
-    };
+  const [settingsLevels, setSettingsLevels] = useState(savedLevels);
+  const [settingsTimer, setSettingsTimer] = useState(savedTimer);
 
-    const handleWin = (message: string) => {
-        // Win
+  useEffect(() => {
+    setSettingsLevels(savedLevels);
+    setSettingsTimer(savedTimer);
+  }, [savedLevels, savedTimer]);
 
-        setGameStatus(3);
-    }
+  const settings = {
+    handleSave: () => {
+      setSavedLevels(settingsLevels);
+      setSavedTimer(settingsTimer);
+    },
+    handleReset: () => {
+      setSettingsLevels(maxLevels);
+      setSettingsTimer(countdownDuration);
+      setSavedLevels(maxLevels);
+      setSavedTimer(countdownDuration);
+    },
+    children: (
+      <>
+        <div className="flex w-full gap-2 *:flex-1 flex-col sm:flex-row">
+          <NPSettingsRange
+            title="Levels"
+            value={settingsLevels}
+            setValue={setSettingsLevels}
+            min={2}
+            max={10}
+          />
+          <NPSettingsRange
+            title="Timer"
+            value={settingsTimer}
+            setValue={setSettingsTimer}
+            min={5}
+            max={100}
+          />
+        </div>
+      </>
+    ),
+  };
 
-    const handleLose = (message: string) => {
-        // Lose
-
-        setGameStatus(2);
-    }
-
-    const nextLevel = () => {
-        if (level >= levels - 1) {
-            handleWin("All levels completed");
-        } else {
-            const newLevel = level + 1;
-            setLevel(newLevel);
-            setRotation(rings[newLevel].rotation);
-        }
-    }
-
-    const updateRotation = (shift: number) => {
-        const newRotation = rotation+shift;
-        setRotation(newRotation);
-        const newRings = rings;
-        newRings[level].rotation = newRotation;
-        setRings(newRings);
-    }
-
-    const handleLeft = () => {
-        updateRotation(-1);
-    }
-
-    const handleRight = () => {
-        updateRotation(+1);
-    }
-
-    const handleUnlock = () => {
-        // Check if the current rotation is a solution
-
-        // Iterate each slot
-        for (const slot of rings[level].slots) {
-            // Get the position of the current ball
-            const ballPosition = unsigned(slot-unsigned(rotation));
-            // If there is a ball here
-            if (rings[level].balls.includes(ballPosition)) {
-                // Fail if the color doesn't match
-                if (rings[level].color[ballPosition] !== rings[level].color[slot]) {
-                    handleLose(`Mismatch on level ${level} with rotation ${rotation}. Slot ${slot} (${rings[level].color[slot]}) does not match ball ${ballPosition} (${rings[level].color[ballPosition]})`);
-                    checkBeepPlayer.play();
-                    return;
-                }
-            }
-        }
-        successPlayer.play();
-        nextLevel();
-    }
-
-    const handleKeyDown = (callback: () => void) => {
-        return () => {
-            if (gameStatus === 1) {
-                callback();
-            }
-        }
-    }
-
-    useKeyDown(handleKeyDown(handleLeft), ["ArrowLeft", "a", "A"], allowKeyDown);
-    useKeyDown(handleKeyDown(handleRight), ["ArrowRight", "d", "D"], allowKeyDown);
-    useKeyDown(handleKeyDown(handleUnlock), ["Enter", " "], allowKeyDown);
-
-    const svgSize = 50 * (levels * 2 + 1);
-
-    const [settingsLevels, setSettingsLevels] = useState(levels);
-    const [settingsTimer, setSettingsTimer] = useState(timer);
-
-    useEffect(() => {
-        setSettingsLevels(levels);
-        setSettingsTimer(timer);
-
-        // I don't want to re-run the useEffect if this updates. My IDE wants me to put this in the dependencies, but
-        // that isn't what I want to do. I think it should be fine if it is left out?
-        if (gameStatus !== 4) {
-            resetGame();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [levels, timer]);
-
-    const settings = {
-        handleSave: () => {
-            setLevels(settingsLevels);
-            setTimer(settingsTimer);
-            setGameStatus(4);
-        },
-        handleReset: () => {
-            setLevels(maxLevels);
-            setTimer(countdownDuration);
-            setGameStatus(4);
-        },
-        children: (
-            <>
-                <div className={"flex w-full gap-2 *:flex-1 flex-col sm:flex-row"}>
-                    <NPSettingsRange title={"Levels"} value={settingsLevels} setValue={setSettingsLevels} min={2} max={10} />
-                    <NPSettingsRange title={"Timer"} value={settingsTimer} setValue={setSettingsTimer} min={5} max={100} />
-                </div>
-            </>
-        ),
-    };
-
+  if (isChallengeLoading) {
     return (
-        <>
-            <LeaderboardEligibleBadge
-                game={gameId}
-                gameSettings={{
-                    levels: levels,
-                    timer: timer,
-                }}
-            />
-            <GameStatsTracker
-                game={gameId as any}
-                gameStatus={gameStatus}
-                score={level}
-                elapsedMs={elapsed}
-                targetScore={maxLevels}
-                wonStatus={3}
-                lostStatus={2}
-                gameSettings={{
-                    levels: levels,
-                    timer: timer,
-                }}
-            />
-            <NPHackContainer
-                title={title}
-                description={"Unlock each lock"}
-                buttons={[
-                    [
-                        {
-                            label: "Rotate Left",
-                            color: "purple",
-                            callback: handleLeft,
-                            disabled: gameStatus !== 1,
-                        },
-                        {
-                            label: "Rotate Right",
-                            color: "purple",
-                            callback: handleRight,
-                            disabled: gameStatus !== 1,
-                        }
-                    ],
-                    [
-                        {
-                            label: "Unlock",
-                            color: "green",
-                            callback: handleUnlock,
-                            disabled: gameStatus !== 1,
-                        }
-                    ]
-                ]}
-                countdownDuration={timer*1000}
-                resetCallback={handleRetry}
-                elapsedCallback={setElapsed}
-                resetDelay={3000}
-                status={gameStatus}
-                setStatus={setGameStatus}
-                statusMessage={getStatusMessage(gameStatus)}
-                settings={isChallengeMode ? undefined : settings}
-                // className="h-full"
-            >
-                <div className={classNames(
-                    `
-                        aspect-square
-                        max-h-full max-w-full
-                        rounded-lg
-                        bg-[rgba(0,28,49,0.3)]
-                        flex items-center justify-center
-                        relative
-                    `,
-                    gameStatus === 0 || gameStatus === 4 ? "blur" : "",
-                )}
-                    style={{
-                        // TODO: Refactor the responsive sizing so it doesn't use hardcoded values.
-
-                        // Note: These values will need to be updated if the page styles are changed.
-
-                        // Total height of the container element is 194px plus a 64px header and 40px padding
-                        // Total width of the container is 24px plus 40px padding
-                        maxWidth: `calc(100vh - 298px)`,
-                        width: `calc(100vw - 64px)`,
-                    }}
-                >
-                    <div className="
-                        aspect-square
-                        flex items-center justify-center
-                        size-full
-                        absolute
-                    ">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            version="1.1"
-                            className="
-                                size-full aspect-square
-
-                                *:origin-center
-
-                                data-[stroke=gray]:*:stroke-[rgb(173_173_173)]
-                                data-[stroke=fail]:*:stroke-[rgb(255_84_84)]
-                                data-[stroke=win]:*:stroke-[rgb(48_221_189/0.816)]
-
-                                *:*:origin-center
-
-                                data-[stroke=blue]:*:*:stroke-[rgb(46_134_213)]
-                                data-[stroke=yellow]:*:*:stroke-[rgb(239_181_17)]
-                                data-[stroke=red]:*:*:stroke-[rgb(202_39_97)]
-                                data-[stroke=fail]:*:*:stroke-[rgb(255_84_84)]
-                                data-[stroke=win]:*:*:stroke-[rgb(48_221_189/0.816)]
-
-                                data-[fill=blue]:*:*:fill-[rgb(46_134_213)]
-                                data-[fill=yellow]:*:*:fill-[rgb(239_181_17)]
-                                data-[fill=red]:*:*:fill-[rgb(202_39_97)]
-                                data-[fill=fail]:*:*:fill-[rgb(255_84_84)]
-                                data-[fill=win]:*:*:fill-[rgb(48_221_189/0.816)]
-                            "
-                            viewBox={`0 0 ${svgSize} ${svgSize}`}
-                        >
-
-                            <g
-                                className="
-                                        *:stroke-[1.2px] *:origin-center
-                                        *:stroke-[rgb(142_142_142)]
-                                    "
-                            >
-                                {[...Array(positions/2)].map((value, index) => <line
-                                    key={index}
-                                    x1={35} x2={svgSize-35}
-                                    y1={svgSize/2} y2={svgSize/2}
-                                    transform={`rotate(${index*degInterval})`}
-                                ></line>)}
-                            </g>
-                            {rings.map((ring, ringIndex) => {
-                                const radius = (ringIndex + 1) * 50 - 10;
-                                const slotRadius = radius + 15;
-
-                                return (
-                                    <React.Fragment key={ringIndex}>
-                                        <circle
-                                            className="
-                                                fill-none stroke-[3px]
-                                            "
-                                            data-stroke={
-                                                (level > ringIndex || gameStatus === 3) ? "win" :
-                                                    (gameStatus === 2 && level == ringIndex) ? "fail" :
-                                                        "gray"
-                                            }
-                                            cx="50%"
-                                            cy="50%"
-                                            r={radius}
-                                        />
-                                        <g
-                                            className="
-                                                *:ease-in-out *:transition-transform *:duration-200
-                                            "
-                                        >
-                                            {ring.balls.map((ball, index) => <circle
-                                                key={index}
-                                                style={{
-                                                    transform: `rotate(${(ball + ring.rotation) * 30}deg) translateX(${radius}px)`,
-                                                }}
-                                                data-fill={
-                                                    (level > ringIndex || gameStatus === 3) ? "win" :
-                                                        (gameStatus === 2 && level == ringIndex) ? "fail" :
-                                                            ring.color[ball]
-                                                }
-                                                cx="50%"
-                                                cy="50%"
-                                                r="8.5px"
-                                            />)}
-                                        </g>
-                                        <g
-                                            className="
-                                                *:fill-none *:stroke-[5px]
-                                            "
-                                        >
-                                            {ring.slots.map((slot, index) => <circle
-                                                key={index}
-                                                data-r-px={slotRadius}
-                                                cx="50%"
-                                                cy="50%"
-                                                r={slotRadius}
-                                                data-stroke={
-                                                    (level > ringIndex || gameStatus === 3) ? "win" :
-                                                        (gameStatus === 2 && level == ringIndex) ? "fail" :
-                                                            ring.color[slot]
-                                                }
-                                                style={{
-                                                    transform: `rotate(${-15 + (slot * 30)}deg)`,
-                                                    strokeDasharray: `${2 * slotRadius * Math.PI}`,
-                                                    strokeDashoffset: `${(11 * (2 * slotRadius * Math.PI)) / 12}`,
-                                                }}
-                                            />)}
-                                        </g>
-                                    </React.Fragment>
-                                )
-                            })}
-                        </svg>
-                    </div>
-                    {/*<div className="overlay hidden absolute"></div>*/}
-                    {/*<div className="lock-container absolute">*/}
-                    {/*</div>*/}
-                </div>
-            </NPHackContainer>
-        </>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#54FFA4]"></div>
+      </div>
     );
-}
+  }
+
+  const legacyStatus =
+    phase === 'won' ? 3 : phase === 'lost' ? 2 : phase === 'ended' ? (result?.won ? 3 : 2) : 1;
+
+  const svgSize = 50 * (state.rings.length * 2 + 1);
+
+  return (
+    <>
+      <LeaderboardEligibleBadge
+        game={gameId}
+        gameSettings={{ levels: activeLevels, timer: activeTimer }}
+      />
+      <GameStatsTracker
+        game={gameId as any}
+        gameStatus={legacyStatus}
+        score={result ? result.score : state.level}
+        elapsedMs={result?.elapsedMs ?? 0}
+        targetScore={activeLevels}
+        wonStatus={3}
+        lostStatus={2}
+        gameSettings={{ levels: activeLevels, timer: activeTimer }}
+      />
+      <GameShell
+        title={title}
+        description="Unlock each lock"
+        phase={phase}
+        result={result}
+        durationMs={activeTimer * 1000}
+        runId={runId}
+        statusMessage={
+          result
+            ? result.won
+              ? 'The lock was picked successfully.'
+              : 'The lockpick bent out of shape.'
+            : ''
+        }
+        buttons={[
+          [
+            {
+              label: 'Rotate Left',
+              color: 'purple',
+              callback: rotateLeft,
+              disabled: phase !== 'playing',
+            },
+            {
+              label: 'Rotate Right',
+              color: 'purple',
+              callback: rotateRight,
+              disabled: phase !== 'playing',
+            },
+          ],
+          [{ label: 'Unlock', color: 'green', callback: unlock, disabled: phase !== 'playing' }],
+        ]}
+        settings={isChallengeMode ? undefined : settings}
+      >
+        <div
+          className={classNames(
+            'aspect-square max-h-full max-w-full rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-center relative',
+            phase === 'idle' && 'blur',
+          )}
+          style={{
+            maxWidth: `calc(100vh - 298px)`,
+            width: `calc(100vw - 64px)`,
+          }}
+        >
+          <div className="aspect-square flex items-center justify-center size-full absolute">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              version="1.1"
+              className="
+                size-full aspect-square
+                *:origin-center
+                data-[stroke=gray]:*:stroke-[rgb(173_173_173)]
+                data-[stroke=fail]:*:stroke-[rgb(255_84_84)]
+                data-[stroke=win]:*:stroke-[rgb(48_221_189/0.816)]
+                *:*:origin-center
+                data-[stroke=blue]:*:*:stroke-[rgb(46_134_213)]
+                data-[stroke=yellow]:*:*:stroke-[rgb(239_181_17)]
+                data-[stroke=red]:*:*:stroke-[rgb(202_39_97)]
+                data-[stroke=fail]:*:*:stroke-[rgb(255_84_84)]
+                data-[stroke=win]:*:*:stroke-[rgb(48_221_189/0.816)]
+                data-[fill=blue]:*:*:fill-[rgb(46_134_213)]
+                data-[fill=yellow]:*:*:fill-[rgb(239_181_17)]
+                data-[fill=red]:*:*:fill-[rgb(202_39_97)]
+                data-[fill=fail]:*:*:fill-[rgb(255_84_84)]
+                data-[fill=win]:*:*:fill-[rgb(48_221_189/0.816)]
+              "
+              viewBox={`0 0 ${svgSize} ${svgSize}`}
+            >
+              <g className="*:stroke-[1.2px] *:origin-center *:stroke-[rgb(142_142_142)]">
+                {[...Array(positions / 2)].map((_, index) => (
+                  <line
+                    key={index}
+                    x1={35}
+                    x2={svgSize - 35}
+                    y1={svgSize / 2}
+                    y2={svgSize / 2}
+                    transform={`rotate(${index * degInterval})`}
+                  />
+                ))}
+              </g>
+              {state.rings.map((ring, ringIndex) => (
+                <LockpickRing
+                  key={ringIndex}
+                  ring={ring}
+                  ringIndex={ringIndex}
+                  level={state.level}
+                  status={legacyStatus}
+                />
+              ))}
+            </svg>
+          </div>
+        </div>
+      </GameShell>
+    </>
+  );
+};
+
 export default NPLockpick;
