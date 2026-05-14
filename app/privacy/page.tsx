@@ -1,9 +1,18 @@
 import { Shield, Eye, Cookie, Database, Mail, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Privacy Policy - NoPixel 4.0 Minigames Trainer',
   description: 'Privacy Policy for NoPixel 4.0 Minigames - Learn how we protect your data and respect your privacy.',
+  openGraph: {
+    title: 'Privacy Policy - NoPixel 4.0 Minigames Trainer',
+    description: 'How NoPixel 4.0 Minigames protects your data and respects your privacy.',
+    url: 'https://nphacks.net/privacy',
+  },
+  alternates: {
+    canonical: 'https://nphacks.net/privacy',
+  },
 };
 
 export default function PrivacyPage() {

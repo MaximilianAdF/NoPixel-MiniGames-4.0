@@ -1,4 +1,18 @@
 import { Code, Github, Star, GitFork, Heart, ExternalLink, Bug } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Open Source - NoPixel 4.0 Minigames Trainer',
+  description: 'NoPixel 4.0 Minigames Trainer is free and open source. Browse the code on GitHub, report bugs, suggest features, or contribute.',
+  openGraph: {
+    title: 'Open Source - NoPixel 4.0 Minigames Trainer',
+    description: 'A free, open-source practice tool for the GTA RP community. Contribute on GitHub.',
+    url: 'https://nphacks.net/open-source',
+  },
+  alternates: {
+    canonical: 'https://nphacks.net/open-source',
+  },
+};
 
 export default function OpenSourcePage() {
   return (
