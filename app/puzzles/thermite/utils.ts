@@ -4,7 +4,7 @@ import longImg from "@/public/images/thermite/long.svg";
 
 export type PieceType = "short" | "medium" | "long";
 export type SquarePiece = {type: PieceType, distance: number, img: any};
-const squarePieces: SquarePiece[] = [
+export const squarePieces: SquarePiece[] = [
     {
         type: "short",
         distance: 1,
@@ -37,16 +37,23 @@ export type SquareCoord = [
 
 export const presets = [
     {
-        // Maze Bank - Sewer hack.
+        label: "Maze Bank - Sewer",
         timer: 60,
         targetScore: 24,
         rows: 6,
         columns: 6,
     },
     {
-        // Maze Bank - Vault hack.
+        label: "Maze Bank - Vault",
         timer: 60,
         targetScore: 28,
+        rows: 6,
+        columns: 6,
+    },
+    {
+        label: "Art Asylum - Water",
+        timer: 25,
+        targetScore: 30,
         rows: 6,
         columns: 6,
     },
