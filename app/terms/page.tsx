@@ -1,9 +1,18 @@
 import { FileText, AlertTriangle, Scale, UserX, Shield } from 'lucide-react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Terms of Service - NoPixel 4.0 Minigames Trainer',
   description: 'Terms of Service for NoPixel 4.0 Minigames - Read our terms and conditions for using the site.',
+  openGraph: {
+    title: 'Terms of Service - NoPixel 4.0 Minigames Trainer',
+    description: 'Terms and conditions for using the NoPixel 4.0 minigame trainers.',
+    url: 'https://nphacks.net/terms',
+  },
+  alternates: {
+    canonical: 'https://nphacks.net/terms',
+  },
 };
 
 export default function TermsPage() {

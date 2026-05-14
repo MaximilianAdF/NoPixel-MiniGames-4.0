@@ -1,6 +1,8 @@
 import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Keyboard, Zap, Brain, Trophy, Timer, MousePointer } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import JsonLd from '@/app/components/JsonLd';
+import { breadcrumbList, guideArticle } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
   title: 'Chopping Guide - Master NoPixel 4.0 Typing Challenge | Expert Tips',
@@ -19,6 +21,20 @@ export const metadata: Metadata = {
 export default function ChoppingGuidePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/' },
+          { name: 'Guides', path: '/guides' },
+          { name: 'Chopping Guide', path: '/guides/chopping' },
+        ])}
+      />
+      <JsonLd
+        data={guideArticle({
+          headline: 'Chopping Guide - Master NoPixel 4.0 Typing Challenge | Expert Tips',
+          description: 'Complete guide to mastering the Chopping minigame in NoPixel 4.0. Learn typing speed techniques, letter sequence strategies, and pro tips for VIN scratching.',
+          path: '/guides/chopping',
+        })}
+      />
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
         <Link 

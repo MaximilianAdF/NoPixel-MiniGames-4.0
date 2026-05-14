@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Target, ArrowLeft, Shield, Gamepad2, AlertTriangle, Map, Users, DollarSign } from 'lucide-react';
+import JsonLd from '@/app/components/JsonLd';
+import { breadcrumbList, guideArticle } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
     title: 'Complete Guide to NoPixel 4.0 Heists - Planning, Hacks & Execution',
@@ -19,6 +21,20 @@ export const metadata: Metadata = {
 export default function HeistGuidePage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
+            <JsonLd
+                data={breadcrumbList([
+                    { name: 'Home', path: '/' },
+                    { name: 'Guides', path: '/guides' },
+                    { name: 'Complete Guide to NoPixel 4.0 Heists', path: '/guides/nopixel-heist-guide' },
+                ])}
+            />
+            <JsonLd
+                data={guideArticle({
+                    headline: 'Complete Guide to NoPixel 4.0 Heists - Planning, Hacks & Execution',
+                    description: 'Everything you need to know about NoPixel 4.0 heists. Learn which hacking minigames each heist requires, how to plan crew roles, and strategies for successful bank robberies.',
+                    path: '/guides/nopixel-heist-guide',
+                })}
+            />
             <div className="max-w-3xl mx-auto">
                 {/* Navigation */}
                 <div className="pt-16 mb-8">

@@ -1,6 +1,8 @@
 import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Blocks, Zap, Brain, Trophy, Timer } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import JsonLd from '@/app/components/JsonLd';
+import { breadcrumbList, guideArticle } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
   title: 'Roof Running Guide - Master NoPixel 4.0 Tile Clearing Puzzle | Expert Tips',
@@ -19,6 +21,20 @@ export const metadata: Metadata = {
 export default function RoofRunningGuidePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/' },
+          { name: 'Guides', path: '/guides' },
+          { name: 'Roof Running Guide', path: '/guides/roof-running' },
+        ])}
+      />
+      <JsonLd
+        data={guideArticle({
+          headline: 'Roof Running Guide - Master NoPixel 4.0 Tile Clearing Puzzle | Expert Tips',
+          description: 'Complete guide to mastering the Roof Running minigame in NoPixel 4.0. Learn tile group clearing, gravity mechanics, and strategic color matching techniques.',
+          path: '/guides/roof-running',
+        })}
+      />
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
         <Link 

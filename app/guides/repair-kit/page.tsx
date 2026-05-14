@@ -1,6 +1,8 @@
 import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Wrench, Zap, Brain, Trophy, Settings, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import JsonLd from '@/app/components/JsonLd';
+import { breadcrumbList, guideArticle } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
   title: 'Repair Kit Guide - Master NoPixel 4.0 Precision Timing | Expert Tips',
@@ -19,6 +21,20 @@ export const metadata: Metadata = {
 export default function RepairKitGuidePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/' },
+          { name: 'Guides', path: '/guides' },
+          { name: 'Repair Kit Guide', path: '/guides/repair-kit' },
+        ])}
+      />
+      <JsonLd
+        data={guideArticle({
+          headline: 'Repair Kit Guide - Master NoPixel 4.0 Precision Timing | Expert Tips',
+          description: 'Complete guide to mastering the Repair Kit minigame in NoPixel 4.0. Learn indicator timing, sweet spot targeting, and pro tips for equipment repairs.',
+          path: '/guides/repair-kit',
+        })}
+      />
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
         <Link 

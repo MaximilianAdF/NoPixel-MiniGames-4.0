@@ -33,8 +33,8 @@ export default function CookieConsent() {
     setIsVisible(false);
     setTimeout(() => setShowBanner(false), 300); // Wait for fade out
     
-    // Optionally: Disable analytics and ads if rejected
-    // You can add logic here to disable Google Analytics and AdSense
+    // Optionally: disable analytics if rejected
+    // You can add logic here to disable Google Analytics
     if (typeof window !== 'undefined') {
       // Disable Google Analytics
       (window as any)['ga-disable-GA_MEASUREMENT_ID'] = true;
@@ -81,11 +81,10 @@ export default function CookieConsent() {
               </div>
               <div className="flex-1 pr-8">
                 <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
-                  🍪 Cookie & Advertising Notice
+                  Cookie Notice
                 </h3>
                 <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-3">
-                  We use cookies and third-party services to enhance your experience, analyze site traffic, and display personalized advertisements through <strong className="text-white">Google AdSense</strong>. 
-                  This includes <strong className="text-white">Google Analytics</strong> for understanding how you use our site, and <strong className="text-white">advertising cookies</strong> that may track your browsing across websites to show relevant ads.
+                  We use cookies and third-party services to enhance your experience and analyze site traffic. This includes <strong className="text-white">Google Analytics</strong> for understanding how you use our site.
                 </p>
                 <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-3">
                   By clicking <strong className="text-white">&quot;Accept All&quot;</strong>, you consent to:
@@ -93,17 +92,11 @@ export default function CookieConsent() {
                 <ul className="text-gray-300 text-xs md:text-sm space-y-1 mb-3 ml-4 list-disc">
                   <li>Functional cookies for site features and preferences</li>
                   <li>Google Analytics tracking for site analytics</li>
-                  <li>Google AdSense personalized advertising cookies</li>
-                  <li>Third-party cookies from ad partners</li>
                 </ul>
                 <p className="text-gray-400 text-xs md:text-sm">
                   You can manage preferences in your browser or visit our{' '}
                   <Link href="/privacy" className="text-[#54FFA4] hover:text-[#45e894] underline">
                     Privacy Policy
-                  </Link>
-                  {' '}and{' '}
-                  <Link href="/advertising" className="text-[#54FFA4] hover:text-[#45e894] underline">
-                    Advertising Policy
                   </Link>
                   {' '}for details.
                 </p>
@@ -113,13 +106,10 @@ export default function CookieConsent() {
             {/* Cookie Types (Expandable - Optional) */}
             <div className="mb-6 p-4 bg-[#0F1B21]/50 rounded-lg border border-[#54FFA4]/20">
               <p className="text-sm text-gray-300 mb-2">
-                <strong className="text-white">🔹 Essential Cookies:</strong> Required for basic site functionality (login, settings)
-              </p>
-              <p className="text-sm text-gray-300 mb-2">
-                <strong className="text-white">🔹 Analytics Cookies:</strong> Help us understand how you use the site (Google Analytics)
+                <strong className="text-white">Essential Cookies:</strong> Required for basic site functionality (login, settings)
               </p>
               <p className="text-sm text-gray-300">
-                <strong className="text-white">🔹 Advertising Cookies:</strong> Used to show relevant ads (Google AdSense)
+                <strong className="text-white">Analytics Cookies:</strong> Help us understand how you use the site (Google Analytics)
               </p>
             </div>
 

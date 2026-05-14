@@ -5,6 +5,7 @@ import { GameType } from '@/interfaces/user';
 import { ObjectId } from 'mongodb';
 import { calculateDifficultyMultiplier } from '@/app/utils/difficultyCalculator';
 import { rateLimit } from '@/lib/rateLimit';
+import { isGameType, isSaneNumber, validateGameSettings } from '@/lib/gameValidation';
 
 export interface RecordGameRequest {
   game: GameType;
@@ -47,12 +48,19 @@ export async function POST(request: Request) {
 
     const body: RecordGameRequest = await request.json();
 
-    // Validate request
-    if (!body.game || body.score === undefined || body.timePlayedMs === undefined) {
-      return NextResponse.json(
-        { error: 'Missing required fields: game, score, timePlayedMs' },
-        { status: 400 }
-      );
+    // Validate request — reject malformed or out-of-range input before it reaches the XP math.
+    if (!isGameType(body.game)) {
+      return NextResponse.json({ error: 'Invalid game' }, { status: 400 });
+    }
+    if (!isSaneNumber(body.score) || !isSaneNumber(body.timePlayedMs)) {
+      return NextResponse.json({ error: 'Invalid score or timePlayedMs' }, { status: 400 });
+    }
+    if (typeof body.won !== 'boolean') {
+      return NextResponse.json({ error: 'Invalid won' }, { status: 400 });
+    }
+    const settingsCheck = validateGameSettings(body.game, body.gameSettings);
+    if (!settingsCheck.ok) {
+      return NextResponse.json({ error: settingsCheck.error }, { status: 400 });
     }
 
     const client = await clientPromise;

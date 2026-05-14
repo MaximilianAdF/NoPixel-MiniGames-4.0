@@ -1,4 +1,18 @@
 import { Code, Github, Star, GitFork, Heart, ExternalLink, Bug } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Open Source - NoPixel 4.0 Minigames Trainer',
+  description: 'NoPixel 4.0 Minigames Trainer is free and open source. Browse the code on GitHub, report bugs, suggest features, or contribute.',
+  openGraph: {
+    title: 'Open Source - NoPixel 4.0 Minigames Trainer',
+    description: 'A free, open-source practice tool for the GTA RP community. Contribute on GitHub.',
+    url: 'https://nphacks.net/open-source',
+  },
+  alternates: {
+    canonical: 'https://nphacks.net/open-source',
+  },
+};
 
 export default function OpenSourcePage() {
   return (
@@ -113,7 +127,7 @@ export default function OpenSourcePage() {
                 3
               </div>
               <div>
-                <h3 className="text-white font-semibold mb-2">💡 Suggest Features</h3>
+                <h3 className="text-white font-semibold mb-2">Suggest Features</h3>
                 <p className="text-gray-300">
                   Have an idea for a new feature or improvement? Open a feature request on our GitHub discussions!
                 </p>
@@ -125,7 +139,7 @@ export default function OpenSourcePage() {
                 4
               </div>
               <div>
-                <h3 className="text-white font-semibold mb-2">🔧 Submit Pull Requests</h3>
+                <h3 className="text-white font-semibold mb-2">Submit Pull Requests</h3>
                 <p className="text-gray-300">
                   Know how to code? Fork the repo, make your changes, and submit a pull request. All contributions are welcome!
                 </p>
@@ -137,7 +151,7 @@ export default function OpenSourcePage() {
                 5
               </div>
               <div>
-                <h3 className="text-white font-semibold mb-2">📖 Improve Documentation</h3>
+                <h3 className="text-white font-semibold mb-2">Improve Documentation</h3>
                 <p className="text-gray-300">
                   Help us write better guides, fix typos, or translate content for non-English speakers.
                 </p>

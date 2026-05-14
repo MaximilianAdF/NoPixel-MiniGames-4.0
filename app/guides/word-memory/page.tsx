@@ -1,6 +1,8 @@
 import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Zap, Brain, Trophy, Eye, Layers } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import JsonLd from '@/app/components/JsonLd';
+import { breadcrumbList, guideArticle } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
   title: 'Word Memory Guide - Master NoPixel 4.0 Recognition Challenge | Expert Tips',
@@ -19,6 +21,20 @@ export const metadata: Metadata = {
 export default function WordMemoryGuidePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/' },
+          { name: 'Guides', path: '/guides' },
+          { name: 'Word Memory Guide', path: '/guides/word-memory' },
+        ])}
+      />
+      <JsonLd
+        data={guideArticle({
+          headline: 'Word Memory Guide - Master NoPixel 4.0 Recognition Challenge | Expert Tips',
+          description: 'Complete guide to mastering the Word Memory minigame in NoPixel 4.0. Learn NEW vs SEEN recognition techniques, memory tracking strategies, and pro tips.',
+          path: '/guides/word-memory',
+        })}
+      />
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
         <Link 

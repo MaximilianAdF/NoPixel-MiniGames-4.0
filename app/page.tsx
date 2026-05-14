@@ -302,7 +302,7 @@ export default function Home() {
               <div className="mb-4"><Trophy className="w-12 h-12 text-spring-green-400 group-hover:scale-110 transition-transform duration-300" /></div>
               <h3 className="text-xl font-bold text-white mb-3 group-hover:text-spring-green-300 transition-colors duration-300">Global Leaderboards</h3>
               <p className="text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
-                Compete with players worldwide. Track your performance, set personal records, and climb to the top of the rankings for each minigame.
+                Compete with players worldwide. Earn XP from every game, build your daily challenge streak, and climb the global level and streak rankings.
               </p>
             </div>
             <div className="group bg-gradient-to-br from-mirage-900/80 to-mirage-950/80 rounded-xl p-6 border-2 border-spring-green-500/30 hover:border-spring-green-600 transition-all duration-300 hover:shadow-lg hover:shadow-spring-green-900/20 hover:-translate-y-1">
@@ -335,8 +335,8 @@ export default function Home() {
               <p className="hover:text-gray-200 transition-colors duration-300">
                 Each minigame has been carefully crafted to match the look, feel, and mechanics of the original NoPixel 4.0 implementations. 
                 Test your reflexes with the Thermite hack, demonstrate your pattern recognition with the Word Memory 
-                challenge, or prove your coordination with the Roof Running game. Track your progress with our integrated highscore system 
-                and compete with players from around the world.
+                challenge, or prove your coordination with the Roof Running game. Level up as you play and
+                compete with players around the world.
               </p>
             </div>
           </div>

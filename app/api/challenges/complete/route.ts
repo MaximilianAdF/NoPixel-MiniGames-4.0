@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 import { rateLimit } from '@/lib/rateLimit';
+import { isSaneNumber } from '@/lib/gameValidation';
 
 export interface CompleteChallengeRequest {
   challengeId: string;
@@ -41,13 +42,13 @@ export async function POST(request: Request) {
     }
 
     const body: CompleteChallengeRequest = await request.json();
-    
-    // Validate request
-    if (!body.challengeId || body.score === undefined || body.timeMs === undefined) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+
+    // Validate request — guard the ObjectId parse and reject non-numeric score/time/mistakes.
+    if (!body.challengeId || !ObjectId.isValid(body.challengeId)) {
+      return NextResponse.json({ error: 'Invalid challengeId' }, { status: 400 });
+    }
+    if (!isSaneNumber(body.score) || !isSaneNumber(body.timeMs) || !isSaneNumber(body.mistakes)) {
+      return NextResponse.json({ error: 'Invalid score, timeMs, or mistakes' }, { status: 400 });
     }
 
     const client = await clientPromise;

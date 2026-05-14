@@ -14,8 +14,7 @@ interface ThermiteSettings extends BaseGameSettings {
 }
 
 interface ChoppingSettings extends BaseGameSettings {
-  numLetters?: number;
-  duration?: number;
+  letters?: number;
 }
 
 interface RoofRunningSettings extends BaseGameSettings {
@@ -34,8 +33,7 @@ interface PinCrackerSettings extends BaseGameSettings {
 }
 
 interface LockpickSettings extends BaseGameSettings {
-  lockDifficulty?: number;
-  duration?: number;
+  levels?: number;
 }
 
 interface RepairKitSettings extends BaseGameSettings {
@@ -44,9 +42,7 @@ interface RepairKitSettings extends BaseGameSettings {
 }
 
 interface LaundrySettings extends BaseGameSettings {
-  numPhrases?: number;
-  targetMatches?: number;
-  duration?: number;
+  levels?: number;
 }
 
 type GameSettings = 
@@ -69,8 +65,8 @@ const DEFAULT_SETTINGS: Record<string, GameSettings> = {
     columns: 6,  // presets[0].columns
   },
   chopping: {
-    numLetters: 15,  // defaultNumLetters
-    duration: 7,  // defaultDuration (in seconds)
+    letters: 15,
+    timer: 7,
   },
   'roof-running': {
     rows: 8,  // defaultRows
@@ -86,17 +82,16 @@ const DEFAULT_SETTINGS: Record<string, GameSettings> = {
     duration: 20,  // defaultDuration (in seconds)
   },
   lockpick: {
-    lockDifficulty: 5,  // Placeholder - lockpick doesn't have settings yet
-    duration: 30,
+    levels: 4,
+    timer: 20,
   },
   'repair-kit': {
     itemsAmount: 3,  // Always same XP per user - doesn't have difficulty settings
     timer: 45,
   },
   laundromat: {
-    numPhrases: 5,  // maxLevels from Laundromat.tsx
-    targetMatches: 4,
-    duration: 12,  // countdownDuration (in seconds)
+    levels: 5,
+    timer: 12,
   },
 };
 
@@ -152,8 +147,8 @@ export function calculateDifficultyMultiplier(
     case 'chopping': {
       const s = settings as ChoppingSettings;
       const d = defaults as ChoppingSettings;
-      addFactor(s.numLetters, d.numLetters);
-      addFactor(s.duration, d.duration, true);
+      addFactor(s.letters, d.letters);
+      addFactor(s.timer, d.timer, true);
       break;
     }
     
@@ -185,8 +180,8 @@ export function calculateDifficultyMultiplier(
     case 'lockpick': {
       const s = settings as LockpickSettings;
       const d = defaults as LockpickSettings;
-      addFactor(s.lockDifficulty, d.lockDifficulty);
-      addFactor(s.duration, d.duration, true);
+      addFactor(s.levels, d.levels);
+      addFactor(s.timer, d.timer, true);
       break;
     }
     
@@ -199,8 +194,8 @@ export function calculateDifficultyMultiplier(
     case 'laundromat': {
       const s = settings as LaundrySettings;
       const d = defaults as LaundrySettings;
-      addFactor(s.numPhrases, d.numPhrases);
-      addFactor(s.duration, d.duration, true);
+      addFactor(s.levels, d.levels);
+      addFactor(s.timer, d.timer, true);
       break;
     }
   }

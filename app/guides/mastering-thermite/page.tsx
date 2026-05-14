@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Flame, ArrowLeft, Lightbulb, AlertTriangle, Trophy, Brain, GraduationCap, Target } from 'lucide-react';
+import JsonLd from '@/app/components/JsonLd';
+import { breadcrumbList, guideArticle } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
     title: 'Mastering Thermite Hacks in NoPixel 4.0 - Complete Strategy Guide',
@@ -19,6 +21,20 @@ export const metadata: Metadata = {
 export default function MasteringThermitePage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
+            <JsonLd
+                data={breadcrumbList([
+                    { name: 'Home', path: '/' },
+                    { name: 'Guides', path: '/guides' },
+                    { name: 'Mastering Thermite Hacks in NoPixel 4.0', path: '/guides/mastering-thermite' },
+                ])}
+            />
+            <JsonLd
+                data={guideArticle({
+                    headline: 'Mastering Thermite Hacks in NoPixel 4.0 - Complete Strategy Guide',
+                    description: 'Learn how to master the Thermite hacking minigame in NoPixel 4.0. Expert memory techniques, pattern recognition strategies, and pro tips for conquering bank heist laser systems.',
+                    path: '/guides/mastering-thermite',
+                })}
+            />
             <div className="max-w-3xl mx-auto">
                 {/* Navigation */}
                 <div className="pt-16 mb-8">

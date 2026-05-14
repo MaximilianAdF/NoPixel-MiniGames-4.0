@@ -51,7 +51,7 @@ const orbitron = Orbitron({
   display: 'swap',
   variable: '--font-orbitron',
   adjustFontFallback: true,
-  preload: true,
+  preload: false,
 });
 
 const rajdhani = Rajdhani({
@@ -60,7 +60,7 @@ const rajdhani = Rajdhani({
   display: 'swap',
   variable: '--font-rajdhani',
   adjustFontFallback: true,
-  preload: true,
+  preload: false,
 });
 
 const caveat = Caveat({
@@ -69,7 +69,7 @@ const caveat = Caveat({
   display: 'swap',
   variable: '--font-caveat',
   adjustFontFallback: true,
-  preload: true,
+  preload: false,
 });
 
 
@@ -171,19 +171,10 @@ export default function RootLayout({
     >
       <head>
         <meta name="theme-color" content="#020617" />
-        <meta name="google-adsense-account" content="ca-pub-8849653057967400" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="color-scheme" content="dark" />
-
-        {/* Google AdSense Verification for nphacks.net */}
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8849653057967400"
-          crossOrigin="anonymous"
-          strategy="beforeInteractive"
-        />
 
         {/* Google Tag Manager - Replace GTM-XXXXXXX with your actual GTM ID */}
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />

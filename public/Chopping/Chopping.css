@@ -10,52 +10,40 @@
 .game-grid {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
+  gap: var(--cell-gap, 0.5rem);
   z-index: 1;
   width: 100%;
   height: 100%;
   overflow: visible;
-  /* CSS containment for performance isolation - removed paint to allow overflow */
-  contain: layout style;
+  /* Container context so letter cells size to the grid, not the viewport. */
+  container-type: inline-size;
   /* GPU acceleration */
   transform: translateZ(0);
 }
 
 .game-grid-row {
   display: flex;
+  flex: 1;
+  min-height: 0;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--cell-gap, 0.5rem);
   z-index: 1;
   overflow: visible;
-  /* Isolate row rendering - no paint containment to allow letter overflow */
-  contain: none;
   transform: translateZ(0);
 }
 
-/* Mobile & Tablet: Additional constraints to prevent overflow */
+/* Mobile & Tablet: tighten the gap between cells. */
 @media (max-width: 1023px) {
   .game-grid {
-    gap: 0.3rem;
-    padding: 0;
-  }
-  
-  .game-grid-row {
-    gap: 0.3rem;
+    --cell-gap: 0.3rem;
   }
 }
 
 /* Extra small devices */
 @media (max-width: 480px) {
   .game-grid {
-    gap: 0.2rem;
-    padding: 0;
-  }
-  
-  .game-grid-row {
-    gap: 0.2rem;
+    --cell-gap: 0.2rem;
   }
 }
 
@@ -151,60 +139,44 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
+  /* Size to the grid container: one of six columns wide, square, capped to the row height. */
+  width: calc((100cqw - 5 * var(--cell-gap, 0.5rem)) / 6);
+  aspect-ratio: 1 / 1;
+  max-height: 100%;
+  font-size: clamp(1rem, 6.5cqw, 2.75rem);
   font-weight: 500;
-  width: 6rem;
-  height: 6rem;
   flex-shrink: 0;
   color: rgb(112, 193, 255);
   border: 0.125rem solid rgba(112, 193, 255, 0.05);
   border-radius: 8px;
   background: rgba(22, 40, 52, 0.15);
-  /* Blurred backdrop */
   backdrop-filter: blur(4px);
   z-index: 1;
   box-sizing: border-box;
   /* GPU acceleration - critical for smooth performance */
   will-change: transform, opacity;
   transform: translateZ(0);
-  /* CSS containment - removed paint to allow scale overflow */
-  contain: none;
   /* ONLY animate transform and opacity - nothing else */
-  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), 
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1),
               opacity 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Mobile responsive font sizing */
+/* Mobile & Tablet: thinner borders; sizing is handled by the container units above. */
 @media (max-width: 1023px) {
   .letter {
-    font-size: clamp(1.4rem, 5vw, 2rem);
-    width: clamp(2.8rem, 14vw, 4rem);
-    height: clamp(2.8rem, 14vw, 4rem);
     border: 0.1rem solid rgba(112, 193, 255, 0.05);
     border-radius: 6px;
-    /* Blurred backdrop on mobile */
-    backdrop-filter: blur(4px);
-    background: rgba(22, 40, 52, 0.15);
   }
-  
+
   .letter.done {
     border: 0.1rem solid rgba(48, 221, 189, 0.3);
     /* Minimal shadow on mobile for max performance */
     box-shadow: 0 0 8px rgba(48, 221, 189, 0.2);
   }
-  
+
   .letter.fail {
     border: 0.1rem solid rgba(255, 84, 84, 0.3);
     box-shadow: 0 0 8px rgba(255, 84, 84, 0.2);
-  }
-}
-
-/* Extra small devices */
-@media (max-width: 480px) {
-  .letter {
-    font-size: clamp(1.2rem, 4.5vw, 1.6rem);
-    width: clamp(2.5rem, 13vw, 3.2rem);
-    height: clamp(2.5rem, 13vw, 3.2rem);
   }
 }
 

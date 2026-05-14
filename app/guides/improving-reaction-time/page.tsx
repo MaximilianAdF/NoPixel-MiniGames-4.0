@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Zap, ArrowLeft, Brain, Timer, Eye, Heart, Dumbbell, Coffee } from 'lucide-react';
+import JsonLd from '@/app/components/JsonLd';
+import { breadcrumbList, guideArticle } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
     title: 'How to Improve Reaction Time for GTA RP Minigames - Science-Backed Guide',
@@ -19,6 +21,20 @@ export const metadata: Metadata = {
 export default function ReactionTimeGuidePage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
+            <JsonLd
+                data={breadcrumbList([
+                    { name: 'Home', path: '/' },
+                    { name: 'Guides', path: '/guides' },
+                    { name: 'How to Improve Reaction Time for GTA RP Minigames', path: '/guides/improving-reaction-time' },
+                ])}
+            />
+            <JsonLd
+                data={guideArticle({
+                    headline: 'How to Improve Reaction Time for GTA RP Minigames - Science-Backed Guide',
+                    description: 'Science-backed techniques to improve your reaction speed, hand-eye coordination, and cognitive performance for NoPixel 4.0 minigames. Practical exercises and lifestyle tips.',
+                    path: '/guides/improving-reaction-time',
+                })}
+            />
             <div className="max-w-3xl mx-auto">
                 {/* Navigation */}
                 <div className="pt-16 mb-8">

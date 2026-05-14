@@ -137,7 +137,7 @@ export default function PincrackerInstructions() {
                     Guess 1: 0123 → All red (eliminate 0,1,2,3)<br/>
                     Guess 2: 4567 → 4 yellow, 7 yellow (4 and 7 are in code but wrong positions)<br/>
                     Guess 3: 7498 → 7 green, 4 green, 9 green, 8 red (positions 1,2,3 solved!)<br/>
-                    Guess 4: 7491 → SUCCESS! ✅
+                    Guess 4: 7491 → SUCCESS!
                 </p>
             </InstructionSection>
 

@@ -22,11 +22,7 @@ const LetterCell = memo<LetterCellProps>(
       fail: isFail,
     });
 
-    return (
-      <div className={classes} style={{ justifySelf: 'center' }}>
-        {letter}
-      </div>
-    );
+    return <div className={classes}>{letter}</div>;
   },
   (prevProps, nextProps) => {
     return (
@@ -52,8 +48,6 @@ interface GridRowProps {
 // Memoized per row; the comparator re-renders a row only when its own cells or the active cell change.
 export const GridRow = memo<GridRowProps>(
   ({ rowIndex, board, stateBoard, activeIndex, numLetters, gridCols }) => {
-    const colsInRow = Math.min(numLetters - rowIndex * gridCols, gridCols);
-
     const cells = useMemo(() => {
       const cellsArray = [];
       for (let colIndex = 0; colIndex < gridCols; colIndex++) {
@@ -72,10 +66,7 @@ export const GridRow = memo<GridRowProps>(
     }, [board, stateBoard, activeIndex, numLetters, gridCols, rowIndex]);
 
     return (
-      <div
-        className="game-grid-row"
-        style={{ gridTemplateColumns: `repeat(${colsInRow}, min-content)` }}
-      >
+      <div className="game-grid-row">
         {cells.map((cell) => (
           <LetterCell
             key={cell.key}

@@ -541,14 +541,6 @@ export default function NavigationMenu() {
               >
                 Terms
               </Link>
-              <span className="text-gray-700">•</span>
-              <Link 
-                href="/advertising" 
-                onClick={handleLinkClick}
-                className={`hover:text-[#54FFA4] transition-colors ${pathname === '/advertising' ? 'text-[#54FFA4]' : ''}`}
-              >
-                Ads
-              </Link>
             </div>
           </div>
           </nav>

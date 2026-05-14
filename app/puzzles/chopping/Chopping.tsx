@@ -283,7 +283,7 @@ const Chopping: FC = () => {
           )}
           <div
             ref={gameWrapperRef}
-            className="min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px] w-full max-w-full h-full rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-center text-white p-1 sm:p-4 mx-auto"
+            className="min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px] w-full max-w-full flex-1 min-h-0 rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-center text-white p-1 sm:p-4 mx-auto"
             onTouchStartCapture={mobile.handleInteraction}
             onPointerDownCapture={mobile.handleInteraction}
             style={{ scrollMarginTop: '15vh', overflow: 'visible' }}

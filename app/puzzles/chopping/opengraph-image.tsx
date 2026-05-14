@@ -60,9 +60,6 @@ export default async function Image() {
             Minigames
           </div>
         </div>
-        <div style={{ fontSize: '120px', marginBottom: '20px' }}>
-          ⚡
-        </div>
         <div
           style={{
             fontSize: '72px',
@@ -113,7 +110,7 @@ export default async function Image() {
               textAlign: 'center',
             }}
           >
-            Lightning reflexes • Keyboard skills • Top the leaderboard
+            Lightning reflexes • Keyboard skills
           </div>
         </div>
         <div
@@ -136,7 +133,7 @@ export default async function Image() {
               fontWeight: 'bold',
             }}
           >
-            ⭐ FREE PRACTICE
+            FREE PRACTICE
           </div>
           <div style={{ fontSize: '20px', fontFamily: 'sans-serif', color: '#666' }}>
             •
