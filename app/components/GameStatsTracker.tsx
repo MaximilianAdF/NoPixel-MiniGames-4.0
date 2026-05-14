@@ -6,7 +6,6 @@ import { Zap, Trophy, Flame } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { trackGameEvent } from '../utils/analytics';
 import { trackGameComplete } from '../utils/gtm';
-import { isStandardPreset } from '../utils/gamePresets';
 import ClientPortal from './ClientPortal';
 
 interface GameStatsTrackerProps {
@@ -25,11 +24,6 @@ interface StatsResponse {
   xpEarned: number;
   leveledUp: boolean;
   newLevel?: number;
-  stats: {
-    bestScore: number;
-    averageScore: number;
-    gamesPlayed: number;
-  };
 }
 
 export default function GameStatsTracker({
@@ -98,7 +92,6 @@ export default function GameStatsTracker({
       result: won ? 'win' : 'loss',
       score: score,
       time: elapsedMs / 1000, // Convert to seconds
-      is_standard_preset: isStandardPreset(game, gameSettings || {}),
       is_logged_in: isLoggedIn,
     });
     

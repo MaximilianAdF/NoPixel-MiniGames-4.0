@@ -117,7 +117,6 @@ export default function ThermiteInstructions() {
                     <li><strong>Gradual progression</strong> - Don&apos;t jump to expert mode immediately; master each level first</li>
                     <li><strong>Pressure simulation</strong> - Set personal time limits to simulate heist pressure</li>
                     <li><strong>Review failures</strong> - Understand why you failed specific patterns</li>
-                    <li><strong>Compete on leaderboards</strong> - Push yourself against other players&apos; scores</li>
                 </ul>
             </InstructionSection>
 

@@ -3,12 +3,12 @@ import LeaderboardsClient from './LeaderboardsClient';
 import { Trophy, Medal, Users, TrendingUp } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: "🏆 NoPixel 4.0 Leaderboards - Global Rankings & World Records",
-  description: "Compete on global leaderboards for NoPixel 4.0 minigames. View top players, world records, and rankings for Thermite, Lockpick, PinCracker, Laundromat, Roof Running, Word Memory, and Chopping. Track your progress and climb the ranks!",
-  keywords: ["NoPixel leaderboard", "GTA RP rankings", "thermite world record", "NoPixel high scores", "minigame rankings", "NoPixel 4.0 leaderboard"],
+  title: "🏆 NoPixel 4.0 Leaderboards - Player Level & Daily Streak Rankings",
+  description: "Compete on the NoPixel 4.0 global leaderboards. Climb the Player Level rankings by earning XP, and build the longest Daily Challenge streak. Log in with Discord and track your progress.",
+  keywords: ["NoPixel leaderboard", "GTA RP rankings", "NoPixel player level", "daily streak leaderboard", "NoPixel 4.0 leaderboard"],
   openGraph: {
     title: "🏆 NoPixel 4.0 Leaderboards - Compete Globally",
-    description: "View global rankings for all NoPixel minigames. See who holds the world records and track your progress on the leaderboards.",
+    description: "View the global Player Level and Daily Streak rankings. Earn XP, build your streak, and climb to the top.",
     url: "https://nphacks.net/leaderboards",
   },
   alternates: {
@@ -28,8 +28,9 @@ export default function LeaderboardsPage() {
               Global Leaderboards
             </h1>
             <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-              Compete with players worldwide on our real-time leaderboards. Track your progress across 
-              all 7 NoPixel minigames, set personal records, and climb to the top of the rankings.
+              Compete with players worldwide on our real-time leaderboards. Earn XP to climb
+              the Player Level rankings, and complete the daily challenge every day to build
+              the longest streak.
             </p>
           </div>
 
@@ -38,7 +39,7 @@ export default function LeaderboardsPage() {
             <div className="bg-[#1a2930]/80 border border-yellow-400/20 rounded-xl p-4 text-center">
               <Trophy className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
               <p className="text-gray-400 text-sm">Categories</p>
-              <p className="text-white font-bold text-xl">9</p>
+              <p className="text-white font-bold text-xl">2</p>
             </div>
             <div className="bg-[#1a2930]/80 border border-[#54FFA4]/20 rounded-xl p-4 text-center">
               <Users className="w-8 h-8 text-[#54FFA4] mx-auto mb-2" />
@@ -47,8 +48,8 @@ export default function LeaderboardsPage() {
             </div>
             <div className="bg-[#1a2930]/80 border border-purple-400/20 rounded-xl p-4 text-center">
               <Medal className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-              <p className="text-gray-400 text-sm">Records Set</p>
-              <p className="text-white font-bold text-xl">5000+</p>
+              <p className="text-gray-400 text-sm">Rankings</p>
+              <p className="text-white font-bold text-xl">Live</p>
             </div>
             <div className="bg-[#1a2930]/80 border border-blue-400/20 rounded-xl p-4 text-center">
               <TrendingUp className="w-8 h-8 text-blue-400 mx-auto mb-2" />
@@ -68,27 +69,19 @@ export default function LeaderboardsPage() {
           <h2 className="text-2xl font-bold text-white mb-4">How Our Ranking System Works</h2>
           <div className="space-y-4 text-gray-300">
             <p>
-              Our leaderboards track performance across multiple categories, giving you various ways to compete
-              and prove your skills. Each minigame has its own dedicated leaderboard ranked by completion time
-              or score, depending on the game mechanics.
+              Our leaderboards give you two ways to compete and prove your skills: your overall
+              Player Level, and your Daily Challenge streak.
             </p>
             <h3 className="text-xl font-semibold text-white mt-6 mb-2">Ranking Categories</h3>
             <ul className="space-y-2">
-              <li><span className="text-[#54FFA4] font-semibold">Player Level:</span> Earn XP by completing games and challenges. Level up to show your dedication.</li>
+              <li><span className="text-[#54FFA4] font-semibold">Player Level:</span> Earn XP by completing games and daily challenges. Level up to show your dedication.</li>
               <li><span className="text-[#54FFA4] font-semibold">Daily Streak:</span> Complete daily challenges consecutively to build your streak and climb the rankings.</li>
-              <li><span className="text-[#54FFA4] font-semibold">Minigame Times:</span> Compete for the fastest completion times on each individual minigame.</li>
             </ul>
-            <h3 className="text-xl font-semibold text-white mt-6 mb-2">Fair Competition</h3>
-            <p>
-              Only games played on standard difficulty settings are eligible for the main leaderboards to ensure
-              fair competition. Custom settings and practice runs are tracked separately so you can still
-              monitor your progress without affecting the competitive rankings.
-            </p>
             <h3 className="text-xl font-semibold text-white mt-6 mb-2">Getting Started</h3>
             <p>
-              To appear on the leaderboards, simply log in with your Discord account and start playing! Your
-              best times and scores are automatically tracked and updated in real-time. Challenge yourself,
-              compete with friends, and aim for the top of the global rankings.
+              To appear on the leaderboards, simply log in with your Discord account and start
+              playing! Your XP and streak are automatically tracked and updated in real-time.
+              Challenge yourself, compete with friends, and aim for the top of the global rankings.
             </p>
           </div>
         </div>

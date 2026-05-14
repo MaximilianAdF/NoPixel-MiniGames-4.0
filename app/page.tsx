@@ -352,7 +352,7 @@ export default function Home() {
               Global Leaderboards
             </h2>
             <p className="text-gray-400 text-lg mb-6 max-w-2xl mx-auto hover:text-gray-300 transition-colors duration-300">
-              Compete with players worldwide! Visit the <Link href="/leaderboards" className="text-spring-green-400 hover:text-spring-green-300 font-semibold underline">Leaderboards</Link> page to see top performers for each minigame.
+              Compete with players worldwide! Visit the <Link href="/leaderboards" className="text-spring-green-400 hover:text-spring-green-300 font-semibold underline">Leaderboards</Link> page to see the top players by level and daily streak.
             </p>
           </div>
 
@@ -432,7 +432,7 @@ export default function Home() {
                       "name": "Can I compete with other players?",
                       "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Absolutely! Each minigame features global leaderboards where you can track your performance, compare scores, and compete with players worldwide."
+                        "text": "Absolutely! Our global leaderboards rank players by level and daily challenge streak. Earn XP and build your streak to climb the rankings and compete with players worldwide."
                       }
                     },
                     {
@@ -482,7 +482,7 @@ export default function Home() {
               <div className="border-l-4 border-spring-green-500/30 pl-6 hover:border-spring-green-500 transition-colors duration-300">
                 <h3 className="text-xl font-bold text-white mb-2">Can I compete with other players?</h3>
                 <p className="leading-relaxed">
-                  Absolutely! Each minigame features global leaderboards where you can track your performance, compare scores, and compete with players worldwide.
+                  Absolutely! Our global leaderboards rank players by level and daily challenge streak. Earn XP and build your streak to climb the rankings and compete with players worldwide.
                 </p>
               </div>
               

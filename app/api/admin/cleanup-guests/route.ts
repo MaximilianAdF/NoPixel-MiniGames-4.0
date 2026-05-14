@@ -52,11 +52,6 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        // Delete associated game stats
-        const statsResult = await db.collection('gameStats').deleteMany({
-            userId: { $in: staleUserIds },
-        });
-
         // Delete the guest user documents
         const { ObjectId } = await import('mongodb');
         const userResult = await db.collection('users').deleteMany({
@@ -68,7 +63,6 @@ export async function POST(request: NextRequest) {
             deleted: userResult.deletedCount,
             deletedNoGames: inactiveNoGames.length,
             deletedWithGames: inactiveWithGames.length,
-            deletedStats: statsResult.deletedCount,
         });
     } catch (error) {
         console.error('Cleanup error:', error);

@@ -9,7 +9,6 @@ import { trackGameStart, trackGameRetry } from '@/app/utils/gtm';
 import { useUser } from '@/app/contexts/UserContext';
 import { NPSettingsRange } from '@/app/components/NPSettings';
 import GameStatsTracker from '@/app/components/GameStatsTracker';
-import LeaderboardEligibleBadge from '@/app/components/LeaderboardEligibleBadge';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
@@ -169,10 +168,6 @@ const WordMemory: FC = () => {
 
   return (
     <>
-      <LeaderboardEligibleBadge
-        game="word-memory"
-        gameSettings={{ words: activeNumWords, timer: activeTimer }}
-      />
       <GameStatsTracker
         game="word-memory"
         gameStatus={legacyStatus}

@@ -12,7 +12,6 @@ import { useUser } from '@/app/contexts/UserContext';
 import { NPSettingsRange } from '@/app/components/NPSettings';
 import NPButton from '@/app/components/NPButton';
 import GameStatsTracker from '@/app/components/GameStatsTracker';
-import LeaderboardEligibleBadge from '@/app/components/LeaderboardEligibleBadge';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
@@ -250,15 +249,6 @@ const Thermite: FC = () => {
 
   return (
     <>
-      <LeaderboardEligibleBadge
-        game="thermite"
-        gameSettings={{
-          timer: activeTimer,
-          targetScore: activeTargetScore,
-          rows: activeRows,
-          columns: activeColumns,
-        }}
-      />
       <GameStatsTracker
         game="thermite"
         gameStatus={legacyStatus}

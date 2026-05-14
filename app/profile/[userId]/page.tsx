@@ -1,10 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Trophy, Zap, Flame, Calendar, Clock, TrendingUp, Award, Gamepad2, ArrowLeft, ChevronRight, ListTodo, Star, Medal } from 'lucide-react';
+import { Trophy, Zap, Flame, Calendar, Clock, TrendingUp, Award, Gamepad2, ArrowLeft, ListTodo, Star, Medal } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getGameName, getGameIcon, getGameTailwindGradient } from '../../utils/gameIcons';
 
 interface UserProfile {
   user: {
@@ -20,22 +19,6 @@ interface UserProfile {
     longestDailyStreak: number;
     joinedAt: string;
   };
-  gameStats: {
-    game: string;
-    gamesPlayed: number;
-    gamesWon: number;
-    gamesLost: number;
-    bestScore: number;
-    bestTime: number;
-    bestScoreOverall: number;
-    bestTimeOverall: number;
-    averageScore: number;
-    averageTime: number;
-    totalTimePlayedMs: number;
-    currentStreak: number;
-    longestStreak: number;
-    lastPlayedAt: string;
-  }[];
   challengeHistory: {
     date: string;
     completed: boolean;
@@ -46,7 +29,6 @@ interface UserProfile {
   ranks?: {
     level?: number;
     streak?: number;
-    games?: { [key: string]: number };
   };
 }
 
@@ -181,7 +163,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
     );
   }
 
-  const { user, gameStats, challengeHistory } = profile;
+  const { user, challengeHistory } = profile;
 
   // Calculate XP progress
   const calculateXPForLevel = (level: number): number => {
@@ -201,11 +183,6 @@ export default function PublicProfilePage({ params }: { params: { userId: string
   const challengeCompletionRate = challengeHistory.length > 0 
     ? Math.round((completedChallenges / challengeHistory.length) * 100) 
     : 0;
-
-  // Import game utilities
-  const TIME_BASED_GAMES = ['thermite', 'lockpick', 'pincracker', 'laundromat', 'roof-running', 'chopping'];
-  const SCORE_BASED_GAMES = ['word-memory'];
-  const LEADERBOARD_GAMES = [...TIME_BASED_GAMES, ...SCORE_BASED_GAMES];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] py-8 px-4 sm:px-6 lg:px-8">
@@ -358,102 +335,6 @@ export default function PublicProfilePage({ params }: { params: { userId: string
             <div className="text-sm text-gray-400">
               {completedChallenges} of {challengeHistory.length} completed
             </div>
-          </div>
-        </div>
-
-        {/* Game Statistics Grid */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-            <Star className="w-6 h-6 text-[#54FFA4]" />
-            Game Statistics
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {gameStats.length === 0 ? (
-              <div className="col-span-full text-center py-12 text-gray-400">
-                <Trophy className="w-16 h-16 mx-auto mb-4 text-gray-600" />
-                <p className="text-gray-400 text-lg">No games played yet</p>
-                <p className="text-gray-500 text-sm mt-2">Start playing to see your stats!</p>
-              </div>
-            ) : (
-              gameStats
-                .filter(gameStat => LEADERBOARD_GAMES.includes(gameStat.game))
-                .map((gameStat) => {
-                const isTimeBased = TIME_BASED_GAMES.includes(gameStat.game);
-                
-                return (
-                  <div 
-                    key={gameStat.game}
-                    className="bg-gradient-to-br from-[#1a2930] to-[#0F1B21] border-2 border-[#54FFA4]/30 rounded-xl p-6 hover:border-[#54FFA4]/60 transition-all duration-300 hover:transform hover:scale-105"
-                  >
-                    {/* Game Header */}
-                    <div className="mb-4">
-                      <div className={`h-2 w-full bg-gradient-to-r ${getGameTailwindGradient(gameStat.game)} rounded-full mb-3`} />
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="flex items-center justify-center">{getGameIcon(gameStat.game, 'md')}</span>
-                          <h3 className="text-xl font-bold text-white">{getGameName(gameStat.game)}</h3>
-                        </div>
-                        {profile?.ranks?.games?.[gameStat.game] && formatRank(profile.ranks.games[gameStat.game], gameStat.game)}
-                      </div>
-                    </div>
-
-                    {/* Stats */}
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-sm">
-                          {isTimeBased ? 'Best Time' : 'Best Score'}
-                        </span>
-                        <span className="text-[#54FFA4] font-bold">
-                          {isTimeBased 
-                            ? ((gameStat.bestTimeOverall || gameStat.bestTime) && (gameStat.bestTimeOverall || gameStat.bestTime)! > 0
-                                ? `${((gameStat.bestTimeOverall || gameStat.bestTime)! / 1000).toFixed(2)}s`
-                                : 'N/A')
-                            : ((gameStat.bestScoreOverall || gameStat.bestScore) && (gameStat.bestScoreOverall || gameStat.bestScore)! > 0
-                                ? (gameStat.bestScoreOverall || gameStat.bestScore)!.toLocaleString()
-                                : 'N/A')}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-sm">Average</span>
-                        <span className="text-white font-medium">
-                          {isTimeBased 
-                            ? (gameStat.averageTime && gameStat.averageTime > 0
-                                ? `${(gameStat.averageTime / 1000).toFixed(2)}s`
-                                : 'N/A')
-                            : (gameStat.averageScore && gameStat.averageScore > 0
-                                ? gameStat.averageScore.toLocaleString()
-                                : 'N/A')}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-sm">Games Played</span>
-                        <span className="flex items-center gap-1.5 font-medium">
-                          <span className="text-emerald-400">{gameStat.gamesWon}</span>
-                          <span className="text-gray-500">|</span>
-                          <span className="text-red-400">{gameStat.gamesLost}</span>
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-sm">Time Played</span>
-                        <span className="text-white font-medium">
-                          {Math.floor(gameStat.totalTimePlayedMs / 1000 / 60)}m
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Play Button */}
-                    <Link 
-                      href={`/puzzles/${gameStat.game}`}
-                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#54FFA4] to-[#45e894] text-[#0F1B21] rounded-lg font-bold hover:opacity-90 transition-opacity"
-                    >
-                      Play Now
-                      <ChevronRight className="w-4 h-4" />
-                    </Link>
-                  </div>
-                );
-              })
-            )}
           </div>
         </div>
 

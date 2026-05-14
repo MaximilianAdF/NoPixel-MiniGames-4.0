@@ -224,7 +224,7 @@ export default function MasteringThermitePage() {
                                 </div>
                                 <div className="bg-[#0F1B21]/50 rounded-lg p-4 border border-[#54FFA4]/20">
                                     <h4 className="font-semibold text-[#54FFA4] mb-1">Week 4: Mastery (Days 22-30)</h4>
-                                    <p className="text-sm">Push into 9+ tile territory. Compete on leaderboards to measure your progress against other players. If you can consistently pass 8-tile patterns, you&apos;re ready for virtually any heist in NoPixel 4.0. Keep practicing to maintain your edge.</p>
+                                    <p className="text-sm">Push into 9+ tile territory. If you can consistently pass 8-tile patterns, you&apos;re ready for virtually any heist in NoPixel 4.0. Keep practicing to maintain your edge.</p>
                                 </div>
                             </div>
                         </div>

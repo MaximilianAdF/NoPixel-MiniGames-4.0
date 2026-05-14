@@ -1,17 +1,13 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { Trophy, Medal, Award, Flame, Zap, TrendingUp, Gamepad2, ChevronDown, ChevronRight, User, Play, Info, Filter, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { Trophy, Medal, Award, Flame, Zap, TrendingUp, ChevronDown, ChevronRight, User, Info, Filter, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useUser } from '../contexts/UserContext';
 import { getGameIcon } from '../utils/gameIcons';
-import { getPresetDescription } from '../utils/gamePresets';
-import Icon from '@mdi/react';
-import { mdiFuse, mdiWashingMachine } from '@mdi/js';
-import { Blocks, Brain, Key, Wrench, Keyboard, Fingerprint } from 'lucide-react';
 
-type LeaderboardType = 'level' | 'streak' | 'thermite' | 'lockpick' | 'pincracker' | 'laundromat' | 'roof-running' | 'word-memory' | 'chopping';
+type LeaderboardType = 'level' | 'streak';
 
 interface LeaderboardEntry {
   rank: number;
@@ -29,15 +25,6 @@ const leaderboardCategories = {
   general: [
     { id: 'level', name: 'Player Level', icon: Zap, description: 'Top players by XP and level' },
     { id: 'streak', name: 'Daily Streak', icon: Flame, description: 'Longest consecutive challenge streaks' },
-  ],
-  minigames: [
-    { id: 'thermite', name: 'Thermite', iconType: 'mdi', iconPath: mdiFuse, description: 'Fastest completion time' },
-    { id: 'lockpick', name: 'Lockpick', iconType: 'lucide', IconComponent: Key, description: 'Fastest completion time' },
-    { id: 'pincracker', name: 'PinCracker', iconType: 'lucide', IconComponent: Fingerprint, description: 'Fastest completion time' },
-    { id: 'laundromat', name: 'Laundromat', iconType: 'mdi', iconPath: mdiWashingMachine, description: 'Fastest completion time' },
-    { id: 'roof-running', name: 'Roof Running', iconType: 'lucide', IconComponent: Blocks, description: 'Fastest completion time' },
-    { id: 'word-memory', name: 'Word Memory', iconType: 'lucide', IconComponent: Brain, description: 'Most words remembered' },
-    { id: 'chopping', name: 'Chopping', iconType: 'lucide', IconComponent: Keyboard, description: 'Fastest completion time' },
   ],
 };
 
@@ -260,22 +247,9 @@ export default function LeaderboardsClient() {
     return <span className="text-gray-400 font-bold">#{rank}</span>;
   };
 
-  // Format leaderboard value based on game type
-  const formatLeaderboardValue = (value: number) => {
-    // Time-based games (all except word-memory)
-    const timeBasedGames = ['thermite', 'lockpick', 'laundromat', 'pincracker', 'chopping', 'roof-running'];
+  const formatLeaderboardValue = (value: number) => value.toLocaleString();
 
-    if (timeBasedGames.includes(activeLeaderboard)) {
-      // Convert ms to seconds with 2 decimal places
-      const seconds = (value / 1000).toFixed(2);
-      return `${seconds}s`;
-    }
-
-    // Score-based (word-memory) or level/streak
-    return value.toLocaleString();
-  };
-
-  const activeOption = [...leaderboardCategories.general, ...leaderboardCategories.minigames].find(opt => opt.id === activeLeaderboard);
+  const activeOption = leaderboardCategories.general.find(opt => opt.id === activeLeaderboard);
 
   // No skeleton - just show the page immediately
   // if (isInitialLoad && loading) {
@@ -334,55 +308,6 @@ export default function LeaderboardsClient() {
                 )}
               </div>
 
-              {/* Minigames Category */}
-              <div>
-                <button
-                  onClick={() => toggleCategory('minigames')}
-                  className="w-full px-6 py-4 bg-[#0F1B21]/50 border-b-2 border-[#54FFA4]/30 flex items-center justify-between text-white font-bold hover:bg-[#0F1B21]/70 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <Gamepad2 className="w-5 h-5 text-[#54FFA4]" />
-                    <span>Minigames</span>
-                  </div>
-                  {expandedCategories.has('minigames') ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                </button>
-
-                {expandedCategories.has('minigames') && (
-                  <div className="divide-y divide-[#54FFA4]/20">
-                    {leaderboardCategories.minigames.map((option) => {
-                      const renderIcon = () => {
-                        if (option.iconType === 'mdi' && option.iconPath) {
-                          return <Icon path={option.iconPath} size={0.6} />;
-                        }
-                        if (option.iconType === 'lucide' && option.IconComponent) {
-                          const LucideIcon = option.IconComponent;
-                          return <LucideIcon className="w-4 h-4" />;
-                        }
-                        return null;
-                      };
-
-                      return (
-                        <button
-                          key={option.id}
-                          onClick={() => handleLeaderboardChange(option.id as LeaderboardType)}
-                          disabled={isTransitioning && activeLeaderboard !== option.id}
-                          className={`w-full px-6 py-3 flex items-center gap-3 transition-all duration-200 ${activeLeaderboard === option.id
-                              ? 'bg-gradient-to-r from-[#54FFA4]/20 to-[#45e894]/20 border-l-4 border-[#54FFA4] text-white'
-                              : 'text-gray-300 hover:bg-[#0F1B21]/30'
-                            } ${isTransitioning && activeLeaderboard !== option.id ? 'opacity-50 cursor-not-allowed' : ''
-                            }`}
-                        >
-                          <div className={`transition-colors duration-200 ${activeLeaderboard === option.id ? 'text-[#54FFA4]' : 'text-gray-400'}`}>
-                            {renderIcon()}
-                          </div>
-                          <span className="text-sm font-medium">{option.name}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
             </div>
           </div>
 
@@ -401,17 +326,7 @@ export default function LeaderboardsClient() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    {activeOption && (
-                      <>
-                        {'icon' in activeOption ? (
-                          <activeOption.icon className="w-8 h-8 text-[#54FFA4]" />
-                        ) : activeOption.iconType === 'mdi' && activeOption.iconPath ? (
-                          <Icon path={activeOption.iconPath} size={1.2} className="text-[#54FFA4]" />
-                        ) : activeOption.iconType === 'lucide' && activeOption.IconComponent ? (
-                          <activeOption.IconComponent className="w-8 h-8 text-[#54FFA4]" />
-                        ) : null}
-                      </>
-                    )}
+                    {activeOption && <activeOption.icon className="w-8 h-8 text-[#54FFA4]" />}
                     <h2 className="text-3xl font-bold text-white">{activeOption?.name}</h2>
                     <button
                       onClick={() => setShowInfoModal(true)}
@@ -423,17 +338,6 @@ export default function LeaderboardsClient() {
                   </div>
                   <p className="text-gray-400">{activeOption?.description}</p>
                 </div>
-
-                {/* Play Competitively Button (for minigames only) */}
-                {!['level', 'streak'].includes(activeLeaderboard) && (
-                  <Link
-                    href={`/puzzles/${activeLeaderboard}?competitive=true`}
-                    className="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-[#54FFA4] text-[#0F1B21] rounded-lg font-semibold hover:bg-[#45e894] transition-all shadow-lg hover:shadow-[#54FFA4]/20 hover:-translate-y-0.5"
-                  >
-                    <Play className="w-4 h-4" />
-                    Play Competitively
-                  </Link>
-                )}
 
                 {/* Play Daily Challenge Button (for streak leaderboard) */}
                 {activeLeaderboard === 'streak' && (
@@ -480,16 +384,10 @@ export default function LeaderboardsClient() {
                   <div className="col-span-1">Rank</div>
                   <div className="col-span-6 md:col-span-5">Player</div>
                   <div className="col-span-3 md:col-span-3 text-right">
-                    {activeLeaderboard === 'level'
-                      ? 'Level'
-                      : activeLeaderboard === 'streak'
-                        ? 'Streak'
-                        : activeLeaderboard === 'word-memory'
-                          ? 'Words'
-                          : 'Time'}
+                    {activeLeaderboard === 'level' ? 'Level' : 'Streak'}
                   </div>
                   <div className="hidden md:block md:col-span-3 text-right">
-                    {activeLeaderboard === 'level' ? 'Total XP' : activeLeaderboard === 'streak' ? 'Best Streak' : 'Games Played'}
+                    {activeLeaderboard === 'level' ? 'Total XP' : 'Best Streak'}
                   </div>
                 </div>
               </div>
@@ -740,17 +638,7 @@ export default function LeaderboardsClient() {
               <div className="p-6 border-b-2 border-[#54FFA4]/30 bg-[#0F1B21]/50 sticky top-0">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    {activeOption && (
-                      <>
-                        {'icon' in activeOption ? (
-                          <activeOption.icon className="w-6 h-6 text-[#54FFA4]" />
-                        ) : activeOption.iconType === 'mdi' && activeOption.iconPath ? (
-                          <Icon path={activeOption.iconPath} size={1} className="text-[#54FFA4]" />
-                        ) : activeOption.iconType === 'lucide' && activeOption.IconComponent ? (
-                          <activeOption.IconComponent className="w-6 h-6 text-[#54FFA4]" />
-                        ) : null}
-                      </>
-                    )}
+                    {activeOption && <activeOption.icon className="w-6 h-6 text-[#54FFA4]" />}
                     <h3 className="text-2xl font-bold text-white">{activeOption?.name} Info</h3>
                   </div>
                   <button
@@ -764,29 +652,6 @@ export default function LeaderboardsClient() {
 
               {/* Modal Content */}
               <div className="p-6 space-y-6">
-                {/* Competitive Requirements for minigames */}
-                {!['level', 'streak'].includes(activeLeaderboard) && (
-                  <div>
-                    <h4 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                      <Trophy className="w-5 h-5 text-[#54FFA4]" />
-                      Competitive Requirements
-                    </h4>
-                    <p className="text-gray-300 mb-3">
-                      To qualify for this leaderboard, you must {activeLeaderboard === 'word-memory' ? 'use the standard timer' : 'play with standard preset settings'}:
-                    </p>
-                    <div className="bg-[#0F1B21]/50 border border-[#54FFA4]/30 rounded-lg p-4">
-                      <div className="text-[#54FFA4] font-mono text-sm">
-                        {getPresetDescription(activeLeaderboard)}
-                      </div>
-                      {activeLeaderboard === 'word-memory' && (
-                        <div className="text-gray-400 text-xs mt-2">
-                          * Word count is adjustable, but timer must be 25s
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
                 {/* How Rankings Work */}
                 <div>
                   <h4 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
@@ -805,22 +670,6 @@ export default function LeaderboardsClient() {
                         <span className="text-[#54FFA4] mt-0.5 flex-shrink-0">•</span>
                         <span>Rankings based on consecutive daily challenge completions. Complete the daily challenge every day to maintain your streak!</span>
                       </li>
-                    )}
-                    {!['level', 'streak'].includes(activeLeaderboard) && (
-                      <>
-                        <li className="flex items-start gap-3">
-                          <span className="text-[#54FFA4] mt-0.5 flex-shrink-0">•</span>
-                          <span>Rankings based on your {activeLeaderboard === 'word-memory' ? 'highest score' : 'fastest completion time'} using standard settings</span>
-                        </li>
-                        <li className="flex items-start gap-3">
-                          <span className="text-[#54FFA4] mt-0.5 flex-shrink-0">•</span>
-                          <span>Only games played with competitive settings count toward the leaderboard</span>
-                        </li>
-                        <li className="flex items-start gap-3">
-                          <span className="text-[#54FFA4] mt-0.5 flex-shrink-0">•</span>
-                          <span>Your personal best is automatically tracked and updated</span>
-                        </li>
-                      </>
                     )}
                     <li className="flex items-start gap-3">
                       <span className="text-[#54FFA4] mt-0.5 flex-shrink-0">•</span>

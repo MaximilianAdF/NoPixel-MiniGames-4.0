@@ -33,7 +33,7 @@ export default function FAQPage() {
     },
     {
       question: "How do the leaderboards work?",
-      answer: "Each minigame has its own leaderboard showing top scores. You can view them without logging in. Once Discord authentication is implemented, you'll be able to save your scores permanently and compete globally.",
+      answer: "The leaderboards rank players two ways: by overall Player Level (earn XP from any game or daily challenge) and by Daily Challenge streak. Log in with Discord to appear on the global rankings.",
       icon: Trophy,
     },
     {

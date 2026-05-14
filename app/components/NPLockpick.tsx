@@ -10,7 +10,6 @@ import { trackGameStart, trackGameRetry } from '@/app/utils/gtm';
 import { useUser } from '@/app/contexts/UserContext';
 import { NPSettingsRange } from '@/app/components/NPSettings';
 import GameStatsTracker from './GameStatsTracker';
-import LeaderboardEligibleBadge from './LeaderboardEligibleBadge';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
@@ -200,10 +199,6 @@ const NPLockpick: FC<NPLockpickProps> = ({
 
   return (
     <>
-      <LeaderboardEligibleBadge
-        game={gameId}
-        gameSettings={{ levels: activeLevels, timer: activeTimer }}
-      />
       <GameStatsTracker
         game={gameId as any}
         gameStatus={legacyStatus}

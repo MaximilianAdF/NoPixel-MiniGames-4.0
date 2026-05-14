@@ -5,7 +5,6 @@ import { GameType } from '@/interfaces/user';
 import { ObjectId } from 'mongodb';
 import { calculateDifficultyMultiplier } from '@/app/utils/difficultyCalculator';
 import { rateLimit } from '@/lib/rateLimit';
-import { isStandardPreset, TIME_BASED_GAMES, SCORE_BASED_GAMES } from '@/app/utils/gamePresets';
 
 export interface SaveGameStatsRequest {
   game: GameType;
@@ -19,26 +18,9 @@ export interface SaveGameStatsRequest {
 
 /**
  * POST /api/stats/save
- * 
- * Save a game completion/attempt to the database
- * Updates user stats and game-specific stats
- * 
- * WHAT GETS SAVED:
- * 1. ALL game attempts (won or lost, any preset):
- *    - gamesPlayed count incremented
- *    - totalTimePlayedMs accumulated
- *    - lastPlayedAt timestamp
- * 
- * 2. ONLY WON games (any preset):
- *    - Added to recentScores, recentTimes arrays (for averaging)
- *    - bestScoreOverall updated (higher is better)
- *    - bestTimeOverall updated (lower is better)
- *    - These are used for PROFILE display
- * 
- * 3. ONLY standard preset + won games:
- *    - isLeaderboardEligible set to true
- *    - bestTime / bestScore updated (if new personal best)
- *    - These are used for LEADERBOARD rankings
+ *
+ * Records a game completion against the player's account: increments the
+ * lifetime games/time totals, awards XP, and recomputes the player's level.
  */
 export async function POST(request: Request) {
   try {
@@ -52,19 +34,19 @@ export async function POST(request: Request) {
     }
 
     const userId = session.user.id;
-    
+
     // Rate limit: 30 requests per minute per user (prevents rapid spam)
     const rateLimitResult = await rateLimit(userId, {
       maxRequests: 30,
       windowSeconds: 60,
     });
-    
+
     if (rateLimitResult) {
       return rateLimitResult;
     }
 
     const body: SaveGameStatsRequest = await request.json();
-    
+
     // Validate request
     if (!body.game || body.score === undefined || body.timePlayedMs === undefined) {
       return NextResponse.json(
@@ -75,124 +57,10 @@ export async function POST(request: Request) {
 
     const client = await clientPromise;
     const db = client.db('nopixel');
-    
+
     const now = new Date();
-    const today = now.toISOString().split('T')[0]; // YYYY-MM-DD
 
-    // Check if this run qualifies for leaderboard (standard preset + won)
-    const isLeaderboardRun = body.won && body.gameSettings && isStandardPreset(body.game, body.gameSettings);
-    
-    // For leaderboard runs, check if this is a new personal best
-    let shouldUpdateLeaderboard = false;
-    if (isLeaderboardRun) {
-      const existingLeaderboardEntry = await db.collection('gameStats').findOne({ 
-        userId, 
-        game: body.game,
-        isLeaderboardEligible: true
-      });
-
-      if (!existingLeaderboardEntry) {
-        // First leaderboard-eligible run
-        shouldUpdateLeaderboard = true;
-      } else {
-        // Check if this beats the existing best
-        if (TIME_BASED_GAMES.includes(body.game)) {
-          // For time-based: lower time is better
-          shouldUpdateLeaderboard = body.timePlayedMs < (existingLeaderboardEntry.bestTime || Infinity);
-        } else if (SCORE_BASED_GAMES.includes(body.game)) {
-          // For score-based (word-memory): higher score is better
-          shouldUpdateLeaderboard = body.score > (existingLeaderboardEntry.bestScore || 0);
-        }
-      }
-    }
-
-    // Update or create game stats
-    const gameStatsUpdate: any = {
-      $inc: {
-        gamesPlayed: 1,
-        totalTimePlayedMs: body.timePlayedMs,
-        ...(body.won ? { gamesWon: 1 } : { gamesLost: 1 }), // Track won/lost separately
-      },
-      $set: {
-        lastPlayedAt: now,
-      },
-      $setOnInsert: {
-        firstPlayedAt: now,
-        currentStreak: 0,
-        longestStreak: 0,
-      },
-    };
-
-    // Only track scores/times for WON games (for averaging and bests)
-    if (body.won) {
-      gameStatsUpdate.$push = {
-        recentScores: {
-          $each: [body.score],
-          $slice: -10, // Keep last 10 scores from won games
-        } as any,
-        recentTimes: {
-          $each: [body.timePlayedMs],
-          $slice: -10, // Keep last 10 times from won games
-        } as any,
-        recentDates: {
-          $each: [now],
-          $slice: -10, // Keep last 10 dates
-        } as any,
-      };
-    }
-
-    // If this is a new leaderboard best, update the leaderboard fields
-    if (shouldUpdateLeaderboard) {
-      gameStatsUpdate.$set.isLeaderboardEligible = true;
-      gameStatsUpdate.$set.bestTime = body.timePlayedMs;
-      gameStatsUpdate.$set.bestScore = body.score;
-      gameStatsUpdate.$set.leaderboardSetAt = now;
-    }
-
-    await db.collection('gameStats').updateOne(
-      { userId, game: body.game },
-      gameStatsUpdate,
-      { upsert: true }
-    );
-
-    // Calculate new average score and time, and update overall bests
-    const gameStats = await db.collection('gameStats').findOne({ userId, game: body.game });
-    if (gameStats) {
-      const updates: any = {};
-      
-      if (gameStats.recentScores && gameStats.recentScores.length > 0) {
-        const avgScore = gameStats.recentScores.reduce((a: number, b: number) => a + b, 0) / gameStats.recentScores.length;
-        updates.averageScore = Math.round(avgScore);
-      }
-      
-      if (gameStats.recentTimes && gameStats.recentTimes.length > 0) {
-        const avgTime = gameStats.recentTimes.reduce((a: number, b: number) => a + b, 0) / gameStats.recentTimes.length;
-        updates.averageTime = Math.round(avgTime);
-      }
-      
-      // Always track overall best score and time for profile display (regardless of preset)
-      // Only track for won games
-      if (body.won) {
-        // Update best score overall (higher is better)
-        if (!gameStats.bestScoreOverall || body.score > gameStats.bestScoreOverall) {
-          updates.bestScoreOverall = body.score;
-        }
-        
-        // Update best time overall (lower is better)
-        if (!gameStats.bestTimeOverall || body.timePlayedMs < gameStats.bestTimeOverall) {
-          updates.bestTimeOverall = body.timePlayedMs;
-        }
-      }
-      
-      if (Object.keys(updates).length > 0) {
-        await db.collection('gameStats').updateOne(
-          { userId, game: body.game },
-          { $set: updates }
-        );
-      }
-    }
-
-    // Update user aggregated stats
+    // Update user aggregated stats and award XP
     const xpEarned = calculateXP(body.score, body.timePlayedMs, body.won, body.game, body.gameSettings);
     const userUpdateResult = await db.collection('users').findOneAndUpdate(
       { _id: new ObjectId(userId) },
@@ -214,7 +82,7 @@ export async function POST(request: Request) {
     const user = userUpdateResult;
     let leveledUp = false;
     let newLevel = user?.level || 1;
-    
+
     if (user && user.totalXP !== undefined) {
       const calculatedLevel = calculateLevel(user.totalXP);
       if (calculatedLevel !== user.level) {
@@ -227,19 +95,11 @@ export async function POST(request: Request) {
       }
     }
 
-    // Get updated game stats for response
-    const updatedGameStats = await db.collection('gameStats').findOne({ userId, game: body.game });
-
     return NextResponse.json({
       success: true,
       xpEarned,
       leveledUp,
       newLevel,
-      stats: {
-        bestScore: updatedGameStats?.bestScore || body.score,
-        averageScore: updatedGameStats?.averageScore || body.score,
-        gamesPlayed: updatedGameStats?.gamesPlayed || 1,
-      },
     });
 
   } catch (error) {
@@ -257,9 +117,9 @@ export async function POST(request: Request) {
  * Uses difficulty multiplier from game settings to scale XP rewards
  */
 function calculateXP(
-  score: number, 
-  timeMs: number, 
-  won: boolean, 
+  score: number,
+  timeMs: number,
+  won: boolean,
   game: string,
   gameSettings?: Record<string, any>
 ): number {
@@ -267,7 +127,7 @@ function calculateXP(
   if (!won) {
     return 0;
   }
-  
+
   // Base XP values for each game (completing at normal difficulty)
   const BASE_XP: Record<string, number> = {
     'thermite': 100,
@@ -279,20 +139,20 @@ function calculateXP(
     'chopping': 50,
     'pincracker': 45,
   };
-  
+
   // Get base XP for this game (default to 50 if unknown)
   const baseXP = BASE_XP[game] || 50;
-  
+
   // Calculate difficulty multiplier from game settings
   let difficultyMultiplier = 1.0;
   if (gameSettings) {
     difficultyMultiplier = calculateDifficultyMultiplier(game, gameSettings);
   }
-  
+
   // Apply difficulty multiplier to base XP
   // This means harder settings directly increase XP rewards
   const finalXP = Math.floor(baseXP * difficultyMultiplier);
-  
+
   return finalXP;
 }
 
@@ -300,7 +160,7 @@ function calculateXP(
  * Calculate level from total XP using enhanced polynomial formula
  * This provides exponential-like growth for higher levels
  * Formula: floor(cbrt(xp / 25)) + 1 for cubic progression
- * 
+ *
  * Level 1: 0-24 XP
  * Level 2: 25-199 XP  (25-175 needed)
  * Level 3: 200-674 XP (175-475 needed)
