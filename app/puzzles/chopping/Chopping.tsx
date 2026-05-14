@@ -1,716 +1,318 @@
-"use client";
+'use client';
 
-import { successPlayer, checkBeepPlayer } from "@/public/audio/AudioManager";
-import { Letter, Letters, LetterState } from "@/app/puzzles/chopping/utils";
-import usePersistantState from "@/app/utils/usePersistentState";
-import NPHackContainer from "@/app/components/NPHackContainer";
-import { NPSettingsRange } from "@/app/components/NPSettings";
-import GameStatsTracker from "@/app/components/GameStatsTracker";
-import LeaderboardEligibleBadge from "@/app/components/LeaderboardEligibleBadge";
-import { useDailyChallenge } from "@/app/utils/useDailyChallenge";
-import React, { FC, useEffect, useState, useRef, useCallback, memo, useMemo, startTransition } from "react";
-import { useKeyDown } from "@/app/utils/useKeyDown";
-import useGame from "@/app/utils/useGame";
-import classNames from "classnames";
-import { useIsMobileOrTablet } from "@/app/utils/useMediaQuery";
-import { useSearchParams } from "next/navigation";
-import { trackGameStart, trackGameRetry } from "@/app/utils/gtm";
-import { useUser } from "@/app/contexts/UserContext";
+import { useCallback, useEffect, useRef, useState, type FC } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { successPlayer, checkBeepPlayer, timerBeepPlayer } from '@/public/audio/AudioManager';
+import usePersistantState from '@/app/utils/usePersistentState';
+import { useKeyDown } from '@/app/utils/useKeyDown';
+import { useDailyChallenge } from '@/app/utils/useDailyChallenge';
+import { useMobileGameViewport } from '@/app/utils/useMobileGameViewport';
+import { trackGameStart, trackGameRetry } from '@/app/utils/gtm';
+import { useUser } from '@/app/contexts/UserContext';
+import { NPSettingsRange } from '@/app/components/NPSettings';
+import GameStatsTracker from '@/app/components/GameStatsTracker';
+import LeaderboardEligibleBadge from '@/app/components/LeaderboardEligibleBadge';
+import { useGameHost } from '@/app/game/useGameHost';
+import GameShell from '@/app/game/GameShell';
+import type { GameMode, GameResult } from '@/app/game/types';
+import { choppingEngine } from './engine';
+import { GridRow, defaultGridCols } from './ChoppingGrid';
+import '../../../public/Chopping/Chopping.css';
 
-
-import "../../../public/Chopping/Chopping.css";
-
-
-const getStatusMessage = (status: number | undefined) => {
-    switch (status) {
-        case 0:
-            return "";
-        case 1:
-            return "";
-        case 2:
-            return "Failed!";
-        case 3:
-            return "Success!";
-        case 4:
-            return "Reset!";
-        default:
-            return `Error: Unknown game status ${status}`;
-    }
-}
-
-const getRandomLetter = (): Letter => {
-    return Letters[Math.floor(Math.random() * Letters.length)];
-}
-
-// Keep a stable allowed-keys array so keyboard hook doesn't get a new array each render
-const ALLOWED_KEYS = ['Q', 'q', 'W', 'w', 'E', 'e', 'R', 'r', 'A', 'a', 'S', 's', 'D', 'd'] as const;
-
-// Memoized letter cell to prevent re-rendering unchanged letters
-interface LetterCellProps {
-    letter: Letter;
-    isActive: boolean;
-    isDone: boolean;
-    isFail: boolean;
-}
-
-const LetterCell = memo<LetterCellProps>(({ letter, isActive, isDone, isFail }) => {
-    const classes = classNames("letter", {
-        'letter-active': isActive,
-        'done': isDone,
-        'fail': isFail,
-    });
-
-    return (
-        <div className={classes} style={{ justifySelf: 'center' }}>
-            {letter}
-        </div>
-    );
-}, (prevProps, nextProps) => {
-    // Custom comparison: only re-render if any prop actually changed
-    return prevProps.letter === nextProps.letter &&
-           prevProps.isActive === nextProps.isActive &&
-           prevProps.isDone === nextProps.isDone &&
-           prevProps.isFail === nextProps.isFail;
-});
-
-LetterCell.displayName = 'LetterCell';
-
-// Memoized grid row to prevent re-rendering entire rows when only one cell changes
-interface GridRowProps {
-    rowIndex: number;
-    board: Letter[];
-    stateBoard: LetterState[];
-    activeIndex: number;
-    numLetters: number;
-    gridCols: number;
-}
-
-const GridRow = memo<GridRowProps>(({ rowIndex, board, stateBoard, activeIndex, numLetters, gridCols }) => {
-    const colsInRow = Math.min(numLetters - rowIndex * gridCols, gridCols);
-    
-    // Memoize the cells array to avoid recalculating on every render
-    const cells = useMemo(() => {
-        const cellsArray = [];
-        for (let colIndex = 0; colIndex < gridCols; colIndex++) {
-            const letterIndex = rowIndex * gridCols + colIndex;
-            if (letterIndex < numLetters) {
-                cellsArray.push({
-                    key: colIndex,
-                    letterIndex,
-                    letter: board[letterIndex],
-                    isActive: letterIndex === activeIndex,
-                    isDone: stateBoard[letterIndex] === 'done',
-                    isFail: stateBoard[letterIndex] === 'fail',
-                });
-            }
-        }
-        return cellsArray;
-    }, [board, stateBoard, activeIndex, numLetters, gridCols, rowIndex]);
-
-    return (
-        <div 
-            className='game-grid-row' 
-            style={{ gridTemplateColumns: `repeat(${colsInRow}, min-content)` }}
-        >
-            {cells.map(cell => (
-                <LetterCell
-                    key={cell.key}
-                    letter={cell.letter}
-                    isActive={cell.isActive}
-                    isDone={cell.isDone}
-                    isFail={cell.isFail}
-                />
-            ))}
-        </div>
-    );
-}, (prevProps, nextProps) => {
-    // Only re-render if this row contains the active or changed letter
-    const prevRowStart = prevProps.rowIndex * prevProps.gridCols;
-    const prevRowEnd = prevRowStart + prevProps.gridCols;
-    const nextRowStart = nextProps.rowIndex * nextProps.gridCols;
-    const nextRowEnd = nextRowStart + nextProps.gridCols;
-    
-    // Check if active index moved into or out of this row
-    const prevHasActive = prevProps.activeIndex >= prevRowStart && prevProps.activeIndex < prevRowEnd;
-    const nextHasActive = nextProps.activeIndex >= nextRowStart && nextProps.activeIndex < nextRowEnd;
-    
-    if (prevHasActive !== nextHasActive) return false; // Re-render if active moved
-    
-    // Check if any state in this row changed
-    for (let i = 0; i < prevProps.gridCols; i++) {
-        const idx = prevProps.rowIndex * prevProps.gridCols + i;
-        if (idx >= prevProps.numLetters) break;
-        if (prevProps.board[idx] !== nextProps.board[idx]) return false;
-        if (prevProps.stateBoard[idx] !== nextProps.stateBoard[idx]) return false;
-    }
-    
-    return true; // Don't re-render
-});
-
-GridRow.displayName = 'GridRow';
-
+const ALLOWED_KEYS = ['Q', 'q', 'W', 'w', 'E', 'e', 'R', 'r', 'A', 'a', 'S', 's', 'D', 'd'];
 const defaultNumLetters = 15;
 const defaultDuration = 7;
-const defaultGridCols = 6;
 
 const Chopping: FC = () => {
-    const { isChallengeMode, challengeData, isLoading: isChallengeLoading } = useDailyChallenge();
-    const searchParams = useSearchParams();
-    const isCompetitive = searchParams?.get('competitive') === 'true';
-    
-    // Persistent state for standard play
-    const [savedTimer, setSavedTimer] = usePersistantState("chopping-timer", defaultDuration);
-    const [savedNumLetters, setSavedNumLetters] = usePersistantState("chopping-num-letters", defaultNumLetters);
+  const { isChallengeMode, challengeData, isLoading: isChallengeLoading } = useDailyChallenge();
+  const searchParams = useSearchParams();
+  const isCompetitive = searchParams?.get('competitive') === 'true';
+  const { user } = useUser();
 
-    // Derived state for active game configuration
-    const activeNumLetters = isChallengeMode && challengeData ? (challengeData.numLetters || defaultNumLetters) : (isCompetitive ? defaultNumLetters : savedNumLetters);
-    const activeTimer = isChallengeMode && challengeData ? (challengeData.targetTime ? Math.floor(challengeData.targetTime / 1000) : defaultDuration) : (isCompetitive ? defaultDuration : savedTimer);
+  const [savedTimer, setSavedTimer, timerHydrated] = usePersistantState(
+    'chopping-timer',
+    defaultDuration,
+  );
+  const [savedNumLetters, setSavedNumLetters, lettersHydrated] = usePersistantState(
+    'chopping-num-letters',
+    defaultNumLetters,
+  );
+  const settingsHydrated = timerHydrated && lettersHydrated;
 
-    const [activeIndex, setActiveIndex] = useState<number>(0);
-    // Initialize board with activeNumLetters
-    const [board, setBoard] = useState<Letter[]>(new Array(activeNumLetters));
-    const [stateBoard, setStateBoard] = useState<LetterState[]>(new Array(activeNumLetters).fill(''));
-    const [allowKeyDown, setAllowKeyDown] = useState(true);
-    const [elapsed, setElapsed] = useState(0);
-    const isMobileOrTablet = useIsMobileOrTablet();
+  const activeNumLetters =
+    isChallengeMode && challengeData
+      ? challengeData.numLetters || defaultNumLetters
+      : isCompetitive
+        ? defaultNumLetters
+        : savedNumLetters;
+  const activeTimer =
+    isChallengeMode && challengeData
+      ? challengeData.targetTime
+        ? Math.floor(challengeData.targetTime / 1000)
+        : defaultDuration
+      : isCompetitive
+        ? defaultDuration
+        : savedTimer;
 
-    // Reset board when configuration changes
-    useEffect(() => {
-        // Only reset if we have data or are not in challenge mode
-        if (!isChallengeMode || challengeData) {
-            resetBoard();
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeNumLetters, activeTimer]);
+  const mode: GameMode = isChallengeMode
+    ? 'daily-challenge'
+    : isCompetitive
+      ? 'competitive'
+      : 'practice';
 
-    const mobileInputRef = useRef<HTMLInputElement>(null);
-    const outerContainerRef = useRef<HTMLDivElement>(null);
-    const gameWrapperRef = useRef<HTMLDivElement>(null);
-    const hintDismissedRef = useRef(false);
-    const [showMobileHint, setShowMobileHint] = useState(false);
-    const skipNextInputRef = useRef(false);
-    const hasInteractedRef = useRef(false);
-    // Refs to keep latest values without triggering re-renders — improves keyboard performance
-    const boardRef = useRef<Letter[]>(board);
-    const stateBoardRef = useRef<LetterState[]>(stateBoard);
-    const activeIndexRef = useRef<number>(activeIndex);
+  const lastResultRef = useRef<GameResult | null>(null);
+  const userRef = useRef(user);
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
 
-    // keep refs in sync with state
-    useEffect(() => { boardRef.current = board; }, [board]);
-    useEffect(() => { stateBoardRef.current = stateBoard; }, [stateBoard]);
-    useEffect(() => { activeIndexRef.current = activeIndex; }, [activeIndex]);
+  const { phase, state, result, runId, submitInput } = useGameHost({
+    engine: choppingEngine,
+    config: { numLetters: activeNumLetters },
+    durationMs: activeTimer * 1000,
+    mode,
+    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
+    onTick: () => timerBeepPlayer.play(),
+    onResult: (gameResult) => {
+      lastResultRef.current = gameResult;
+    },
+  });
 
-    useEffect(() => {
-        checkBeepPlayer.whenReady();
-        successPlayer.whenReady();
-    }, []);
+  const outerContainerRef = useRef<HTMLDivElement>(null);
+  const gameWrapperRef = useRef<HTMLDivElement>(null);
+  const mobileInputRef = useRef<HTMLInputElement>(null);
+  const skipNextInputRef = useRef(false);
+  const prevActiveIndexRef = useRef(0);
 
-    const ensureVisible = useCallback((behavior: ScrollBehavior = 'auto') => {
-        if (!isMobileOrTablet || typeof window === 'undefined') return;
-        const container = outerContainerRef.current ?? gameWrapperRef.current;
-        if (!container) return;
+  const mobile = useMobileGameViewport({
+    isPlaying: phase === 'playing',
+    outerRef: outerContainerRef,
+    wrapperRef: gameWrapperRef,
+    inputRef: mobileInputRef,
+  });
 
-        // Get the container's position
-        const rect = container.getBoundingClientRect();
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        // Calculate position to center the element in viewport
-        const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
-        const elementTop = rect.top + scrollTop;
-        const elementCenter = elementTop - (viewportHeight / 2) + (rect.height / 2);
-        
-        // Force scroll to position
-        window.scrollTo({
-            top: Math.max(0, elementCenter),
-            behavior: behavior
-        });
-    }, [isMobileOrTablet]);
+  // Preload sound effects.
+  useEffect(() => {
+    checkBeepPlayer.whenReady();
+    successPlayer.whenReady();
+    timerBeepPlayer.whenReady();
+  }, []);
 
-    const dismissMobileHint = useCallback(() => {
-        if (!hintDismissedRef.current) {
-            hintDismissedRef.current = true;
-            setShowMobileHint(false);
-        }
-    }, []);
-
-    const focusMobileInput = useCallback((options?: { force?: boolean }) => {
-        if (!isMobileOrTablet) return;
-        if (!options?.force && !hasInteractedRef.current) return;
-        const input = mobileInputRef.current;
-        if (!input) return;
-        try {
-            input.focus({ preventScroll: true });
-        } catch {
-            input.focus();
-        }
-        input.setSelectionRange?.(input.value.length, input.value.length);
-        
-        // Scroll after a delay to allow keyboard to open
-        setTimeout(() => ensureVisible('smooth'), 100);
-        setTimeout(() => ensureVisible('smooth'), 300);
-        setTimeout(() => ensureVisible('smooth'), 500);
-    }, [ensureVisible, isMobileOrTablet]);
-
-    const focusInputOnInteraction = useCallback(() => {
-        if (!isMobileOrTablet) return;
-        
-        if (!hasInteractedRef.current) {
-            hasInteractedRef.current = true;
-            dismissMobileHint();
-        }
-
-        const input = mobileInputRef.current;
-        if (!input) return;
-
-        // Immediate focus attempt
-        try {
-            input.focus({ preventScroll: true });
-        } catch {
-            input.focus();
-        }
-
-        // Additional attempts to ensure keyboard stays open
-        if (typeof window !== 'undefined') {
-            window.requestAnimationFrame(() => {
-                try {
-                    input.focus({ preventScroll: true });
-                } catch {
-                    input.focus();
-                }
-            });
-        }
-        
-        // Scroll after delays to allow keyboard to open
-        setTimeout(() => ensureVisible('smooth'), 100);
-        setTimeout(() => ensureVisible('smooth'), 300);
-        setTimeout(() => ensureVisible('smooth'), 500);
-    }, [dismissMobileHint, ensureVisible, isMobileOrTablet]);
-
-    useEffect(() => {
-        if (!isMobileOrTablet) return;
-        const timer = setTimeout(() => {
-            ensureVisible('smooth');
-        }, 200);
-        return () => clearTimeout(timer);
-    }, [ensureVisible, isMobileOrTablet]);
-
-
-    const resetBoard = () => {
-        const newBoard: Letter[] = [];
-        // Resetting board
-        for (let i = 0; i < activeNumLetters; i++) {
-            newBoard.push(getRandomLetter());
-        }
-    setBoard(newBoard);
-    boardRef.current = newBoard;
-    setActiveIndex(0);
-    activeIndexRef.current = 0;
-
-        const newStateBoard = new Array(activeNumLetters).fill('');
-        setStateBoard(newStateBoard);
-        stateBoardRef.current = newStateBoard;
+  // Fire start (and retry, when following a finished round) analytics once per round.
+  useEffect(() => {
+    if (runId === 0) return;
+    if (lastResultRef.current) {
+      trackGameRetry({
+        game_name: 'chopping',
+        previous_result: lastResultRef.current.won ? 'win' : 'loss',
+        previous_score: lastResultRef.current.score,
+      });
+      lastResultRef.current = null;
     }
-   
+    const count = parseInt(sessionStorage.getItem('game_count') || '0', 10) + 1;
+    sessionStorage.setItem('game_count', count.toString());
+    trackGameStart({
+      game_name: 'chopping',
+      is_logged_in: !!userRef.current,
+      user_level: userRef.current?.level || 0,
+      session_game_count: count,
+    });
+  }, [runId]);
 
-    const statusUpdateHandler = (newStatus: number) => {
-        switch (newStatus) {
-            case 1:
-                // Reset game
-                resetBoard();
-                break;
-        }
+  // Key-press beep when a letter is completed correctly (desktop only).
+  useEffect(() => {
+    const advanced = state.activeIndex > prevActiveIndexRef.current;
+    prevActiveIndexRef.current = state.activeIndex;
+    if (advanced && !mobile.isMobile) checkBeepPlayer.play();
+  }, [state.activeIndex, mobile.isMobile]);
+
+  // Success sound on a win (desktop only).
+  useEffect(() => {
+    if (phase === 'won' && !mobile.isMobile) successPlayer.play();
+  }, [phase, mobile.isMobile]);
+
+  const handleKey = useCallback(
+    (key?: string) => {
+      if (key && document.activeElement?.tagName !== 'INPUT') {
+        submitInput(key);
+      }
+    },
+    [submitInput],
+  );
+  useKeyDown(handleKey, ALLOWED_KEYS, true);
+
+  const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (phase !== 'playing') return;
+    const { key } = e;
+    if (key.length === 1) {
+      skipNextInputRef.current = true;
+      e.preventDefault();
+      mobile.dismissHint();
+      submitInput(key.toUpperCase());
+      if (mobileInputRef.current) mobileInputRef.current.value = '';
+      return;
     }
-
-    const [gameStatus, setGameStatus, streak] = useGame(activeTimer*1000, statusUpdateHandler);
-
-    const { user } = useUser();
-
-    // Track game start
-    useEffect(() => {
-        if (gameStatus === 1) {
-            const count = parseInt(sessionStorage.getItem('game_count') || '0') + 1;
-            sessionStorage.setItem('game_count', count.toString());
-            
-            trackGameStart({
-                game_name: 'chopping',
-                is_logged_in: !!user,
-                user_level: user?.level || 0,
-                session_game_count: count,
-            });
-        }
-    }, [gameStatus, user]);
-
-    // Auto-scroll when game starts on mobile
-    useEffect(() => {
-        if (isMobileOrTablet && gameStatus === 1) {
-            setTimeout(() => {
-                ensureVisible('smooth');
-                focusMobileInput({ force: true });
-            }, 300);
-        }
-    }, [gameStatus, isMobileOrTablet, ensureVisible, focusMobileInput]);
-
-    useEffect(() => {
-        if (isMobileOrTablet && gameStatus === 1 && !hintDismissedRef.current) {
-            setShowMobileHint(true);
-        } else {
-            setShowMobileHint(false);
-        }
-    }, [gameStatus, isMobileOrTablet]);
-    
-
-    const resetGame = () => {
-        setGameStatus(1);
+    if (key === 'Backspace') {
+      skipNextInputRef.current = true;
+      e.preventDefault();
+      if (mobileInputRef.current) mobileInputRef.current.value = '';
     }
+  };
 
-    const handleRetry = () => {
-        // Track retry event (user clicking "Play Again" after game end)
-        if (gameStatus === 2 || gameStatus === 3) {
-            trackGameRetry({
-                game_name: 'chopping',
-                previous_result: gameStatus === 3 ? 'win' : 'loss',
-                previous_score: activeIndex,
-            });
-        }
-        resetGame();
+  const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
+    if (skipNextInputRef.current) {
+      skipNextInputRef.current = false;
+      input.value = '';
+      return;
     }
-
-    const handleWin = useCallback((message: string) => {
-        // Win
-        if (!isMobileOrTablet) {
-            successPlayer.play();
-        }
-        setGameStatus(3);
-    }, [setGameStatus, isMobileOrTablet]);
-
-    const handleLose = useCallback((message: string) => {
-        // Lose
-        setGameStatus(2);
-    }, [setGameStatus]);
-
-    const checkStatus = (stateBoard: LetterState[]) => {
-        /* If the final state is 'done', it can be concluded that all other letters are also 'done' */
-        if (stateBoard[stateBoard.length - 1] === 'done') {
-            handleWin("All letters pressed successfully");
-        }
-
-        // Fail if the LetterState of the Letter that is pointed to by activeIndex is 'fail'
-        if (stateBoard[activeIndex] === 'fail') {
-            handleLose(`Letter ${board?.[activeIndex]} failed`);
-        }
+    const key = input.value.slice(-1);
+    if (key && phase === 'playing') {
+      mobile.dismissHint();
+      submitInput(key.toUpperCase());
+      input.value = '';
+      mobile.focusInput();
     }
+  };
 
-    // Stable key handler that reads/writes refs to reduce re-renders and avoid stale closures
-    const handleKeyDown = useCallback((key: string) => {
-        const currentBoard = boardRef.current;
-        const currentActive = activeIndexRef.current;
-        const newStateBoard = [...stateBoardRef.current];
+  const [settingsNumLetters, setSettingsNumLetters] = useState(defaultNumLetters);
+  const [settingsDuration, setSettingsDuration] = useState(defaultDuration);
 
-        if (key.toUpperCase() === currentBoard[currentActive]) {
-            newStateBoard[currentActive] = 'done';
-            const nextIndex = currentActive + 1;
-            activeIndexRef.current = nextIndex;
-            
-            // Critical update: immediately update activeIndex for responsive UI
-            setActiveIndex(nextIndex);
-            
-            // Non-critical update: stateBoard can be deferred
-            startTransition(() => {
-                setStateBoard(newStateBoard);
-            });
-            stateBoardRef.current = newStateBoard;
-            
-            // Only play audio on desktop to avoid mobile lag
-            if (!isMobileOrTablet) {
-                checkBeepPlayer.play();
-            }
-        } else {
-            newStateBoard[currentActive] = 'fail';
-            
-            // Fail state update can also be deferred slightly
-            startTransition(() => {
-                setStateBoard(newStateBoard);
-            });
-            stateBoardRef.current = newStateBoard;
-        }
+  useEffect(() => {
+    setSettingsNumLetters(savedNumLetters);
+    setSettingsDuration(savedTimer);
+  }, [savedNumLetters, savedTimer]);
 
-        // Evaluate win/lose using refs (runs synchronously)
-        // If the final state is 'done', it's a win
-        if (newStateBoard[newStateBoard.length - 1] === 'done') {
-            handleWin("All letters pressed successfully");
-        }
+  const settings = {
+    handleSave: () => {
+      setSavedNumLetters(settingsNumLetters);
+      setSavedTimer(settingsDuration);
+    },
+    handleReset: () => {
+      setSettingsNumLetters(defaultNumLetters);
+      setSettingsDuration(defaultDuration);
+      setSavedNumLetters(defaultNumLetters);
+      setSavedTimer(defaultDuration);
+    },
+    children: (
+      <div className="flex flex-col items-center">
+        <NPSettingsRange
+          title="Number of letters"
+          min={13}
+          max={18}
+          value={settingsNumLetters}
+          setValue={setSettingsNumLetters}
+        />
+        <NPSettingsRange
+          title="Timer"
+          min={5}
+          max={30}
+          value={settingsDuration}
+          setValue={setSettingsDuration}
+        />
+      </div>
+    ),
+  };
 
-        if (newStateBoard[currentActive] === 'fail') {
-            handleLose(`Letter ${currentBoard?.[currentActive]} failed`);
-        }
-    }, [handleWin, handleLose, setActiveIndex, isMobileOrTablet]);
-
-
-    const [settingsNumLetters, setSettingsNumLetters] = useState(defaultNumLetters);
-    const [settingsDuration, setSettingsDuration] = useState(defaultDuration);
-
-    useEffect(() => {
-        setSettingsNumLetters(savedNumLetters);
-        setSettingsDuration(savedTimer);
-
-        if (gameStatus !== 4) {
-            resetGame();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [savedNumLetters, savedTimer]);
-
-    useEffect(() => {
-        if (!isMobileOrTablet || typeof window === 'undefined' || !window.visualViewport) return;
-
-        const viewport = window.visualViewport;
-        const handleResize = () => {
-            const offset = Math.max(0, window.innerHeight - viewport.height);
-            document.body.style.paddingBottom = offset ? `${offset}px` : '';
-            
-            // When keyboard opens, scroll the game into view
-            if (offset > 100) {
-                requestAnimationFrame(() => {
-                    ensureVisible('smooth');
-                });
-                // Retry after animation
-                setTimeout(() => ensureVisible('smooth'), 300);
-            }
-        };
-
-        viewport.addEventListener('resize', handleResize);
-        viewport.addEventListener('scroll', handleResize);
-        handleResize();
-
-        return () => {
-            document.body.style.paddingBottom = '';
-            viewport.removeEventListener('resize', handleResize);
-            viewport.removeEventListener('scroll', handleResize);
-        };
-    }, [isMobileOrTablet, ensureVisible]);        // Handle mobile input
-    const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (gameStatus !== 1) return;
-        const { key } = e;
-        if (!hasInteractedRef.current) {
-            hasInteractedRef.current = true;
-        }
-
-        if (key.length === 1) {
-            skipNextInputRef.current = true;
-            e.preventDefault();
-            dismissMobileHint();
-            handleKeyDown(key.toUpperCase());
-            mobileInputRef.current && (mobileInputRef.current.value = '');
-            return;
-        }
-
-        if (key === 'Backspace') {
-            skipNextInputRef.current = true;
-            e.preventDefault();
-            mobileInputRef.current && (mobileInputRef.current.value = '');
-        }
-    };
-
-    const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {
-        const input = e.currentTarget;
-        if (skipNextInputRef.current) {
-            skipNextInputRef.current = false;
-            input.value = '';
-            return;
-        }
-        const key = input.value.slice(-1);
-        if (key && gameStatus === 1) {
-            if (!hasInteractedRef.current) {
-                hasInteractedRef.current = true;
-            }
-            dismissMobileHint();
-            handleKeyDown(key.toUpperCase());
-            input.value = '';
-            focusMobileInput();
-        }
-    };
-
-    // Memoize the callback we pass to the global keydown hook so it doesn't change every render
-    const globalKeyHandler = useCallback((key?: string) => {
-        if (key && gameStatus === 1 && document.activeElement?.tagName !== 'INPUT') {
-            handleKeyDown(key);
-        }
-    }, [gameStatus, handleKeyDown]);
-
-    useKeyDown(globalKeyHandler, ALLOWED_KEYS as unknown as string[], allowKeyDown);
-
-
-    const settings = {
-        handleSave: () => {
-            setSavedNumLetters(settingsNumLetters);
-            setSavedTimer(settingsDuration);
-            setGameStatus(4);
-        },
-
-        handleReset: () => {
-            setSettingsNumLetters(defaultNumLetters);
-            setSettingsDuration(defaultDuration);
-            setSavedNumLetters(defaultNumLetters);
-            setSavedTimer(defaultDuration);
-            setGameStatus(4);
-        },
-
-        children: (
-            <div className="flex flex-col items-center">
-                <NPSettingsRange
-                    title={"Number of letters"}
-                    min={13}
-                    max={18}
-                    value={settingsNumLetters}
-                    setValue={setSettingsNumLetters}
-                />
-                <NPSettingsRange
-                    title={"Timer"}
-                    min={5}
-                    max={30}
-                    value={settingsDuration}
-                    setValue={setSettingsDuration}
-                />
-            </div>
-        )
-    }
-
-    if (isChallengeLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#54FFA4]"></div>
-            </div>
-        );
-    }
-
+  if (isChallengeLoading) {
     return (
-        <>
-            <LeaderboardEligibleBadge
-                game="chopping"
-                gameSettings={{
-                    letters: activeNumLetters,
-                    timer: activeTimer,
-                }}
-            />
-            <GameStatsTracker
-                game="chopping"
-                gameStatus={gameStatus}
-                score={activeIndex}
-                elapsedMs={elapsed}
-                targetScore={activeNumLetters}
-                wonStatus={3}
-                lostStatus={2}
-                gameSettings={{
-                    letters: activeNumLetters,
-                    timer: activeTimer,
-                }}
-            />
-            <div ref={outerContainerRef} className="flex flex-col gap-4">
-                {/* <StatHandler
-                    streak={streak}
-                    elapsed={elapsed}
-                    setKeyDown={setAllowKeyDown}
-                    minigame={
-                        {
-                            puzzle: "Chopping",
-                            preset: (defaultDuration === timer && defaultNumLetters === numLetters) ? 'Standard' : 'Custom',
-                            duration: timer,
-                            numLetters: numLetters,
-                        }
-                    }
-                /> */}
-                {isMobileOrTablet && showMobileHint && (
-                    <div className="rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
-                        Tap the puzzle, then type the letters to play.
-                    </div>
-                )}
-                <NPHackContainer
-                        title="Alphabet"
-                        description="Tap the letters in order"
-                        buttons={[]}
-                        countdownDuration={activeTimer * 1000}
-                        elapsedCallback={setElapsed}
-                        resetCallback={handleRetry}
-                        resetDelay={3000}
-                        status={gameStatus}
-                        setStatus={setGameStatus}
-                        statusMessage={getStatusMessage(gameStatus)}
-                        settings={isChallengeMode ? undefined : settings}
-                    >
-                        {/* Hidden input for mobile keyboard */}
-                        {isMobileOrTablet && gameStatus === 1 && (
-                            <input
-                                ref={mobileInputRef}
-                                type="text"
-                                inputMode="text"
-                                autoComplete="off"
-                                autoCorrect="off"
-                                autoCapitalize="characters"
-                                className="opacity-0"
-                                style={{
-                                    position: 'fixed',
-                                    top: 0,
-                                    left: 0,
-                                    width: '1px',
-                                    height: '1px',
-                                    background: 'transparent',
-                                }}
-                                onInput={handleMobileInput}
-                                onKeyDown={handleMobileKeyDown}
-                                onFocus={() => {
-                                    // Scroll when keyboard opens
-                                    if (isMobileOrTablet) {
-                                        setTimeout(() => ensureVisible('smooth'), 100);
-                                        setTimeout(() => ensureVisible('smooth'), 300);
-                                        setTimeout(() => ensureVisible('smooth'), 500);
-                                    }
-                                }}
-                                onBlur={(e) => {
-                                    // Prevent keyboard from closing when tapping the game
-                                    if (gameStatus === 1) {
-                                        e.preventDefault();
-                                        e.target.focus();
-                                    }
-                                }}
-                                aria-label="Type letters here"
-                            />
-                        )}
-                        <div
-                            ref={gameWrapperRef}
-                            className="
-                    min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px]
-                    w-full max-w-full
-                    h-full
-                    rounded-lg
-                    bg-[rgba(0,28,49,0.3)]
-                    flex items-center justify-center
-                    text-white
-                    p-1 sm:p-4
-                    mx-auto
-                "
-                            onTouchStartCapture={focusInputOnInteraction}
-                            onPointerDownCapture={focusInputOnInteraction}
-                            style={{ scrollMarginTop: '15vh', overflow: 'visible' }}
-                        >
-                            <div className='game-grid' style={{ height: '100%', width: '100%' }}>
-                                {/* Memoized grid rows - only affected rows re-render */}
-                                {Array.from({ length: Math.ceil(activeNumLetters / defaultGridCols) }).map((_, rowIndex) => (
-                                    <GridRow
-                                        key={rowIndex}
-                                        rowIndex={rowIndex}
-                                        board={board}
-                                        stateBoard={stateBoard}
-                                        activeIndex={activeIndex}
-                                        numLetters={activeNumLetters}
-                                        gridCols={defaultGridCols}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                </NPHackContainer>
-            </div>
-        </>
-    )
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#54FFA4]"></div>
+      </div>
+    );
+  }
 
-}
+  const legacyStatus =
+    phase === 'won' ? 3 : phase === 'lost' ? 2 : phase === 'ended' ? (result?.won ? 3 : 2) : 1;
+
+  return (
+    <>
+      <LeaderboardEligibleBadge
+        game="chopping"
+        gameSettings={{ letters: activeNumLetters, timer: activeTimer }}
+      />
+      <GameStatsTracker
+        game="chopping"
+        gameStatus={legacyStatus}
+        score={result ? result.score : state.activeIndex}
+        elapsedMs={result?.elapsedMs ?? 0}
+        targetScore={activeNumLetters}
+        wonStatus={3}
+        lostStatus={2}
+        gameSettings={{ letters: activeNumLetters, timer: activeTimer }}
+      />
+      <div ref={outerContainerRef} className="flex flex-col gap-4">
+        {mobile.isMobile && mobile.showHint && (
+          <div className="rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
+            Tap the puzzle, then type the letters to play.
+          </div>
+        )}
+        <GameShell
+          title="Alphabet"
+          description="Tap the letters in order"
+          phase={phase}
+          result={result}
+          durationMs={activeTimer * 1000}
+          runId={runId}
+          statusMessage={result ? (result.won ? 'Success!' : 'Failed!') : ''}
+          settings={isChallengeMode ? undefined : settings}
+        >
+          {mobile.isMobile && phase === 'playing' && (
+            <input
+              ref={mobileInputRef}
+              type="text"
+              inputMode="text"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="characters"
+              className="opacity-0"
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '1px',
+                height: '1px',
+                background: 'transparent',
+              }}
+              onInput={handleMobileInput}
+              onKeyDown={handleMobileKeyDown}
+              onFocus={() => mobile.focusInput()}
+              onBlur={(e) => {
+                if (phase === 'playing') {
+                  e.preventDefault();
+                  e.target.focus();
+                }
+              }}
+              aria-label="Type letters here"
+            />
+          )}
+          <div
+            ref={gameWrapperRef}
+            className="min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px] w-full max-w-full h-full rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-center text-white p-1 sm:p-4 mx-auto"
+            onTouchStartCapture={mobile.handleInteraction}
+            onPointerDownCapture={mobile.handleInteraction}
+            style={{ scrollMarginTop: '15vh', overflow: 'visible' }}
+          >
+            <div className="game-grid" style={{ height: '100%', width: '100%' }}>
+              {Array.from({ length: Math.ceil(state.board.length / defaultGridCols) }).map(
+                (_, rowIndex) => (
+                  <GridRow
+                    key={rowIndex}
+                    rowIndex={rowIndex}
+                    board={state.board}
+                    stateBoard={state.stateBoard}
+                    activeIndex={state.activeIndex}
+                    numLetters={state.board.length}
+                    gridCols={defaultGridCols}
+                  />
+                ),
+              )}
+            </div>
+          </div>
+        </GameShell>
+      </div>
+    </>
+  );
+};
 
 export default Chopping;

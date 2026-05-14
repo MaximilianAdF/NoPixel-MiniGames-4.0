@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 export default function usePersistantState<T>(
    key: string,
    initialValue: T
-): [T, (value: T) => void] {
+): [T, (value: T) => void, boolean] {
    // Always start with initialValue to ensure server and client match during hydration
    const [state, setInternalState] = useState<T>(initialValue);
+   // Flips true once the post-mount localStorage read has run; lets consumers wait for the stored value
+   const [hydrated, setHydrated] = useState(false);
 
    // After mount, sync with localStorage
    useEffect(() => {
@@ -19,6 +21,7 @@ export default function usePersistantState<T>(
        } catch (error) {
            console.error(`Error reading localStorage key "${key}":`, error);
        }
+       setHydrated(true);
    }, [key]);
 
    const setState = (value: T) => {
@@ -31,5 +34,5 @@ export default function usePersistantState<T>(
        }
    };
 
-   return [state, setState];
+   return [state, setState, hydrated];
 }
