@@ -136,28 +136,6 @@ function CookiePreferencesSettings() {
                 </div>
               </div>
             </div>
-
-            {/* Advertising Cookies */}
-            <div className="p-4 bg-[#0F1B21]/50 border border-[#54FFA4]/20 rounded-lg">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="text-white font-semibold">Advertising Cookies</h4>
-                    <span className={`px-2 py-0.5 text-xs font-bold rounded ${
-                      consent === 'accepted' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'
-                    }`}>
-                      {consent === 'accepted' ? 'Enabled' : 'Disabled'}
-                    </span>
-                  </div>
-                  <p className="text-gray-400 text-sm mb-2">
-                    Used to show personalized advertisements based on your interests (Google AdSense).
-                  </p>
-                  <p className="text-gray-500 text-xs">
-                    Provider: Google AdSense
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Action Buttons */}

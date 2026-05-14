@@ -19,7 +19,7 @@ export default function GameInstructions({ gameId, title, children }: GameInstru
     const { setIsOpen: setGlobalIsOpen, setWidth: setGlobalWidth } = useGuide();
     const [isOpen, setIsOpen] = usePersistantState<boolean>(
         `game-instructions-${gameId}`,
-        true // Default to open for first-time visitors (AdSense requirement)
+        true // Default to open for first-time visitors
     );
     
     // Track if component has mounted (client-side only)

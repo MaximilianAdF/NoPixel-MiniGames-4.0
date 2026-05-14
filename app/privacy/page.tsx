@@ -134,21 +134,6 @@ export default function PrivacyPage() {
                 Discord Privacy Policy <ExternalLink className="w-4 h-4" />
               </a>
             </div>
-
-            <div>
-              <h3 className="text-xl font-bold text-white mb-3">Google AdSense</h3>
-              <p className="text-gray-300 leading-relaxed mb-3">
-                We may use Google AdSense to display advertisements. Google and its partners use cookies to serve ads based on your prior visits to our website or other websites.
-              </p>
-              <a 
-                href="https://policies.google.com/technologies/ads"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#54FFA4] hover:text-[#45e894] inline-flex items-center gap-2"
-              >
-                Google Ads Policy <ExternalLink className="w-4 h-4" />
-              </a>
-            </div>
           </div>
         </div>
 
@@ -165,7 +150,6 @@ export default function PrivacyPage() {
                 <li>Keep you logged in to your account</li>
                 <li>Remember your preferences and settings</li>
                 <li>Analyze site traffic and usage patterns</li>
-                <li>Deliver relevant advertisements</li>
               </ul>
               <p className="text-gray-300 leading-relaxed mt-4">
                 You can control cookies through your browser settings. However, disabling cookies may limit your ability to use certain features of our website.
