@@ -145,7 +145,7 @@ export default async function Image() {
               fontWeight: 'bold',
             }}
           >
-            ⭐ START PRACTICING NOW
+            START PRACTICING NOW
           </div>
           <div
             style={{

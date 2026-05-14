@@ -81,7 +81,7 @@ export default function CookieConsent() {
               </div>
               <div className="flex-1 pr-8">
                 <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
-                  🍪 Cookie & Advertising Notice
+                  Cookie & Advertising Notice
                 </h3>
                 <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-3">
                   We use cookies and third-party services to enhance your experience, analyze site traffic, and display personalized advertisements through <strong className="text-white">Google AdSense</strong>. 
@@ -113,13 +113,13 @@ export default function CookieConsent() {
             {/* Cookie Types (Expandable - Optional) */}
             <div className="mb-6 p-4 bg-[#0F1B21]/50 rounded-lg border border-[#54FFA4]/20">
               <p className="text-sm text-gray-300 mb-2">
-                <strong className="text-white">🔹 Essential Cookies:</strong> Required for basic site functionality (login, settings)
+                <strong className="text-white">Essential Cookies:</strong> Required for basic site functionality (login, settings)
               </p>
               <p className="text-sm text-gray-300 mb-2">
-                <strong className="text-white">🔹 Analytics Cookies:</strong> Help us understand how you use the site (Google Analytics)
+                <strong className="text-white">Analytics Cookies:</strong> Help us understand how you use the site (Google Analytics)
               </p>
               <p className="text-sm text-gray-300">
-                <strong className="text-white">🔹 Advertising Cookies:</strong> Used to show relevant ads (Google AdSense)
+                <strong className="text-white">Advertising Cookies:</strong> Used to show relevant ads (Google AdSense)
               </p>
             </div>
 

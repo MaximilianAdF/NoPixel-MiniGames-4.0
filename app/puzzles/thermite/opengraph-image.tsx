@@ -76,16 +76,6 @@ export default async function Image() {
           </div>
         </div>
 
-        {/* Game Icon/Emoji */}
-        <div
-          style={{
-            fontSize: '120px',
-            marginBottom: '20px',
-          }}
-        >
-          🔥
-        </div>
-
         {/* Main Title */}
         <div
           style={{
@@ -166,7 +156,7 @@ export default async function Image() {
               fontWeight: 'bold',
             }}
           >
-            ⭐ FREE PRACTICE
+            FREE PRACTICE
           </div>
           <div
             style={{

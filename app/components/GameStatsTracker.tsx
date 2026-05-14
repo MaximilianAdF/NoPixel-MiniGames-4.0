@@ -313,7 +313,6 @@ export default function GameStatsTracker({
             className="bg-gradient-to-br from-[#0F1B21] to-[#1a2930] border-4 border-[#54FFA4] rounded-2xl p-8 shadow-2xl text-center min-w-[300px] animate-scale-in cursor-pointer hover:scale-105 transition-transform"
             onClick={dismissLevelUp}
           >
-            <div className="text-6xl mb-4 animate-bounce">🎉</div>
             <div className="text-[#54FFA4] text-2xl font-bold mb-2">LEVEL UP!</div>
             <div className="text-white text-4xl font-bold mb-2">Level {newLevel}</div>
             <div className="text-gray-400 mb-4">You&apos;re getting better!</div>

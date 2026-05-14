@@ -113,7 +113,7 @@ export default function OpenSourcePage() {
                 3
               </div>
               <div>
-                <h3 className="text-white font-semibold mb-2">💡 Suggest Features</h3>
+                <h3 className="text-white font-semibold mb-2">Suggest Features</h3>
                 <p className="text-gray-300">
                   Have an idea for a new feature or improvement? Open a feature request on our GitHub discussions!
                 </p>
@@ -125,7 +125,7 @@ export default function OpenSourcePage() {
                 4
               </div>
               <div>
-                <h3 className="text-white font-semibold mb-2">🔧 Submit Pull Requests</h3>
+                <h3 className="text-white font-semibold mb-2">Submit Pull Requests</h3>
                 <p className="text-gray-300">
                   Know how to code? Fork the repo, make your changes, and submit a pull request. All contributions are welcome!
                 </p>
@@ -137,7 +137,7 @@ export default function OpenSourcePage() {
                 5
               </div>
               <div>
-                <h3 className="text-white font-semibold mb-2">📖 Improve Documentation</h3>
+                <h3 className="text-white font-semibold mb-2">Improve Documentation</h3>
                 <p className="text-gray-300">
                   Help us write better guides, fix typos, or translate content for non-English speakers.
                 </p>

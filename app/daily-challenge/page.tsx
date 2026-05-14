@@ -3,11 +3,11 @@ import DailyChallengeClient from './DailyChallengeClient';
 import { Calendar, Trophy, Zap, Target, Clock, Flame } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: "🎯 Daily Challenge - NoPixel 4.0 Minigames",
+  title: "Daily Challenge - NoPixel 4.0 Minigames",
   description: "Complete the daily challenge to earn bonus XP and climb the streak leaderboards! A new NoPixel minigame challenge every day with unique settings and rewards. Build your streak and compete globally.",
   keywords: ["daily challenge", "NoPixel daily", "minigame challenge", "daily streak", "NoPixel 4.0 daily", "GTA RP daily challenge"],
   openGraph: {
-    title: "🎯 Daily Challenge - Earn Bonus XP Today",
+    title: "Daily Challenge - Earn Bonus XP Today",
     description: "Complete today's NoPixel minigame challenge for bonus XP. New challenge every day - build your streak!",
     url: "https://nphacks.net/daily-challenge",
   },
