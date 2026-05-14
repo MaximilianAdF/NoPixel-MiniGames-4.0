@@ -8,6 +8,14 @@ export const metadata: Metadata = {
   title: 'Laundromat Hack Guide - Master NoPixel 4.0 Symbol Matching | Expert Tips',
   description: 'Complete guide to mastering the Laundromat minigame in NoPixel 4.0. Learn symbol pair matching techniques, grid memorization, and pro tips for byte decryption.',
   keywords: ['laundromat hack guide', 'NoPixel laundromat', 'symbol matching tutorial', 'laundromat tips', 'GTA RP mazer hack'],
+  alternates: {
+    canonical: 'https://nphacks.net/guides/laundromat',
+  },
+  openGraph: {
+    title: 'Laundromat Hack Guide - Master NoPixel 4.0 Symbol Matching | Expert Tips',
+    description: 'Complete guide to mastering the Laundromat minigame in NoPixel 4.0. Learn symbol pair matching techniques, grid memorization, and pro tips for byte decryption.',
+    url: 'https://nphacks.net/guides/laundromat',
+  },
 };
 
 export default function LaundromatGuidePage() {

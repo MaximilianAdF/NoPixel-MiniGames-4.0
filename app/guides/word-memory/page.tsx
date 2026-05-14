@@ -6,6 +6,14 @@ export const metadata: Metadata = {
   title: 'Word Memory Guide - Master NoPixel 4.0 Recognition Challenge | Expert Tips',
   description: 'Complete guide to mastering the Word Memory minigame in NoPixel 4.0. Learn NEW vs SEEN recognition techniques, memory tracking strategies, and pro tips.',
   keywords: ['word memory guide', 'NoPixel word memory', 'NEW SEEN recognition', 'word tracking tips', 'GTA RP memory challenge'],
+  alternates: {
+    canonical: 'https://nphacks.net/guides/word-memory',
+  },
+  openGraph: {
+    title: 'Word Memory Guide - Master NoPixel 4.0 Recognition Challenge | Expert Tips',
+    description: 'Complete guide to mastering the Word Memory minigame in NoPixel 4.0. Learn NEW vs SEEN recognition techniques, memory tracking strategies, and pro tips.',
+    url: 'https://nphacks.net/guides/word-memory',
+  },
 };
 
 export default function WordMemoryGuidePage() {

@@ -6,6 +6,14 @@ export const metadata: Metadata = {
   title: 'Lockpick Hack Guide - Master NoPixel 4.0 Timing Minigame | Expert Tips',
   description: 'Complete guide to mastering the Lockpick minigame in NoPixel 4.0. Learn timing techniques, indicator tracking, and pro tips for unlocking vehicles and doors.',
   keywords: ['lockpick hack guide', 'NoPixel lockpick', 'timing minigame tutorial', 'lockpick tips', 'GTA RP lockpick strategy'],
+  alternates: {
+    canonical: 'https://nphacks.net/guides/lockpick',
+  },
+  openGraph: {
+    title: 'Lockpick Hack Guide - Master NoPixel 4.0 Timing Minigame | Expert Tips',
+    description: 'Complete guide to mastering the Lockpick minigame in NoPixel 4.0. Learn timing techniques, indicator tracking, and pro tips for unlocking vehicles and doors.',
+    url: 'https://nphacks.net/guides/lockpick',
+  },
 };
 
 export default function LockpickGuidePage() {

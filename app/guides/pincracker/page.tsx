@@ -6,6 +6,14 @@ export const metadata: Metadata = {
   title: 'PIN Cracker Guide - Master NoPixel 4.0 Logic Puzzle | Expert Tips',
   description: 'Complete guide to mastering the PIN Cracker minigame in NoPixel 4.0. Learn Mastermind-style deduction, color feedback interpretation, and pro tips for cracking codes.',
   keywords: ['PIN cracker guide', 'NoPixel PIN hack', 'mastermind puzzle tutorial', 'PIN cracker tips', 'GTA RP logic puzzle'],
+  alternates: {
+    canonical: 'https://nphacks.net/guides/pincracker',
+  },
+  openGraph: {
+    title: 'PIN Cracker Guide - Master NoPixel 4.0 Logic Puzzle | Expert Tips',
+    description: 'Complete guide to mastering the PIN Cracker minigame in NoPixel 4.0. Learn Mastermind-style deduction, color feedback interpretation, and pro tips for cracking codes.',
+    url: 'https://nphacks.net/guides/pincracker',
+  },
 };
 
 export default function PincrackerGuidePage() {

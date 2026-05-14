@@ -105,13 +105,6 @@ export default function Home() {
                 "price": "0",
                 "priceCurrency": "USD"
               },
-              "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": "4.8",
-                "ratingCount": "1250",
-                "bestRating": "5",
-                "worstRating": "1"
-              },
               "screenshot": "https://nphacks.net/images/og-image.png",
               "featureList": [
                 "Thermite Hacking Practice",
@@ -161,7 +154,9 @@ export default function Home() {
             <div className="relative flex flex-col sm:flex-row items-center sm:items-start justify-center gap-2 sm:gap-4">
               {/* NoPixel - Large on the left */}
               <h1 className="relative group cursor-pointer text-center sm:text-left">
-                <span 
+                <span className="sr-only">NoPixel 4.0 Minigames — Hacking Simulator</span>
+                <span
+                  aria-hidden="true"
                   className="inline-block text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black bg-clip-text text-transparent transition-transform duration-500 group-hover:translate-x-2 animate-gradient-flow"
                   style={{ 
                     fontFamily: 'var(--font-orbitron)', 

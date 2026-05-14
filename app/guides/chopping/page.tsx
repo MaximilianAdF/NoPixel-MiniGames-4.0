@@ -6,6 +6,14 @@ export const metadata: Metadata = {
   title: 'Chopping Guide - Master NoPixel 4.0 Typing Challenge | Expert Tips',
   description: 'Complete guide to mastering the Chopping minigame in NoPixel 4.0. Learn typing speed techniques, letter sequence strategies, and pro tips for VIN scratching.',
   keywords: ['chopping guide', 'NoPixel VIN scratch', 'typing challenge tutorial', 'keyboard speed tips', 'GTA RP chopping minigame'],
+  alternates: {
+    canonical: 'https://nphacks.net/guides/chopping',
+  },
+  openGraph: {
+    title: 'Chopping Guide - Master NoPixel 4.0 Typing Challenge | Expert Tips',
+    description: 'Complete guide to mastering the Chopping minigame in NoPixel 4.0. Learn typing speed techniques, letter sequence strategies, and pro tips for VIN scratching.',
+    url: 'https://nphacks.net/guides/chopping',
+  },
 };
 
 export default function ChoppingGuidePage() {
