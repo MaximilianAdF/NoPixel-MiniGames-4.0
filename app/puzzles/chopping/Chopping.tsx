@@ -29,11 +29,15 @@ const Chopping: FC = () => {
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
 
-  const [savedTimer, setSavedTimer] = usePersistantState('chopping-timer', defaultDuration);
-  const [savedNumLetters, setSavedNumLetters] = usePersistantState(
+  const [savedTimer, setSavedTimer, timerHydrated] = usePersistantState(
+    'chopping-timer',
+    defaultDuration,
+  );
+  const [savedNumLetters, setSavedNumLetters, lettersHydrated] = usePersistantState(
     'chopping-num-letters',
     defaultNumLetters,
   );
+  const settingsHydrated = timerHydrated && lettersHydrated;
 
   const activeNumLetters =
     isChallengeMode && challengeData
@@ -67,7 +71,7 @@ const Chopping: FC = () => {
     config: { numLetters: activeNumLetters },
     durationMs: activeTimer * 1000,
     mode,
-    ready: !isChallengeMode || challengeData != null,
+    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {
       lastResultRef.current = gameResult;

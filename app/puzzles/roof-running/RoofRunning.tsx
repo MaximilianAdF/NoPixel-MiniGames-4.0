@@ -27,12 +27,19 @@ const RoofRunning: FC = () => {
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
 
-  const [savedRows, setSavedRows] = usePersistantState('np-roofrunning-rows', defaultRows);
-  const [savedColumns, setSavedColumns] = usePersistantState(
+  const [savedRows, setSavedRows, rowsHydrated] = usePersistantState(
+    'np-roofrunning-rows',
+    defaultRows,
+  );
+  const [savedColumns, setSavedColumns, columnsHydrated] = usePersistantState(
     'np-roofrunning-columns',
     defaultColumns,
   );
-  const [savedTimer, setSavedTimer] = usePersistantState('np-roofrunning-timer', defaultDuration);
+  const [savedTimer, setSavedTimer, timerHydrated] = usePersistantState(
+    'np-roofrunning-timer',
+    defaultDuration,
+  );
+  const settingsHydrated = rowsHydrated && columnsHydrated && timerHydrated;
 
   const activeRows =
     isChallengeMode && challengeData
@@ -72,7 +79,7 @@ const RoofRunning: FC = () => {
     config: { rows: activeRows, columns: activeColumns },
     durationMs: activeTimer * 1000,
     mode,
-    ready: !isChallengeMode || challengeData != null,
+    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {
       lastResultRef.current = gameResult;

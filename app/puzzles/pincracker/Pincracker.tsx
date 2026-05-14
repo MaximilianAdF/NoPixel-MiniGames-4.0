@@ -31,11 +31,15 @@ const Pincracker: FC = () => {
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
 
-  const [savedTimer, setSavedTimer] = usePersistantState('pincracker-timer', defaultDuration);
-  const [savedPinLength, setSavedPinLength] = usePersistantState(
+  const [savedTimer, setSavedTimer, timerHydrated] = usePersistantState(
+    'pincracker-timer',
+    defaultDuration,
+  );
+  const [savedPinLength, setSavedPinLength, pinLengthHydrated] = usePersistantState(
     'pincracker-pin-length',
     defaultPinLength,
   );
+  const settingsHydrated = timerHydrated && pinLengthHydrated;
 
   const activePinLength =
     isChallengeMode && challengeData
@@ -69,7 +73,7 @@ const Pincracker: FC = () => {
     config: { pinLength: activePinLength },
     durationMs: activeTimer * 1000,
     mode,
-    ready: !isChallengeMode || challengeData != null,
+    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {
       lastResultRef.current = gameResult;

@@ -24,11 +24,15 @@ const WordMemory: FC = () => {
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
 
-  const [savedNumWords, setSavedNumWords] = usePersistantState(
+  const [savedNumWords, setSavedNumWords, numWordsHydrated] = usePersistantState(
     'word-memory-num-words',
     defaultNumWords,
   );
-  const [savedTimer, setSavedTimer] = usePersistantState('word-memory-timer', defaultDuration);
+  const [savedTimer, setSavedTimer, timerHydrated] = usePersistantState(
+    'word-memory-timer',
+    defaultDuration,
+  );
+  const settingsHydrated = numWordsHydrated && timerHydrated;
 
   const activeNumWords =
     isChallengeMode && challengeData
@@ -62,7 +66,7 @@ const WordMemory: FC = () => {
     config: { numWords: activeNumWords },
     durationMs: activeTimer * 1000,
     mode,
-    ready: !isChallengeMode || challengeData != null,
+    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {
       lastResultRef.current = gameResult;
