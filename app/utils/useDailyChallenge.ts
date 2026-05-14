@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useUser } from '@/app/contexts/UserContext';
 
 interface ChallengeData {
   id: string;
@@ -28,6 +29,7 @@ let pendingFetch: Promise<any> | null = null;
 export function useDailyChallenge() {
   const searchParams = useSearchParams();
   const challengeId = searchParams?.get('challengeId');
+  const { dailyChallengeStatus } = useUser();
   const [challengeData, setChallengeData] = useState<ChallengeData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -82,9 +84,16 @@ export function useDailyChallenge() {
     }
   }, [challengeId]);
 
+  // True once today's challenge has already been completed - a replay is then practice, not a fresh terminal run.
+  const isCompleted =
+    !!challengeId &&
+    dailyChallengeStatus?.challengeId === challengeId &&
+    !!dailyChallengeStatus?.completed;
+
   return {
     isChallengeMode: !!challengeId,
     challengeData,
     isLoading,
+    isCompleted,
   };
 }

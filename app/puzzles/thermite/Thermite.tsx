@@ -22,7 +22,7 @@ import backgroundImg from '@/public/images/thermite/background.svg';
 import './style.css';
 
 const Thermite: FC = () => {
-  const { isChallengeMode, challengeData, isLoading: isChallengeLoading } = useDailyChallenge();
+  const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const searchParams = useSearchParams();
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
@@ -74,7 +74,7 @@ const Thermite: FC = () => {
         ? presets[0].columns
         : savedColumns;
 
-  const mode: GameMode = isChallengeMode
+  const mode: GameMode = isChallengeMode && !isCompleted
     ? 'daily-challenge'
     : isCompetitive
       ? 'competitive'

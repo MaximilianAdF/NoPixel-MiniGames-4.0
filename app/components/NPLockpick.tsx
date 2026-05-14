@@ -35,7 +35,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
   gameId = 'lockpick',
   isCompetitive = false,
 }) => {
-  const { isChallengeMode, challengeData, isLoading: isChallengeLoading } = useDailyChallenge();
+  const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const { user } = useUser();
 
   const [savedLevels, setSavedLevels, levelsHydrated] = usePersistantState(
@@ -63,7 +63,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
         ? countdownDuration
         : savedTimer;
 
-  const mode: GameMode = isChallengeMode
+  const mode: GameMode = isChallengeMode && !isCompleted
     ? 'daily-challenge'
     : isCompetitive
       ? 'competitive'
