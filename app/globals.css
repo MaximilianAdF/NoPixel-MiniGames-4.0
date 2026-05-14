@@ -177,12 +177,6 @@
 }
 
 @layer utilities {
-  .animate-binaryRain {
-    animation: binaryRain linear infinite;
-  }
-  .animate-scanLine {
-    animation: scanLine 10s linear infinite;
-  }
   .animate-fadeIn {
     animation: fadeIn 0.3s ease-in-out;
   }
