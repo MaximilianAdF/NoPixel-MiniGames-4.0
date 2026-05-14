@@ -238,6 +238,7 @@ const RoofRunning: FC = () => {
               grid
               gap-x-0.5 gap-y-1
               mx-auto
+              min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px]
               *:aspect-square
               data-[color=red]:*:bg-gradient-to-b
               data-[color=red]:*:from-[#f30308]

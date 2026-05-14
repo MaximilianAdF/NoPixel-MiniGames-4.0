@@ -249,7 +249,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
       >
         <div
           className={classNames(
-            'w-full rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-center',
+            'w-full max-w-full min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px] rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-center',
             phase === 'idle' && 'blur',
           )}
         >

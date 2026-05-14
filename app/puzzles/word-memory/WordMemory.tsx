@@ -209,7 +209,7 @@ const WordMemory: FC = () => {
         ]}
         settings={isChallengeMode ? undefined : settings}
       >
-        <div className="flex w-full flex-col flex-1 rounded-lg bg-[rgba(0,28,49,0.3)] text-white">
+        <div className="flex w-full flex-col flex-1 min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px] max-w-full rounded-lg bg-[rgba(0,28,49,0.3)] text-white">
           <p className="pt-4 text-center text-2xl">
             {state.round}/{state.numWords}
           </p>

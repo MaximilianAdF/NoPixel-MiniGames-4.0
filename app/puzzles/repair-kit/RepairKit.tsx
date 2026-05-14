@@ -137,7 +137,7 @@ const RepairKit: FC = () => {
           'w-full m-auto p-2 sm:p-3 md:p-5 flex relative rounded-lg gap-2 sm:gap-3',
           'bg-gradient-to-r from-[rgb(18_19_20)] to-[rgb(36_68_90)] shadow',
           'h-16 sm:h-20 md:h-24',
-          'max-w-full',
+          'max-w-[95vw] sm:max-w-[600px] md:max-w-[800px]',
         )}
       >
         <button

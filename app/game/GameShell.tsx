@@ -144,7 +144,7 @@ export default function GameShell({
             </div>
             {settings && (
               <div
-                className="flex justify-center items-center p-1 mr-4 sm:mr-7 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 shrink-0"
+                className="flex justify-center items-center p-1 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 shrink-0"
                 onClick={() => setSettingsVisible(true)}
                 role="button"
                 aria-label="Open Settings"
