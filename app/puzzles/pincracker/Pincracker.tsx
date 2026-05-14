@@ -537,10 +537,11 @@ const Pincracker: FC = () => {
                     timer: activeTimer,
                 }}
             />
+            {/* score: autoClear resets activeIndex to 0 in the same render as the win, so report full pin length on win */}
             <GameStatsTracker
                 game="pincracker"
                 gameStatus={gameStatus}
-                score={activeIndex}
+                score={gameStatus === 3 ? activePinLength : activeIndex}
                 elapsedMs={elapsed}
                 targetScore={activePinLength}
                 wonStatus={3}
