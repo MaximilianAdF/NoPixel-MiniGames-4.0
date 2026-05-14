@@ -281,10 +281,7 @@ export default function GameStatsTracker({
             </div>
             
             <button
-              onClick={() => {
-                setShowChallengeCompleteDialog(false);
-                router.push('/daily-challenge');
-              }}
+              onClick={() => router.push('/daily-challenge')}
               className="w-full bg-gradient-to-r from-[#54FFA4] to-[#45e894] text-[#0F1B21] font-bold py-3 px-6 rounded-lg hover:from-[#45e894] hover:to-[#54FFA4] transition-all duration-300 transform hover:scale-105"
             >
               Back to Daily Challenges

@@ -112,11 +112,12 @@ export function useGameHost<State, Config, Input>({
     };
   }, [runId, phase, durationMs, endGame]);
 
-  // After a result, practice loops to a new round; daily-challenge and competitive end terminally.
+  // After a result: practice and failed daily challenges loop; won challenges and competitive runs end terminally.
   useEffect(() => {
     if (phase !== 'won' && phase !== 'lost') return;
     const timer = setTimeout(() => {
-      if (mode === 'practice') start();
+      const retry = mode === 'practice' || (mode === 'daily-challenge' && phase === 'lost');
+      if (retry) start();
       else setPhase('ended');
     }, AUTO_RESTART_MS);
     return () => clearTimeout(timer);
