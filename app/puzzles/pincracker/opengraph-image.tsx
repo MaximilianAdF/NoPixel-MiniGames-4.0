@@ -110,7 +110,7 @@ export default async function Image() {
               textAlign: 'center',
             }}
           >
-            Pattern recognition • Speed typing • Climb the ranks
+            Pattern recognition • Speed typing
           </div>
         </div>
         <div

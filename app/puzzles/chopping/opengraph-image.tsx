@@ -110,7 +110,7 @@ export default async function Image() {
               textAlign: 'center',
             }}
           >
-            Lightning reflexes • Keyboard skills • Top the leaderboard
+            Lightning reflexes • Keyboard skills
           </div>
         </div>
         <div

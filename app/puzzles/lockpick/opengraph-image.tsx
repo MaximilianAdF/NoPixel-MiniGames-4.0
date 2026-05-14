@@ -110,7 +110,7 @@ export default async function Image() {
               textAlign: 'center',
             }}
           >
-            Perfect your timing • Global leaderboards • Free practice
+            Perfect your timing • Free practice
           </div>
         </div>
         <div

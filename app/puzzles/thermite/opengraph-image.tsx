@@ -131,7 +131,7 @@ export default async function Image() {
               textAlign: 'center',
             }}
           >
-            Master timing • Compete on leaderboards • Free training
+            Master timing • Free training
           </div>
         </div>
 

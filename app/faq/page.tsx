@@ -28,7 +28,7 @@ export default function FAQPage() {
     },
     {
       question: "Do I need to pay or create an account?",
-      answer: "Nope! Everything is 100% free. You can practice all minigames without logging in. Optional Discord login will be available in the future to save your scores and compete on global leaderboards.",
+      answer: "Nope! Everything is 100% free. You can practice all minigames without logging in. An optional Discord login lets you earn XP, level up, build a daily challenge streak, and appear on the global leaderboards.",
       icon: Users,
     },
     {

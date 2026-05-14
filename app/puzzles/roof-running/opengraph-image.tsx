@@ -110,7 +110,7 @@ export default async function Image() {
               textAlign: 'center',
             }}
           >
-            Fast reflexes • Pattern recall • Race the leaderboards
+            Fast reflexes • Pattern recall
           </div>
         </div>
         <div
