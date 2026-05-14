@@ -51,7 +51,7 @@ const orbitron = Orbitron({
   display: 'swap',
   variable: '--font-orbitron',
   adjustFontFallback: true,
-  preload: true,
+  preload: false,
 });
 
 const rajdhani = Rajdhani({
@@ -60,7 +60,7 @@ const rajdhani = Rajdhani({
   display: 'swap',
   variable: '--font-rajdhani',
   adjustFontFallback: true,
-  preload: true,
+  preload: false,
 });
 
 const caveat = Caveat({
@@ -69,7 +69,7 @@ const caveat = Caveat({
   display: 'swap',
   variable: '--font-caveat',
   adjustFontFallback: true,
-  preload: true,
+  preload: false,
 });
 
 
