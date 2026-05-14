@@ -3,6 +3,8 @@ import Icon from '@mdi/react';
 import { mdiFuse } from '@mdi/js';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import JsonLd from '@/app/components/JsonLd';
+import { breadcrumbList, guideArticle } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
   title: 'Thermite Hack Guide - Master NoPixel 4.0 Memory Pattern Grid | Expert Tips',
@@ -21,6 +23,20 @@ export const metadata: Metadata = {
 export default function ThermiteGuidePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/' },
+          { name: 'Guides', path: '/guides' },
+          { name: 'Thermite Hack Guide', path: '/guides/thermite' },
+        ])}
+      />
+      <JsonLd
+        data={guideArticle({
+          headline: 'Thermite Hack Guide - Master NoPixel 4.0 Memory Pattern Grid | Expert Tips',
+          description: 'Complete guide to mastering the Thermite hack in NoPixel 4.0. Learn pattern memorization, sequence recall strategies, and pro tips for bank heist laser security.',
+          path: '/guides/thermite',
+        })}
+      />
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
         <Link 

@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import RoofRunning from "@/app/puzzles/roof-running/RoofRunning";
 import PuzzleBackButton from "@/app/components/PuzzleBackButton";
 import PuzzlePageWrapper from "@/app/puzzles/PuzzlePageWrapper";
+import JsonLd from "@/app/components/JsonLd";
+import { breadcrumbList } from "@/lib/structuredData";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -27,9 +29,17 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <PuzzlePageWrapper>
-      <PuzzleBackButton />
-      <RoofRunning />
-    </PuzzlePageWrapper>
+    <>
+      <JsonLd
+        data={breadcrumbList([
+          { name: "Home", path: "/" },
+          { name: "Roof Running Minigame", path: "/puzzles/roof-running" },
+        ])}
+      />
+      <PuzzlePageWrapper>
+        <PuzzleBackButton />
+        <RoofRunning />
+      </PuzzlePageWrapper>
+    </>
   );
 }

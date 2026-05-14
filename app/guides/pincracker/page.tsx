@@ -1,6 +1,8 @@
 import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Zap, Brain, Trophy, Eye, Calculator, Fingerprint } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import JsonLd from '@/app/components/JsonLd';
+import { breadcrumbList, guideArticle } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
   title: 'PIN Cracker Guide - Master NoPixel 4.0 Logic Puzzle | Expert Tips',
@@ -19,6 +21,20 @@ export const metadata: Metadata = {
 export default function PincrackerGuidePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/' },
+          { name: 'Guides', path: '/guides' },
+          { name: 'PIN Cracker Guide', path: '/guides/pincracker' },
+        ])}
+      />
+      <JsonLd
+        data={guideArticle({
+          headline: 'PIN Cracker Guide - Master NoPixel 4.0 Logic Puzzle | Expert Tips',
+          description: 'Complete guide to mastering the PIN Cracker minigame in NoPixel 4.0. Learn Mastermind-style deduction, color feedback interpretation, and pro tips for cracking codes.',
+          path: '/guides/pincracker',
+        })}
+      />
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
         <Link 

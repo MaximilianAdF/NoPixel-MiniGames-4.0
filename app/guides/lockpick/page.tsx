@@ -1,6 +1,8 @@
 import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Zap, Brain, Trophy, Crosshair, Key } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import JsonLd from '@/app/components/JsonLd';
+import { breadcrumbList, guideArticle } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
   title: 'Lockpick Hack Guide - Master NoPixel 4.0 Timing Minigame | Expert Tips',
@@ -19,6 +21,20 @@ export const metadata: Metadata = {
 export default function LockpickGuidePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/' },
+          { name: 'Guides', path: '/guides' },
+          { name: 'Lockpick Hack Guide', path: '/guides/lockpick' },
+        ])}
+      />
+      <JsonLd
+        data={guideArticle({
+          headline: 'Lockpick Hack Guide - Master NoPixel 4.0 Timing Minigame | Expert Tips',
+          description: 'Complete guide to mastering the Lockpick minigame in NoPixel 4.0. Learn timing techniques, indicator tracking, and pro tips for unlocking vehicles and doors.',
+          path: '/guides/lockpick',
+        })}
+      />
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
         <Link 
