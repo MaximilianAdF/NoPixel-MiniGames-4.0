@@ -14,6 +14,9 @@ interface UseGameHostArgs<State, Config, Input> {
   rng?: () => number;
   onTick?: () => void;
   onResult?: (result: GameResult) => void;
+  // Fires for every accepted input. 1v1 streams these to the opponent so they
+  // can replay the same engine in their spectator view.
+  onInput?: (input: Input) => void;
 }
 
 export interface GameHost<State, Input> {
@@ -35,6 +38,7 @@ export function useGameHost<State, Config, Input>({
   rng = Math.random,
   onTick,
   onResult,
+  onInput,
 }: UseGameHostArgs<State, Config, Input>): GameHost<State, Input> {
   const [phase, setPhase] = useState<GamePhase>('idle');
   const [state, setState] = useState<State>(() => engine.init(config, rng));
@@ -48,6 +52,7 @@ export function useGameHost<State, Config, Input>({
   const rngRef = useRef(rng);
   const onTickRef = useRef(onTick);
   const onResultRef = useRef(onResult);
+  const onInputRef = useRef(onInput);
 
   // Mirror latest props into refs so the callbacks below stay referentially stable.
   useEffect(() => {
@@ -56,6 +61,7 @@ export function useGameHost<State, Config, Input>({
     rngRef.current = rng;
     onTickRef.current = onTick;
     onResultRef.current = onResult;
+    onInputRef.current = onInput;
   });
 
   const endGame = useCallback(
@@ -85,6 +91,7 @@ export function useGameHost<State, Config, Input>({
   const submitInput = useCallback(
     (input: Input) => {
       if (phaseRef.current !== 'playing') return;
+      onInputRef.current?.(input);
       const { state: next, outcome } = engine.applyInput(stateRef.current, input);
       stateRef.current = next;
       setState(next);

@@ -33,6 +33,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   const [match, setMatch] = useState<{ game: GameType; seed: number } | null>(null);
   const [myResult, setMyResult] = useState<GameResult | null>(null);
   const [opponentResult, setOpponentResult] = useState<GameResult | null>(null);
+  const [opponentInputs, setOpponentInputs] = useState<unknown[]>([]);
 
   const displayName = user?.displayName ?? user?.username ?? 'Player';
 
@@ -41,8 +42,11 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       setMatch({ game: msg.game, seed: msg.seed });
       setMyResult(null);
       setOpponentResult(null);
+      setOpponentInputs([]);
     } else if (msg.type === 'match:result') {
       setOpponentResult({ won: msg.won, score: msg.score, elapsedMs: msg.elapsedMs });
+    } else if (msg.type === 'match:input') {
+      setOpponentInputs((prev) => [...prev, msg.input]);
     }
   }, []);
 
@@ -71,6 +75,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     setMatch({ game, seed });
     setMyResult(null);
     setOpponentResult(null);
+    setOpponentInputs([]);
     await publish({ type: 'match:start', game, seed, startedAt: Date.now() });
   };
 
@@ -87,10 +92,18 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     [publish],
   );
 
+  const handleInput = useCallback(
+    (input: unknown) => {
+      void publish({ type: 'match:input', input });
+    },
+    [publish],
+  );
+
   const handleBackToLobby = () => {
     setMatch(null);
     setMyResult(null);
     setOpponentResult(null);
+    setOpponentInputs([]);
   };
 
   if (!isLoggedIn) {
@@ -124,8 +137,14 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   if (match) {
     return (
       <div className="min-h-screen p-4 md:p-8">
-        <div className="max-w-4xl mx-auto pt-8">
-          <MatchView game={match.game} seed={match.seed} onMatchEnd={handleMatchEnd} />
+        <div className="max-w-7xl mx-auto pt-8">
+          <MatchView
+            game={match.game}
+            seed={match.seed}
+            onMatchEnd={handleMatchEnd}
+            onInput={handleInput}
+            opponentInputs={opponentInputs}
+          />
         </div>
       </div>
     );

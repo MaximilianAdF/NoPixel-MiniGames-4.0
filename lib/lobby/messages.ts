@@ -19,4 +19,11 @@ export interface MatchResultMessage {
   elapsedMs: number;
 }
 
-export type LobbyMessage = MatchStartMessage | MatchResultMessage;
+// A streamed input event. The opponent replays these through the engine to
+// render a live spectator view of the player's game.
+export interface MatchInputMessage {
+  type: 'match:input';
+  input: unknown;
+}
+
+export type LobbyMessage = MatchStartMessage | MatchResultMessage | MatchInputMessage;

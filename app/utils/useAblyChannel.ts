@@ -54,7 +54,10 @@ export function useAblyChannel<TMsg>({
     }
 
     let cancelled = false;
-    const client = new Ably.Realtime({ authUrl: '/api/ably/token' });
+    // echoMessages: false — we apply our own actions locally before publishing,
+    // so we don't want them echoed back and double-applied (especially the
+    // match:input stream that drives the spectator view).
+    const client = new Ably.Realtime({ authUrl: '/api/ably/token', echoMessages: false });
 
     client.connection.on((change) => {
       if (cancelled) return;
