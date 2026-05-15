@@ -92,21 +92,25 @@ export function useAblyChannel<TMsg>({
       }
     };
 
-    channel.presence.subscribe(() => {
-      void refreshPresence();
-    });
-
-    channel.subscribe((msg) => {
-      if (cancelled) return;
-      onMessageRef.current?.(msg.data as TMsg);
-    });
-
-    void channel.presence
-      .enter({ displayName: presenceDisplayName })
-      .then(refreshPresence)
-      .catch((err) => {
-        console.error('Failed to enter presence:', err);
-      });
+    // Wrap subscribe + enter in one async fn with one try/catch. Without this,
+    // React's strict-mode double-mount can close the client mid-attach and the
+    // in-flight subscribe/enter Promises reject unhandled.
+    const setup = async () => {
+      try {
+        await channel.presence.subscribe(() => {
+          void refreshPresence();
+        });
+        await channel.subscribe((msg) => {
+          if (cancelled) return;
+          onMessageRef.current?.(msg.data as TMsg);
+        });
+        await channel.presence.enter({ displayName: presenceDisplayName });
+        await refreshPresence();
+      } catch (err) {
+        if (!cancelled) console.error('Failed to set up Ably channel:', err);
+      }
+    };
+    void setup();
 
     return () => {
       cancelled = true;
