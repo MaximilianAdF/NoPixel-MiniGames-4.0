@@ -77,12 +77,16 @@ export function useAblyChannel<TMsg>({
       try {
         const members = await channel.presence.get();
         if (cancelled) return;
-        setPresence(
-          members.map((m) => ({
-            clientId: m.clientId ?? '',
+        // Dedupe by clientId — the same user across multiple tabs/connections counts once.
+        const byClientId = new Map<string, PresenceMember>();
+        for (const m of members) {
+          if (!m.clientId) continue;
+          byClientId.set(m.clientId, {
+            clientId: m.clientId,
             data: (m.data ?? { displayName: '' }) as { displayName: string },
-          })),
-        );
+          });
+        }
+        setPresence(Array.from(byClientId.values()));
       } catch (err) {
         console.error('Failed to fetch presence:', err);
       }
