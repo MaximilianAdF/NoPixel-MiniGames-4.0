@@ -1,0 +1,25 @@
+// A fixed pool of common, distinct words. The Word Memory engine samples from
+// this via its injected rng, so word generation is deterministic and replayable.
+export const WORD_BANK: string[] = [
+  'apple', 'river', 'table', 'cloud', 'stone', 'bridge', 'garden', 'candle',
+  'pencil', 'window', 'forest', 'planet', 'rocket', 'basket', 'copper', 'silver',
+  'marble', 'velvet', 'cotton', 'anchor', 'harbor', 'island', 'valley', 'meadow',
+  'canyon', 'desert', 'glacier', 'thunder', 'rainbow', 'blossom', 'harvest', 'lantern',
+  'compass', 'telescope', 'mountain', 'fountain', 'cottage', 'castle', 'tower', 'cellar',
+  'hallway', 'balcony', 'chimney', 'mirror', 'drawer', 'ladder', 'hammer', 'wrench',
+  'needle', 'thread', 'button', 'ribbon', 'blanket', 'pillow', 'mattress', 'curtain',
+  'carpet', 'ceiling', 'kitchen', 'pantry', 'closet', 'garage', 'driveway', 'sidewalk',
+  'highway', 'tunnel', 'railway', 'station', 'airport', 'lighthouse', 'windmill', 'stadium',
+  'library', 'museum', 'market', 'factory', 'chapel', 'palace', 'fortress', 'cathedral',
+  'rabbit', 'falcon', 'otter', 'badger', 'beaver', 'hedgehog', 'dolphin', 'penguin',
+  'walrus', 'panther', 'leopard', 'jaguar', 'raccoon', 'squirrel', 'sparrow', 'heron',
+  'pelican', 'tortoise', 'lizard', 'salmon', 'lobster', 'jellyfish', 'octopus', 'butterfly',
+  'dragonfly', 'beetle', 'cricket', 'pumpkin', 'walnut', 'almond', 'cherry', 'peach',
+  'melon', 'apricot', 'biscuit', 'pretzel', 'muffin', 'waffle', 'pancake', 'noodle',
+  'pepper', 'ginger', 'cinnamon', 'vanilla', 'caramel', 'custard', 'clover', 'maple',
+  'willow', 'cedar', 'birch', 'cactus', 'orchid', 'tulip', 'daisy', 'poppy',
+  'thistle', 'bamboo', 'festival', 'carnival', 'parade', 'journey', 'voyage', 'treasure',
+  'puzzle', 'riddle', 'melody', 'rhythm', 'shadow', 'ember', 'pebble', 'boulder',
+  'gravel', 'crystal', 'granite', 'bronze', 'leather', 'comet', 'meteor', 'galaxy',
+  'eclipse', 'aurora', 'blizzard', 'breeze', 'sunrise', 'sunset', 'whistle', 'magnet',
+];

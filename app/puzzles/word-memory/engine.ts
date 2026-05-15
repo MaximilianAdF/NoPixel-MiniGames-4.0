@@ -1,5 +1,5 @@
 import type { GameEngine } from '@/app/game/types';
-import { generate } from 'random-words';
+import { WORD_BANK } from './wordBank';
 
 export interface WordMemoryState {
   sequence: string[];
@@ -13,9 +13,19 @@ export interface WordMemoryConfig {
 
 export type WordMemoryInput = { type: 'seen' } | { type: 'new' };
 
+// Fisher–Yates over a copy, driven by the injected rng so the draw is reproducible.
+function shuffle<T>(rng: () => number, array: T[]): T[] {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 export const wordMemoryEngine: GameEngine<WordMemoryState, WordMemoryConfig, WordMemoryInput> = {
   init({ numWords }, rng) {
-    const pool = generate(Math.floor(numWords / 2)) as string[];
+    const pool = shuffle(rng, WORD_BANK).slice(0, Math.floor(numWords / 2));
     const sequence: string[] = [];
     for (let i = 0; i <= numWords; i++) {
       sequence.push(pool[Math.floor(rng() * pool.length)]);
