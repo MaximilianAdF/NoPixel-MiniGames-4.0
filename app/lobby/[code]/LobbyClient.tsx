@@ -84,7 +84,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-[#0a0c10] flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
           <p className="text-white/70 mb-4">Log in with Discord to join this lobby.</p>
           <Link
@@ -112,7 +112,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   // Match in progress: render the game.
   if (match) {
     return (
-      <div className="min-h-screen bg-[#0a0c10] p-4 md:p-8">
+      <div className="min-h-screen p-4 md:p-8">
         <div className="max-w-4xl mx-auto pt-8">
           <MatchView game={match.game} seed={match.seed} onMatchEnd={handleMatchEnd} />
         </div>
@@ -122,7 +122,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
 
   // Lobby view.
   return (
-    <div className="min-h-screen bg-[#0a0c10] p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-lg mx-auto pt-12">
         <Link
           href="/lobby"
@@ -227,7 +227,7 @@ function OutcomeView({
   onBack: () => void;
 }) {
   return (
-    <div className="min-h-screen bg-[#0a0c10] flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md text-center">
         <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Match over</p>
         <h2

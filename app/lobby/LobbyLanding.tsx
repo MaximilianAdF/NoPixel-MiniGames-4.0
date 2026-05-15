@@ -30,7 +30,7 @@ export default function LobbyLanding() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0c10] flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <header className="text-center mb-12">
           <Swords className="w-7 h-7 text-[#54FFA4] mx-auto mb-4" strokeWidth={1.5} />
