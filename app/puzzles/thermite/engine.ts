@@ -1,5 +1,5 @@
 import type { GameEngine } from '@/app/game/types';
-import { squarePieces, type GridRow, type Square, type SquareCoord, type SquarePiece } from './utils';
+import { squarePieces, type GridRow, type Square, type SquareCoord, type SquarePiece } from './pieces';
 
 export interface ThermiteState {
   board: GridRow[];

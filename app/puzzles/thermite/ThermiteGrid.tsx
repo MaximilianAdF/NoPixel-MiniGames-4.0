@@ -3,7 +3,8 @@
 import { memo } from 'react';
 import Image from 'next/image';
 import crossImg from '@/public/images/thermite/cross.svg';
-import type { Square } from './utils';
+import type { Square } from './pieces';
+import { pieceImages } from './utils';
 
 interface ThermiteSquareProps {
   square: Square;
@@ -24,7 +25,7 @@ export const ThermiteSquare = memo<ThermiteSquareProps>(
       onClick={() => onSquareClick(row, col)}
     >
       <span className="piece">
-        <Image src={square.piece.img} alt="" width={75} height={75} />
+        <Image src={pieceImages[square.piece.type]} alt="" width={75} height={75} />
       </span>
       <div className="crosses">
         <Image src={crossImg} alt="" width={16} height={16} />
