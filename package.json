@@ -17,6 +17,7 @@
     "@mdi/react": "^1.6.1",
     "@vercel/analytics": "^1.2.2",
     "@vercel/speed-insights": "^1.0.10",
+    "ably": "^2.21.0",
     "classnames": "^2.5.1",
     "jose": "^6.1.0",
     "lucide-react": "^0.548.0",
