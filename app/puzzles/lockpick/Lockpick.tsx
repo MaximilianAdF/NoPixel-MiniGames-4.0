@@ -3,11 +3,17 @@
 import NPLockpick from "@/app/components/NPLockpick";
 import {FC} from "react";
 import { useSearchParams } from "next/navigation";
+import type { GameResult } from '@/app/game/types';
 
-const Lockpick: FC = () => {
+interface LockpickProps {
+    seed?: number;
+    onMatchEnd?: (result: GameResult) => void;
+}
+
+const Lockpick: FC<LockpickProps> = ({ seed, onMatchEnd }) => {
     const searchParams = useSearchParams();
     const isCompetitive = searchParams?.get('competitive') === 'true';
-    
+
     // Default values - will be overridden by daily challenge if active
     return (
         <NPLockpick
@@ -16,6 +22,8 @@ const Lockpick: FC = () => {
             title={"Lockpick"}
             gameId="lockpick"
             isCompetitive={isCompetitive}
+            seed={seed}
+            onMatchEnd={onMatchEnd}
         />
     )
 };

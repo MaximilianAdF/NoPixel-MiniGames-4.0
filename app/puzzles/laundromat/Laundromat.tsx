@@ -3,11 +3,17 @@
 import NPLockpick from "@/app/components/NPLockpick";
 import {FC} from "react";
 import { useSearchParams } from "next/navigation";
+import type { GameResult } from '@/app/game/types';
 
-const Laundromat: FC = () => {
+interface LaundromatProps {
+    seed?: number;
+    onMatchEnd?: (result: GameResult) => void;
+}
+
+const Laundromat: FC<LaundromatProps> = ({ seed, onMatchEnd }) => {
     const searchParams = useSearchParams();
     const isCompetitive = searchParams?.get('competitive') === 'true';
-    
+
     // Default values - will be overridden by daily challenge if active
     return (
         <NPLockpick
@@ -16,6 +22,8 @@ const Laundromat: FC = () => {
             title={"Laundromat"}
             gameId="laundromat"
             isCompetitive={isCompetitive}
+            seed={seed}
+            onMatchEnd={onMatchEnd}
         />
     )
 };

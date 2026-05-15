@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type FC } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { useSearchParams } from 'next/navigation';
 import classNames from 'classnames';
 import { timerBeepPlayer } from '@/public/audio/AudioManager';
@@ -13,6 +13,7 @@ import GameStatsTracker from '@/app/components/GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
+import { seededRandom } from '@/lib/lobby/seededRandom';
 import { roofRunningEngine } from './engine';
 import { RoofTile } from './RoofRunningGrid';
 
@@ -20,11 +21,24 @@ const defaultRows = 8;
 const defaultColumns = 11;
 const defaultDuration = 25;
 
-const RoofRunning: FC = () => {
+interface RoofRunningProps {
+  // 1v1 match mode: defaults override saved prefs, engine seeds from this value, no auto-restart.
+  seed?: number;
+  // Fires when the match ends so the lobby can move on to the outcome view.
+  onMatchEnd?: (result: GameResult) => void;
+}
+
+const RoofRunning: FC<RoofRunningProps> = ({ seed, onMatchEnd }) => {
+  const isMatch = seed !== undefined;
   const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const searchParams = useSearchParams();
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
+
+  const rng = useMemo(
+    () => (isMatch ? seededRandom(seed!) : undefined),
+    [isMatch, seed],
+  );
 
   const [savedRows, setSavedRows, rowsHydrated] = usePersistantState(
     'np-roofrunning-rows',
@@ -40,20 +54,23 @@ const RoofRunning: FC = () => {
   );
   const settingsHydrated = rowsHydrated && columnsHydrated && timerHydrated;
 
-  const activeRows =
-    isChallengeMode && challengeData
+  const activeRows = isMatch
+    ? defaultRows
+    : isChallengeMode && challengeData
       ? challengeData.rows || defaultRows
       : isCompetitive
         ? defaultRows
         : savedRows;
-  const activeColumns =
-    isChallengeMode && challengeData
+  const activeColumns = isMatch
+    ? defaultColumns
+    : isChallengeMode && challengeData
       ? challengeData.columns || defaultColumns
       : isCompetitive
         ? defaultColumns
         : savedColumns;
-  const activeTimer =
-    isChallengeMode && challengeData
+  const activeTimer = isMatch
+    ? defaultDuration
+    : isChallengeMode && challengeData
       ? challengeData.targetTime
         ? Math.floor(challengeData.targetTime / 1000)
         : defaultDuration
@@ -61,11 +78,13 @@ const RoofRunning: FC = () => {
         ? defaultDuration
         : savedTimer;
 
-  const mode: GameMode = isChallengeMode && !isCompleted
-    ? 'daily-challenge'
-    : isCompetitive
-      ? 'competitive'
-      : 'practice';
+  const mode: GameMode = isMatch
+    ? 'competitive'
+    : isChallengeMode && !isCompleted
+      ? 'daily-challenge'
+      : isCompetitive
+        ? 'competitive'
+        : 'practice';
 
   const lastResultRef = useRef<GameResult | null>(null);
   const userRef = useRef(user);
@@ -78,10 +97,12 @@ const RoofRunning: FC = () => {
     config: { rows: activeRows, columns: activeColumns },
     durationMs: activeTimer * 1000,
     mode,
-    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
+    rng,
+    ready: isMatch || (settingsHydrated && (!isChallengeMode || challengeData != null)),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {
       lastResultRef.current = gameResult;
+      if (isMatch) onMatchEnd?.(gameResult);
     },
   });
 
@@ -207,16 +228,18 @@ const RoofRunning: FC = () => {
 
   return (
     <>
-      <GameStatsTracker
-        game="roof-running"
-        gameStatus={legacyStatus}
-        score={result ? result.score : state.board.filter((v) => v === 'empty').length}
-        elapsedMs={result?.elapsedMs ?? 0}
-        targetScore={activeRows * activeColumns}
-        wonStatus={3}
-        lostStatus={2}
-        gameSettings={{ rows: activeRows, columns: activeColumns, timer: activeTimer }}
-      />
+      {!isMatch && (
+        <GameStatsTracker
+          game="roof-running"
+          gameStatus={legacyStatus}
+          score={result ? result.score : state.board.filter((v) => v === 'empty').length}
+          elapsedMs={result?.elapsedMs ?? 0}
+          targetScore={activeRows * activeColumns}
+          wonStatus={3}
+          lostStatus={2}
+          gameSettings={{ rows: activeRows, columns: activeColumns, timer: activeTimer }}
+        />
+      )}
       <GameShell
         title="Same Game"
         description="Click on matching groups of blocks"
@@ -225,7 +248,7 @@ const RoofRunning: FC = () => {
         durationMs={activeTimer * 1000}
         runId={runId}
         statusMessage={result ? (result.won ? 'Success!' : 'Failed!') : ''}
-        settings={isChallengeMode ? undefined : settings}
+        settings={isMatch || isChallengeMode ? undefined : settings}
       >
         <div
           className={classNames(

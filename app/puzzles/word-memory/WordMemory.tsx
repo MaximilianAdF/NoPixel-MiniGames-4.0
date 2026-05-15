@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type FC } from 'react';
+import { useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { successPlayer, checkBeepPlayer, timerBeepPlayer } from '@/public/audio/AudioManager';
 import usePersistantState from '@/app/utils/usePersistentState';
@@ -12,16 +12,30 @@ import GameStatsTracker from '@/app/components/GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
+import { seededRandom } from '@/lib/lobby/seededRandom';
 import { wordMemoryEngine } from './engine';
 
 const defaultNumWords = 25;
 const defaultDuration = 25;
 
-const WordMemory: FC = () => {
+interface WordMemoryProps {
+  // 1v1 match mode: defaults override saved prefs, engine seeds from this value, no auto-restart.
+  seed?: number;
+  // Fires when the match ends so the lobby can move on to the outcome view.
+  onMatchEnd?: (result: GameResult) => void;
+}
+
+const WordMemory: FC<WordMemoryProps> = ({ seed, onMatchEnd }) => {
+  const isMatch = seed !== undefined;
   const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const searchParams = useSearchParams();
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
+
+  const rng = useMemo(
+    () => (isMatch ? seededRandom(seed!) : undefined),
+    [isMatch, seed],
+  );
 
   const [savedNumWords, setSavedNumWords, numWordsHydrated] = usePersistantState(
     'word-memory-num-words',
@@ -33,14 +47,16 @@ const WordMemory: FC = () => {
   );
   const settingsHydrated = numWordsHydrated && timerHydrated;
 
-  const activeNumWords =
-    isChallengeMode && challengeData
+  const activeNumWords = isMatch
+    ? defaultNumWords
+    : isChallengeMode && challengeData
       ? challengeData.words || defaultNumWords
       : isCompetitive
         ? 25
         : savedNumWords;
-  const activeTimer =
-    isChallengeMode && challengeData
+  const activeTimer = isMatch
+    ? defaultDuration
+    : isChallengeMode && challengeData
       ? challengeData.targetTime
         ? Math.floor(challengeData.targetTime / 1000)
         : defaultDuration
@@ -48,11 +64,13 @@ const WordMemory: FC = () => {
         ? 25
         : savedTimer;
 
-  const mode: GameMode = isChallengeMode && !isCompleted
-    ? 'daily-challenge'
-    : isCompetitive
-      ? 'competitive'
-      : 'practice';
+  const mode: GameMode = isMatch
+    ? 'competitive'
+    : isChallengeMode && !isCompleted
+      ? 'daily-challenge'
+      : isCompetitive
+        ? 'competitive'
+        : 'practice';
 
   const lastResultRef = useRef<GameResult | null>(null);
   const userRef = useRef(user);
@@ -65,10 +83,12 @@ const WordMemory: FC = () => {
     config: { numWords: activeNumWords },
     durationMs: activeTimer * 1000,
     mode,
-    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
+    rng,
+    ready: isMatch || (settingsHydrated && (!isChallengeMode || challengeData != null)),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {
       lastResultRef.current = gameResult;
+      if (isMatch) onMatchEnd?.(gameResult);
     },
   });
 
@@ -168,15 +188,17 @@ const WordMemory: FC = () => {
 
   return (
     <>
-      <GameStatsTracker
-        game="word-memory"
-        gameStatus={legacyStatus}
-        score={result ? result.score : state.round}
-        elapsedMs={result?.elapsedMs ?? 0}
-        wonStatus={3}
-        lostStatus={2}
-        gameSettings={{ numWords: activeNumWords, duration: activeTimer }}
-      />
+      {!isMatch && (
+        <GameStatsTracker
+          game="word-memory"
+          gameStatus={legacyStatus}
+          score={result ? result.score : state.round}
+          elapsedMs={result?.elapsedMs ?? 0}
+          wonStatus={3}
+          lostStatus={2}
+          gameSettings={{ numWords: activeNumWords, duration: activeTimer }}
+        />
+      )}
       <GameShell
         title="Word Memory"
         description="Memorize the words seen"
@@ -202,7 +224,7 @@ const WordMemory: FC = () => {
             },
           ],
         ]}
-        settings={isChallengeMode ? undefined : settings}
+        settings={isMatch || isChallengeMode ? undefined : settings}
       >
         <div className="flex w-full flex-col flex-1 min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px] max-w-full rounded-lg bg-[rgba(0,28,49,0.3)] text-white">
           <p className="pt-4 text-center text-2xl">

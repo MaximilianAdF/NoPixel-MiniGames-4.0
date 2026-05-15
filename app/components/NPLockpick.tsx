@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type FC } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FC } from 'react';
 import classNames from 'classnames';
 import { checkBeepPlayer, successPlayer, timerBeepPlayer } from '@/public/audio/AudioManager';
 import usePersistantState from '@/app/utils/usePersistentState';
@@ -13,6 +13,7 @@ import GameStatsTracker from './GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
+import { seededRandom } from '@/lib/lobby/seededRandom';
 import { lockpickEngine, degInterval, positions } from './lockpickEngine';
 import { LockpickRing } from './LockpickRing';
 
@@ -22,6 +23,10 @@ interface NPLockpickProps {
   title: string;
   gameId?: string;
   isCompetitive?: boolean;
+  // 1v1 match mode: defaults override saved prefs, engine seeds from this value, no auto-restart.
+  seed?: number;
+  // Fires when the match ends so the lobby can move on to the outcome view.
+  onMatchEnd?: (result: GameResult) => void;
 }
 
 const ROTATE_LEFT_KEYS = ['ArrowLeft', 'a', 'A'];
@@ -34,9 +39,17 @@ const NPLockpick: FC<NPLockpickProps> = ({
   title,
   gameId = 'lockpick',
   isCompetitive = false,
+  seed,
+  onMatchEnd,
 }) => {
+  const isMatch = seed !== undefined;
   const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const { user } = useUser();
+
+  const rng = useMemo(
+    () => (isMatch ? seededRandom(seed!) : undefined),
+    [isMatch, seed],
+  );
 
   const [savedLevels, setSavedLevels, levelsHydrated] = usePersistantState(
     `np-lockpick-${title}-levels`,
@@ -48,14 +61,16 @@ const NPLockpick: FC<NPLockpickProps> = ({
   );
   const settingsHydrated = levelsHydrated && timerHydrated;
 
-  const activeLevels =
-    isChallengeMode && challengeData
+  const activeLevels = isMatch
+    ? maxLevels
+    : isChallengeMode && challengeData
       ? challengeData.levels || maxLevels
       : isCompetitive
         ? maxLevels
         : savedLevels;
-  const activeTimer =
-    isChallengeMode && challengeData
+  const activeTimer = isMatch
+    ? countdownDuration
+    : isChallengeMode && challengeData
       ? challengeData.targetTime
         ? Math.floor(challengeData.targetTime / 1000)
         : countdownDuration
@@ -63,11 +78,13 @@ const NPLockpick: FC<NPLockpickProps> = ({
         ? countdownDuration
         : savedTimer;
 
-  const mode: GameMode = isChallengeMode && !isCompleted
-    ? 'daily-challenge'
-    : isCompetitive
-      ? 'competitive'
-      : 'practice';
+  const mode: GameMode = isMatch
+    ? 'competitive'
+    : isChallengeMode && !isCompleted
+      ? 'daily-challenge'
+      : isCompetitive
+        ? 'competitive'
+        : 'practice';
 
   const lastResultRef = useRef<GameResult | null>(null);
   const userRef = useRef(user);
@@ -80,10 +97,12 @@ const NPLockpick: FC<NPLockpickProps> = ({
     config: { levels: activeLevels },
     durationMs: activeTimer * 1000,
     mode,
-    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
+    rng,
+    ready: isMatch || (settingsHydrated && (!isChallengeMode || challengeData != null)),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {
       lastResultRef.current = gameResult;
+      if (isMatch) onMatchEnd?.(gameResult);
     },
   });
 
@@ -199,16 +218,18 @@ const NPLockpick: FC<NPLockpickProps> = ({
 
   return (
     <>
-      <GameStatsTracker
-        game={gameId as any}
-        gameStatus={legacyStatus}
-        score={result ? result.score : state.level}
-        elapsedMs={result?.elapsedMs ?? 0}
-        targetScore={activeLevels}
-        wonStatus={3}
-        lostStatus={2}
-        gameSettings={{ levels: activeLevels, timer: activeTimer }}
-      />
+      {!isMatch && (
+        <GameStatsTracker
+          game={gameId as any}
+          gameStatus={legacyStatus}
+          score={result ? result.score : state.level}
+          elapsedMs={result?.elapsedMs ?? 0}
+          targetScore={activeLevels}
+          wonStatus={3}
+          lostStatus={2}
+          gameSettings={{ levels: activeLevels, timer: activeTimer }}
+        />
+      )}
       <GameShell
         title={title}
         description="Unlock each lock"
@@ -240,7 +261,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
           ],
           [{ label: 'Unlock', color: 'green', callback: unlock, disabled: phase !== 'playing' }],
         ]}
-        settings={isChallengeMode ? undefined : settings}
+        settings={isMatch || isChallengeMode ? undefined : settings}
       >
         <div
           className={classNames(

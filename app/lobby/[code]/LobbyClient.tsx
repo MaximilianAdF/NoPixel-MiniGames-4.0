@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Copy, Check, Loader2, Play } from 'lucide-react';
+import { ArrowLeft, Copy, Check, Loader2 } from 'lucide-react';
 import { useUser } from '@/app/contexts/UserContext';
 import { useAblyChannel, type ChannelStatus } from '@/app/utils/useAblyChannel';
 import { generateMatchSeed } from '@/lib/lobby/seededRandom';
@@ -11,6 +11,17 @@ import type { LobbyMessage } from '@/lib/lobby/messages';
 import type { GameType } from '@/interfaces/user';
 import type { GameResult } from '@/app/game/types';
 import MatchView from './MatchView';
+
+// Games available for 1v1 (RepairKit excluded — real-time mechanic).
+const ONEV_ONE_GAMES: { id: GameType; label: string }[] = [
+  { id: 'thermite', label: 'Thermite' },
+  { id: 'lockpick', label: 'Lockpick' },
+  { id: 'laundromat', label: 'Laundromat' },
+  { id: 'pincracker', label: 'Pin Cracker' },
+  { id: 'roof-running', label: 'Roof Running' },
+  { id: 'word-memory', label: 'Word Memory' },
+  { id: 'chopping', label: 'Chopping' },
+];
 
 interface LobbyClientProps {
   code: string;
@@ -190,14 +201,21 @@ export default function LobbyClient({ code }: LobbyClientProps) {
         {isHost && presence.length >= 2 && (
           <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5">
             <p className="text-white/70 text-sm mb-3">Start a match</p>
-            <button
-              onClick={() => handleStart('chopping')}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-[#54FFA4] text-[#0a0c10] py-3 font-semibold hover:bg-[#45e894] transition-colors"
-            >
-              <Play className="w-4 h-4" />
-              Chopping
-            </button>
-            <p className="text-white/30 text-xs mt-3 text-center">More games landing soon.</p>
+            <div className="grid grid-cols-2 gap-2">
+              {ONEV_ONE_GAMES.map((entry, i) => {
+                const lastSolo =
+                  i === ONEV_ONE_GAMES.length - 1 && ONEV_ONE_GAMES.length % 2 === 1;
+                return (
+                  <button
+                    key={entry.id}
+                    onClick={() => handleStart(entry.id)}
+                    className={`rounded-xl bg-white/[0.04] hover:bg-[#54FFA4] hover:text-black text-white/90 py-3 px-4 text-sm font-medium transition-colors ${lastSolo ? 'col-span-2' : ''}`}
+                  >
+                    {entry.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
 

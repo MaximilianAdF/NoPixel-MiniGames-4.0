@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type FC } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import classNames from 'classnames';
@@ -15,17 +15,31 @@ import GameStatsTracker from '@/app/components/GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
+import { seededRandom } from '@/lib/lobby/seededRandom';
 import { presets } from './utils';
 import { thermiteEngine } from './engine';
 import { ThermiteSquare } from './ThermiteGrid';
 import backgroundImg from '@/public/images/thermite/background.svg';
 import './style.css';
 
-const Thermite: FC = () => {
+interface ThermiteProps {
+  // 1v1 match mode: defaults override saved prefs, engine seeds from this value, no auto-restart.
+  seed?: number;
+  // Fires when the match ends so the lobby can move on to the outcome view.
+  onMatchEnd?: (result: GameResult) => void;
+}
+
+const Thermite: FC<ThermiteProps> = ({ seed, onMatchEnd }) => {
+  const isMatch = seed !== undefined;
   const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const searchParams = useSearchParams();
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
+
+  const rng = useMemo(
+    () => (isMatch ? seededRandom(seed!) : undefined),
+    [isMatch, seed],
+  );
 
   const [savedPreset, setSavedPreset, presetHydrated] = usePersistantState('np-thermite-preset', 0);
   const [savedTimer, setSavedTimer, timerHydrated] = usePersistantState(
@@ -47,38 +61,44 @@ const Thermite: FC = () => {
   const settingsHydrated =
     presetHydrated && timerHydrated && targetScoreHydrated && rowsHydrated && columnsHydrated;
 
-  const activeTargetScore =
-    isChallengeMode && challengeData
+  const activeTargetScore = isMatch
+    ? presets[0].targetScore
+    : isChallengeMode && challengeData
       ? challengeData.targetScore || presets[0].targetScore
       : isCompetitive
         ? presets[0].targetScore
         : savedTargetScore;
-  const activeTimer =
-    isChallengeMode && challengeData
+  const activeTimer = isMatch
+    ? presets[0].timer
+    : isChallengeMode && challengeData
       ? challengeData.targetTime
         ? Math.floor(challengeData.targetTime / 1000)
         : presets[0].timer
       : isCompetitive
         ? presets[0].timer
         : savedTimer;
-  const activeRows =
-    isChallengeMode && challengeData
+  const activeRows = isMatch
+    ? presets[0].rows
+    : isChallengeMode && challengeData
       ? challengeData.rows || presets[0].rows
       : isCompetitive
         ? presets[0].rows
         : savedRows;
-  const activeColumns =
-    isChallengeMode && challengeData
+  const activeColumns = isMatch
+    ? presets[0].columns
+    : isChallengeMode && challengeData
       ? challengeData.columns || presets[0].columns
       : isCompetitive
         ? presets[0].columns
         : savedColumns;
 
-  const mode: GameMode = isChallengeMode && !isCompleted
-    ? 'daily-challenge'
-    : isCompetitive
-      ? 'competitive'
-      : 'practice';
+  const mode: GameMode = isMatch
+    ? 'competitive'
+    : isChallengeMode && !isCompleted
+      ? 'daily-challenge'
+      : isCompetitive
+        ? 'competitive'
+        : 'practice';
 
   const lastResultRef = useRef<GameResult | null>(null);
   const userRef = useRef(user);
@@ -91,10 +111,12 @@ const Thermite: FC = () => {
     config: { rows: activeRows, columns: activeColumns, targetScore: activeTargetScore },
     durationMs: activeTimer * 1000,
     mode,
-    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
+    rng,
+    ready: isMatch || (settingsHydrated && (!isChallengeMode || challengeData != null)),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {
       lastResultRef.current = gameResult;
+      if (isMatch) onMatchEnd?.(gameResult);
     },
   });
 
@@ -249,21 +271,23 @@ const Thermite: FC = () => {
 
   return (
     <>
-      <GameStatsTracker
-        game="thermite"
-        gameStatus={legacyStatus}
-        score={result ? result.score : state.score}
-        elapsedMs={result?.elapsedMs ?? 0}
-        targetScore={activeTargetScore}
-        wonStatus={3}
-        lostStatus={2}
-        gameSettings={{
-          timer: activeTimer,
-          targetScore: activeTargetScore,
-          rows: activeRows,
-          columns: activeColumns,
-        }}
-      />
+      {!isMatch && (
+        <GameStatsTracker
+          game="thermite"
+          gameStatus={legacyStatus}
+          score={result ? result.score : state.score}
+          elapsedMs={result?.elapsedMs ?? 0}
+          targetScore={activeTargetScore}
+          wonStatus={3}
+          lostStatus={2}
+          gameSettings={{
+            timer: activeTimer,
+            targetScore: activeTargetScore,
+            rows: activeRows,
+            columns: activeColumns,
+          }}
+        />
+      )}
       <GameShell
         title="Mazer"
         description="Decrypt the required number of bytes"
@@ -274,7 +298,7 @@ const Thermite: FC = () => {
         statusMessage={result ? (result.won ? 'Success!' : 'Failed!') : ''}
         score={result ? result.score : state.score}
         targetScore={state.targetScore}
-        settings={isChallengeMode ? undefined : settings}
+        settings={isMatch || isChallengeMode ? undefined : settings}
       >
         <div
           className={classNames(

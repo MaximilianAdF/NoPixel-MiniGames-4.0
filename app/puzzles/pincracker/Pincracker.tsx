@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type FC } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { checkBeepPlayer, successPlayer, timerBeepPlayer } from '@/public/audio/AudioManager';
 import usePersistantState from '@/app/utils/usePersistentState';
@@ -15,6 +15,7 @@ import GameStatsTracker from '@/app/components/GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
+import { seededRandom } from '@/lib/lobby/seededRandom';
 import type { Digit } from './utils';
 import { pincrackerEngine } from './engine';
 import { PinColumn } from './PincrackerGrid';
@@ -24,11 +25,24 @@ const REVEAL_STEP_MS = 250;
 const defaultDuration = 20;
 const defaultPinLength = 4;
 
-const Pincracker: FC = () => {
+interface PincrackerProps {
+  // 1v1 match mode: defaults override saved prefs, engine seeds from this value, no auto-restart.
+  seed?: number;
+  // Fires when the match ends so the lobby can move on to the outcome view.
+  onMatchEnd?: (result: GameResult) => void;
+}
+
+const Pincracker: FC<PincrackerProps> = ({ seed, onMatchEnd }) => {
+  const isMatch = seed !== undefined;
   const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const searchParams = useSearchParams();
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
+
+  const rng = useMemo(
+    () => (isMatch ? seededRandom(seed!) : undefined),
+    [isMatch, seed],
+  );
 
   const [savedTimer, setSavedTimer, timerHydrated] = usePersistantState(
     'pincracker-timer',
@@ -40,14 +54,16 @@ const Pincracker: FC = () => {
   );
   const settingsHydrated = timerHydrated && pinLengthHydrated;
 
-  const activePinLength =
-    isChallengeMode && challengeData
+  const activePinLength = isMatch
+    ? defaultPinLength
+    : isChallengeMode && challengeData
       ? challengeData.pinLength || defaultPinLength
       : isCompetitive
         ? 4
         : savedPinLength;
-  const activeTimer =
-    isChallengeMode && challengeData
+  const activeTimer = isMatch
+    ? defaultDuration
+    : isChallengeMode && challengeData
       ? challengeData.targetTime
         ? Math.floor(challengeData.targetTime / 1000)
         : defaultDuration
@@ -55,11 +71,13 @@ const Pincracker: FC = () => {
         ? 24
         : savedTimer;
 
-  const mode: GameMode = isChallengeMode && !isCompleted
-    ? 'daily-challenge'
-    : isCompetitive
-      ? 'competitive'
-      : 'practice';
+  const mode: GameMode = isMatch
+    ? 'competitive'
+    : isChallengeMode && !isCompleted
+      ? 'daily-challenge'
+      : isCompetitive
+        ? 'competitive'
+        : 'practice';
 
   const lastResultRef = useRef<GameResult | null>(null);
   const userRef = useRef(user);
@@ -72,10 +90,12 @@ const Pincracker: FC = () => {
     config: { pinLength: activePinLength },
     durationMs: activeTimer * 1000,
     mode,
-    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
+    rng,
+    ready: isMatch || (settingsHydrated && (!isChallengeMode || challengeData != null)),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {
       lastResultRef.current = gameResult;
+      if (isMatch) onMatchEnd?.(gameResult);
     },
   });
 
@@ -268,16 +288,18 @@ const Pincracker: FC = () => {
 
   return (
     <>
-      <GameStatsTracker
-        game="pincracker"
-        gameStatus={legacyStatus}
-        score={result ? result.score : state.activeIndex}
-        elapsedMs={result?.elapsedMs ?? 0}
-        targetScore={activePinLength}
-        wonStatus={3}
-        lostStatus={2}
-        gameSettings={{ pinLength: activePinLength, duration: activeTimer }}
-      />
+      {!isMatch && (
+        <GameStatsTracker
+          game="pincracker"
+          gameStatus={legacyStatus}
+          score={result ? result.score : state.activeIndex}
+          elapsedMs={result?.elapsedMs ?? 0}
+          targetScore={activePinLength}
+          wonStatus={3}
+          lostStatus={2}
+          gameSettings={{ pinLength: activePinLength, duration: activeTimer }}
+        />
+      )}
       <div ref={outerContainerRef} className="flex flex-col gap-4">
         {mobile.isMobile && mobile.showHint && (
           <div className="rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
@@ -302,7 +324,7 @@ const Pincracker: FC = () => {
               },
             ],
           ]}
-          settings={isChallengeMode ? undefined : settings}
+          settings={isMatch || isChallengeMode ? undefined : settings}
         >
           {mobile.isMobile && phase === 'playing' && (
             <input
