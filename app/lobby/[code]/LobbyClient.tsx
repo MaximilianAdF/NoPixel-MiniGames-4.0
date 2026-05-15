@@ -1,10 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Copy, Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, Copy, Check, Loader2, Play } from 'lucide-react';
 import { useUser } from '@/app/contexts/UserContext';
 import { useAblyChannel, type ChannelStatus } from '@/app/utils/useAblyChannel';
+import { generateMatchSeed } from '@/lib/lobby/seededRandom';
+import { determineHost } from '@/lib/lobby/host';
+import type { LobbyMessage } from '@/lib/lobby/messages';
+import type { GameType } from '@/interfaces/user';
+import type { GameResult } from '@/app/game/types';
+import MatchView from './MatchView';
 
 interface LobbyClientProps {
   code: string;
@@ -13,14 +19,31 @@ interface LobbyClientProps {
 export default function LobbyClient({ code }: LobbyClientProps) {
   const { user, isLoggedIn } = useUser();
   const [copied, setCopied] = useState(false);
+  const [match, setMatch] = useState<{ game: GameType; seed: number } | null>(null);
+  const [myResult, setMyResult] = useState<GameResult | null>(null);
+  const [opponentResult, setOpponentResult] = useState<GameResult | null>(null);
 
   const displayName = user?.displayName ?? user?.username ?? 'Player';
 
-  const { status, presence } = useAblyChannel({
+  const handleMessage = useCallback((msg: LobbyMessage) => {
+    if (msg.type === 'match:start') {
+      setMatch({ game: msg.game, seed: msg.seed });
+      setMyResult(null);
+      setOpponentResult(null);
+    } else if (msg.type === 'match:result') {
+      setOpponentResult({ won: msg.won, score: msg.score, elapsedMs: msg.elapsedMs });
+    }
+  }, []);
+
+  const { status, presence, publish } = useAblyChannel<LobbyMessage>({
     channelName: `lobby:${code}`,
     presenceData: { displayName },
+    onMessage: handleMessage,
     enabled: isLoggedIn,
   });
+
+  const hostClientId = determineHost(presence);
+  const isHost = hostClientId !== undefined && hostClientId === user?.id;
 
   const handleCopy = async () => {
     try {
@@ -28,8 +51,35 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      // Silent fail — user can still read and copy manually.
+      // Silent fail.
     }
+  };
+
+  const handleStart = async (game: GameType) => {
+    const seed = generateMatchSeed();
+    setMatch({ game, seed });
+    setMyResult(null);
+    setOpponentResult(null);
+    await publish({ type: 'match:start', game, seed, startedAt: Date.now() });
+  };
+
+  const handleMatchEnd = useCallback(
+    (result: GameResult) => {
+      setMyResult(result);
+      void publish({
+        type: 'match:result',
+        won: result.won,
+        score: result.score,
+        elapsedMs: result.elapsedMs,
+      });
+    },
+    [publish],
+  );
+
+  const handleBackToLobby = () => {
+    setMatch(null);
+    setMyResult(null);
+    setOpponentResult(null);
   };
 
   if (!isLoggedIn) {
@@ -48,6 +98,29 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     );
   }
 
+  // Outcome view: my game has ended.
+  if (match && myResult) {
+    return (
+      <OutcomeView
+        myResult={myResult}
+        opponentResult={opponentResult}
+        onBack={handleBackToLobby}
+      />
+    );
+  }
+
+  // Match in progress: render the game.
+  if (match) {
+    return (
+      <div className="min-h-screen bg-[#0a0c10] p-4 md:p-8">
+        <div className="max-w-4xl mx-auto pt-8">
+          <MatchView game={match.game} seed={match.seed} onMatchEnd={handleMatchEnd} />
+        </div>
+      </div>
+    );
+  }
+
+  // Lobby view.
   return (
     <div className="min-h-screen bg-[#0a0c10] p-4 md:p-8">
       <div className="max-w-lg mx-auto pt-12">
@@ -78,7 +151,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
           <p className="text-white/40 text-sm mt-4">Share this with your friend</p>
         </div>
 
-        <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5">
+        <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5 mb-3">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-white/90 font-medium text-sm">
               Players <span className="text-white/30">·</span>{' '}
@@ -99,21 +172,102 @@ export default function LobbyClient({ code }: LobbyClientProps) {
                   className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-[#54FFA4]" />
-                  <span className="text-white/90 text-sm">{member.data.displayName}</span>
+                  <span className="text-white/90 text-sm flex-1">{member.data.displayName}</span>
+                  {member.clientId === hostClientId && (
+                    <span className="text-white/50 text-xs px-2 py-0.5 rounded-full bg-white/5">
+                      host
+                    </span>
+                  )}
                   {member.clientId === user?.id && (
-                    <span className="text-white/30 text-xs ml-auto">you</span>
+                    <span className="text-white/40 text-xs">you</span>
                   )}
                 </li>
               ))}
             </ul>
           )}
-
-          {status === 'connected' && presence.length === 1 && (
-            <p className="text-white/40 text-xs text-center mt-4">
-              Waiting for someone to join…
-            </p>
-          )}
         </div>
+
+        {isHost && presence.length >= 2 && (
+          <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5">
+            <p className="text-white/70 text-sm mb-3">Start a match</p>
+            <button
+              onClick={() => handleStart('chopping')}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-[#54FFA4] text-[#0a0c10] py-3 font-semibold hover:bg-[#45e894] transition-colors"
+            >
+              <Play className="w-4 h-4" />
+              Chopping
+            </button>
+            <p className="text-white/30 text-xs mt-3 text-center">More games landing soon.</p>
+          </div>
+        )}
+
+        {isHost && presence.length < 2 && (
+          <p className="text-white/40 text-xs text-center">
+            Waiting for someone to join before starting a match…
+          </p>
+        )}
+
+        {!isHost && presence.length >= 2 && (
+          <p className="text-white/40 text-xs text-center">
+            Waiting for the host to start a match…
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function OutcomeView({
+  myResult,
+  opponentResult,
+  onBack,
+}: {
+  myResult: GameResult;
+  opponentResult: GameResult | null;
+  onBack: () => void;
+}) {
+  return (
+    <div className="min-h-screen bg-[#0a0c10] flex items-center justify-center p-4">
+      <div className="w-full max-w-md text-center">
+        <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Match over</p>
+        <h2
+          className={`text-4xl font-bold mb-8 ${
+            myResult.won ? 'text-[#54FFA4]' : 'text-white/80'
+          }`}
+        >
+          {myResult.won ? 'You won' : 'You lost'}
+        </h2>
+
+        <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5 mb-6 text-left space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-white/60 text-sm">You</span>
+            <span className="text-white/90 text-sm font-mono">
+              {myResult.won ? 'won' : 'lost'} · {myResult.score} ·{' '}
+              {(myResult.elapsedMs / 1000).toFixed(1)}s
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-white/60 text-sm">Opponent</span>
+            {opponentResult ? (
+              <span className="text-white/90 text-sm font-mono">
+                {opponentResult.won ? 'won' : 'lost'} · {opponentResult.score} ·{' '}
+                {(opponentResult.elapsedMs / 1000).toFixed(1)}s
+              </span>
+            ) : (
+              <span className="text-white/40 text-sm inline-flex items-center gap-2">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                still playing
+              </span>
+            )}
+          </div>
+        </div>
+
+        <button
+          onClick={onBack}
+          className="w-full rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] text-white py-3 font-medium transition-colors"
+        >
+          Back to lobby
+        </button>
       </div>
     </div>
   );

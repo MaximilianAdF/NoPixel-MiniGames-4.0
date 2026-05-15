@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type FC } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { successPlayer, checkBeepPlayer, timerBeepPlayer } from '@/public/audio/AudioManager';
 import usePersistantState from '@/app/utils/usePersistentState';
@@ -14,6 +14,7 @@ import GameStatsTracker from '@/app/components/GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
+import { seededRandom } from '@/lib/lobby/seededRandom';
 import { choppingEngine } from './engine';
 import { GridRow, defaultGridCols } from './ChoppingGrid';
 import '../../../public/Chopping/Chopping.css';
@@ -22,11 +23,24 @@ const ALLOWED_KEYS = ['Q', 'q', 'W', 'w', 'E', 'e', 'R', 'r', 'A', 'a', 'S', 's'
 const defaultNumLetters = 15;
 const defaultDuration = 7;
 
-const Chopping: FC = () => {
+interface ChoppingProps {
+  // 1v1 match mode: defaults override saved prefs, engine seeds from this value, no auto-restart.
+  seed?: number;
+  // Fires when the match ends (win or loss) so the lobby can move on to the outcome view.
+  onMatchEnd?: (result: GameResult) => void;
+}
+
+const Chopping: FC<ChoppingProps> = ({ seed, onMatchEnd }) => {
+  const isMatch = seed !== undefined;
   const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const searchParams = useSearchParams();
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
+
+  const rng = useMemo(
+    () => (isMatch ? seededRandom(seed!) : undefined),
+    [isMatch, seed],
+  );
 
   const [savedTimer, setSavedTimer, timerHydrated] = usePersistantState(
     'chopping-timer',
@@ -38,14 +52,16 @@ const Chopping: FC = () => {
   );
   const settingsHydrated = timerHydrated && lettersHydrated;
 
-  const activeNumLetters =
-    isChallengeMode && challengeData
+  const activeNumLetters = isMatch
+    ? defaultNumLetters
+    : isChallengeMode && challengeData
       ? challengeData.numLetters || defaultNumLetters
       : isCompetitive
         ? defaultNumLetters
         : savedNumLetters;
-  const activeTimer =
-    isChallengeMode && challengeData
+  const activeTimer = isMatch
+    ? defaultDuration
+    : isChallengeMode && challengeData
       ? challengeData.targetTime
         ? Math.floor(challengeData.targetTime / 1000)
         : defaultDuration
@@ -53,11 +69,13 @@ const Chopping: FC = () => {
         ? defaultDuration
         : savedTimer;
 
-  const mode: GameMode = isChallengeMode && !isCompleted
-    ? 'daily-challenge'
-    : isCompetitive
-      ? 'competitive'
-      : 'practice';
+  const mode: GameMode = isMatch
+    ? 'competitive'
+    : isChallengeMode && !isCompleted
+      ? 'daily-challenge'
+      : isCompetitive
+        ? 'competitive'
+        : 'practice';
 
   const lastResultRef = useRef<GameResult | null>(null);
   const userRef = useRef(user);
@@ -70,10 +88,12 @@ const Chopping: FC = () => {
     config: { numLetters: activeNumLetters },
     durationMs: activeTimer * 1000,
     mode,
-    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
+    rng,
+    ready: isMatch || (settingsHydrated && (!isChallengeMode || challengeData != null)),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {
       lastResultRef.current = gameResult;
+      if (isMatch) onMatchEnd?.(gameResult);
     },
   });
 
@@ -226,16 +246,18 @@ const Chopping: FC = () => {
 
   return (
     <>
-      <GameStatsTracker
-        game="chopping"
-        gameStatus={legacyStatus}
-        score={result ? result.score : state.activeIndex}
-        elapsedMs={result?.elapsedMs ?? 0}
-        targetScore={activeNumLetters}
-        wonStatus={3}
-        lostStatus={2}
-        gameSettings={{ letters: activeNumLetters, timer: activeTimer }}
-      />
+      {!isMatch && (
+        <GameStatsTracker
+          game="chopping"
+          gameStatus={legacyStatus}
+          score={result ? result.score : state.activeIndex}
+          elapsedMs={result?.elapsedMs ?? 0}
+          targetScore={activeNumLetters}
+          wonStatus={3}
+          lostStatus={2}
+          gameSettings={{ letters: activeNumLetters, timer: activeTimer }}
+        />
+      )}
       <div ref={outerContainerRef} className="flex flex-col gap-4">
         {mobile.isMobile && mobile.showHint && (
           <div className="rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
@@ -250,7 +272,7 @@ const Chopping: FC = () => {
           durationMs={activeTimer * 1000}
           runId={runId}
           statusMessage={result ? (result.won ? 'Success!' : 'Failed!') : ''}
-          settings={isChallengeMode ? undefined : settings}
+          settings={isMatch || isChallengeMode ? undefined : settings}
         >
           {mobile.isMobile && phase === 'playing' && (
             <input
