@@ -17,6 +17,9 @@ interface UseGameHostArgs<State, Config, Input> {
   // Fires for every accepted input. 1v1 streams these to the opponent so they
   // can replay the same engine in their spectator view.
   onInput?: (input: Input) => void;
+  // 1v1 mode: no countdown expiry, no per-second tick. The match ends only on
+  // engine-driven win/loss (a player completing or making a fatal mistake).
+  noTimer?: boolean;
 }
 
 export interface GameHost<State, Input> {
@@ -39,6 +42,7 @@ export function useGameHost<State, Config, Input>({
   onTick,
   onResult,
   onInput,
+  noTimer = false,
 }: UseGameHostArgs<State, Config, Input>): GameHost<State, Input> {
   const [phase, setPhase] = useState<GamePhase>('idle');
   const [state, setState] = useState<State>(() => engine.init(config, rng));
@@ -108,16 +112,18 @@ export function useGameHost<State, Config, Input>({
   }, [ready, configKey, durationMs, start]);
 
   // Countdown: per-second tick and expiry, scoped to a single playing run.
+  // Skipped in noTimer mode (1v1 is decided by engine outcomes, not the clock).
   useEffect(() => {
     if (phase !== 'playing') return;
     startTimeRef.current = Date.now();
+    if (noTimer) return;
     const expiry = setTimeout(() => endGame(false), durationMs);
     const tick = setInterval(() => onTickRef.current?.(), 1000);
     return () => {
       clearTimeout(expiry);
       clearInterval(tick);
     };
-  }, [runId, phase, durationMs, endGame]);
+  }, [runId, phase, durationMs, endGame, noTimer]);
 
   // After a result: practice and failed daily challenges loop; won challenges and competitive runs end terminally.
   useEffect(() => {

@@ -36,27 +36,47 @@ export default function MatchView({
       return (
         <Splitscreen
           mine={
-            <Chopping
-              seed={seed}
-              onMatchEnd={onMatchEnd}
-              onInput={(input) => onInput(input)}
-            />
+            <Chopping seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
           }
           theirs={<ChoppingSpectator seed={seed} inputs={opponentInputs as string[]} />}
         />
       );
     case 'thermite':
-      return <Thermite seed={seed} onMatchEnd={onMatchEnd} />;
+      return (
+        <SingleGame>
+          <Thermite seed={seed} onMatchEnd={onMatchEnd} />
+        </SingleGame>
+      );
     case 'lockpick':
-      return <Lockpick seed={seed} onMatchEnd={onMatchEnd} />;
+      return (
+        <SingleGame>
+          <Lockpick seed={seed} onMatchEnd={onMatchEnd} />
+        </SingleGame>
+      );
     case 'laundromat':
-      return <Laundromat seed={seed} onMatchEnd={onMatchEnd} />;
+      return (
+        <SingleGame>
+          <Laundromat seed={seed} onMatchEnd={onMatchEnd} />
+        </SingleGame>
+      );
     case 'pincracker':
-      return <Pincracker seed={seed} onMatchEnd={onMatchEnd} />;
+      return (
+        <SingleGame>
+          <Pincracker seed={seed} onMatchEnd={onMatchEnd} />
+        </SingleGame>
+      );
     case 'roof-running':
-      return <RoofRunning seed={seed} onMatchEnd={onMatchEnd} />;
+      return (
+        <SingleGame>
+          <RoofRunning seed={seed} onMatchEnd={onMatchEnd} />
+        </SingleGame>
+      );
     case 'word-memory':
-      return <WordMemory seed={seed} onMatchEnd={onMatchEnd} />;
+      return (
+        <SingleGame>
+          <WordMemory seed={seed} onMatchEnd={onMatchEnd} />
+        </SingleGame>
+      );
     default:
       return (
         <p className="text-white/60 text-center text-sm">
@@ -66,19 +86,49 @@ export default function MatchView({
   }
 }
 
-// Stacks vertically below xl, side-by-side at xl+ where there's room for two
-// chopping boards without the inner grid shrinking past usability.
+// Splitscreen: full viewport, stacked on small screens, side-by-side at xl+ with
+// a vertical divider. Each half centers its game both horizontally and vertically
+// so the two boards sit cleanly inside their own half of the screen.
 function Splitscreen({ mine, theirs }: { mine: React.ReactNode; theirs: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-      <div>
-        <div className="text-white/40 text-xs uppercase tracking-wider mb-2">You</div>
+    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-2 divide-y xl:divide-y-0 xl:divide-x divide-white/10">
+      <Half label="You" accent>
         {mine}
+      </Half>
+      <Half label="Opponent">{theirs}</Half>
+    </div>
+  );
+}
+
+function Half({
+  label,
+  accent,
+  children,
+}: {
+  label: string;
+  accent?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center justify-center p-4 sm:p-6 xl:p-10 min-h-screen xl:min-h-0">
+      <div className="w-full max-w-2xl flex flex-col">
+        <div
+          className={`text-xs uppercase tracking-[0.2em] mb-3 font-semibold ${
+            accent ? 'text-[#54FFA4]' : 'text-white/40'
+          }`}
+        >
+          {label}
+        </div>
+        {children}
       </div>
-      <div>
-        <div className="text-white/40 text-xs uppercase tracking-wider mb-2">Opponent</div>
-        {theirs}
-      </div>
+    </div>
+  );
+}
+
+function SingleGame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 xl:p-10">
+      <div className="w-full max-w-2xl">{children}</div>
     </div>
   );
 }

@@ -172,6 +172,7 @@ const Chopping: FC<ChoppingProps> = ({ seed, onMatchEnd, onInput }) => {
       if (isMatch) onMatchEnd?.(gameResult);
     },
     onInput,
+    noTimer: isMatch,
   });
 
   const outerContainerRef = useRef<HTMLDivElement>(null);
@@ -348,6 +349,7 @@ const Chopping: FC<ChoppingProps> = ({ seed, onMatchEnd, onInput }) => {
           runId={runId}
           durationMs={activeTimer * 1000}
           compact={isMatch}
+          hideTimer={isMatch}
           wrapperRef={gameWrapperRef}
           onInteraction={mobile.handleInteraction}
           settings={isMatch || isChallengeMode ? undefined : settings}
@@ -413,6 +415,7 @@ export const ChoppingSpectator: FC<ChoppingSpectatorProps> = ({ seed, inputs }) 
       runId={1}
       durationMs={defaultDuration * 1000}
       compact
+      hideTimer
     />
   );
 };

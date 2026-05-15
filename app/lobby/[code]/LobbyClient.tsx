@@ -122,8 +122,9 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     );
   }
 
-  // Outcome view: my game has ended.
-  if (match && myResult) {
+  // Outcome view: either side has ended (1v1 has no timer, so the first end
+  // is decisive — if the opponent finishes before me, I lose immediately).
+  if (match && (myResult || opponentResult)) {
     return (
       <OutcomeView
         myResult={myResult}
@@ -133,20 +134,17 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     );
   }
 
-  // Match in progress: render the game.
+  // Match in progress: render the game full-width so the splitscreen halves
+  // get the full viewport.
   if (match) {
     return (
-      <div className="min-h-screen p-4 md:p-8">
-        <div className="max-w-7xl mx-auto pt-8">
-          <MatchView
-            game={match.game}
-            seed={match.seed}
-            onMatchEnd={handleMatchEnd}
-            onInput={handleInput}
-            opponentInputs={opponentInputs}
-          />
-        </div>
-      </div>
+      <MatchView
+        game={match.game}
+        seed={match.seed}
+        onMatchEnd={handleMatchEnd}
+        onInput={handleInput}
+        opponentInputs={opponentInputs}
+      />
     );
   }
 
@@ -259,44 +257,38 @@ function OutcomeView({
   opponentResult,
   onBack,
 }: {
-  myResult: GameResult;
+  myResult: GameResult | null;
   opponentResult: GameResult | null;
   onBack: () => void;
 }) {
+  // Race semantics: if I finished, I trust my own result. Otherwise the only
+  // result is the opponent's, and my outcome is the inverse of theirs.
+  // When both finished and both won, the faster locally-measured time wins.
+  const iWon = (() => {
+    if (myResult && opponentResult) {
+      if (myResult.won && opponentResult.won) {
+        return myResult.elapsedMs < opponentResult.elapsedMs;
+      }
+      return myResult.won;
+    }
+    if (myResult) return myResult.won;
+    if (opponentResult) return !opponentResult.won;
+    return false;
+  })();
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md text-center">
         <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Match over</p>
         <h2
-          className={`text-4xl font-bold mb-8 ${
-            myResult.won ? 'text-[#54FFA4]' : 'text-white/80'
-          }`}
+          className={`text-4xl font-bold mb-8 ${iWon ? 'text-[#54FFA4]' : 'text-white/80'}`}
         >
-          {myResult.won ? 'You won' : 'You lost'}
+          {iWon ? 'You won' : 'You lost'}
         </h2>
 
         <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5 mb-6 text-left space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-white/60 text-sm">You</span>
-            <span className="text-white/90 text-sm font-mono">
-              {myResult.won ? 'won' : 'lost'} · {myResult.score} ·{' '}
-              {(myResult.elapsedMs / 1000).toFixed(1)}s
-            </span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-white/60 text-sm">Opponent</span>
-            {opponentResult ? (
-              <span className="text-white/90 text-sm font-mono">
-                {opponentResult.won ? 'won' : 'lost'} · {opponentResult.score} ·{' '}
-                {(opponentResult.elapsedMs / 1000).toFixed(1)}s
-              </span>
-            ) : (
-              <span className="text-white/40 text-sm inline-flex items-center gap-2">
-                <Loader2 className="w-3 h-3 animate-spin" />
-                still playing
-              </span>
-            )}
-          </div>
+          <ResultRow label="You" result={myResult} pendingLabel="didn't finish" />
+          <ResultRow label="Opponent" result={opponentResult} pendingLabel="still playing" />
         </div>
 
         <button
@@ -306,6 +298,30 @@ function OutcomeView({
           Back to lobby
         </button>
       </div>
+    </div>
+  );
+}
+
+function ResultRow({
+  label,
+  result,
+  pendingLabel,
+}: {
+  label: string;
+  result: GameResult | null;
+  pendingLabel: string;
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-white/60 text-sm">{label}</span>
+      {result ? (
+        <span className="text-white/90 text-sm font-mono">
+          {result.won ? 'won' : 'lost'} · {result.score} ·{' '}
+          {(result.elapsedMs / 1000).toFixed(1)}s
+        </span>
+      ) : (
+        <span className="text-white/40 text-sm">{pendingLabel}</span>
+      )}
     </div>
   );
 }
