@@ -8,6 +8,9 @@ export type ChannelStatus = 'connecting' | 'connected' | 'disconnected' | 'faile
 export interface PresenceMember {
   clientId: string;
   data: { displayName: string };
+  // Ably-server timestamp (ms since epoch) — both clients see the same value, so
+  // it's a deterministic basis for host determination.
+  timestamp: number;
 }
 
 interface UseAblyChannelArgs<TMsg> {
@@ -84,6 +87,7 @@ export function useAblyChannel<TMsg>({
           byClientId.set(m.clientId, {
             clientId: m.clientId,
             data: (m.data ?? { displayName: '' }) as { displayName: string },
+            timestamp: m.timestamp ?? 0,
           });
         }
         setPresence(Array.from(byClientId.values()));
