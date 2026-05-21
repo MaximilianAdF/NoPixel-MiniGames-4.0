@@ -45,6 +45,11 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   const [matchExpired, setMatchExpired] = useState(false);
   const [lobbyLastActivity, setLobbyLastActivity] = useState(() => Date.now());
   const [now, setNow] = useState(() => Date.now());
+  // Host-controlled per-lobby setting. Persists across matches in the same lobby.
+  const [focusMode, setFocusMode] = useState(false);
+  // Each match captures the focusMode the host had at start time, so a mid-match
+  // toggle doesn't affect the in-progress game.
+  const [matchFocusMode, setMatchFocusMode] = useState(false);
 
   const displayName = user?.displayName ?? user?.username ?? 'Player';
 
@@ -55,6 +60,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       setOpponentResult(null);
       setOpponentInputs([]);
       setMatchExpired(false);
+      setMatchFocusMode(msg.focusMode);
       // Use local Date.now() so the timer isn't sensitive to clock skew
       // between the two clients.
       setMatchStartTime(Date.now());
@@ -135,8 +141,9 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     setOpponentResult(null);
     setOpponentInputs([]);
     setMatchExpired(false);
+    setMatchFocusMode(focusMode);
     setMatchStartTime(Date.now());
-    await publish({ type: 'match:start', game, seed, startedAt: Date.now() });
+    await publish({ type: 'match:start', game, seed, startedAt: Date.now(), focusMode });
   };
 
   const handleMatchEnd = useCallback(
@@ -218,6 +225,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
           onMatchEnd={handleMatchEnd}
           onInput={handleInput}
           opponentInputs={opponentInputs}
+          focusMode={matchFocusMode}
         />
       </>
     );
@@ -295,7 +303,10 @@ export default function LobbyClient({ code }: LobbyClientProps) {
 
         {isHost && presence.length >= 2 && (
           <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5">
-            <p className="text-white/70 text-sm mb-3">Start a match</p>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-white/70 text-sm">Start a match</p>
+              <FocusToggle enabled={focusMode} onChange={setFocusMode} />
+            </div>
             <div className="grid grid-cols-2 gap-2">
               {ONEV_ONE_GAMES.map((entry, i) => {
                 const lastSolo =
@@ -469,6 +480,36 @@ function ResultRow({
         <span className="text-white/40 text-sm">{pendingLabel}</span>
       )}
     </div>
+  );
+}
+
+function FocusToggle({
+  enabled,
+  onChange,
+}: {
+  enabled: boolean;
+  onChange: (next: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!enabled)}
+      className="group inline-flex items-center gap-2 text-xs text-white/50 hover:text-white/90 transition-colors"
+      title="Hide the opponent's board — show only their progress"
+    >
+      <span>Focus mode</span>
+      <span
+        className={`relative inline-block w-8 h-4 rounded-full transition-colors ${
+          enabled ? 'bg-[#54FFA4]' : 'bg-white/10 group-hover:bg-white/20'
+        }`}
+      >
+        <span
+          className={`absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-white transition-transform ${
+            enabled ? 'translate-x-4' : 'translate-x-0'
+          }`}
+        />
+      </span>
+    </button>
   );
 }
 

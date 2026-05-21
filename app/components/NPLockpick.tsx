@@ -14,6 +14,7 @@ import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GamePhase, GameResult } from '@/app/game/types';
 import { useReplayedState } from '@/app/utils/useReplayedState';
+import OpponentSummary from '@/app/lobby/OpponentSummary';
 import {
   lockpickEngine,
   degInterval,
@@ -435,6 +436,27 @@ export const NPLockpickSpectator: FC<NPLockpickSpectatorProps> = ({
       title={title}
       compact
       hideTimer
+    />
+  );
+};
+
+interface NPLockpickSummaryProps {
+  seed: number;
+  inputs: LockpickInput[];
+  levels: number;
+  title: string;
+}
+
+export const NPLockpickSummary: FC<NPLockpickSummaryProps> = ({ seed, inputs, levels, title }) => {
+  const config = useMemo(() => ({ levels }), [levels]);
+  const { state, outcome } = useReplayedState(lockpickEngine, config, seed, inputs);
+  return (
+    <OpponentSummary
+      title={title}
+      metricLabel="Level"
+      metricValue={`${state.level} / ${state.rings.length}`}
+      progress={{ current: state.level, total: state.rings.length }}
+      outcome={outcome}
     />
   );
 };

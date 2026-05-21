@@ -16,6 +16,7 @@ import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GamePhase, GameResult } from '@/app/game/types';
 import { useReplayedState } from '@/app/utils/useReplayedState';
+import OpponentSummary from '@/app/lobby/OpponentSummary';
 import type { Digit } from './utils';
 import { pincrackerEngine, type PincrackerInput, type PincrackerState } from './engine';
 import { PinColumn } from './PincrackerGrid';
@@ -480,6 +481,22 @@ export const PincrackerSpectator: FC<PincrackerSpectatorProps> = ({ seed, inputs
       durationMs={defaultDuration * 1000}
       compact
       hideTimer
+    />
+  );
+};
+
+// Pincracker has no clear "target" until the pin is cracked, so the summary
+// surfaces the number of failed cracks so far rather than a progress bar.
+export const PincrackerSummary: FC<PincrackerSpectatorProps> = ({ seed, inputs }) => {
+  const config = useMemo(() => ({ pinLength: defaultPinLength }), []);
+  const { outcome } = useReplayedState(pincrackerEngine, config, seed, inputs);
+  const attempts = inputs.filter((i) => i.type === 'finish').length;
+  return (
+    <OpponentSummary
+      title="PinCracker"
+      metricLabel="Attempts"
+      metricValue={String(attempts)}
+      outcome={outcome}
     />
   );
 };

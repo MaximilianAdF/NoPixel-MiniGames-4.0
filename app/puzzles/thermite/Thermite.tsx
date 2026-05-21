@@ -16,6 +16,7 @@ import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GamePhase, GameResult } from '@/app/game/types';
 import { useReplayedState } from '@/app/utils/useReplayedState';
+import OpponentSummary from '@/app/lobby/OpponentSummary';
 import { presets } from './utils';
 import { thermiteEngine, type ThermiteInput, type ThermiteState } from './engine';
 import { ThermiteSquare } from './ThermiteGrid';
@@ -418,6 +419,23 @@ export const ThermiteSpectator: FC<ThermiteSpectatorProps> = ({ seed, inputs }) 
       durationMs={presets[0].timer * 1000}
       compact
       hideTimer
+    />
+  );
+};
+
+export const ThermiteSummary: FC<ThermiteSpectatorProps> = ({ seed, inputs }) => {
+  const config = useMemo(
+    () => ({ rows: presets[0].rows, columns: presets[0].columns, targetScore: presets[0].targetScore }),
+    [],
+  );
+  const { state, outcome } = useReplayedState(thermiteEngine, config, seed, inputs);
+  return (
+    <OpponentSummary
+      title="Thermite"
+      metricLabel="Bytes"
+      metricValue={`${state.score} / ${state.targetScore}`}
+      progress={{ current: state.score, total: state.targetScore }}
+      outcome={outcome}
     />
   );
 };

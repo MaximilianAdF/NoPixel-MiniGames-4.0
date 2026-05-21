@@ -8,6 +8,9 @@ export interface MatchStartMessage {
   game: GameType;
   seed: number;
   startedAt: number;
+  // Focus mode: hide the opponent's mirrored board, render only a compact
+  // progress summary on the opponent's half of the splitscreen.
+  focusMode: boolean;
 }
 
 // A player reports their match outcome — the opponent uses this to render

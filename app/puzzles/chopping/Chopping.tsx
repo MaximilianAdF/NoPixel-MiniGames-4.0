@@ -15,6 +15,7 @@ import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GamePhase, GameResult } from '@/app/game/types';
 import { useReplayedState } from '@/app/utils/useReplayedState';
+import OpponentSummary from '@/app/lobby/OpponentSummary';
 import { choppingEngine, type ChoppingState } from './engine';
 import { GridRow, defaultGridCols } from './ChoppingGrid';
 import '../../../public/Chopping/Chopping.css';
@@ -410,6 +411,22 @@ export const ChoppingSpectator: FC<ChoppingSpectatorProps> = ({ seed, inputs }) 
       durationMs={defaultDuration * 1000}
       compact
       hideTimer
+    />
+  );
+};
+
+// Focus-mode summary: same replayed state as the spectator, but rendered as a
+// compact progress widget instead of the full board.
+export const ChoppingSummary: FC<ChoppingSpectatorProps> = ({ seed, inputs }) => {
+  const config = useMemo(() => ({ numLetters: defaultNumLetters }), []);
+  const { state, outcome } = useReplayedState(choppingEngine, config, seed, inputs);
+  return (
+    <OpponentSummary
+      title="Chopping"
+      metricLabel="Letters"
+      metricValue={`${state.activeIndex} / ${state.board.length}`}
+      progress={{ current: state.activeIndex, total: state.board.length }}
+      outcome={outcome}
     />
   );
 };

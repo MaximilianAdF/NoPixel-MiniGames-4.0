@@ -2,17 +2,29 @@
 
 import type { GameType } from '@/interfaces/user';
 import type { GameResult } from '@/app/game/types';
-import Chopping, { ChoppingSpectator } from '@/app/puzzles/chopping/Chopping';
-import Thermite, { ThermiteSpectator } from '@/app/puzzles/thermite/Thermite';
+import Chopping, { ChoppingSpectator, ChoppingSummary } from '@/app/puzzles/chopping/Chopping';
+import Thermite, { ThermiteSpectator, ThermiteSummary } from '@/app/puzzles/thermite/Thermite';
 import type { ThermiteInput } from '@/app/puzzles/thermite/engine';
-import WordMemory, { WordMemorySpectator } from '@/app/puzzles/word-memory/WordMemory';
+import WordMemory, {
+  WordMemorySpectator,
+  WordMemorySummary,
+} from '@/app/puzzles/word-memory/WordMemory';
 import type { WordMemoryInput } from '@/app/puzzles/word-memory/engine';
-import RoofRunning, { RoofRunningSpectator } from '@/app/puzzles/roof-running/RoofRunning';
+import RoofRunning, {
+  RoofRunningSpectator,
+  RoofRunningSummary,
+} from '@/app/puzzles/roof-running/RoofRunning';
 import type { RoofRunningInput } from '@/app/puzzles/roof-running/engine';
-import Pincracker, { PincrackerSpectator } from '@/app/puzzles/pincracker/Pincracker';
+import Pincracker, {
+  PincrackerSpectator,
+  PincrackerSummary,
+} from '@/app/puzzles/pincracker/Pincracker';
 import type { PincrackerInput } from '@/app/puzzles/pincracker/engine';
-import Lockpick, { LockpickSpectator } from '@/app/puzzles/lockpick/Lockpick';
-import Laundromat, { LaundromatSpectator } from '@/app/puzzles/laundromat/Laundromat';
+import Lockpick, { LockpickSpectator, LockpickSummary } from '@/app/puzzles/lockpick/Lockpick';
+import Laundromat, {
+  LaundromatSpectator,
+  LaundromatSummary,
+} from '@/app/puzzles/laundromat/Laundromat';
 import type { LockpickInput } from '@/app/components/lockpickEngine';
 
 interface MatchViewProps {
@@ -24,85 +36,141 @@ interface MatchViewProps {
   // Opponent's streamed inputs, accumulated by the lobby. Replayed in the
   // spectator view to mirror their game live.
   opponentInputs: unknown[];
+  // Focus mode: render a compact opponent-progress summary instead of the
+  // full mirrored board.
+  focusMode: boolean;
 }
 
 // Renders the chosen game in 1v1 match mode as a splitscreen (mine + opponent
-// spectator). RepairKit is excluded — real-time mechanic, not a 1v1 candidate.
+// view). RepairKit is excluded — real-time mechanic, not a 1v1 candidate.
 export default function MatchView({
   game,
   seed,
   onMatchEnd,
   onInput,
   opponentInputs,
+  focusMode,
 }: MatchViewProps) {
   switch (game) {
-    case 'chopping':
+    case 'chopping': {
+      const inputs = opponentInputs as string[];
       return (
         <Splitscreen
           mine={
             <Chopping seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
           }
-          theirs={<ChoppingSpectator seed={seed} inputs={opponentInputs as string[]} />}
+          theirs={
+            focusMode ? (
+              <ChoppingSummary seed={seed} inputs={inputs} />
+            ) : (
+              <ChoppingSpectator seed={seed} inputs={inputs} />
+            )
+          }
         />
       );
-    case 'thermite':
+    }
+    case 'thermite': {
+      const inputs = opponentInputs as ThermiteInput[];
       return (
         <Splitscreen
           mine={
             <Thermite seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
           }
-          theirs={<ThermiteSpectator seed={seed} inputs={opponentInputs as ThermiteInput[]} />}
+          theirs={
+            focusMode ? (
+              <ThermiteSummary seed={seed} inputs={inputs} />
+            ) : (
+              <ThermiteSpectator seed={seed} inputs={inputs} />
+            )
+          }
         />
       );
-    case 'lockpick':
+    }
+    case 'lockpick': {
+      const inputs = opponentInputs as LockpickInput[];
       return (
         <Splitscreen
           mine={
             <Lockpick seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
           }
-          theirs={<LockpickSpectator seed={seed} inputs={opponentInputs as LockpickInput[]} />}
+          theirs={
+            focusMode ? (
+              <LockpickSummary seed={seed} inputs={inputs} />
+            ) : (
+              <LockpickSpectator seed={seed} inputs={inputs} />
+            )
+          }
         />
       );
-    case 'laundromat':
+    }
+    case 'laundromat': {
+      const inputs = opponentInputs as LockpickInput[];
       return (
         <Splitscreen
           mine={
             <Laundromat seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
           }
-          theirs={<LaundromatSpectator seed={seed} inputs={opponentInputs as LockpickInput[]} />}
+          theirs={
+            focusMode ? (
+              <LaundromatSummary seed={seed} inputs={inputs} />
+            ) : (
+              <LaundromatSpectator seed={seed} inputs={inputs} />
+            )
+          }
         />
       );
-    case 'pincracker':
+    }
+    case 'pincracker': {
+      const inputs = opponentInputs as PincrackerInput[];
       return (
         <Splitscreen
           mine={
             <Pincracker seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
           }
           theirs={
-            <PincrackerSpectator seed={seed} inputs={opponentInputs as PincrackerInput[]} />
+            focusMode ? (
+              <PincrackerSummary seed={seed} inputs={inputs} />
+            ) : (
+              <PincrackerSpectator seed={seed} inputs={inputs} />
+            )
           }
         />
       );
-    case 'roof-running':
+    }
+    case 'roof-running': {
+      const inputs = opponentInputs as RoofRunningInput[];
       return (
         <Splitscreen
           mine={
             <RoofRunning seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
           }
           theirs={
-            <RoofRunningSpectator seed={seed} inputs={opponentInputs as RoofRunningInput[]} />
+            focusMode ? (
+              <RoofRunningSummary seed={seed} inputs={inputs} />
+            ) : (
+              <RoofRunningSpectator seed={seed} inputs={inputs} />
+            )
           }
         />
       );
-    case 'word-memory':
+    }
+    case 'word-memory': {
+      const inputs = opponentInputs as WordMemoryInput[];
       return (
         <Splitscreen
           mine={
             <WordMemory seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
           }
-          theirs={<WordMemorySpectator seed={seed} inputs={opponentInputs as WordMemoryInput[]} />}
+          theirs={
+            focusMode ? (
+              <WordMemorySummary seed={seed} inputs={inputs} />
+            ) : (
+              <WordMemorySpectator seed={seed} inputs={inputs} />
+            )
+          }
         />
       );
+    }
     default:
       return (
         <p className="text-white/60 text-center text-sm">
@@ -150,4 +218,3 @@ function Half({
     </div>
   );
 }
-

@@ -13,6 +13,7 @@ import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GamePhase, GameResult } from '@/app/game/types';
 import { useReplayedState } from '@/app/utils/useReplayedState';
+import OpponentSummary from '@/app/lobby/OpponentSummary';
 import { wordMemoryEngine, type WordMemoryInput, type WordMemoryState } from './engine';
 
 const defaultNumWords = 25;
@@ -313,6 +314,20 @@ export const WordMemorySpectator: FC<WordMemorySpectatorProps> = ({ seed, inputs
       durationMs={defaultDuration * 1000}
       compact
       hideTimer
+    />
+  );
+};
+
+export const WordMemorySummary: FC<WordMemorySpectatorProps> = ({ seed, inputs }) => {
+  const config = useMemo(() => ({ numWords: defaultNumWords }), []);
+  const { state, outcome } = useReplayedState(wordMemoryEngine, config, seed, inputs);
+  return (
+    <OpponentSummary
+      title="Word Memory"
+      metricLabel="Round"
+      metricValue={`${state.round} / ${state.numWords}`}
+      progress={{ current: state.round, total: state.numWords }}
+      outcome={outcome}
     />
   );
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import NPLockpick, { NPLockpickSpectator } from '@/app/components/NPLockpick';
+import NPLockpick, { NPLockpickSpectator, NPLockpickSummary } from '@/app/components/NPLockpick';
 import { FC } from 'react';
 import { useSearchParams } from 'next/navigation';
 import type { GameResult } from '@/app/game/types';
@@ -45,6 +45,13 @@ export const LockpickSpectator: FC<{ seed: number; inputs: LockpickInput[] }> = 
     title={TITLE}
     countdownDuration={COUNTDOWN_DURATION}
   />
+);
+
+export const LockpickSummary: FC<{ seed: number; inputs: LockpickInput[] }> = ({
+  seed,
+  inputs,
+}) => (
+  <NPLockpickSummary seed={seed} inputs={inputs} levels={MAX_LEVELS} title={TITLE} />
 );
 
 export default Lockpick;

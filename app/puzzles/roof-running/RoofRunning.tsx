@@ -14,6 +14,7 @@ import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GamePhase, GameResult } from '@/app/game/types';
 import { useReplayedState } from '@/app/utils/useReplayedState';
+import OpponentSummary from '@/app/lobby/OpponentSummary';
 import { roofRunningEngine, type RoofRunningInput, type RoofRunningState } from './engine';
 import { RoofTile } from './RoofRunningGrid';
 
@@ -365,6 +366,22 @@ export const RoofRunningSpectator: FC<RoofRunningSpectatorProps> = ({ seed, inpu
       durationMs={defaultDuration * 1000}
       compact
       hideTimer
+    />
+  );
+};
+
+export const RoofRunningSummary: FC<RoofRunningSpectatorProps> = ({ seed, inputs }) => {
+  const config = useMemo(() => ({ rows: defaultRows, columns: defaultColumns }), []);
+  const { state, outcome } = useReplayedState(roofRunningEngine, config, seed, inputs);
+  const cleared = state.board.filter((v) => v === 'empty').length;
+  const total = state.board.length;
+  return (
+    <OpponentSummary
+      title="Same Game"
+      metricLabel="Cleared"
+      metricValue={`${cleared} / ${total}`}
+      progress={{ current: cleared, total }}
+      outcome={outcome}
     />
   );
 };
