@@ -11,8 +11,9 @@ import RoofRunning, { RoofRunningSpectator } from '@/app/puzzles/roof-running/Ro
 import type { RoofRunningInput } from '@/app/puzzles/roof-running/engine';
 import Pincracker, { PincrackerSpectator } from '@/app/puzzles/pincracker/Pincracker';
 import type { PincrackerInput } from '@/app/puzzles/pincracker/engine';
-import Lockpick from '@/app/puzzles/lockpick/Lockpick';
-import Laundromat from '@/app/puzzles/laundromat/Laundromat';
+import Lockpick, { LockpickSpectator } from '@/app/puzzles/lockpick/Lockpick';
+import Laundromat, { LaundromatSpectator } from '@/app/puzzles/laundromat/Laundromat';
+import type { LockpickInput } from '@/app/components/lockpickEngine';
 
 interface MatchViewProps {
   game: GameType;
@@ -25,9 +26,8 @@ interface MatchViewProps {
   opponentInputs: unknown[];
 }
 
-// Renders the chosen game in 1v1 match mode. Chopping is the splitscreen vertical
-// slice; the other six games are still single-screen until they get the same
-// view/spectator split. RepairKit is excluded — real-time mechanic.
+// Renders the chosen game in 1v1 match mode as a splitscreen (mine + opponent
+// spectator). RepairKit is excluded — real-time mechanic, not a 1v1 candidate.
 export default function MatchView({
   game,
   seed,
@@ -56,15 +56,21 @@ export default function MatchView({
       );
     case 'lockpick':
       return (
-        <SingleGame>
-          <Lockpick seed={seed} onMatchEnd={onMatchEnd} />
-        </SingleGame>
+        <Splitscreen
+          mine={
+            <Lockpick seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
+          }
+          theirs={<LockpickSpectator seed={seed} inputs={opponentInputs as LockpickInput[]} />}
+        />
       );
     case 'laundromat':
       return (
-        <SingleGame>
-          <Laundromat seed={seed} onMatchEnd={onMatchEnd} />
-        </SingleGame>
+        <Splitscreen
+          mine={
+            <Laundromat seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
+          }
+          theirs={<LaundromatSpectator seed={seed} inputs={opponentInputs as LockpickInput[]} />}
+        />
       );
     case 'pincracker':
       return (
@@ -145,10 +151,3 @@ function Half({
   );
 }
 
-function SingleGame({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 xl:p-10">
-      <div className="w-full max-w-2xl">{children}</div>
-    </div>
-  );
-}
