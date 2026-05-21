@@ -357,12 +357,12 @@ function MatchHeader({
     // pill visually breaks the divider and "carries" it across.
     <div className="fixed top-0 left-1/2 -translate-x-1/2 z-50 pt-3 pointer-events-none">
       <div
-        className={`pointer-events-auto flex items-center gap-4 rounded-full bg-black/80 backdrop-blur-sm px-5 py-2 border border-white/10 shadow-xl shadow-black/50 transition-all duration-500 ease-out ${
+        className={`pointer-events-auto grid grid-cols-[5rem_auto_5rem] items-center gap-x-3 rounded-full bg-black/80 backdrop-blur-sm px-4 py-2 border border-white/10 shadow-xl shadow-black/50 transition-all duration-500 ease-out ${
           mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3'
         }`}
       >
         <span
-          className={`text-sm font-mono tabular-nums transition-colors duration-300 ${
+          className={`text-right text-sm font-mono tabular-nums transition-colors duration-300 ${
             lowTime ? 'text-amber-300' : 'text-white/75'
           }`}
         >
@@ -371,7 +371,7 @@ function MatchHeader({
         <span className="w-px h-4 bg-white/20" />
         <button
           onClick={onForfeit}
-          className="text-sm text-white/60 hover:text-red-300 transition-colors duration-200 inline-flex items-center gap-1.5"
+          className="justify-self-start text-sm text-white/60 hover:text-red-300 transition-colors duration-200 inline-flex items-center gap-1.5"
         >
           <LogOut className="w-3.5 h-3.5" />
           Forfeit
