@@ -28,6 +28,7 @@ const ONEV_ONE_GAMES: { id: GameType; label: string }[] = [
 const LOBBY_IDLE_MS = 5 * 60 * 1000;   // close lobby after 5 min of no matches
 const LOBBY_WARN_MS = 60 * 1000;       // show warning toast last 60s
 const MATCH_MAX_MS = 3 * 60 * 1000;    // cap any single match at 3 min → draw
+const COUNTDOWN_MS = 3 * 1000;         // sync the start: both clients unblock at the same goAt
 
 interface LobbyClientProps {
   code: string;
@@ -45,6 +46,10 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   const [matchExpired, setMatchExpired] = useState(false);
   const [lobbyLastActivity, setLobbyLastActivity] = useState(() => Date.now());
   const [now, setNow] = useState(() => Date.now());
+  // Synced go-time: host computes Date.now() + COUNTDOWN_MS, ships it on
+  // match:start, both clients setTimeout to the same wall-clock moment so
+  // the host's ~100ms network-latency headstart goes away.
+  const [goAt, setGoAt] = useState<number | null>(null);
   // Host-controlled per-lobby setting. Persists across matches in the same lobby.
   const [focusMode, setFocusMode] = useState(false);
   // Each match captures the focusMode the host had at start time, so a mid-match
@@ -61,9 +66,12 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       setOpponentInputs([]);
       setMatchExpired(false);
       setMatchFocusMode(msg.focusMode);
-      // Use local Date.now() so the timer isn't sensitive to clock skew
-      // between the two clients.
-      setMatchStartTime(Date.now());
+      // Cap goAt to a sane range so a wildly-skewed peer clock can't strand
+      // us on a multi-minute countdown.
+      const cappedGoAt = Math.min(msg.goAt, Date.now() + COUNTDOWN_MS + 1500);
+      setGoAt(cappedGoAt);
+      // Match timer starts counting from GO, not from when match:start arrived.
+      setMatchStartTime(cappedGoAt);
     } else if (msg.type === 'match:result') {
       setOpponentResult({ won: msg.won, score: msg.score, elapsedMs: msg.elapsedMs });
     } else if (msg.type === 'match:input') {
@@ -111,6 +119,16 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     }
   }, [match, now, lobbyLastActivity, router]);
 
+  // Precision tick aligned to goAt so the countdown→match transition fires
+  // exactly at the synced go-time, not at the next 1Hz tick boundary.
+  useEffect(() => {
+    if (!goAt) return;
+    const delay = goAt - Date.now();
+    if (delay <= 0) return;
+    const handle = setTimeout(() => setNow(Date.now()), delay);
+    return () => clearTimeout(handle);
+  }, [goAt]);
+
   // Match max-duration: first client to expire publishes match:timeout so both
   // converge on a draw without UI flicker. Guard against firing after the
   // match is already resolved (e.g., opponent forfeited at 2:30, timer would
@@ -136,14 +154,23 @@ export default function LobbyClient({ code }: LobbyClientProps) {
 
   const handleStart = async (game: GameType) => {
     const seed = generateMatchSeed();
+    const newGoAt = Date.now() + COUNTDOWN_MS;
     setMatch({ game, seed });
     setMyResult(null);
     setOpponentResult(null);
     setOpponentInputs([]);
     setMatchExpired(false);
     setMatchFocusMode(focusMode);
-    setMatchStartTime(Date.now());
-    await publish({ type: 'match:start', game, seed, startedAt: Date.now(), focusMode });
+    setGoAt(newGoAt);
+    setMatchStartTime(newGoAt);
+    await publish({
+      type: 'match:start',
+      game,
+      seed,
+      startedAt: Date.now(),
+      goAt: newGoAt,
+      focusMode,
+    });
   };
 
   const handleMatchEnd = useCallback(
@@ -181,6 +208,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     setOpponentInputs([]);
     setMatchExpired(false);
     setMatchStartTime(null);
+    setGoAt(null);
     setLobbyLastActivity(Date.now());
   };
 
@@ -198,6 +226,12 @@ export default function LobbyClient({ code }: LobbyClientProps) {
         </div>
       </div>
     );
+  }
+
+  // Synced countdown: rendered before anything else so neither client can
+  // start playing before goAt.
+  if (match && goAt && now < goAt) {
+    return <Countdown remainingMs={goAt - now} />;
   }
 
   // Outcome view: either side ended, or the match timer expired (draw).
@@ -483,6 +517,36 @@ function ResultRow({
       ) : (
         <span className="text-white/40 text-sm">{pendingLabel}</span>
       )}
+    </div>
+  );
+}
+
+function Countdown({ remainingMs }: { remainingMs: number }) {
+  const seconds = Math.max(1, Math.ceil(remainingMs / 1000));
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div
+        key={seconds}
+        className="text-[10rem] sm:text-[14rem] font-bold text-white tabular-nums animate-[countdown-pop_0.5s_ease-out_forwards]"
+      >
+        {seconds}
+      </div>
+      <style jsx>{`
+        @keyframes countdown-pop {
+          0% {
+            transform: scale(0.4);
+            opacity: 0;
+          }
+          35% {
+            transform: scale(1.15);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(1);
+            opacity: 0.9;
+          }
+        }
+      `}</style>
     </div>
   );
 }

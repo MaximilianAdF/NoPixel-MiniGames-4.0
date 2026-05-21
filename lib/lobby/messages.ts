@@ -8,6 +8,10 @@ export interface MatchStartMessage {
   game: GameType;
   seed: number;
   startedAt: number;
+  // Wall-clock moment (in host's Date.now() frame) at which both clients
+  // should unblock the game. Both sides count down to this so the host's
+  // ~100ms network-latency headstart goes away.
+  goAt: number;
   // Focus mode: hide the opponent's mirrored board, render only a compact
   // progress summary on the opponent's half of the splitscreen.
   focusMode: boolean;
