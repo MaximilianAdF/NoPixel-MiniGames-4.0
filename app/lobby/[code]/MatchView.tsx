@@ -36,13 +36,15 @@ interface MatchViewProps {
   // Opponent's streamed inputs, accumulated by the lobby. Replayed in the
   // spectator view to mirror their game live.
   opponentInputs: unknown[];
-  // Focus mode: render a compact opponent-progress summary instead of the
-  // full mirrored board.
+  // Focus mode: render the player's game centered and full-width with a
+  // small floating opponent-progress widget tucked in the corner.
   focusMode: boolean;
 }
 
-// Renders the chosen game in 1v1 match mode as a splitscreen (mine + opponent
-// view). RepairKit is excluded — real-time mechanic, not a 1v1 candidate.
+// Renders the chosen game in 1v1 match mode. In normal mode, it's a
+// splitscreen (mine + spectator mirror). In focus mode, it's a single
+// centered game with a small floating opponent summary in the corner.
+// RepairKit is excluded — real-time mechanic, not a 1v1 candidate.
 export default function MatchView({
   game,
   seed,
@@ -51,132 +53,87 @@ export default function MatchView({
   opponentInputs,
   focusMode,
 }: MatchViewProps) {
+  const trio = renderTrio(game, seed, onMatchEnd, onInput, opponentInputs);
+  if (!trio) {
+    return (
+      <p className="text-white/60 text-center text-sm">{game} isn&apos;t available for 1v1.</p>
+    );
+  }
+  if (focusMode) {
+    return <FocusLayout interactive={trio.interactive} summary={trio.summary} />;
+  }
+  return <Splitscreen mine={trio.interactive} theirs={trio.spectator} />;
+}
+
+// Picks the interactive / spectator / summary triplet for a given game. Each
+// game owns its own type-safe casts; here we just pick the right components.
+function renderTrio(
+  game: GameType,
+  seed: number,
+  onMatchEnd: (result: GameResult) => void,
+  onInput: (input: unknown) => void,
+  opponentInputs: unknown[],
+): { interactive: React.ReactNode; spectator: React.ReactNode; summary: React.ReactNode } | null {
+  const send = (input: unknown) => onInput(input);
   switch (game) {
     case 'chopping': {
       const inputs = opponentInputs as string[];
-      return (
-        <Splitscreen
-          mine={
-            <Chopping seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
-          }
-          theirs={
-            focusMode ? (
-              <ChoppingSummary seed={seed} inputs={inputs} />
-            ) : (
-              <ChoppingSpectator seed={seed} inputs={inputs} />
-            )
-          }
-        />
-      );
+      return {
+        interactive: <Chopping seed={seed} onMatchEnd={onMatchEnd} onInput={send} />,
+        spectator: <ChoppingSpectator seed={seed} inputs={inputs} />,
+        summary: <ChoppingSummary seed={seed} inputs={inputs} />,
+      };
     }
     case 'thermite': {
       const inputs = opponentInputs as ThermiteInput[];
-      return (
-        <Splitscreen
-          mine={
-            <Thermite seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
-          }
-          theirs={
-            focusMode ? (
-              <ThermiteSummary seed={seed} inputs={inputs} />
-            ) : (
-              <ThermiteSpectator seed={seed} inputs={inputs} />
-            )
-          }
-        />
-      );
+      return {
+        interactive: <Thermite seed={seed} onMatchEnd={onMatchEnd} onInput={send} />,
+        spectator: <ThermiteSpectator seed={seed} inputs={inputs} />,
+        summary: <ThermiteSummary seed={seed} inputs={inputs} />,
+      };
     }
     case 'lockpick': {
       const inputs = opponentInputs as LockpickInput[];
-      return (
-        <Splitscreen
-          mine={
-            <Lockpick seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
-          }
-          theirs={
-            focusMode ? (
-              <LockpickSummary seed={seed} inputs={inputs} />
-            ) : (
-              <LockpickSpectator seed={seed} inputs={inputs} />
-            )
-          }
-        />
-      );
+      return {
+        interactive: <Lockpick seed={seed} onMatchEnd={onMatchEnd} onInput={send} />,
+        spectator: <LockpickSpectator seed={seed} inputs={inputs} />,
+        summary: <LockpickSummary seed={seed} inputs={inputs} />,
+      };
     }
     case 'laundromat': {
       const inputs = opponentInputs as LockpickInput[];
-      return (
-        <Splitscreen
-          mine={
-            <Laundromat seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
-          }
-          theirs={
-            focusMode ? (
-              <LaundromatSummary seed={seed} inputs={inputs} />
-            ) : (
-              <LaundromatSpectator seed={seed} inputs={inputs} />
-            )
-          }
-        />
-      );
+      return {
+        interactive: <Laundromat seed={seed} onMatchEnd={onMatchEnd} onInput={send} />,
+        spectator: <LaundromatSpectator seed={seed} inputs={inputs} />,
+        summary: <LaundromatSummary seed={seed} inputs={inputs} />,
+      };
     }
     case 'pincracker': {
       const inputs = opponentInputs as PincrackerInput[];
-      return (
-        <Splitscreen
-          mine={
-            <Pincracker seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
-          }
-          theirs={
-            focusMode ? (
-              <PincrackerSummary seed={seed} inputs={inputs} />
-            ) : (
-              <PincrackerSpectator seed={seed} inputs={inputs} />
-            )
-          }
-        />
-      );
+      return {
+        interactive: <Pincracker seed={seed} onMatchEnd={onMatchEnd} onInput={send} />,
+        spectator: <PincrackerSpectator seed={seed} inputs={inputs} />,
+        summary: <PincrackerSummary seed={seed} inputs={inputs} />,
+      };
     }
     case 'roof-running': {
       const inputs = opponentInputs as RoofRunningInput[];
-      return (
-        <Splitscreen
-          mine={
-            <RoofRunning seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
-          }
-          theirs={
-            focusMode ? (
-              <RoofRunningSummary seed={seed} inputs={inputs} />
-            ) : (
-              <RoofRunningSpectator seed={seed} inputs={inputs} />
-            )
-          }
-        />
-      );
+      return {
+        interactive: <RoofRunning seed={seed} onMatchEnd={onMatchEnd} onInput={send} />,
+        spectator: <RoofRunningSpectator seed={seed} inputs={inputs} />,
+        summary: <RoofRunningSummary seed={seed} inputs={inputs} />,
+      };
     }
     case 'word-memory': {
       const inputs = opponentInputs as WordMemoryInput[];
-      return (
-        <Splitscreen
-          mine={
-            <WordMemory seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
-          }
-          theirs={
-            focusMode ? (
-              <WordMemorySummary seed={seed} inputs={inputs} />
-            ) : (
-              <WordMemorySpectator seed={seed} inputs={inputs} />
-            )
-          }
-        />
-      );
+      return {
+        interactive: <WordMemory seed={seed} onMatchEnd={onMatchEnd} onInput={send} />,
+        spectator: <WordMemorySpectator seed={seed} inputs={inputs} />,
+        summary: <WordMemorySummary seed={seed} inputs={inputs} />,
+      };
     }
     default:
-      return (
-        <p className="text-white/60 text-center text-sm">
-          {game} isn&apos;t available for 1v1.
-        </p>
-      );
+      return null;
   }
 }
 
@@ -216,5 +173,25 @@ function Half({
         {children}
       </div>
     </div>
+  );
+}
+
+// Focus mode: the player's game gets the full viewport (centered), and the
+// opponent's progress floats in the top-left corner — small enough to ignore,
+// readable enough to glance at.
+function FocusLayout({
+  interactive,
+  summary,
+}: {
+  interactive: React.ReactNode;
+  summary: React.ReactNode;
+}) {
+  return (
+    <>
+      <div className="fixed top-3 left-4 z-40">{summary}</div>
+      <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 xl:p-10">
+        <div className="w-full max-w-2xl">{interactive}</div>
+      </div>
+    </>
   );
 }

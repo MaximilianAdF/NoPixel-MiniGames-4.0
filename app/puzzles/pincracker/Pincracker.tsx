@@ -96,18 +96,18 @@ const PincrackerView: FC<PincrackerViewProps> = ({
     };
   }, [state.revealing, state.pin.length, onRevealStep, onRevealComplete]);
 
-  const buttons = onCrack
-    ? [
-        [
-          {
-            label: 'Crack',
-            color: 'green' as const,
-            callback: onCrack,
-            disabled: phase !== 'playing',
-          },
-        ],
-      ]
-    : [];
+  // Render the Crack button on both sides so the splitscreen shells stay the
+  // same height; just disable it on the spectator side.
+  const buttons = [
+    [
+      {
+        label: 'Crack',
+        color: 'green' as const,
+        callback: onCrack ?? (() => {}),
+        disabled: !onCrack || phase !== 'playing',
+      },
+    ],
+  ];
 
   return (
     <GameShell

@@ -47,24 +47,25 @@ const WordMemoryView: FC<WordMemoryViewProps> = ({
   settings,
 }) => {
   const currentWord = state.sequence[state.round];
-  const buttons = onAnswer
-    ? [
-        [
-          {
-            label: 'Seen',
-            color: 'purple' as const,
-            callback: () => onAnswer('seen'),
-            disabled: phase !== 'playing',
-          },
-          {
-            label: 'New',
-            color: 'green' as const,
-            callback: () => onAnswer('new'),
-            disabled: phase !== 'playing',
-          },
-        ],
-      ]
-    : [];
+  // Render Seen/New on both sides so the splitscreen shells stay the same
+  // height; just disable them on the spectator side.
+  const noop = () => {};
+  const buttons = [
+    [
+      {
+        label: 'Seen',
+        color: 'purple' as const,
+        callback: onAnswer ? () => onAnswer('seen') : noop,
+        disabled: !onAnswer || phase !== 'playing',
+      },
+      {
+        label: 'New',
+        color: 'green' as const,
+        callback: onAnswer ? () => onAnswer('new') : noop,
+        disabled: !onAnswer || phase !== 'playing',
+      },
+    ],
+  ];
 
   return (
     <GameShell

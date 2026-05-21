@@ -65,33 +65,33 @@ const NPLockpickView: FC<NPLockpickViewProps> = ({
     phase === 'won' ? 3 : phase === 'lost' ? 2 : phase === 'ended' ? (result?.won ? 3 : 2) : 1;
   const svgSize = 50 * (state.rings.length * 2 + 1);
 
-  const interactive = !!(onRotateLeft && onRotateRight && onUnlock);
-  const buttons = interactive
-    ? [
-        [
-          {
-            label: 'Rotate Left',
-            color: 'purple' as const,
-            callback: onRotateLeft,
-            disabled: phase !== 'playing',
-          },
-          {
-            label: 'Rotate Right',
-            color: 'purple' as const,
-            callback: onRotateRight,
-            disabled: phase !== 'playing',
-          },
-        ],
-        [
-          {
-            label: 'Unlock',
-            color: 'green' as const,
-            callback: onUnlock,
-            disabled: phase !== 'playing',
-          },
-        ],
-      ]
-    : [];
+  // Always render the button rows so the spectator side has the same height
+  // as the interactive side; just disable everything when no handler is wired.
+  const noop = () => {};
+  const buttons = [
+    [
+      {
+        label: 'Rotate Left',
+        color: 'purple' as const,
+        callback: onRotateLeft ?? noop,
+        disabled: !onRotateLeft || phase !== 'playing',
+      },
+      {
+        label: 'Rotate Right',
+        color: 'purple' as const,
+        callback: onRotateRight ?? noop,
+        disabled: !onRotateRight || phase !== 'playing',
+      },
+    ],
+    [
+      {
+        label: 'Unlock',
+        color: 'green' as const,
+        callback: onUnlock ?? noop,
+        disabled: !onUnlock || phase !== 'playing',
+      },
+    ],
+  ];
 
   return (
     <GameShell

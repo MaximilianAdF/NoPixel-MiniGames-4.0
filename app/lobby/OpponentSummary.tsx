@@ -14,9 +14,9 @@ interface OpponentSummaryProps {
   outcome: GameOutcome;
 }
 
-// Compact opponent-progress widget for focus mode. Renders in place of the
-// full spectator view so the player isn't distracted by the opponent's board
-// but still sees how they're doing.
+// Compact, minimalistic opponent-progress widget for focus mode. Sized to
+// tuck discreetly into a screen corner — small enough not to compete with
+// the player's own game for attention, big enough to glance at.
 export default function OpponentSummary({
   title,
   metricLabel,
@@ -24,41 +24,41 @@ export default function OpponentSummary({
   progress,
   outcome,
 }: OpponentSummaryProps) {
-  const percent = progress && progress.total > 0
-    ? Math.min(100, (progress.current / progress.total) * 100)
-    : null;
+  const percent =
+    progress && progress.total > 0
+      ? Math.min(100, (progress.current / progress.total) * 100)
+      : null;
 
   const barColor =
-    outcome === 'won'
-      ? 'bg-emerald-400'
-      : outcome === 'lost'
-        ? 'bg-red-400'
-        : 'bg-[#54FFA4]';
+    outcome === 'won' ? 'bg-emerald-400' : outcome === 'lost' ? 'bg-red-400' : 'bg-[#54FFA4]';
 
   return (
-    <div className="w-full rounded-2xl bg-white/[0.03] border border-white/10 px-6 py-8">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-white/90 text-base font-medium">{title}</h3>
-        {outcome !== 'playing' && (
-          <span
-            className={`text-xs uppercase tracking-wider font-semibold ${
-              outcome === 'won' ? 'text-emerald-400' : 'text-red-400'
-            }`}
-          >
-            {outcome === 'won' ? 'Finished' : 'Failed'}
+    <div className="w-56 rounded-xl bg-black/70 backdrop-blur-md border border-white/10 px-3.5 py-2.5 shadow-lg shadow-black/40">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-white/40 text-[10px] uppercase tracking-[0.15em] font-semibold">
+          Opponent
+        </span>
+        {outcome === 'won' && (
+          <span className="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider">
+            Finished
+          </span>
+        )}
+        {outcome === 'lost' && (
+          <span className="text-[10px] text-red-400 font-semibold uppercase tracking-wider">
+            Failed
           </span>
         )}
       </div>
-
-      <div className="flex items-baseline justify-between mb-4">
-        <span className="text-white/50 text-sm uppercase tracking-wider">{metricLabel}</span>
-        <span className="text-white text-3xl font-mono tabular-nums">{metricValue}</span>
+      <div className="flex items-baseline justify-between gap-2 mb-2">
+        <span className="text-white/80 text-xs truncate">
+          {title} <span className="text-white/30">·</span> {metricLabel}
+        </span>
+        <span className="text-white text-sm font-mono tabular-nums">{metricValue}</span>
       </div>
-
       {percent !== null && (
-        <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+        <div className="h-0.5 rounded-full bg-white/10 overflow-hidden">
           <div
-            className={`h-full transition-all duration-300 ${barColor}`}
+            className={`h-full ${barColor} transition-all duration-300`}
             style={{ width: `${percent}%` }}
           />
         </div>

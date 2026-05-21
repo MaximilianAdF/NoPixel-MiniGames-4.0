@@ -442,7 +442,11 @@ function OutcomeView({
             </p>
           ) : (
             <div className="text-left space-y-3">
-              <ResultRow label="You" result={myResult} pendingLabel="didn't finish" />
+              {/* Skip the "You" row when I won by default (opponent forfeited
+                  / lost before I finished) — the title already says I won. */}
+              {(myResult || !iWon) && (
+                <ResultRow label="You" result={myResult} pendingLabel="didn't finish" />
+              )}
               <ResultRow label="Opponent" result={opponentResult} pendingLabel="still playing" />
             </div>
           )}
