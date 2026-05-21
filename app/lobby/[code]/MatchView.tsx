@@ -7,10 +7,11 @@ import Thermite, { ThermiteSpectator } from '@/app/puzzles/thermite/Thermite';
 import type { ThermiteInput } from '@/app/puzzles/thermite/engine';
 import WordMemory, { WordMemorySpectator } from '@/app/puzzles/word-memory/WordMemory';
 import type { WordMemoryInput } from '@/app/puzzles/word-memory/engine';
+import RoofRunning, { RoofRunningSpectator } from '@/app/puzzles/roof-running/RoofRunning';
+import type { RoofRunningInput } from '@/app/puzzles/roof-running/engine';
 import Lockpick from '@/app/puzzles/lockpick/Lockpick';
 import Laundromat from '@/app/puzzles/laundromat/Laundromat';
 import Pincracker from '@/app/puzzles/pincracker/Pincracker';
-import RoofRunning from '@/app/puzzles/roof-running/RoofRunning';
 
 interface MatchViewProps {
   game: GameType;
@@ -72,9 +73,14 @@ export default function MatchView({
       );
     case 'roof-running':
       return (
-        <SingleGame>
-          <RoofRunning seed={seed} onMatchEnd={onMatchEnd} />
-        </SingleGame>
+        <Splitscreen
+          mine={
+            <RoofRunning seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
+          }
+          theirs={
+            <RoofRunningSpectator seed={seed} inputs={opponentInputs as RoofRunningInput[]} />
+          }
+        />
       );
     case 'word-memory':
       return (
