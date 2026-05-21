@@ -3,7 +3,8 @@
 import type { GameType } from '@/interfaces/user';
 import type { GameResult } from '@/app/game/types';
 import Chopping, { ChoppingSpectator } from '@/app/puzzles/chopping/Chopping';
-import Thermite from '@/app/puzzles/thermite/Thermite';
+import Thermite, { ThermiteSpectator } from '@/app/puzzles/thermite/Thermite';
+import type { ThermiteInput } from '@/app/puzzles/thermite/engine';
 import Lockpick from '@/app/puzzles/lockpick/Lockpick';
 import Laundromat from '@/app/puzzles/laundromat/Laundromat';
 import Pincracker from '@/app/puzzles/pincracker/Pincracker';
@@ -43,9 +44,12 @@ export default function MatchView({
       );
     case 'thermite':
       return (
-        <SingleGame>
-          <Thermite seed={seed} onMatchEnd={onMatchEnd} />
-        </SingleGame>
+        <Splitscreen
+          mine={
+            <Thermite seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
+          }
+          theirs={<ThermiteSpectator seed={seed} inputs={opponentInputs as ThermiteInput[]} />}
+        />
       );
     case 'lockpick':
       return (
