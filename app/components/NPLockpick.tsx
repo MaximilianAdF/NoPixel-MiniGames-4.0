@@ -13,7 +13,6 @@ import GameStatsTracker from './GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
-import { seededRandom } from '@/lib/lobby/seededRandom';
 import { lockpickEngine, degInterval, positions } from './lockpickEngine';
 import { LockpickRing } from './LockpickRing';
 
@@ -45,11 +44,6 @@ const NPLockpick: FC<NPLockpickProps> = ({
   const isMatch = seed !== undefined;
   const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const { user } = useUser();
-
-  const rng = useMemo(
-    () => (isMatch ? seededRandom(seed!) : undefined),
-    [isMatch, seed],
-  );
 
   const [savedLevels, setSavedLevels, levelsHydrated] = usePersistantState(
     `np-lockpick-${title}-levels`,
@@ -97,7 +91,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
     config: { levels: activeLevels },
     durationMs: activeTimer * 1000,
     mode,
-    rng,
+    seed: isMatch ? seed : undefined,
     ready: isMatch || (settingsHydrated && (!isChallengeMode || challengeData != null)),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {

@@ -15,7 +15,6 @@ import GameStatsTracker from '@/app/components/GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GamePhase, GameResult } from '@/app/game/types';
-import { seededRandom } from '@/lib/lobby/seededRandom';
 import { useReplayedState } from '@/app/utils/useReplayedState';
 import { presets } from './utils';
 import { thermiteEngine, type ThermiteInput, type ThermiteState } from './engine';
@@ -135,11 +134,6 @@ const Thermite: FC<ThermiteProps> = ({ seed, onMatchEnd, onInput }) => {
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
 
-  const rng = useMemo(
-    () => (isMatch ? seededRandom(seed!) : undefined),
-    [isMatch, seed],
-  );
-
   const [savedPreset, setSavedPreset, presetHydrated] = usePersistantState('np-thermite-preset', 0);
   const [savedTimer, setSavedTimer, timerHydrated] = usePersistantState(
     'np-thermite-timer',
@@ -210,7 +204,7 @@ const Thermite: FC<ThermiteProps> = ({ seed, onMatchEnd, onInput }) => {
     config: { rows: activeRows, columns: activeColumns, targetScore: activeTargetScore },
     durationMs: activeTimer * 1000,
     mode,
-    rng,
+    seed: isMatch ? seed : undefined,
     ready: isMatch || (settingsHydrated && (!isChallengeMode || challengeData != null)),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {

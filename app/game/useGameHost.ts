@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { seededRandom } from '@/lib/lobby/seededRandom';
 import type { GameEngine, GameMode, GamePhase, GameResult } from './types';
 
 const AUTO_RESTART_MS = 3000;
@@ -11,7 +12,12 @@ interface UseGameHostArgs<State, Config, Input> {
   durationMs: number;
   mode: GameMode;
   ready?: boolean;
-  rng?: () => number;
+  // Determinism seed. When provided, every engine.init call (lazy useState
+  // init, restart, etc.) gets its own fresh seededRandom(seed) closure, so
+  // React Strict-Mode double-invokes and the ready-effect's extra start()
+  // call don't leak rng state between inits — every init produces identical
+  // state, matching what useReplayedState sees on the spectator side.
+  seed?: number;
   onTick?: () => void;
   onResult?: (result: GameResult) => void;
   // Fires for every accepted input. 1v1 streams these to the opponent so they
@@ -38,14 +44,22 @@ export function useGameHost<State, Config, Input>({
   durationMs,
   mode,
   ready = true,
-  rng = Math.random,
+  seed,
   onTick,
   onResult,
   onInput,
   noTimer = false,
 }: UseGameHostArgs<State, Config, Input>): GameHost<State, Input> {
+  // Factory, not a stateful rng — so every engine.init call below gets a
+  // fresh closure. Math.random is itself stateless from our perspective
+  // (the global PRNG advances either way), so reusing it across calls is fine.
+  const rngFactory = useMemo<() => () => number>(
+    () => (seed !== undefined ? () => seededRandom(seed) : () => Math.random),
+    [seed],
+  );
+
   const [phase, setPhase] = useState<GamePhase>('idle');
-  const [state, setState] = useState<State>(() => engine.init(config, rng));
+  const [state, setState] = useState<State>(() => engine.init(config, rngFactory()));
   const [result, setResult] = useState<GameResult | null>(null);
   const [runId, setRunId] = useState(0);
 
@@ -53,7 +67,7 @@ export function useGameHost<State, Config, Input>({
   const phaseRef = useRef(phase);
   const startTimeRef = useRef(0);
   const configRef = useRef(config);
-  const rngRef = useRef(rng);
+  const rngFactoryRef = useRef(rngFactory);
   const onTickRef = useRef(onTick);
   const onResultRef = useRef(onResult);
   const onInputRef = useRef(onInput);
@@ -62,7 +76,7 @@ export function useGameHost<State, Config, Input>({
   useEffect(() => {
     phaseRef.current = phase;
     configRef.current = config;
-    rngRef.current = rng;
+    rngFactoryRef.current = rngFactory;
     onTickRef.current = onTick;
     onResultRef.current = onResult;
     onInputRef.current = onInput;
@@ -84,7 +98,7 @@ export function useGameHost<State, Config, Input>({
   );
 
   const start = useCallback(() => {
-    const initial = engine.init(configRef.current, rngRef.current);
+    const initial = engine.init(configRef.current, rngFactoryRef.current());
     stateRef.current = initial;
     setState(initial);
     setResult(null);

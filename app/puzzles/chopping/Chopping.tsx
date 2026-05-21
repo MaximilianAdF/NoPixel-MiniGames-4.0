@@ -14,7 +14,6 @@ import GameStatsTracker from '@/app/components/GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GamePhase, GameResult } from '@/app/game/types';
-import { seededRandom } from '@/lib/lobby/seededRandom';
 import { useReplayedState } from '@/app/utils/useReplayedState';
 import { choppingEngine, type ChoppingState } from './engine';
 import { GridRow, defaultGridCols } from './ChoppingGrid';
@@ -113,11 +112,6 @@ const Chopping: FC<ChoppingProps> = ({ seed, onMatchEnd, onInput }) => {
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
 
-  const rng = useMemo(
-    () => (isMatch ? seededRandom(seed!) : undefined),
-    [isMatch, seed],
-  );
-
   const [savedTimer, setSavedTimer, timerHydrated] = usePersistantState(
     'chopping-timer',
     defaultDuration,
@@ -164,7 +158,7 @@ const Chopping: FC<ChoppingProps> = ({ seed, onMatchEnd, onInput }) => {
     config: { numLetters: activeNumLetters },
     durationMs: activeTimer * 1000,
     mode,
-    rng,
+    seed: isMatch ? seed : undefined,
     ready: isMatch || (settingsHydrated && (!isChallengeMode || challengeData != null)),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {

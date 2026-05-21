@@ -12,7 +12,6 @@ import GameStatsTracker from '@/app/components/GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
-import { seededRandom } from '@/lib/lobby/seededRandom';
 import { wordMemoryEngine } from './engine';
 
 const defaultNumWords = 25;
@@ -31,11 +30,6 @@ const WordMemory: FC<WordMemoryProps> = ({ seed, onMatchEnd }) => {
   const searchParams = useSearchParams();
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
-
-  const rng = useMemo(
-    () => (isMatch ? seededRandom(seed!) : undefined),
-    [isMatch, seed],
-  );
 
   const [savedNumWords, setSavedNumWords, numWordsHydrated] = usePersistantState(
     'word-memory-num-words',
@@ -83,7 +77,7 @@ const WordMemory: FC<WordMemoryProps> = ({ seed, onMatchEnd }) => {
     config: { numWords: activeNumWords },
     durationMs: activeTimer * 1000,
     mode,
-    rng,
+    seed: isMatch ? seed : undefined,
     ready: isMatch || (settingsHydrated && (!isChallengeMode || challengeData != null)),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {

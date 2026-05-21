@@ -13,7 +13,6 @@ import GameStatsTracker from '@/app/components/GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
 import type { GameMode, GameResult } from '@/app/game/types';
-import { seededRandom } from '@/lib/lobby/seededRandom';
 import { roofRunningEngine } from './engine';
 import { RoofTile } from './RoofRunningGrid';
 
@@ -34,11 +33,6 @@ const RoofRunning: FC<RoofRunningProps> = ({ seed, onMatchEnd }) => {
   const searchParams = useSearchParams();
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
-
-  const rng = useMemo(
-    () => (isMatch ? seededRandom(seed!) : undefined),
-    [isMatch, seed],
-  );
 
   const [savedRows, setSavedRows, rowsHydrated] = usePersistantState(
     'np-roofrunning-rows',
@@ -97,7 +91,7 @@ const RoofRunning: FC<RoofRunningProps> = ({ seed, onMatchEnd }) => {
     config: { rows: activeRows, columns: activeColumns },
     durationMs: activeTimer * 1000,
     mode,
-    rng,
+    seed: isMatch ? seed : undefined,
     ready: isMatch || (settingsHydrated && (!isChallengeMode || challengeData != null)),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {
