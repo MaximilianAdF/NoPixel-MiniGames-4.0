@@ -26,4 +26,15 @@ export interface MatchInputMessage {
   input: unknown;
 }
 
-export type LobbyMessage = MatchStartMessage | MatchResultMessage | MatchInputMessage;
+// Match max-duration was hit. Fired by whichever client's local timer trips
+// first; the receiver sets matchExpired locally too so both converge on a
+// draw outcome without UI flicker.
+export interface MatchTimeoutMessage {
+  type: 'match:timeout';
+}
+
+export type LobbyMessage =
+  | MatchStartMessage
+  | MatchResultMessage
+  | MatchInputMessage
+  | MatchTimeoutMessage;

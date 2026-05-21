@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Copy, Check, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Copy, Check, Loader2, LogOut } from 'lucide-react';
 import { useUser } from '@/app/contexts/UserContext';
 import { useAblyChannel, type ChannelStatus } from '@/app/utils/useAblyChannel';
 import { generateMatchSeed } from '@/lib/lobby/seededRandom';
@@ -23,17 +24,27 @@ const ONEV_ONE_GAMES: { id: GameType; label: string }[] = [
   { id: 'chopping', label: 'Chopping' },
 ];
 
+// Lobby lifetime — universal across all games.
+const LOBBY_IDLE_MS = 5 * 60 * 1000;   // close lobby after 5 min of no matches
+const LOBBY_WARN_MS = 60 * 1000;       // show warning toast last 60s
+const MATCH_MAX_MS = 3 * 60 * 1000;    // cap any single match at 3 min → draw
+
 interface LobbyClientProps {
   code: string;
 }
 
 export default function LobbyClient({ code }: LobbyClientProps) {
   const { user, isLoggedIn } = useUser();
+  const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [match, setMatch] = useState<{ game: GameType; seed: number } | null>(null);
   const [myResult, setMyResult] = useState<GameResult | null>(null);
   const [opponentResult, setOpponentResult] = useState<GameResult | null>(null);
   const [opponentInputs, setOpponentInputs] = useState<unknown[]>([]);
+  const [matchStartTime, setMatchStartTime] = useState<number | null>(null);
+  const [matchExpired, setMatchExpired] = useState(false);
+  const [lobbyLastActivity, setLobbyLastActivity] = useState(() => Date.now());
+  const [now, setNow] = useState(() => Date.now());
 
   const displayName = user?.displayName ?? user?.username ?? 'Player';
 
@@ -43,10 +54,16 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       setMyResult(null);
       setOpponentResult(null);
       setOpponentInputs([]);
+      setMatchExpired(false);
+      // Use local Date.now() so the timer isn't sensitive to clock skew
+      // between the two clients.
+      setMatchStartTime(Date.now());
     } else if (msg.type === 'match:result') {
       setOpponentResult({ won: msg.won, score: msg.score, elapsedMs: msg.elapsedMs });
     } else if (msg.type === 'match:input') {
       setOpponentInputs((prev) => [...prev, msg.input]);
+    } else if (msg.type === 'match:timeout') {
+      setMatchExpired(true);
     }
   }, []);
 
@@ -59,6 +76,44 @@ export default function LobbyClient({ code }: LobbyClientProps) {
 
   const hostClientId = determineHost(presence);
   const isHost = hostClientId !== undefined && hostClientId === user?.id;
+
+  // 1Hz ticker — drives all the countdown displays + expiry checks below.
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Anyone joining/leaving the lobby counts as activity — resets the idle clock.
+  useEffect(() => {
+    setLobbyLastActivity(Date.now());
+  }, [presence.length]);
+
+  // When a match ends (back to lobby), reset activity so the next idle window
+  // starts fresh.
+  useEffect(() => {
+    if (!match && !matchStartTime) return;
+    if (match && (myResult || opponentResult || matchExpired)) {
+      setLobbyLastActivity(Date.now());
+    }
+  }, [match, matchStartTime, myResult, opponentResult, matchExpired]);
+
+  // Idle-lobby timeout: only counts when no match is in progress.
+  useEffect(() => {
+    if (match) return;
+    if (now - lobbyLastActivity >= LOBBY_IDLE_MS) {
+      router.push('/lobby');
+    }
+  }, [match, now, lobbyLastActivity, router]);
+
+  // Match max-duration: first client to expire publishes match:timeout so both
+  // converge on a draw without UI flicker.
+  useEffect(() => {
+    if (!match || matchStartTime === null || matchExpired) return;
+    if (now - matchStartTime >= MATCH_MAX_MS) {
+      setMatchExpired(true);
+      void publish({ type: 'match:timeout' });
+    }
+  }, [match, matchStartTime, now, matchExpired, publish]);
 
   const handleCopy = async () => {
     try {
@@ -76,6 +131,8 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     setMyResult(null);
     setOpponentResult(null);
     setOpponentInputs([]);
+    setMatchExpired(false);
+    setMatchStartTime(Date.now());
     await publish({ type: 'match:start', game, seed, startedAt: Date.now() });
   };
 
@@ -99,11 +156,22 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     [publish],
   );
 
+  const handleForfeit = useCallback(() => {
+    if (myResult) return;
+    const elapsedMs = matchStartTime ? Date.now() - matchStartTime : 0;
+    const result: GameResult = { won: false, score: 0, elapsedMs };
+    setMyResult(result);
+    void publish({ type: 'match:result', won: false, score: 0, elapsedMs });
+  }, [myResult, matchStartTime, publish]);
+
   const handleBackToLobby = () => {
     setMatch(null);
     setMyResult(null);
     setOpponentResult(null);
     setOpponentInputs([]);
+    setMatchExpired(false);
+    setMatchStartTime(null);
+    setLobbyLastActivity(Date.now());
   };
 
   if (!isLoggedIn) {
@@ -122,33 +190,40 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     );
   }
 
-  // Outcome view: either side has ended (1v1 has no timer, so the first end
-  // is decisive — if the opponent finishes before me, I lose immediately).
-  if (match && (myResult || opponentResult)) {
+  // Outcome view: either side ended, or the match timer expired (draw).
+  if (match && (myResult || opponentResult || matchExpired)) {
     return (
       <OutcomeView
         myResult={myResult}
         opponentResult={opponentResult}
+        matchExpired={matchExpired}
         onBack={handleBackToLobby}
       />
     );
   }
 
-  // Match in progress: render the game full-width so the splitscreen halves
-  // get the full viewport.
+  // Match in progress.
   if (match) {
+    const matchRemainingMs =
+      matchStartTime !== null ? Math.max(0, matchStartTime + MATCH_MAX_MS - now) : MATCH_MAX_MS;
     return (
-      <MatchView
-        game={match.game}
-        seed={match.seed}
-        onMatchEnd={handleMatchEnd}
-        onInput={handleInput}
-        opponentInputs={opponentInputs}
-      />
+      <>
+        <MatchHeader remainingMs={matchRemainingMs} onForfeit={handleForfeit} />
+        <MatchView
+          game={match.game}
+          seed={match.seed}
+          onMatchEnd={handleMatchEnd}
+          onInput={handleInput}
+          opponentInputs={opponentInputs}
+        />
+      </>
     );
   }
 
   // Lobby view.
+  const lobbyRemainingMs = Math.max(0, lobbyLastActivity + LOBBY_IDLE_MS - now);
+  const showIdleWarning = lobbyRemainingMs <= LOBBY_WARN_MS;
+
   return (
     <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-lg mx-auto pt-12">
@@ -157,7 +232,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
           className="inline-flex items-center gap-2 text-white/40 hover:text-white/70 text-sm transition-colors mb-12"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back
+          Leave lobby
         </Link>
 
         <div className="text-center mb-12">
@@ -248,6 +323,44 @@ export default function LobbyClient({ code }: LobbyClientProps) {
           </p>
         )}
       </div>
+
+      {showIdleWarning && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-2xl bg-amber-500/15 backdrop-blur border border-amber-500/30 text-amber-200 text-xs">
+          Lobby closes in {Math.ceil(lobbyRemainingMs / 1000)}s due to inactivity
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MatchHeader({
+  remainingMs,
+  onForfeit,
+}: {
+  remainingMs: number;
+  onForfeit: () => void;
+}) {
+  const seconds = Math.max(0, Math.ceil(remainingMs / 1000));
+  const mm = Math.floor(seconds / 60);
+  const ss = seconds % 60;
+  const lowTime = remainingMs <= 30 * 1000;
+  return (
+    <div className="fixed top-4 right-4 z-50 flex items-center gap-3 rounded-2xl bg-black/50 backdrop-blur px-4 py-2 border border-white/10">
+      <span
+        className={`text-xs font-mono tabular-nums ${
+          lowTime ? 'text-amber-300' : 'text-white/60'
+        }`}
+      >
+        {mm}:{ss.toString().padStart(2, '0')}
+      </span>
+      <span className="w-px h-3 bg-white/10" />
+      <button
+        onClick={onForfeit}
+        className="text-xs text-red-400/80 hover:text-red-300 transition-colors inline-flex items-center gap-1.5"
+      >
+        <LogOut className="w-3 h-3" />
+        Forfeit
+      </button>
     </div>
   );
 }
@@ -255,16 +368,21 @@ export default function LobbyClient({ code }: LobbyClientProps) {
 function OutcomeView({
   myResult,
   opponentResult,
+  matchExpired,
   onBack,
 }: {
   myResult: GameResult | null;
   opponentResult: GameResult | null;
+  matchExpired: boolean;
   onBack: () => void;
 }) {
-  // Race semantics: if I finished, I trust my own result. Otherwise the only
-  // result is the opponent's, and my outcome is the inverse of theirs.
-  // When both finished and both won, the faster locally-measured time wins.
+  // Draw when the match timer ran out — overrides any partial results.
+  // Otherwise: if I finished, I trust my own result. If only the opponent
+  // finished, my outcome is the inverse. When both won, the faster
+  // locally-measured time wins.
+  const isDraw = matchExpired && !(myResult?.won || opponentResult?.won);
   const iWon = (() => {
+    if (isDraw) return false;
     if (myResult && opponentResult) {
       if (myResult.won && opponentResult.won) {
         return myResult.elapsedMs < opponentResult.elapsedMs;
@@ -276,15 +394,19 @@ function OutcomeView({
     return false;
   })();
 
+  const title = isDraw ? 'Draw' : iWon ? 'You won' : 'You lost';
+  const titleColor = isDraw
+    ? 'text-amber-300'
+    : iWon
+      ? 'text-[#54FFA4]'
+      : 'text-white/80';
+  const subtitle = isDraw ? 'Match timed out' : 'Match over';
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md text-center">
-        <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Match over</p>
-        <h2
-          className={`text-4xl font-bold mb-8 ${iWon ? 'text-[#54FFA4]' : 'text-white/80'}`}
-        >
-          {iWon ? 'You won' : 'You lost'}
-        </h2>
+        <p className="text-white/40 text-xs uppercase tracking-wider mb-2">{subtitle}</p>
+        <h2 className={`text-4xl font-bold mb-8 ${titleColor}`}>{title}</h2>
 
         <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5 mb-6 text-left space-y-3">
           <ResultRow label="You" result={myResult} pendingLabel="didn't finish" />
