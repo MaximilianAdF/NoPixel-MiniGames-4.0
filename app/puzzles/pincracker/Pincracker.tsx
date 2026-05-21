@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState, type FC } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FC, type ReactNode } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { checkBeepPlayer, successPlayer, timerBeepPlayer } from '@/public/audio/AudioManager';
 import usePersistantState from '@/app/utils/usePersistentState';
@@ -14,9 +14,10 @@ import NPButton from '@/app/components/NPButton';
 import GameStatsTracker from '@/app/components/GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
-import type { GameMode, GameResult } from '@/app/game/types';
+import type { GameMode, GamePhase, GameResult } from '@/app/game/types';
+import { useReplayedState } from '@/app/utils/useReplayedState';
 import type { Digit } from './utils';
-import { pincrackerEngine } from './engine';
+import { pincrackerEngine, type PincrackerInput, type PincrackerState } from './engine';
 import { PinColumn } from './PincrackerGrid';
 
 const ALLOWED_KEYS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Backspace', 'Enter'];
@@ -24,14 +25,138 @@ const REVEAL_STEP_MS = 250;
 const defaultDuration = 20;
 const defaultPinLength = 4;
 
+interface PincrackerViewProps {
+  state: PincrackerState;
+  phase: GamePhase;
+  result: GameResult | null;
+  runId: number;
+  durationMs: number;
+  hideTimer?: boolean;
+  compact?: boolean;
+  // Interactive-only. When omitted, no Crack button is rendered and the grid
+  // is non-interactive.
+  onCrack?: () => void;
+  // Interactive-only: optional hidden mobile input rendered inside the GameShell.
+  mobileInput?: ReactNode;
+  wrapperRef?: React.Ref<HTMLDivElement>;
+  onInteraction?: () => void;
+  // Optional hooks for the staggered reveal animation. onRevealStep fires per
+  // step (interactive uses it for the beep); onRevealComplete fires after the
+  // walk completes (interactive uses it to submit the 'finish' input).
+  onRevealStep?: () => void;
+  onRevealComplete?: () => void;
+  settings?: React.ComponentProps<typeof GameShell>['settings'];
+}
+
+// Presentational shell + grid. Owns the staggered pin-reveal animation so
+// both the interactive host and the spectator see the same walking reveal
+// when state.revealing flips true.
+const PincrackerView: FC<PincrackerViewProps> = ({
+  state,
+  phase,
+  result,
+  runId,
+  durationMs,
+  hideTimer,
+  compact,
+  onCrack,
+  mobileInput,
+  wrapperRef,
+  onInteraction,
+  onRevealStep,
+  onRevealComplete,
+  settings,
+}) => {
+  const [revealedCount, setRevealedCount] = useState(0);
+
+  useEffect(() => {
+    if (!state.revealing) {
+      setRevealedCount(0);
+      return;
+    }
+    const total = state.pin.length;
+    let count = 0;
+    let interval: ReturnType<typeof setInterval> | undefined;
+    let finishTimer: ReturnType<typeof setTimeout> | undefined;
+    const step = () => {
+      count += 1;
+      setRevealedCount(count);
+      onRevealStep?.();
+      if (count >= total) {
+        if (interval) clearInterval(interval);
+        finishTimer = setTimeout(() => onRevealComplete?.(), REVEAL_STEP_MS);
+      }
+    };
+    step();
+    interval = setInterval(step, REVEAL_STEP_MS);
+    return () => {
+      if (interval) clearInterval(interval);
+      if (finishTimer) clearTimeout(finishTimer);
+    };
+  }, [state.revealing, state.pin.length, onRevealStep, onRevealComplete]);
+
+  const buttons = onCrack
+    ? [
+        [
+          {
+            label: 'Crack',
+            color: 'green' as const,
+            callback: onCrack,
+            disabled: phase !== 'playing',
+          },
+        ],
+      ]
+    : [];
+
+  return (
+    <GameShell
+      title="PinCracker"
+      description="Decode digits of the pin code"
+      phase={phase}
+      result={result}
+      durationMs={durationMs}
+      runId={runId}
+      statusMessage={result ? (result.won ? 'Success!' : 'Failed!') : ''}
+      buttons={buttons}
+      hideTimer={hideTimer}
+      settings={settings}
+    >
+      {mobileInput}
+      <div
+        ref={wrapperRef}
+        className={`h-56 sm:h-60 md:h-64 ${
+          compact ? '' : 'min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px] '
+        }w-full max-w-full rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-between text-white text-6xl sm:text-7xl md:text-8xl px-3 sm:px-5 md:px-6 mx-auto ${
+          !onCrack ? 'pointer-events-none' : ''
+        }`}
+        onTouchStartCapture={onInteraction}
+        onPointerDownCapture={onInteraction}
+        style={{ scrollMarginTop: '15vh' }}
+      >
+        {state.guess.map((digit, index) => (
+          <PinColumn
+            key={index}
+            digit={digit}
+            feedback={state.feedback ? state.feedback[index] : null}
+            isRevealed={state.feedback != null && (!state.revealing || index < revealedCount)}
+            isFlashing={state.revealing && index === revealedCount - 1}
+          />
+        ))}
+      </div>
+    </GameShell>
+  );
+};
+
 interface PincrackerProps {
   // 1v1 match mode: defaults override saved prefs, engine seeds from this value, no auto-restart.
   seed?: number;
   // Fires when the match ends so the lobby can move on to the outcome view.
   onMatchEnd?: (result: GameResult) => void;
+  // Streams each input to the lobby for the opponent's spectator replay.
+  onInput?: (input: PincrackerInput) => void;
 }
 
-const Pincracker: FC<PincrackerProps> = ({ seed, onMatchEnd }) => {
+const Pincracker: FC<PincrackerProps> = ({ seed, onMatchEnd, onInput }) => {
   const isMatch = seed !== undefined;
   const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const searchParams = useSearchParams();
@@ -91,6 +216,8 @@ const Pincracker: FC<PincrackerProps> = ({ seed, onMatchEnd }) => {
       lastResultRef.current = gameResult;
       if (isMatch) onMatchEnd?.(gameResult);
     },
+    onInput,
+    noTimer: isMatch,
   });
 
   const outerContainerRef = useRef<HTMLDivElement>(null);
@@ -109,8 +236,6 @@ const Pincracker: FC<PincrackerProps> = ({ seed, onMatchEnd }) => {
   useEffect(() => {
     autoClearRef.current = autoClear;
   }, [autoClear]);
-
-  const [revealedCount, setRevealedCount] = useState(0);
 
   // Preload sound effects.
   useEffect(() => {
@@ -145,37 +270,15 @@ const Pincracker: FC<PincrackerProps> = ({ seed, onMatchEnd }) => {
     if (phase === 'won') successPlayer.play();
   }, [phase]);
 
-  // Staggered crack reveal: walk the markers one step at a time, then commit the result.
-  useEffect(() => {
-    if (phase !== 'playing' || !state.revealing) return;
-    const total = state.pin.length;
-    let count = 0;
-    let interval: ReturnType<typeof setInterval> | undefined;
-    let finishTimer: ReturnType<typeof setTimeout> | undefined;
-    const step = () => {
-      count += 1;
-      setRevealedCount(count);
-      checkBeepPlayer.play();
-      if (count >= total) {
-        if (interval) clearInterval(interval);
-        finishTimer = setTimeout(
-          () => submitInput({ type: 'finish', autoClear: autoClearRef.current }),
-          REVEAL_STEP_MS,
-        );
-      }
-    };
-    step();
-    interval = setInterval(step, REVEAL_STEP_MS);
-    return () => {
-      if (interval) clearInterval(interval);
-      if (finishTimer) clearTimeout(finishTimer);
-    };
-  }, [phase, state.revealing, state.pin.length, submitInput]);
+  const handleRevealComplete = useCallback(
+    () => submitInput({ type: 'finish', autoClear: autoClearRef.current }),
+    [submitInput],
+  );
+  const handleRevealStep = useCallback(() => checkBeepPlayer.play(), []);
 
   const submitKey = useCallback(
     (key: string) => {
       if (key === 'Enter') {
-        setRevealedCount(0);
         submitInput({ type: 'crack' });
       } else if (key === 'Backspace') {
         submitInput({ type: 'backspace' });
@@ -300,74 +403,84 @@ const Pincracker: FC<PincrackerProps> = ({ seed, onMatchEnd }) => {
             Tap the puzzle, then start typing to enter the code.
           </div>
         )}
-        <GameShell
-          title="PinCracker"
-          description="Decode digits of the pin code"
+        <PincrackerView
+          state={state}
           phase={phase}
           result={result}
-          durationMs={activeTimer * 1000}
           runId={runId}
-          statusMessage={result ? (result.won ? 'Success!' : 'Failed!') : ''}
-          buttons={[
-            [
-              {
-                label: 'Crack',
-                color: 'green',
-                callback: () => submitKey('Enter'),
-                disabled: phase !== 'playing',
-              },
-            ],
-          ]}
+          durationMs={activeTimer * 1000}
+          hideTimer={isMatch}
+          compact={isMatch}
+          onCrack={() => submitKey('Enter')}
+          onRevealStep={handleRevealStep}
+          onRevealComplete={handleRevealComplete}
+          wrapperRef={gameWrapperRef}
+          onInteraction={mobile.handleInteraction}
           settings={isMatch || isChallengeMode ? undefined : settings}
-        >
-          {mobile.isMobile && phase === 'playing' && (
-            <input
-              ref={mobileInputRef}
-              type="tel"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              autoComplete="off"
-              className="opacity-0"
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '1px',
-                height: '1px',
-                background: 'transparent',
-              }}
-              onInput={handleMobileInput}
-              onKeyDown={handleMobileKeyDown}
-              onFocus={() => mobile.focusInput()}
-              onBlur={(e) => {
-                if (phase === 'playing') {
-                  e.preventDefault();
-                  e.target.focus();
-                }
-              }}
-              aria-label="Enter PIN digits"
-            />
-          )}
-          <div
-            ref={gameWrapperRef}
-            className="h-56 sm:h-60 md:h-64 min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px] w-full max-w-full rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-between text-white text-6xl sm:text-7xl md:text-8xl px-3 sm:px-5 md:px-6 mx-auto"
-            onTouchStartCapture={mobile.handleInteraction}
-            onPointerDownCapture={mobile.handleInteraction}
-            style={{ scrollMarginTop: '15vh' }}
-          >
-            {state.guess.map((digit, index) => (
-              <PinColumn
-                key={index}
-                digit={digit}
-                feedback={state.feedback ? state.feedback[index] : null}
-                isRevealed={state.feedback != null && (!state.revealing || index < revealedCount)}
-                isFlashing={state.revealing && index === revealedCount - 1}
+          mobileInput={
+            mobile.isMobile && phase === 'playing' ? (
+              <input
+                ref={mobileInputRef}
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                autoComplete="off"
+                className="opacity-0"
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  width: '1px',
+                  height: '1px',
+                  background: 'transparent',
+                }}
+                onInput={handleMobileInput}
+                onKeyDown={handleMobileKeyDown}
+                onFocus={() => mobile.focusInput()}
+                onBlur={(e) => {
+                  if (phase === 'playing') {
+                    e.preventDefault();
+                    e.target.focus();
+                  }
+                }}
+                aria-label="Enter PIN digits"
               />
-            ))}
-          </div>
-        </GameShell>
+            ) : null
+          }
+        />
       </div>
     </>
+  );
+};
+
+interface PincrackerSpectatorProps {
+  seed: number;
+  inputs: PincrackerInput[];
+}
+
+// Replays a 1v1 opponent's pincracker game from streamed digit/crack/finish
+// inputs. The View handles the reveal animation locally — no host callbacks
+// are needed since the 'finish' input also arrives via replay.
+export const PincrackerSpectator: FC<PincrackerSpectatorProps> = ({ seed, inputs }) => {
+  const config = useMemo(() => ({ pinLength: defaultPinLength }), []);
+  const { state, outcome } = useReplayedState(pincrackerEngine, config, seed, inputs);
+
+  const phase: GamePhase = outcome === 'won' ? 'won' : outcome === 'lost' ? 'lost' : 'playing';
+  const result: GameResult | null =
+    outcome === 'playing'
+      ? null
+      : { won: outcome === 'won', score: state.activeIndex, elapsedMs: 0 };
+
+  return (
+    <PincrackerView
+      state={state}
+      phase={phase}
+      result={result}
+      runId={1}
+      durationMs={defaultDuration * 1000}
+      compact
+      hideTimer
+    />
   );
 };
 

@@ -9,9 +9,10 @@ import WordMemory, { WordMemorySpectator } from '@/app/puzzles/word-memory/WordM
 import type { WordMemoryInput } from '@/app/puzzles/word-memory/engine';
 import RoofRunning, { RoofRunningSpectator } from '@/app/puzzles/roof-running/RoofRunning';
 import type { RoofRunningInput } from '@/app/puzzles/roof-running/engine';
+import Pincracker, { PincrackerSpectator } from '@/app/puzzles/pincracker/Pincracker';
+import type { PincrackerInput } from '@/app/puzzles/pincracker/engine';
 import Lockpick from '@/app/puzzles/lockpick/Lockpick';
 import Laundromat from '@/app/puzzles/laundromat/Laundromat';
-import Pincracker from '@/app/puzzles/pincracker/Pincracker';
 
 interface MatchViewProps {
   game: GameType;
@@ -67,9 +68,14 @@ export default function MatchView({
       );
     case 'pincracker':
       return (
-        <SingleGame>
-          <Pincracker seed={seed} onMatchEnd={onMatchEnd} />
-        </SingleGame>
+        <Splitscreen
+          mine={
+            <Pincracker seed={seed} onMatchEnd={onMatchEnd} onInput={(input) => onInput(input)} />
+          }
+          theirs={
+            <PincrackerSpectator seed={seed} inputs={opponentInputs as PincrackerInput[]} />
+          }
+        />
       );
     case 'roof-running':
       return (
