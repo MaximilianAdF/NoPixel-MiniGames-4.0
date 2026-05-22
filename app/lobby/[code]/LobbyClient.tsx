@@ -634,9 +634,15 @@ export default function LobbyClient({ code }: LobbyClientProps) {
                         ? 'ring-2 ring-[#54FFA4]/40 ring-offset-2 ring-offset-[#0a0c10]'
                         : undefined
                     }
-                    emote={emotes[member.clientId] ?? null}
                   />
-                  <span className="text-white/90 text-sm flex-1 truncate">{member.data.displayName}</span>
+                  <span className="text-white/90 text-sm truncate min-w-0">{member.data.displayName}</span>
+                  {emotes[member.clientId] && (
+                    <InlineEmote
+                      emote={emotes[member.clientId].emote}
+                      emoteKey={emotes[member.clientId].key}
+                    />
+                  )}
+                  <div className="flex-1" />
                   {member.clientId === hostClientId && (
                     <span className="text-[10px] uppercase tracking-wider text-[#54FFA4]/80 px-2 py-0.5 rounded-full bg-[#54FFA4]/10 border border-[#54FFA4]/20 font-semibold">
                       host
@@ -685,6 +691,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
                   <button
                     key={entry.id}
                     onClick={() => handleStart(entry.id)}
+                    title={requested && opponent ? `Requested by ${opponent.data.displayName}` : undefined}
                     className={`group relative rounded-xl border text-sm font-medium transition-all duration-200 active:scale-[0.98] py-3.5 px-4 ${
                       requested
                         ? 'bg-[#54FFA4]/12 border-[#54FFA4]/45 text-[#54FFA4] hover:bg-[#54FFA4]/20'
@@ -692,10 +699,18 @@ export default function LobbyClient({ code }: LobbyClientProps) {
                     } ${lastSolo ? 'col-span-2' : ''}`}
                   >
                     {entry.label}
-                    {requested && (
-                      <span className="absolute top-1.5 right-1.5 text-[8.5px] uppercase tracking-wider font-semibold text-[#54FFA4] bg-[#54FFA4]/15 border border-[#54FFA4]/30 rounded-full px-1.5 py-0.5">
-                        requested
-                      </span>
+                    {requested && opponent && (
+                      <div className="absolute -top-1.5 -right-1.5">
+                        <PlayerAvatar
+                          userId={opponent.clientId}
+                          displayName={opponent.data.displayName}
+                          discordId={opponent.data.discordId}
+                          avatarHash={opponent.data.avatarHash}
+                          size={22}
+                          linkable={false}
+                          ringClass="ring-2 ring-[#54FFA4] ring-offset-2 ring-offset-[#0a0c10]"
+                        />
+                      </div>
                     )}
                   </button>
                 );
@@ -1032,14 +1047,14 @@ function ResultRow({
             discordId={member.data.discordId}
             avatarHash={member.data.avatarHash}
             size={24}
-            emote={emote}
           />
         ) : (
           <div className="w-6 h-6 rounded-full bg-white/10" />
         )}
-        <span className="text-white/70 text-sm truncate">
+        <span className="text-white/70 text-sm truncate min-w-0">
           {member ? member.data.displayName : label}
         </span>
+        {emote && <InlineEmote emote={emote.emote} emoteKey={emote.key} />}
       </div>
       {result ? (
         <span className="text-white/90 text-sm font-mono tabular-nums shrink-0">
@@ -1050,6 +1065,17 @@ function ResultRow({
         <span className="text-white/40 text-sm shrink-0">{pendingLabel}</span>
       )}
     </div>
+  );
+}
+
+function InlineEmote({ emote, emoteKey }: { emote: string; emoteKey: number }) {
+  return (
+    <span
+      key={emoteKey}
+      className="emote-inline inline-flex items-center px-2 py-0.5 rounded-md bg-[#54FFA4]/15 border border-[#54FFA4]/30 text-[#54FFA4] text-[11px] font-semibold whitespace-nowrap shrink-0"
+    >
+      {emote}
+    </span>
   );
 }
 

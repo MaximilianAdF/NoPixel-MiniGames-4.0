@@ -216,6 +216,18 @@
   animation: emoteFloat 3s ease-out forwards;
 }
 
+/* Inline emote chip (player list / outcome rows where a floating bubble
+   would overflow into a neighbouring row). Pops in once and stays put;
+   parent removes it after EMOTE_DURATION_MS. */
+@keyframes emoteInline {
+  0% { transform: scale(0.5); opacity: 0; }
+  20% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.emote-inline {
+  animation: emoteInline 0.35s ease-out forwards;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

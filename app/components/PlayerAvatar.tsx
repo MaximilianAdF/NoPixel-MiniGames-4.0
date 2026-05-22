@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 
 interface PlayerAvatarProps {
@@ -34,19 +35,22 @@ export default function PlayerAvatar({
   ringClass,
   emote,
 }: PlayerAvatarProps) {
+  const [imgError, setImgError] = useState(false);
   const avatarUrl =
     discordId && avatarHash
       ? `https://cdn.discordapp.com/avatars/${discordId}/${avatarHash}.png?size=${size * 2}`
       : null;
   const initial = (displayName || '?').trim().charAt(0).toUpperCase() || '?';
+  const showFallback = !avatarUrl || imgError;
 
-  const body = avatarUrl ? (
+  const body = !showFallback ? (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={avatarUrl}
+      src={avatarUrl!}
       alt={displayName}
       width={size}
       height={size}
+      onError={() => setImgError(true)}
       className="rounded-full object-cover"
       style={{ width: size, height: size }}
     />
