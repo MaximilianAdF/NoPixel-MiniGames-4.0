@@ -46,6 +46,8 @@ interface PincrackerViewProps {
   // walk completes (interactive uses it to submit the 'finish' input).
   onRevealStep?: () => void;
   onRevealComplete?: () => void;
+  // 1v1 spectator: increments on each opponent Crack press → pulse animation.
+  pulseKeys?: { crack?: number };
   settings?: React.ComponentProps<typeof GameShell>['settings'];
 }
 
@@ -66,6 +68,7 @@ const PincrackerView: FC<PincrackerViewProps> = ({
   onInteraction,
   onRevealStep,
   onRevealComplete,
+  pulseKeys,
   settings,
 }) => {
   const [revealedCount, setRevealedCount] = useState(0);
@@ -105,6 +108,7 @@ const PincrackerView: FC<PincrackerViewProps> = ({
         color: 'green' as const,
         callback: onCrack ?? (() => {}),
         disabled: !onCrack || phase !== 'playing',
+        pulseKey: pulseKeys?.crack,
       },
     ],
   ];
@@ -466,6 +470,11 @@ export const PincrackerSpectator: FC<PincrackerSpectatorProps> = ({ seed, inputs
   const config = useMemo(() => ({ pinLength: defaultPinLength }), []);
   const { state, outcome } = useReplayedState(pincrackerEngine, config, seed, inputs);
 
+  const pulseKeys = useMemo(() => {
+    const crack = inputs.filter((i) => i.type === 'crack').length;
+    return { crack: crack || undefined };
+  }, [inputs]);
+
   const phase: GamePhase = outcome === 'won' ? 'won' : outcome === 'lost' ? 'lost' : 'playing';
   const result: GameResult | null =
     outcome === 'playing'
@@ -481,6 +490,7 @@ export const PincrackerSpectator: FC<PincrackerSpectatorProps> = ({ seed, inputs
       durationMs={defaultDuration * 1000}
       compact
       hideTimer
+      pulseKeys={pulseKeys}
     />
   );
 };

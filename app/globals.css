@@ -180,6 +180,28 @@
   .animate-fadeIn {
     animation: fadeIn 0.3s ease-in-out;
   }
+
+  /* 1v1 spectator: brief scale + brightness pulse fired when the opponent
+     presses a control button, so the viewer can see what the opponent did
+     without the button itself being clickable on their side. */
+  .np-button-pulse {
+    animation: npButtonPulse 0.35s ease-out;
+  }
+}
+
+@keyframes npButtonPulse {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  30% {
+    transform: scale(1.06);
+    filter: brightness(1.7);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
 }
 
 @keyframes fadeIn {

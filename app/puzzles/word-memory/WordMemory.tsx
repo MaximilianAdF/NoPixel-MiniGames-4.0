@@ -29,6 +29,8 @@ interface WordMemoryViewProps {
   compact?: boolean;
   // Interactive-only. When omitted, no buttons are rendered.
   onAnswer?: (answer: 'seen' | 'new') => void;
+  // 1v1 spectator: per-button counters that pulse on each opponent press.
+  pulseKeys?: { seen?: number; new?: number };
   settings?: React.ComponentProps<typeof GameShell>['settings'];
 }
 
@@ -44,6 +46,7 @@ const WordMemoryView: FC<WordMemoryViewProps> = ({
   hideTimer,
   compact,
   onAnswer,
+  pulseKeys,
   settings,
 }) => {
   const currentWord = state.sequence[state.round];
@@ -57,12 +60,14 @@ const WordMemoryView: FC<WordMemoryViewProps> = ({
         color: 'purple' as const,
         callback: onAnswer ? () => onAnswer('seen') : noop,
         disabled: !onAnswer || phase !== 'playing',
+        pulseKey: pulseKeys?.seen,
       },
       {
         label: 'New',
         color: 'green' as const,
         callback: onAnswer ? () => onAnswer('new') : noop,
         disabled: !onAnswer || phase !== 'playing',
+        pulseKey: pulseKeys?.new,
       },
     ],
   ];
@@ -300,6 +305,12 @@ export const WordMemorySpectator: FC<WordMemorySpectatorProps> = ({ seed, inputs
   const config = useMemo(() => ({ numWords: defaultNumWords }), []);
   const { state, outcome } = useReplayedState(wordMemoryEngine, config, seed, inputs);
 
+  const pulseKeys = useMemo(() => {
+    const seen = inputs.filter((i) => i.type === 'seen').length;
+    const fresh = inputs.filter((i) => i.type === 'new').length;
+    return { seen: seen || undefined, new: fresh || undefined };
+  }, [inputs]);
+
   const phase: GamePhase = outcome === 'won' ? 'won' : outcome === 'lost' ? 'lost' : 'playing';
   const result: GameResult | null =
     outcome === 'playing'
@@ -315,6 +326,7 @@ export const WordMemorySpectator: FC<WordMemorySpectatorProps> = ({ seed, inputs
       durationMs={defaultDuration * 1000}
       compact
       hideTimer
+      pulseKeys={pulseKeys}
     />
   );
 };

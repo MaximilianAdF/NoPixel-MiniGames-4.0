@@ -16,6 +16,9 @@ interface ShellButton {
   color: 'purple' | 'green';
   callback?: () => void;
   disabled?: boolean;
+  // 1v1 spectator: set to a fresh increasing number on every opponent press
+  // to trigger a brief pulse animation on the button.
+  pulseKey?: number;
 }
 
 interface ShellSettings {
@@ -179,6 +182,7 @@ export default function GameShell({
                     onClick={button.callback}
                     color={button.color}
                     disabled={button.disabled}
+                    pulseKey={button.pulseKey}
                   >
                     {button.label}
                   </NPButton>

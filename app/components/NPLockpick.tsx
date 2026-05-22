@@ -41,6 +41,9 @@ interface NPLockpickViewProps {
   onRotateLeft?: () => void;
   onRotateRight?: () => void;
   onUnlock?: () => void;
+  // 1v1 spectator: per-button counters that increment on each opponent
+  // press, triggering a pulse animation on the corresponding button.
+  pulseKeys?: { rotateLeft?: number; rotateRight?: number; unlock?: number };
   settings?: React.ComponentProps<typeof GameShell>['settings'];
 }
 
@@ -59,6 +62,7 @@ const NPLockpickView: FC<NPLockpickViewProps> = ({
   onRotateLeft,
   onRotateRight,
   onUnlock,
+  pulseKeys,
   settings,
 }) => {
   const legacyStatus =
@@ -75,12 +79,14 @@ const NPLockpickView: FC<NPLockpickViewProps> = ({
         color: 'purple' as const,
         callback: onRotateLeft ?? noop,
         disabled: !onRotateLeft || phase !== 'playing',
+        pulseKey: pulseKeys?.rotateLeft,
       },
       {
         label: 'Rotate Right',
         color: 'purple' as const,
         callback: onRotateRight ?? noop,
         disabled: !onRotateRight || phase !== 'playing',
+        pulseKey: pulseKeys?.rotateRight,
       },
     ],
     [
@@ -89,6 +95,7 @@ const NPLockpickView: FC<NPLockpickViewProps> = ({
         color: 'green' as const,
         callback: onUnlock ?? noop,
         disabled: !onUnlock || phase !== 'playing',
+        pulseKey: pulseKeys?.unlock,
       },
     ],
   ];
@@ -420,6 +427,28 @@ export const NPLockpickSpectator: FC<NPLockpickSpectatorProps> = ({
   const config = useMemo(() => ({ levels }), [levels]);
   const { state, outcome } = useReplayedState(lockpickEngine, config, seed, inputs);
 
+  // Count each kind of opponent input so the corresponding button pulses
+  // whenever a new occurrence lands. `0 → undefined` so the pulse doesn't
+  // fire on the initial render.
+  const pulseKeys = useMemo(() => {
+    let left = 0;
+    let right = 0;
+    let unlock = 0;
+    for (const input of inputs) {
+      if (input.type === 'rotate') {
+        if (input.direction === -1) left += 1;
+        else right += 1;
+      } else if (input.type === 'unlock') {
+        unlock += 1;
+      }
+    }
+    return {
+      rotateLeft: left || undefined,
+      rotateRight: right || undefined,
+      unlock: unlock || undefined,
+    };
+  }, [inputs]);
+
   const phase: GamePhase = outcome === 'won' ? 'won' : outcome === 'lost' ? 'lost' : 'playing';
   const result: GameResult | null =
     outcome === 'playing'
@@ -436,6 +465,7 @@ export const NPLockpickSpectator: FC<NPLockpickSpectatorProps> = ({
       title={title}
       compact
       hideTimer
+      pulseKeys={pulseKeys}
     />
   );
 };
