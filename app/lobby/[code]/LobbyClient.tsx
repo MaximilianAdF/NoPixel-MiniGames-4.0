@@ -58,6 +58,12 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   // Each match captures the focusMode the host had at start time, so a mid-match
   // toggle doesn't affect the in-progress game.
   const [matchFocusMode, setMatchFocusMode] = useState(false);
+  // Canonical outcome — host derives once it has full info and broadcasts via
+  // match:outcome; both ends render based on this state, no per-client flicker.
+  const [outcome, setOutcome] = useState<{
+    winnerClientId: string | null;
+    reason: 'finished' | 'timeout';
+  } | null>(null);
 
   const displayName = user?.displayName ?? user?.username ?? 'Player';
 
@@ -69,6 +75,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       setOpponentInputs([]);
       setMatchExpired(false);
       setMatchFocusMode(msg.focusMode);
+      setOutcome(null);
       // Use the host's goAt. Cap to a sane local range so a wildly-skewed
       // peer clock can't make the countdown last minutes or fire instantly.
       const receiveNow = Date.now();
@@ -88,6 +95,8 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       setOpponentInputs((prev) => [...prev, msg.input]);
     } else if (msg.type === 'match:timeout') {
       setMatchExpired(true);
+    } else if (msg.type === 'match:outcome') {
+      setOutcome({ winnerClientId: msg.winnerClientId, reason: msg.reason });
     }
   }, []);
 
@@ -100,6 +109,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
 
   const hostClientId = determineHost(presence);
   const isHost = hostClientId !== undefined && hostClientId === user?.id;
+  const opponentClientId = presence.find((p) => p.clientId !== user?.id)?.clientId ?? null;
 
   // 1Hz ticker — drives all the countdown displays + expiry checks below.
   useEffect(() => {
@@ -179,6 +189,49 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     return () => clearTimeout(handle);
   }, [match, matchStartTime, matchExpired, myResult, opponentResult, publish]);
 
+  // Host arbiter: derive and broadcast the canonical match:outcome once we
+  // have enough info. If only one side has a result yet, wait briefly for
+  // the other before locking in.
+  useEffect(() => {
+    if (!isHost || outcome || !user?.id || !opponentClientId) return;
+    if (!myResult && !opponentResult && !matchExpired) return;
+
+    const decide = () =>
+      deriveWinner(myResult, opponentResult, matchExpired, user.id, opponentClientId);
+
+    const publishAndSet = (decision: ReturnType<typeof deriveWinner>) => {
+      void publish({
+        type: 'match:outcome',
+        winnerClientId: decision.winnerClientId,
+        reason: decision.reason,
+      });
+      setOutcome(decision);
+    };
+
+    // Both results in hand (or matchExpired) — decide immediately.
+    if ((myResult && opponentResult) || matchExpired) {
+      publishAndSet(decide());
+      return;
+    }
+
+    // Only one side reported. Give the other ~600ms to land before locking.
+    const handle = setTimeout(() => publishAndSet(decide()), 600);
+    return () => clearTimeout(handle);
+  }, [isHost, myResult, opponentResult, matchExpired, outcome, user?.id, opponentClientId, publish]);
+
+  // Non-host fallback: if the host's match:outcome doesn't arrive within a
+  // couple of seconds (host disconnected mid-match), derive locally so the
+  // outcome view still renders.
+  useEffect(() => {
+    if (isHost || outcome || !user?.id || !opponentClientId) return;
+    if (!myResult && !opponentResult && !matchExpired) return;
+
+    const handle = setTimeout(() => {
+      setOutcome(deriveWinner(myResult, opponentResult, matchExpired, user.id, opponentClientId));
+    }, 2500);
+    return () => clearTimeout(handle);
+  }, [isHost, myResult, opponentResult, matchExpired, outcome, user?.id, opponentClientId]);
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(code);
@@ -199,6 +252,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     setOpponentInputs([]);
     setMatchExpired(false);
     setMatchFocusMode(focusMode);
+    setOutcome(null);
     // Sync `now` atomically with goAt so the initial countdown render shows
     // exactly 3 instead of 4 (the 1Hz interval state can be up to 1s stale).
     setNow(startNow);
@@ -250,6 +304,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     setMatchExpired(false);
     setMatchStartTime(null);
     setGoAt(null);
+    setOutcome(null);
     setLobbyLastActivity(Date.now());
   };
 
@@ -275,13 +330,19 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     return <Countdown remainingMs={goAt - now} />;
   }
 
-  // Outcome view: either side ended, or the match timer expired (draw).
-  if (match && (myResult || opponentResult || matchExpired)) {
+  // Outcome view: only when the canonical outcome is in. Until then (between
+  // a partial result landing and the host's match:outcome arriving) we keep
+  // the game on-screen so the user isn't briefly shown the wrong winner.
+  if (match && outcome) {
+    const iWon = outcome.winnerClientId === user?.id;
+    const isDraw = outcome.winnerClientId === null;
     return (
       <OutcomeView
+        iWon={iWon}
+        isDraw={isDraw}
+        reason={outcome.reason}
         myResult={myResult}
         opponentResult={opponentResult}
-        matchExpired={matchExpired}
         onBack={handleBackToLobby}
       />
     );
@@ -468,41 +529,27 @@ function MatchHeader({
 }
 
 function OutcomeView({
+  iWon,
+  isDraw,
+  reason,
   myResult,
   opponentResult,
-  matchExpired,
   onBack,
 }: {
+  iWon: boolean;
+  isDraw: boolean;
+  reason: 'finished' | 'timeout';
   myResult: GameResult | null;
   opponentResult: GameResult | null;
-  matchExpired: boolean;
   onBack: () => void;
 }) {
-  // Draw when the match timer ran out — overrides any partial results.
-  // Otherwise: if I finished, I trust my own result. If only the opponent
-  // finished, my outcome is the inverse. When both won, the faster
-  // locally-measured time wins.
-  const isDraw = matchExpired && !(myResult?.won || opponentResult?.won);
-  const iWon = (() => {
-    if (isDraw) return false;
-    if (myResult && opponentResult) {
-      if (myResult.won && opponentResult.won) {
-        return myResult.elapsedMs < opponentResult.elapsedMs;
-      }
-      return myResult.won;
-    }
-    if (myResult) return myResult.won;
-    if (opponentResult) return !opponentResult.won;
-    return false;
-  })();
-
   const title = isDraw ? 'Draw' : iWon ? 'You won' : 'You lost';
   const titleColor = isDraw
     ? 'text-amber-300'
     : iWon
       ? 'text-[#54FFA4]'
       : 'text-white/80';
-  const subtitle = isDraw ? 'Match timed out' : 'Match over';
+  const subtitle = reason === 'timeout' && isDraw ? 'Match timed out' : 'Match over';
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -511,7 +558,7 @@ function OutcomeView({
         <h2 className={`text-4xl font-bold mb-8 ${titleColor}`}>{title}</h2>
 
         <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5 mb-6">
-          {isDraw ? (
+          {isDraw && reason === 'timeout' ? (
             <p className="text-white/60 text-sm text-center">
               Neither player finished in time.
             </p>
@@ -522,7 +569,7 @@ function OutcomeView({
               {(myResult || !iWon) && (
                 <ResultRow label="You" result={myResult} pendingLabel="didn't finish" />
               )}
-              <ResultRow label="Opponent" result={opponentResult} pendingLabel="still playing" />
+              <ResultRow label="Opponent" result={opponentResult} pendingLabel="didn't finish" />
             </div>
           )}
         </div>
@@ -536,6 +583,42 @@ function OutcomeView({
       </div>
     </div>
   );
+}
+
+// Pure derivation: given both clients' results + matchExpired + the two
+// clientIds, return the canonical { winner, reason }. Both host and the
+// non-host fallback call this with identical inputs so they converge.
+function deriveWinner(
+  myResult: GameResult | null,
+  opponentResult: GameResult | null,
+  matchExpired: boolean,
+  myClientId: string,
+  opponentClientId: string,
+): { winnerClientId: string | null; reason: 'finished' | 'timeout' } {
+  const reason: 'finished' | 'timeout' = matchExpired ? 'timeout' : 'finished';
+
+  if (myResult && opponentResult) {
+    if (myResult.won && opponentResult.won) {
+      // Race: faster locally-measured time wins; clientId tiebreaks an
+      // exact tie so both clients converge on the same winner.
+      if (myResult.elapsedMs < opponentResult.elapsedMs) return { winnerClientId: myClientId, reason };
+      if (myResult.elapsedMs > opponentResult.elapsedMs) return { winnerClientId: opponentClientId, reason };
+      const winner = myClientId < opponentClientId ? myClientId : opponentClientId;
+      return { winnerClientId: winner, reason };
+    }
+    if (myResult.won) return { winnerClientId: myClientId, reason };
+    if (opponentResult.won) return { winnerClientId: opponentClientId, reason };
+    return { winnerClientId: null, reason }; // both lost
+  }
+
+  if (myResult) {
+    return { winnerClientId: myResult.won ? myClientId : opponentClientId, reason };
+  }
+  if (opponentResult) {
+    return { winnerClientId: opponentResult.won ? opponentClientId : myClientId, reason };
+  }
+  // Only matchExpired with no results — true draw.
+  return { winnerClientId: null, reason };
 }
 
 function ResultRow({

@@ -40,8 +40,19 @@ export interface MatchTimeoutMessage {
   type: 'match:timeout';
 }
 
+// Canonical outcome — the host is the arbiter, derives the winner once it
+// has all the info (both results / forfeit / timeout) and broadcasts so
+// both ends render the same result without per-client derivation flicker.
+// winnerClientId === null is a draw.
+export interface MatchOutcomeMessage {
+  type: 'match:outcome';
+  winnerClientId: string | null;
+  reason: 'finished' | 'timeout';
+}
+
 export type LobbyMessage =
   | MatchStartMessage
   | MatchResultMessage
   | MatchInputMessage
-  | MatchTimeoutMessage;
+  | MatchTimeoutMessage
+  | MatchOutcomeMessage;
