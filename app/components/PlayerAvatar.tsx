@@ -18,6 +18,9 @@ interface PlayerAvatarProps {
   linkable?: boolean;
   // Ring colour around the avatar (spring-green for "this is me" / "host", etc).
   ringClass?: string;
+  // Optional floating emote bubble above the avatar. `key` should change per
+  // emote so the CSS animation restarts on each new one.
+  emote?: { emote: string; key: number } | null;
 }
 
 export default function PlayerAvatar({
@@ -29,6 +32,7 @@ export default function PlayerAvatar({
   className,
   linkable = true,
   ringClass,
+  emote,
 }: PlayerAvatarProps) {
   const avatarUrl =
     discordId && avatarHash
@@ -61,6 +65,14 @@ export default function PlayerAvatar({
       className={`relative shrink-0 rounded-full ${ringClass ?? ''} ${className ?? ''}`}
       style={{ width: size, height: size }}
     >
+      {emote && (
+        <div
+          key={emote.key}
+          className="emote-bubble absolute -top-9 left-1/2 -translate-x-1/2 z-20 px-3 py-1.5 rounded-full bg-black/90 backdrop-blur-sm border border-white/15 text-white text-xs font-semibold whitespace-nowrap shadow-xl shadow-black/50 pointer-events-none"
+        >
+          {emote.emote}
+        </div>
+      )}
       {body}
     </div>
   );

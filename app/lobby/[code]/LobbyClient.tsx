@@ -8,6 +8,7 @@ import { useUser } from '@/app/contexts/UserContext';
 import { useAblyChannel, type ChannelStatus, type PresenceMember } from '@/app/utils/useAblyChannel';
 import { checkBeepPlayer, successPlayer } from '@/public/audio/AudioManager';
 import PlayerAvatar from '@/app/components/PlayerAvatar';
+import { EMOTES, EMOTE_THROTTLE_MS, EMOTE_DURATION_MS } from '@/app/lobby/emotes';
 import { generateMatchSeed } from '@/lib/lobby/seededRandom';
 import { determineHost } from '@/lib/lobby/host';
 import type { LobbyMessage } from '@/lib/lobby/messages';
@@ -73,6 +74,13 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     winnerClientId: string | null;
     reason: 'finished' | 'timeout';
   } | null>(null);
+  // Recent emote per player — wiped 3s after each emote so the bubble fades.
+  const [emotes, setEmotes] = useState<Record<string, { emote: string; key: number }>>({});
+  const lastEmoteSentRef = useRef(0);
+  // Non-host's suggestion is mirrored on both clients so the host's "Start a
+  // match" panel can show a "Requested" badge, and the non-host's suggest
+  // panel can show their own selection.
+  const [suggestedGame, setSuggestedGame] = useState<GameType | null>(null);
 
   const displayName = user?.displayName ?? user?.username ?? 'Player';
 
@@ -80,6 +88,19 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   useEffect(() => {
     checkBeepPlayer.whenReady();
     successPlayer.whenReady();
+  }, []);
+
+  const showEmote = useCallback((emote: string, fromClientId: string) => {
+    const key = Date.now();
+    setEmotes((prev) => ({ ...prev, [fromClientId]: { emote, key } }));
+    setTimeout(() => {
+      setEmotes((prev) => {
+        if (prev[fromClientId]?.key !== key) return prev;
+        const next = { ...prev };
+        delete next[fromClientId];
+        return next;
+      });
+    }, EMOTE_DURATION_MS);
   }, []);
 
   const handleMessage = useCallback((msg: LobbyMessage) => {
@@ -91,6 +112,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       setMatchExpired(false);
       setMatchFocusMode(msg.focusMode);
       setOutcome(null);
+      setSuggestedGame(null);
       // Use the host's goAt. Cap to a sane local range so a wildly-skewed
       // peer clock can't make the countdown last minutes or fire instantly.
       const receiveNow = Date.now();
@@ -112,8 +134,12 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       setMatchExpired(true);
     } else if (msg.type === 'match:outcome') {
       setOutcome({ winnerClientId: msg.winnerClientId, reason: msg.reason });
+    } else if (msg.type === 'emote') {
+      showEmote(msg.emote, msg.fromClientId);
+    } else if (msg.type === 'suggest') {
+      setSuggestedGame(msg.game);
     }
-  }, []);
+  }, [showEmote]);
 
   const { status, presence, publish } = useAblyChannel<LobbyMessage>({
     channelName: `lobby:${code}`,
@@ -339,6 +365,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     setMatchExpired(false);
     setMatchFocusMode(focusMode);
     setOutcome(null);
+    setSuggestedGame(null);
     // Sync `now` atomically with goAt so the initial countdown render shows
     // exactly 3 instead of 4 (the 1Hz interval state can be up to 1s stale).
     setNow(startNow);
@@ -395,8 +422,34 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     setMatchStartTime(null);
     setGoAt(null);
     setOutcome(null);
+    setSuggestedGame(null);
     setLobbyLastActivity(Date.now());
   };
+
+  const sendEmote = useCallback(
+    (emote: string) => {
+      const nowMs = Date.now();
+      if (nowMs - lastEmoteSentRef.current < EMOTE_THROTTLE_MS) return;
+      if (!user?.id) return;
+      lastEmoteSentRef.current = nowMs;
+      // Show on my own side immediately (echo is disabled — we won't get our
+      // own message back).
+      showEmote(emote, user.id);
+      void publish({ type: 'emote', emote, fromClientId: user.id });
+    },
+    [user?.id, publish, showEmote],
+  );
+
+  const sendSuggestion = useCallback(
+    (game: GameType) => {
+      if (!user?.id) return;
+      // Toggle off if clicking the same suggestion.
+      const next = suggestedGame === game ? null : game;
+      setSuggestedGame(next);
+      if (next) void publish({ type: 'suggest', game: next, fromClientId: user.id });
+    },
+    [user?.id, suggestedGame, publish],
+  );
 
   if (!isLoggedIn) {
     return (
@@ -427,14 +480,24 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     const iWon = outcome.winnerClientId === user?.id;
     const isDraw = outcome.winnerClientId === null;
     return (
-      <OutcomeView
-        iWon={iWon}
-        isDraw={isDraw}
-        reason={outcome.reason}
-        myResult={myResult}
-        opponentResult={opponentResult}
-        onBack={handleBackToLobby}
-      />
+      <>
+        <OutcomeView
+          iWon={iWon}
+          isDraw={isDraw}
+          reason={outcome.reason}
+          myResult={myResult}
+          opponentResult={opponentResult}
+          me={me}
+          opponent={opponent}
+          emotes={emotes}
+          onBack={handleBackToLobby}
+        />
+        {presence.length >= 2 && (
+          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
+            <EmoteBar onSend={sendEmote} />
+          </div>
+        )}
+      </>
     );
   }
 
@@ -454,7 +517,11 @@ export default function LobbyClient({ code }: LobbyClientProps) {
           focusMode={matchFocusMode}
           me={me}
           opponent={opponent}
+          emotes={emotes}
         />
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
+          <EmoteBar onSend={sendEmote} />
+        </div>
       </>
     );
   }
@@ -542,6 +609,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
                         ? 'ring-2 ring-[#54FFA4]/40 ring-offset-2 ring-offset-[#0a0c10]'
                         : undefined
                     }
+                    emote={emotes[member.clientId] ?? null}
                   />
                   <span className="text-white/90 text-sm flex-1 truncate">{member.data.displayName}</span>
                   {member.clientId === hostClientId && (
@@ -574,13 +642,23 @@ export default function LobbyClient({ code }: LobbyClientProps) {
               {ONEV_ONE_GAMES.map((entry, i) => {
                 const lastSolo =
                   i === ONEV_ONE_GAMES.length - 1 && ONEV_ONE_GAMES.length % 2 === 1;
+                const requested = suggestedGame === entry.id;
                 return (
                   <button
                     key={entry.id}
                     onClick={() => handleStart(entry.id)}
-                    className={`group rounded-xl bg-white/[0.04] hover:bg-[#54FFA4]/10 border border-white/[0.06] hover:border-[#54FFA4]/40 text-white/90 hover:text-[#54FFA4] py-3.5 px-4 text-sm font-medium transition-all duration-200 active:scale-[0.98] ${lastSolo ? 'col-span-2' : ''}`}
+                    className={`group relative rounded-xl border text-sm font-medium transition-all duration-200 active:scale-[0.98] py-3.5 px-4 ${
+                      requested
+                        ? 'bg-[#54FFA4]/12 border-[#54FFA4]/45 text-[#54FFA4] hover:bg-[#54FFA4]/20'
+                        : 'bg-white/[0.04] hover:bg-[#54FFA4]/10 border-white/[0.06] hover:border-[#54FFA4]/40 text-white/90 hover:text-[#54FFA4]'
+                    } ${lastSolo ? 'col-span-2' : ''}`}
                   >
                     {entry.label}
+                    {requested && (
+                      <span className="absolute top-1.5 right-1.5 text-[8.5px] uppercase tracking-wider font-semibold text-[#54FFA4] bg-[#54FFA4]/15 border border-[#54FFA4]/30 rounded-full px-1.5 py-0.5">
+                        requested
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -597,20 +675,69 @@ export default function LobbyClient({ code }: LobbyClientProps) {
         )}
 
         {!isHost && presence.length >= 2 && (
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.01] px-5 py-4 text-center">
-            <p className="text-white/50 text-xs inline-flex items-center gap-2">
+          <section className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-5">
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="text-white/90 font-semibold text-sm tracking-wide">Suggest a game</h2>
+              <span className="text-[10px] uppercase tracking-wider text-white/40">Host picks</span>
+            </div>
+            <p className="text-white/40 text-xs mb-4">Hint to the host what you&apos;d like to play.</p>
+            <div className="grid grid-cols-2 gap-2">
+              {ONEV_ONE_GAMES.map((entry, i) => {
+                const lastSolo =
+                  i === ONEV_ONE_GAMES.length - 1 && ONEV_ONE_GAMES.length % 2 === 1;
+                const selected = suggestedGame === entry.id;
+                return (
+                  <button
+                    key={entry.id}
+                    onClick={() => sendSuggestion(entry.id)}
+                    className={`rounded-xl border text-sm font-medium transition-all duration-200 active:scale-[0.98] py-3.5 px-4 ${
+                      selected
+                        ? 'bg-[#54FFA4]/12 border-[#54FFA4]/45 text-[#54FFA4]'
+                        : 'bg-white/[0.04] hover:bg-white/[0.08] border-white/[0.06] hover:border-white/15 text-white/85'
+                    } ${lastSolo ? 'col-span-2' : ''}`}
+                  >
+                    {entry.label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-white/30 text-[11px] inline-flex items-center gap-1.5 mt-3">
               <Loader2 className="w-3 h-3 animate-spin" />
-              Waiting for the host to start a match…
+              Waiting for the host to start…
             </p>
-          </div>
+          </section>
         )}
       </div>
 
+      {/* Floating emote bar — visible in the lobby and outcome views. */}
+      {presence.length >= 2 && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
+          <EmoteBar onSend={sendEmote} />
+        </div>
+      )}
+
       {showIdleWarning && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-2xl bg-amber-500/15 backdrop-blur border border-amber-500/30 text-amber-200 text-xs">
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-2xl bg-amber-500/15 backdrop-blur border border-amber-500/30 text-amber-200 text-xs">
           Lobby closes in {Math.ceil(lobbyRemainingMs / 1000)}s due to inactivity
         </div>
       )}
+    </div>
+  );
+}
+
+function EmoteBar({ onSend }: { onSend: (emote: string) => void }) {
+  return (
+    <div className="flex items-center gap-1 rounded-2xl bg-black/65 backdrop-blur-md border border-white/10 p-1.5 shadow-xl shadow-black/40">
+      {EMOTES.map((emote) => (
+        <button
+          key={emote}
+          type="button"
+          onClick={() => onSend(emote)}
+          className="px-3 py-1.5 rounded-xl text-white/75 hover:text-white hover:bg-white/10 text-xs font-semibold transition-colors active:scale-95"
+        >
+          {emote}
+        </button>
+      ))}
     </div>
   );
 }
@@ -693,6 +820,9 @@ function OutcomeView({
   reason,
   myResult,
   opponentResult,
+  me,
+  opponent,
+  emotes,
   onBack,
 }: {
   iWon: boolean;
@@ -700,6 +830,9 @@ function OutcomeView({
   reason: 'finished' | 'timeout';
   myResult: GameResult | null;
   opponentResult: GameResult | null;
+  me: PresenceMember | null;
+  opponent: PresenceMember | null;
+  emotes: Record<string, { emote: string; key: number }>;
   onBack: () => void;
 }) {
   const title = isDraw ? 'Draw' : iWon ? 'You won' : 'You lost';
@@ -726,9 +859,21 @@ function OutcomeView({
               {/* Skip the "You" row when I won by default (opponent forfeited
                   / lost before I finished) — the title already says I won. */}
               {(myResult || !iWon) && (
-                <ResultRow label="You" result={myResult} pendingLabel="didn't finish" />
+                <ResultRow
+                  label="You"
+                  member={me}
+                  emote={me ? emotes[me.clientId] ?? null : null}
+                  result={myResult}
+                  pendingLabel="didn't finish"
+                />
               )}
-              <ResultRow label="Opponent" result={opponentResult} pendingLabel="didn't finish" />
+              <ResultRow
+                label="Opponent"
+                member={opponent}
+                emote={opponent ? emotes[opponent.clientId] ?? null : null}
+                result={opponentResult}
+                pendingLabel="didn't finish"
+              />
             </div>
           )}
         </div>
@@ -782,23 +927,43 @@ function deriveWinner(
 
 function ResultRow({
   label,
+  member,
+  emote,
   result,
   pendingLabel,
 }: {
   label: string;
+  member: PresenceMember | null;
+  emote: { emote: string; key: number } | null;
   result: GameResult | null;
   pendingLabel: string;
 }) {
   return (
-    <div className="flex items-center justify-between">
-      <span className="text-white/60 text-sm">{label}</span>
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-2.5 min-w-0">
+        {member ? (
+          <PlayerAvatar
+            userId={member.clientId}
+            displayName={member.data.displayName}
+            discordId={member.data.discordId}
+            avatarHash={member.data.avatarHash}
+            size={24}
+            emote={emote}
+          />
+        ) : (
+          <div className="w-6 h-6 rounded-full bg-white/10" />
+        )}
+        <span className="text-white/70 text-sm truncate">
+          {member ? member.data.displayName : label}
+        </span>
+      </div>
       {result ? (
-        <span className="text-white/90 text-sm font-mono">
+        <span className="text-white/90 text-sm font-mono tabular-nums shrink-0">
           {result.won ? 'won' : 'lost'} · {result.score} ·{' '}
           {(result.elapsedMs / 1000).toFixed(1)}s
         </span>
       ) : (
-        <span className="text-white/40 text-sm">{pendingLabel}</span>
+        <span className="text-white/40 text-sm shrink-0">{pendingLabel}</span>
       )}
     </div>
   );

@@ -50,9 +50,27 @@ export interface MatchOutcomeMessage {
   reason: 'finished' | 'timeout';
 }
 
+// Quick reaction sent in lobby / during / after a match. Renders as a brief
+// floating bubble near the sender's avatar on every other client.
+export interface EmoteMessage {
+  type: 'emote';
+  emote: string;
+  fromClientId: string;
+}
+
+// Non-host hints to the host which game they want to play. The host's
+// "Start a match" grid highlights the suggested game.
+export interface SuggestGameMessage {
+  type: 'suggest';
+  game: GameType;
+  fromClientId: string;
+}
+
 export type LobbyMessage =
   | MatchStartMessage
   | MatchResultMessage
   | MatchInputMessage
   | MatchTimeoutMessage
-  | MatchOutcomeMessage;
+  | MatchOutcomeMessage
+  | EmoteMessage
+  | SuggestGameMessage;

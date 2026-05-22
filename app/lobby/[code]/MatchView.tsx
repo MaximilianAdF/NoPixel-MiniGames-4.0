@@ -45,6 +45,9 @@ interface MatchViewProps {
   // labels. Both may be null briefly during reconnection.
   me: PresenceMember | null;
   opponent: PresenceMember | null;
+  // Recent emotes keyed by clientId; rendered as a floating bubble above
+  // the corresponding avatar.
+  emotes: Record<string, { emote: string; key: number }>;
 }
 
 // Renders the chosen game in 1v1 match mode. In normal mode, it's a
@@ -60,6 +63,7 @@ export default function MatchView({
   focusMode,
   me,
   opponent,
+  emotes,
 }: MatchViewProps) {
   const trio = renderTrio(game, seed, onMatchEnd, onInput, opponentInputs);
   if (!trio) {
@@ -67,13 +71,27 @@ export default function MatchView({
       <p className="text-white/60 text-center text-sm">{game} isn&apos;t available for 1v1.</p>
     );
   }
+  const myEmote = me ? emotes[me.clientId] ?? null : null;
+  const opponentEmote = opponent ? emotes[opponent.clientId] ?? null : null;
   if (focusMode) {
     return (
-      <FocusLayout interactive={trio.interactive} summary={trio.summary} opponent={opponent} />
+      <FocusLayout
+        interactive={trio.interactive}
+        summary={trio.summary}
+        opponent={opponent}
+        opponentEmote={opponentEmote}
+      />
     );
   }
   return (
-    <Splitscreen mine={trio.interactive} theirs={trio.spectator} me={me} opponent={opponent} />
+    <Splitscreen
+      mine={trio.interactive}
+      theirs={trio.spectator}
+      me={me}
+      opponent={opponent}
+      myEmote={myEmote}
+      opponentEmote={opponentEmote}
+    />
   );
 }
 
@@ -157,18 +175,22 @@ function Splitscreen({
   theirs,
   me,
   opponent,
+  myEmote,
+  opponentEmote,
 }: {
   mine: React.ReactNode;
   theirs: React.ReactNode;
   me: PresenceMember | null;
   opponent: PresenceMember | null;
+  myEmote: { emote: string; key: number } | null;
+  opponentEmote: { emote: string; key: number } | null;
 }) {
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-2 divide-y xl:divide-y-0 xl:divide-x divide-white/10">
-      <Half label="You" member={me} accent>
+      <Half label="You" member={me} emote={myEmote} accent>
         {mine}
       </Half>
-      <Half label="Opponent" member={opponent}>
+      <Half label="Opponent" member={opponent} emote={opponentEmote}>
         {theirs}
       </Half>
     </div>
@@ -185,11 +207,13 @@ const GAME_MAX_W = 'max(42rem, 35vw)';
 function Half({
   label,
   member,
+  emote,
   accent,
   children,
 }: {
   label: string;
   member: PresenceMember | null;
+  emote: { emote: string; key: number } | null;
   accent?: boolean;
   children: React.ReactNode;
 }) {
@@ -205,6 +229,7 @@ function Half({
               avatarHash={member.data.avatarHash}
               size={26}
               ringClass={accent ? 'ring-2 ring-[#54FFA4]/40' : undefined}
+              emote={emote}
             />
           ) : (
             <div className="w-6 h-6 rounded-full bg-white/10" />
@@ -237,10 +262,12 @@ function FocusLayout({
   interactive,
   summary,
   opponent,
+  opponentEmote,
 }: {
   interactive: React.ReactNode;
   summary: React.ReactNode;
   opponent: PresenceMember | null;
+  opponentEmote: { emote: string; key: number } | null;
 }) {
   return (
     <>
@@ -253,6 +280,7 @@ function FocusLayout({
               discordId={opponent.data.discordId}
               avatarHash={opponent.data.avatarHash}
               size={22}
+              emote={opponentEmote}
             />
             <span className="text-white/85 text-xs font-medium truncate">
               {opponent.data.displayName}
