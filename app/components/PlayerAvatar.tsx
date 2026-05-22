@@ -36,10 +36,17 @@ export default function PlayerAvatar({
   emote,
 }: PlayerAvatarProps) {
   const [imgError, setImgError] = useState(false);
-  const avatarUrl =
-    discordId && avatarHash
-      ? `https://cdn.discordapp.com/avatars/${discordId}/${avatarHash}.png?size=${size * 2}`
-      : null;
+  // The session sometimes hands us the full Discord CDN URL in `avatarHash`
+  // and sometimes just the hash — handle both. (The naming is a holdover
+  // from when we expected only the hash.)
+  const avatarUrl = (() => {
+    if (!avatarHash) return null;
+    if (avatarHash.startsWith('http://') || avatarHash.startsWith('https://')) {
+      return avatarHash;
+    }
+    if (!discordId) return null;
+    return `https://cdn.discordapp.com/avatars/${discordId}/${avatarHash}.png?size=${size * 2}`;
+  })();
   const initial = (displayName || '?').trim().charAt(0).toUpperCase() || '?';
   const showFallback = !avatarUrl || imgError;
 
