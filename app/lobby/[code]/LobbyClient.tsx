@@ -10,6 +10,7 @@ import { checkBeepPlayer, successPlayer } from '@/public/audio/AudioManager';
 import PlayerAvatar from '@/app/components/PlayerAvatar';
 import { EMOTES, EMOTE_BY_ID, EMOTE_THROTTLE_MS, EMOTE_DURATION_MS } from '@/app/lobby/emotes';
 import { playEmoteSound } from '@/app/lobby/emoteSounds';
+import EmoteImage from '@/app/lobby/EmoteImage';
 import { generateMatchSeed } from '@/lib/lobby/seededRandom';
 import { determineHost } from '@/lib/lobby/host';
 import type { LobbyMessage } from '@/lib/lobby/messages';
@@ -77,7 +78,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   } | null>(null);
   // Recent emote per player — wiped 3s after each emote so the bubble fades.
   const [emotes, setEmotes] = useState<
-    Record<string, { imageUrl: string; label: string; key: number }>
+    Record<string, { primaryUrl: string; fallbackUrl: string; label: string; key: number }>
   >({});
   const lastEmoteSentRef = useRef(0);
   // Non-host's suggestion is mirrored on both clients so the host's "Start a
@@ -101,7 +102,12 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     const key = Date.now();
     setEmotes((prev) => ({
       ...prev,
-      [fromClientId]: { imageUrl: def.imageUrl, label: def.label, key },
+      [fromClientId]: {
+        primaryUrl: def.animatedUrl,
+        fallbackUrl: def.staticUrl,
+        label: def.label,
+        key,
+      },
     }));
     // Sound for both sender (immediate gesture) and receiver. The shared
     // AudioContext is created lazily and resumes on first user interaction,
@@ -650,7 +656,8 @@ export default function LobbyClient({ code }: LobbyClientProps) {
                   <span className="text-white/90 text-sm truncate min-w-0">{member.data.displayName}</span>
                   {emotes[member.clientId] && (
                     <InlineEmote
-                      imageUrl={emotes[member.clientId].imageUrl}
+                      primaryUrl={emotes[member.clientId].primaryUrl}
+                      fallbackUrl={emotes[member.clientId].fallbackUrl}
                       label={emotes[member.clientId].label}
                       emoteKey={emotes[member.clientId].key}
                     />
@@ -849,14 +856,12 @@ function EmoteBar({ onSend }: { onSend: (emoteId: string) => void }) {
           aria-label={emote.label}
           className="p-1.5 rounded-xl hover:bg-white/10 transition-colors active:scale-90"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={emote.imageUrl}
-            alt={emote.label}
-            width={36}
-            height={36}
-            className="w-9 h-9 block"
-            draggable={false}
+          <EmoteImage
+            primaryUrl={emote.animatedUrl}
+            fallbackUrl={emote.staticUrl}
+            label={emote.label}
+            size={36}
+            className="block"
           />
         </button>
       ))}
@@ -954,7 +959,7 @@ function OutcomeView({
   opponentResult: GameResult | null;
   me: PresenceMember | null;
   opponent: PresenceMember | null;
-  emotes: Record<string, { imageUrl: string; label: string; key: number }>;
+  emotes: Record<string, { primaryUrl: string; fallbackUrl: string; label: string; key: number }>;
   onBack: () => void;
 }) {
   const title = isDraw ? 'Draw' : iWon ? 'You won' : 'You lost';
@@ -1056,7 +1061,7 @@ function ResultRow({
 }: {
   label: string;
   member: PresenceMember | null;
-  emote: { imageUrl: string; label: string; key: number } | null;
+  emote: { primaryUrl: string; fallbackUrl: string; label: string; key: number } | null;
   result: GameResult | null;
   pendingLabel: string;
 }) {
@@ -1077,7 +1082,14 @@ function ResultRow({
         <span className="text-white/70 text-sm truncate min-w-0">
           {member ? member.data.displayName : label}
         </span>
-        {emote && <InlineEmote imageUrl={emote.imageUrl} label={emote.label} emoteKey={emote.key} />}
+        {emote && (
+          <InlineEmote
+            primaryUrl={emote.primaryUrl}
+            fallbackUrl={emote.fallbackUrl}
+            label={emote.label}
+            emoteKey={emote.key}
+          />
+        )}
       </div>
       {result ? (
         <span className="text-white/90 text-sm font-mono tabular-nums shrink-0">
@@ -1092,11 +1104,13 @@ function ResultRow({
 }
 
 function InlineEmote({
-  imageUrl,
+  primaryUrl,
+  fallbackUrl,
   label,
   emoteKey,
 }: {
-  imageUrl: string;
+  primaryUrl: string;
+  fallbackUrl: string;
   label: string;
   emoteKey: number;
 }) {
@@ -1105,8 +1119,7 @@ function InlineEmote({
       key={emoteKey}
       className="emote-inline inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/[0.05] border border-white/15 shrink-0"
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={imageUrl} alt={label} width={20} height={20} className="w-5 h-5" />
+      <EmoteImage primaryUrl={primaryUrl} fallbackUrl={fallbackUrl} label={label} size={20} />
     </span>
   );
 }

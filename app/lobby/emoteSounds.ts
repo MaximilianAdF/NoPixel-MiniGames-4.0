@@ -1,7 +1,7 @@
 // Cartoony emote sound effects via the Web Audio API — no asset files to
-// ship, one shared AudioContext for the lifetime of the tab. Each sound is
-// tuned to read as the corresponding Fluent UI emoji ("WAAAH" for cry,
-// "HONK HONK HONK" for clown, etc.) rather than a generic beep.
+// ship, one shared AudioContext for the lifetime of the tab. Each sound
+// is tuned to read as the corresponding Fluent emoji rather than a
+// generic beep.
 
 let ctx: AudioContext | null = null;
 
@@ -24,26 +24,74 @@ function getCtx(): AudioContext | null {
   return ctx;
 }
 
-// 😆  "HA HA HA HA" — five bright triangle pulses bouncing between two pitches.
+// Builds a "ha"-style syllable: a brief unvoiced noise burst (the "h"),
+// then a short pitched sawtooth with a downward glide and a band-pass
+// formant filter (the "a"). Stacking these in a pattern produces a
+// recognisable cartoon laugh instead of a generic series of beeps.
+function laughSyllable(
+  c: AudioContext,
+  startSec: number,
+  pitch: number,
+  level: number,
+) {
+  const t = c.currentTime + startSec;
+
+  // "h" — short noise burst with high-pass to sound breathy.
+  const noiseDur = 0.025;
+  const buf = c.createBuffer(1, Math.max(1, Math.floor(noiseDur * c.sampleRate)), c.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) {
+    data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+  }
+  const noise = c.createBufferSource();
+  noise.buffer = buf;
+  const noiseFilter = c.createBiquadFilter();
+  noiseFilter.type = 'highpass';
+  noiseFilter.frequency.value = 1500;
+  const noiseGain = c.createGain();
+  noiseGain.gain.value = level * 0.6;
+  noise.connect(noiseFilter).connect(noiseGain).connect(c.destination);
+  noise.start(t);
+
+  // "a" — short pitched sawtooth with a quick downward glide for the
+  // natural "ha" inflection. Band-pass filter narrows it to a vowel-ish
+  // tone instead of a buzzy saw.
+  const aStart = t + 0.025;
+  const aEnd = t + 0.12;
+  const osc = c.createOscillator();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(pitch * 1.18, aStart);
+  osc.frequency.exponentialRampToValueAtTime(pitch, aStart + 0.06);
+  const filter = c.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.value = 1100;
+  filter.Q.value = 3;
+  const oscGain = c.createGain();
+  oscGain.gain.setValueAtTime(0, aStart);
+  oscGain.gain.linearRampToValueAtTime(level, aStart + 0.015);
+  oscGain.gain.exponentialRampToValueAtTime(0.001, aEnd);
+  osc.connect(filter).connect(oscGain).connect(c.destination);
+  osc.start(aStart);
+  osc.stop(aEnd + 0.02);
+}
+
+// 😆  Six "ha" syllables with descending energy and a bit of pitch
+// variation, like a real cartoon belly laugh.
 function playLaugh() {
   const c = getCtx();
   if (!c) return;
-  [720, 880, 720, 880, 720].forEach((f, i) => {
-    const osc = c.createOscillator();
-    const gain = c.createGain();
-    osc.type = 'triangle';
-    osc.frequency.value = f;
-    osc.connect(gain);
-    gain.connect(c.destination);
-    const t0 = c.currentTime + i * 0.09;
-    gain.gain.setValueAtTime(0.18, t0);
-    gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.08);
-    osc.start(t0);
-    osc.stop(t0 + 0.1);
-  });
+  const pattern: Array<{ t: number; pitch: number; level: number }> = [
+    { t: 0.0, pitch: 320, level: 0.28 },
+    { t: 0.14, pitch: 280, level: 0.28 },
+    { t: 0.28, pitch: 320, level: 0.26 },
+    { t: 0.42, pitch: 280, level: 0.24 },
+    { t: 0.56, pitch: 300, level: 0.2 },
+    { t: 0.7, pitch: 260, level: 0.15 },
+  ];
+  pattern.forEach((p) => laughSyllable(c, p.t, p.pitch, p.level));
 }
 
-// 😭  Long "WAAAH" — sustained triangle sweeping 600 → 200Hz with vibrato.
+// 😭  Long "WAAAH" — sustained triangle sweeping 600 → 180Hz with vibrato.
 function playCry() {
   const c = getCtx();
   if (!c) return;

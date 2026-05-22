@@ -1,18 +1,24 @@
-// Preset quick-reactions shipped over the Ably lobby channel. Visuals are
-// Microsoft Fluent UI 3D emoji PNGs served via jsdelivr — no asset files
-// to commit, but they cache aggressively on the CDN. Wire format stores
-// the stable `id` so visuals can change later without breaking history.
+// Preset quick-reactions shipped over the Ably lobby channel. Each emote
+// has an animated WebP from Google's Noto Animated Emoji set and a static
+// Fluent UI 3D PNG fallback (used when Noto doesn't cover a particular
+// face). Wire format stores the stable `id`.
 export interface EmoteDef {
   id: string;
-  // Unicode emoji used as the <img> alt text + sound-effect lookup fallback.
+  // Unicode glyph — also handy as alt text / lookup key.
   unicode: string;
-  imageUrl: string;
+  // Animated WebP from Google Noto Animated Emoji (Google Fonts CDN).
+  animatedUrl: string;
+  // Static Fluent UI 3D PNG, used as <img> onError fallback.
+  staticUrl: string;
   // Short label used as tooltip / aria-label on the button.
   label: string;
 }
 
-// Fluent UI emoji repo path convention: assets/<Name>/3D/<snake_case_name>_3d.png
-function fe(name: string): string {
+function notoAnimated(codepoint: string, size: 32 | 64 | 128 | 256 | 512 = 256): string {
+  return `https://fonts.gstatic.com/s/e/notoemoji/latest/${codepoint}/${size}.webp`;
+}
+
+function fluentStatic(name: string): string {
   const filename = `${name.toLowerCase().replace(/ /g, '_')}_3d.png`;
   return `https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/${encodeURIComponent(name)}/3D/${filename}`;
 }
@@ -21,31 +27,36 @@ export const EMOTES: EmoteDef[] = [
   {
     id: 'laugh',
     unicode: '😆',
-    imageUrl: fe('Grinning squinting face'),
+    animatedUrl: notoAnimated('1f606'),
+    staticUrl: fluentStatic('Grinning squinting face'),
     label: 'LOL',
   },
   {
     id: 'cry',
     unicode: '😭',
-    imageUrl: fe('Loudly crying face'),
+    animatedUrl: notoAnimated('1f62d'),
+    staticUrl: fluentStatic('Loudly crying face'),
     label: 'Cry',
   },
   {
     id: 'clown',
     unicode: '🤡',
-    imageUrl: fe('Clown face'),
+    animatedUrl: notoAnimated('1f921'),
+    staticUrl: fluentStatic('Clown face'),
     label: 'Clown',
   },
   {
     id: 'angry',
     unicode: '😡',
-    imageUrl: fe('Pouting face'),
+    animatedUrl: notoAnimated('1f621'),
+    staticUrl: fluentStatic('Pouting face'),
     label: 'Mad',
   },
   {
     id: 'rip',
     unicode: '💀',
-    imageUrl: fe('Skull'),
+    animatedUrl: notoAnimated('1f480'),
+    staticUrl: fluentStatic('Skull'),
     label: 'RIP',
   },
 ];
