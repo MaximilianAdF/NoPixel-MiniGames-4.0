@@ -14,8 +14,11 @@ export interface EmoteDef {
   label: string;
 }
 
-function notoAnimated(codepoint: string, size: 32 | 64 | 128 | 256 | 512 = 256): string {
-  return `https://fonts.gstatic.com/s/e/notoemoji/latest/${codepoint}/${size}.webp`;
+// Google only publishes the animated WebP at the 512 size on this CDN —
+// other sizes return HTML 404 pages, which would silently fall back to the
+// static Fluent PNG. The browser scales it down via the <img>'s width/height.
+function notoAnimated(codepoint: string): string {
+  return `https://fonts.gstatic.com/s/e/notoemoji/latest/${codepoint}/512.webp`;
 }
 
 function fluentStatic(name: string): string {
