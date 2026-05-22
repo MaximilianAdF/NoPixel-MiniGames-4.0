@@ -11,6 +11,7 @@ import { determineHost } from '@/lib/lobby/host';
 import type { LobbyMessage } from '@/lib/lobby/messages';
 import type { GameType } from '@/interfaces/user';
 import type { GameResult } from '@/app/game/types';
+import { orbitron } from '@/app/fonts';
 import MatchView from './MatchView';
 
 // Games available for 1v1 (RepairKit excluded — real-time mechanic).
@@ -46,9 +47,10 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   const [matchExpired, setMatchExpired] = useState(false);
   const [lobbyLastActivity, setLobbyLastActivity] = useState(() => Date.now());
   const [now, setNow] = useState(() => Date.now());
-  // Synced go-time: host computes Date.now() + COUNTDOWN_MS, ships it on
-  // match:start, both clients setTimeout to the same wall-clock moment so
-  // the host's ~100ms network-latency headstart goes away.
+  // Each client times its own 3-second countdown from when it receives the
+  // match:start. This gives a consistent 3-2-1 display on both sides (no
+  // leaked clock skew) at the cost of ~50ms host network-latency advantage,
+  // which is negligible compared to human reaction time.
   const [goAt, setGoAt] = useState<number | null>(null);
   // Host-controlled per-lobby setting. Persists across matches in the same lobby.
   const [focusMode, setFocusMode] = useState(false);
@@ -66,12 +68,12 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       setOpponentInputs([]);
       setMatchExpired(false);
       setMatchFocusMode(msg.focusMode);
-      // Cap goAt to a sane range so a wildly-skewed peer clock can't strand
-      // us on a multi-minute countdown.
-      const cappedGoAt = Math.min(msg.goAt, Date.now() + COUNTDOWN_MS + 1500);
-      setGoAt(cappedGoAt);
+      // Time the countdown locally so the display stays in sync with the
+      // host's regardless of clock skew between the two browsers.
+      const localGoAt = Date.now() + COUNTDOWN_MS;
+      setGoAt(localGoAt);
       // Match timer starts counting from GO, not from when match:start arrived.
-      setMatchStartTime(cappedGoAt);
+      setMatchStartTime(localGoAt);
     } else if (msg.type === 'match:result') {
       setOpponentResult({ won: msg.won, score: msg.score, elapsedMs: msg.elapsedMs });
     } else if (msg.type === 'match:input') {
@@ -168,7 +170,6 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       game,
       seed,
       startedAt: Date.now(),
-      goAt: newGoAt,
       focusMode,
     });
   };
@@ -524,26 +525,67 @@ function ResultRow({
 function Countdown({ remainingMs }: { remainingMs: number }) {
   const seconds = Math.max(1, Math.ceil(remainingMs / 1000));
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div
+      className="min-h-screen flex items-center justify-center relative overflow-hidden"
+      style={{ perspective: '1200px' }}
+    >
+      {/* Soft radial backdrop so the number sits in a faint pool of green light. */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(circle at center, rgba(84,255,164,0.10) 0%, rgba(84,255,164,0.04) 25%, transparent 55%)',
+        }}
+      />
+      {/* Faint horizon line that the number lands on. */}
+      <div
+        aria-hidden
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 w-[36rem] h-px pointer-events-none"
+        style={{
+          background:
+            'linear-gradient(to right, transparent, rgba(84,255,164,0.4), transparent)',
+        }}
+      />
       <div
         key={seconds}
-        className="text-[10rem] sm:text-[14rem] font-bold text-white tabular-nums animate-[countdown-pop_0.5s_ease-out_forwards]"
+        className={`${orbitron.className} relative text-[12rem] sm:text-[18rem] leading-none tabular-nums select-none countdown-num`}
+        style={{
+          color: 'transparent',
+          backgroundImage:
+            'linear-gradient(135deg, #ffffff 0%, #d8fff0 35%, #54FFA4 65%, #2db97a 100%)',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          letterSpacing: '-0.04em',
+        }}
       >
         {seconds}
       </div>
       <style jsx>{`
-        @keyframes countdown-pop {
+        .countdown-num {
+          animation: rush 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          transform-origin: center;
+        }
+        @keyframes rush {
           0% {
-            transform: scale(0.4);
+            transform: scale(0.15) translateZ(-600px);
             opacity: 0;
+            filter: blur(40px)
+              drop-shadow(0 0 0 rgba(84, 255, 164, 0));
           }
-          35% {
-            transform: scale(1.15);
+          30% {
+            transform: scale(1.3) translateZ(0);
             opacity: 1;
+            filter: blur(0)
+              drop-shadow(0 0 90px rgba(84, 255, 164, 0.7))
+              drop-shadow(0 0 30px rgba(255, 255, 255, 0.4));
           }
           100% {
-            transform: scale(1);
-            opacity: 0.9;
+            transform: scale(1) translateZ(0);
+            opacity: 0.95;
+            filter: blur(0)
+              drop-shadow(0 0 60px rgba(84, 255, 164, 0.5))
+              drop-shadow(0 0 20px rgba(255, 255, 255, 0.25));
           }
         }
       `}</style>

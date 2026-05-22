@@ -485,17 +485,20 @@ export const PincrackerSpectator: FC<PincrackerSpectatorProps> = ({ seed, inputs
   );
 };
 
-// Pincracker has no clear "target" until the pin is cracked, so the summary
-// surfaces the number of failed cracks so far rather than a progress bar.
+// Pincracker has no clear "target" so the summary surfaces the most useful
+// signal of how close the opponent is: greens and yellows from their last
+// guess. Before the first guess it shows "Cracking…".
 export const PincrackerSummary: FC<PincrackerSpectatorProps> = ({ seed, inputs }) => {
   const config = useMemo(() => ({ pinLength: defaultPinLength }), []);
-  const { outcome } = useReplayedState(pincrackerEngine, config, seed, inputs);
-  const attempts = inputs.filter((i) => i.type === 'finish').length;
+  const { state, outcome } = useReplayedState(pincrackerEngine, config, seed, inputs);
+  const feedback = state.feedback;
+  const greens = feedback?.filter((f) => f === 'green').length ?? 0;
+  const yellows = feedback?.filter((f) => f === 'yellow').length ?? 0;
   return (
     <OpponentSummary
       title="PinCracker"
-      metricLabel="Attempts"
-      metricValue={String(attempts)}
+      metricLabel={feedback ? 'Last guess' : 'Status'}
+      metricValue={feedback ? `${greens}G · ${yellows}Y` : 'Cracking…'}
       outcome={outcome}
     />
   );
