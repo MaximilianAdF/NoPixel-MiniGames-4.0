@@ -151,6 +151,13 @@ function Splitscreen({ mine, theirs }: { mine: React.ReactNode; theirs: React.Re
   );
 }
 
+// max(42rem, 35vw) holds 672px on standard 1920p (35% × 1920 = 672, matches
+// the old max-w-2xl baseline) and scales up on wider monitors so the games
+// take a consistent ~35% of viewport width on 2560p / 4K instead of being
+// stuck at 672px regardless of monitor size. Only the game wrappers scale —
+// the header pill, opponent summary and other UI keep their fixed sizing.
+const GAME_MAX_W = 'max(42rem, 35vw)';
+
 function Half({
   label,
   accent,
@@ -162,7 +169,7 @@ function Half({
 }) {
   return (
     <div className="flex items-center justify-center p-6 sm:p-10 lg:p-14 xl:p-20 min-h-screen xl:min-h-0">
-      <div className="w-full max-w-2xl flex flex-col">
+      <div className="w-full flex flex-col" style={{ maxWidth: GAME_MAX_W }}>
         <div
           className={`text-xs uppercase tracking-[0.2em] mb-3 font-semibold ${
             accent ? 'text-[#54FFA4]' : 'text-white/40'
@@ -190,7 +197,9 @@ function FocusLayout({
     <>
       <div className="fixed top-3 left-4 z-40">{summary}</div>
       <div className="min-h-screen flex items-center justify-center p-6 sm:p-10 lg:p-14 xl:p-20">
-        <div className="w-full max-w-2xl">{interactive}</div>
+        <div className="w-full" style={{ maxWidth: GAME_MAX_W }}>
+          {interactive}
+        </div>
       </div>
     </>
   );
