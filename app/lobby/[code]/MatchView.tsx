@@ -2,6 +2,8 @@
 
 import type { GameType } from '@/interfaces/user';
 import type { GameResult } from '@/app/game/types';
+import type { PresenceMember } from '@/app/utils/useAblyChannel';
+import PlayerAvatar from '@/app/components/PlayerAvatar';
 import Chopping, { ChoppingSpectator, ChoppingSummary } from '@/app/puzzles/chopping/Chopping';
 import Thermite, { ThermiteSpectator, ThermiteSummary } from '@/app/puzzles/thermite/Thermite';
 import type { ThermiteInput } from '@/app/puzzles/thermite/engine';
@@ -39,6 +41,10 @@ interface MatchViewProps {
   // Focus mode: render the player's game centered and full-width with a
   // small floating opponent-progress widget tucked in the corner.
   focusMode: boolean;
+  // Player identities — used to render avatars next to the You / Opponent
+  // labels. Both may be null briefly during reconnection.
+  me: PresenceMember | null;
+  opponent: PresenceMember | null;
 }
 
 // Renders the chosen game in 1v1 match mode. In normal mode, it's a
@@ -52,6 +58,8 @@ export default function MatchView({
   onInput,
   opponentInputs,
   focusMode,
+  me,
+  opponent,
 }: MatchViewProps) {
   const trio = renderTrio(game, seed, onMatchEnd, onInput, opponentInputs);
   if (!trio) {
@@ -60,9 +68,13 @@ export default function MatchView({
     );
   }
   if (focusMode) {
-    return <FocusLayout interactive={trio.interactive} summary={trio.summary} />;
+    return (
+      <FocusLayout interactive={trio.interactive} summary={trio.summary} opponent={opponent} />
+    );
   }
-  return <Splitscreen mine={trio.interactive} theirs={trio.spectator} />;
+  return (
+    <Splitscreen mine={trio.interactive} theirs={trio.spectator} me={me} opponent={opponent} />
+  );
 }
 
 // Picks the interactive / spectator / summary triplet for a given game. Each
@@ -140,13 +152,25 @@ function renderTrio(
 // Splitscreen: full viewport, stacked on small screens, side-by-side at xl+ with
 // a vertical divider. Each half centers its game both horizontally and vertically
 // so the two boards sit cleanly inside their own half of the screen.
-function Splitscreen({ mine, theirs }: { mine: React.ReactNode; theirs: React.ReactNode }) {
+function Splitscreen({
+  mine,
+  theirs,
+  me,
+  opponent,
+}: {
+  mine: React.ReactNode;
+  theirs: React.ReactNode;
+  me: PresenceMember | null;
+  opponent: PresenceMember | null;
+}) {
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-2 divide-y xl:divide-y-0 xl:divide-x divide-white/10">
-      <Half label="You" accent>
+      <Half label="You" member={me} accent>
         {mine}
       </Half>
-      <Half label="Opponent">{theirs}</Half>
+      <Half label="Opponent" member={opponent}>
+        {theirs}
+      </Half>
     </div>
   );
 }
@@ -160,22 +184,45 @@ const GAME_MAX_W = 'max(42rem, 35vw)';
 
 function Half({
   label,
+  member,
   accent,
   children,
 }: {
   label: string;
+  member: PresenceMember | null;
   accent?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex items-center justify-center p-6 sm:p-10 lg:p-14 xl:p-20 min-h-screen xl:min-h-0">
       <div className="w-full flex flex-col" style={{ maxWidth: GAME_MAX_W }}>
-        <div
-          className={`text-xs uppercase tracking-[0.2em] mb-3 font-semibold ${
-            accent ? 'text-[#54FFA4]' : 'text-white/40'
-          }`}
-        >
-          {label}
+        <div className="flex items-center gap-2.5 mb-3">
+          {member ? (
+            <PlayerAvatar
+              userId={member.clientId}
+              displayName={member.data.displayName}
+              discordId={member.data.discordId}
+              avatarHash={member.data.avatarHash}
+              size={26}
+              ringClass={accent ? 'ring-2 ring-[#54FFA4]/40' : undefined}
+            />
+          ) : (
+            <div className="w-6 h-6 rounded-full bg-white/10" />
+          )}
+          <div className="flex items-baseline gap-2 min-w-0">
+            <span
+              className={`text-xs uppercase tracking-[0.2em] font-semibold ${
+                accent ? 'text-[#54FFA4]' : 'text-white/40'
+              }`}
+            >
+              {label}
+            </span>
+            {member && (
+              <span className="text-xs text-white/55 truncate">
+                {member.data.displayName}
+              </span>
+            )}
+          </div>
         </div>
         {children}
       </div>
@@ -189,13 +236,31 @@ function Half({
 function FocusLayout({
   interactive,
   summary,
+  opponent,
 }: {
   interactive: React.ReactNode;
   summary: React.ReactNode;
+  opponent: PresenceMember | null;
 }) {
   return (
     <>
-      <div className="fixed top-3 left-4 z-40">{summary}</div>
+      <div className="fixed top-3 left-4 z-40 space-y-2">
+        {opponent && (
+          <div className="flex items-center gap-2 rounded-xl bg-black/70 backdrop-blur-md border border-white/10 px-3 py-1.5 shadow-lg shadow-black/40 w-56">
+            <PlayerAvatar
+              userId={opponent.clientId}
+              displayName={opponent.data.displayName}
+              discordId={opponent.data.discordId}
+              avatarHash={opponent.data.avatarHash}
+              size={22}
+            />
+            <span className="text-white/85 text-xs font-medium truncate">
+              {opponent.data.displayName}
+            </span>
+          </div>
+        )}
+        {summary}
+      </div>
       <div className="min-h-screen flex items-center justify-center p-6 sm:p-10 lg:p-14 xl:p-20">
         <div className="w-full" style={{ maxWidth: GAME_MAX_W }}>
           {interactive}

@@ -5,9 +5,17 @@ import * as Ably from 'ably';
 
 export type ChannelStatus = 'connecting' | 'connected' | 'disconnected' | 'failed';
 
+export interface PresenceData {
+  displayName: string;
+  // Discord identity, when available — used to compose the avatar URL and
+  // link to the user's profile page. Optional so guests still fit.
+  discordId?: string;
+  avatarHash?: string;
+}
+
 export interface PresenceMember {
   clientId: string;
-  data: { displayName: string };
+  data: PresenceData;
   // Ably-server timestamp (ms since epoch) — both clients see the same value, so
   // it's a deterministic basis for host determination.
   timestamp: number;
@@ -15,7 +23,7 @@ export interface PresenceMember {
 
 interface UseAblyChannelArgs<TMsg> {
   channelName: string;
-  presenceData: { displayName: string };
+  presenceData: PresenceData;
   onMessage?: (msg: TMsg) => void;
   enabled?: boolean;
 }
@@ -44,7 +52,7 @@ export function useAblyChannel<TMsg>({
     onMessageRef.current = onMessage;
   });
 
-  const presenceDisplayName = presenceData.displayName;
+  const presenceDataKey = JSON.stringify(presenceData);
 
   useEffect(() => {
     if (!enabled) {
@@ -89,7 +97,7 @@ export function useAblyChannel<TMsg>({
           if (!m.clientId) continue;
           byClientId.set(m.clientId, {
             clientId: m.clientId,
-            data: (m.data ?? { displayName: '' }) as { displayName: string },
+            data: (m.data ?? { displayName: '' }) as PresenceData,
             timestamp: m.timestamp ?? 0,
           });
         }
@@ -111,7 +119,7 @@ export function useAblyChannel<TMsg>({
           if (cancelled) return;
           onMessageRef.current?.(msg.data as TMsg);
         });
-        await channel.presence.enter({ displayName: presenceDisplayName });
+        await channel.presence.enter(JSON.parse(presenceDataKey));
         await refreshPresence();
       } catch (err) {
         if (!cancelled) console.error('Failed to set up Ably channel:', err);
@@ -127,7 +135,7 @@ export function useAblyChannel<TMsg>({
       client.close();
       channelRef.current = null;
     };
-  }, [enabled, channelName, presenceDisplayName]);
+  }, [enabled, channelName, presenceDataKey]);
 
   const publish = async (msg: TMsg) => {
     if (!channelRef.current) {

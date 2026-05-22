@@ -5,7 +5,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Copy, Check, Loader2, LogOut, Share2 } from 'lucide-react';
 import { useUser } from '@/app/contexts/UserContext';
-import { useAblyChannel, type ChannelStatus } from '@/app/utils/useAblyChannel';
+import { useAblyChannel, type ChannelStatus, type PresenceMember } from '@/app/utils/useAblyChannel';
+import { checkBeepPlayer, successPlayer } from '@/public/audio/AudioManager';
+import PlayerAvatar from '@/app/components/PlayerAvatar';
 import { generateMatchSeed } from '@/lib/lobby/seededRandom';
 import { determineHost } from '@/lib/lobby/host';
 import type { LobbyMessage } from '@/lib/lobby/messages';
@@ -74,6 +76,12 @@ export default function LobbyClient({ code }: LobbyClientProps) {
 
   const displayName = user?.displayName ?? user?.username ?? 'Player';
 
+  // Preload lobby audio cues once on mount.
+  useEffect(() => {
+    checkBeepPlayer.whenReady();
+    successPlayer.whenReady();
+  }, []);
+
   const handleMessage = useCallback((msg: LobbyMessage) => {
     if (msg.type === 'match:start') {
       setMatch({ game: msg.game, seed: msg.seed });
@@ -109,14 +117,20 @@ export default function LobbyClient({ code }: LobbyClientProps) {
 
   const { status, presence, publish } = useAblyChannel<LobbyMessage>({
     channelName: `lobby:${code}`,
-    presenceData: { displayName },
+    presenceData: {
+      displayName,
+      discordId: user?.discordId,
+      avatarHash: user?.avatar,
+    },
     onMessage: handleMessage,
     enabled: isLoggedIn,
   });
 
   const hostClientId = determineHost(presence);
   const isHost = hostClientId !== undefined && hostClientId === user?.id;
-  const opponentClientId = presence.find((p) => p.clientId !== user?.id)?.clientId ?? null;
+  const me = presence.find((p) => p.clientId === user?.id) ?? null;
+  const opponent = presence.find((p) => p.clientId !== user?.id) ?? null;
+  const opponentClientId = opponent?.clientId ?? null;
 
   // 1Hz ticker — drives all the countdown displays + expiry checks below.
   useEffect(() => {
@@ -127,13 +141,41 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   // Only a new joiner counts as activity. If the opponent gets idle-kicked
   // first, the host's presence drops 2→1; we don't want that to reset the
   // host's own idle clock and let them sit forever.
+  // Plays a subtle audio cue when the opponent first joins so the host
+  // notices without having to watch the lobby tab.
   const prevPresenceLenRef = useRef(0);
   useEffect(() => {
     if (presence.length > prevPresenceLenRef.current) {
       setLobbyLastActivity(Date.now());
+      if (prevPresenceLenRef.current > 0) {
+        // Skip on initial 0→1 (that's just us mounting); fire when a peer joins.
+        checkBeepPlayer.play();
+      }
     }
     prevPresenceLenRef.current = presence.length;
   }, [presence.length]);
+
+  // Audio: success sound when an opponent's result arrives (they finished
+  // their game) so we know to look up. Skips on every other state change.
+  const prevOpponentResultRef = useRef<GameResult | null>(null);
+  useEffect(() => {
+    if (opponentResult && !prevOpponentResultRef.current) {
+      checkBeepPlayer.play();
+    }
+    prevOpponentResultRef.current = opponentResult;
+  }, [opponentResult]);
+
+  // Audio: success chime exactly at GO when the match unblocks.
+  useEffect(() => {
+    if (!goAt) return;
+    const delay = goAt - Date.now();
+    if (delay <= 0) {
+      successPlayer.play();
+      return;
+    }
+    const handle = setTimeout(() => successPlayer.play(), delay);
+    return () => clearTimeout(handle);
+  }, [goAt]);
 
   // When a match ends (back to lobby), reset activity so the next idle window
   // starts fresh.
@@ -410,6 +452,8 @@ export default function LobbyClient({ code }: LobbyClientProps) {
           onInput={handleInput}
           opponentInputs={opponentInputs}
           focusMode={matchFocusMode}
+          me={me}
+          opponent={opponent}
         />
       </>
     );
@@ -487,10 +531,18 @@ export default function LobbyClient({ code }: LobbyClientProps) {
                   key={member.clientId}
                   className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.02] transition-colors"
                 >
-                  <span className="relative flex">
-                    <span className="absolute inline-flex h-full w-full rounded-full bg-[#54FFA4]/40 animate-ping opacity-50" />
-                    <span className="relative w-2 h-2 rounded-full bg-[#54FFA4]" />
-                  </span>
+                  <PlayerAvatar
+                    userId={member.clientId}
+                    displayName={member.data.displayName}
+                    discordId={member.data.discordId}
+                    avatarHash={member.data.avatarHash}
+                    size={28}
+                    ringClass={
+                      member.clientId === user?.id
+                        ? 'ring-2 ring-[#54FFA4]/40 ring-offset-2 ring-offset-[#0a0c10]'
+                        : undefined
+                    }
+                  />
                   <span className="text-white/90 text-sm flex-1 truncate">{member.data.displayName}</span>
                   {member.clientId === hostClientId && (
                     <span className="text-[10px] uppercase tracking-wider text-[#54FFA4]/80 px-2 py-0.5 rounded-full bg-[#54FFA4]/10 border border-[#54FFA4]/20 font-semibold">
@@ -504,7 +556,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
               ))}
               {presence.length === 1 && (
                 <li className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-dashed border-white/[0.06]">
-                  <span className="w-2 h-2 rounded-full bg-white/15" />
+                  <div className="w-7 h-7 rounded-full bg-white/[0.04] border border-white/[0.06]" />
                   <span className="text-white/30 text-sm flex-1 italic">Waiting for opponent…</span>
                 </li>
               )}
