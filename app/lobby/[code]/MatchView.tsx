@@ -162,10 +162,10 @@ function Half({
 }) {
   return (
     <div className="flex items-center justify-center p-6 sm:p-10 lg:p-14 xl:p-20 min-h-screen xl:min-h-0">
-      {/* No max-width — each half takes ~50vw on splitscreen so the games
-          actually grow on larger displays. Padding gives them breathing room
-          against the viewport edges and the centre divider. */}
-      <div className="w-full flex flex-col">
+      {/* Cap at 2xl: a sensible fixed size that looks balanced across
+          1080p / 1440p / 4K without the smaller-screen-takes-over effect
+          that pure 50vw scaling produced. */}
+      <div className="w-full max-w-2xl flex flex-col">
         <div
           className={`text-xs uppercase tracking-[0.2em] mb-3 font-semibold ${
             accent ? 'text-[#54FFA4]' : 'text-white/40'
@@ -193,9 +193,9 @@ function FocusLayout({
     <>
       <div className="fixed top-3 left-4 z-40">{summary}</div>
       <div className="min-h-screen flex items-center justify-center p-6 sm:p-10 lg:p-14 xl:p-20">
-        {/* Single-pane focus mode: cap at 3xl so the lone game has visible
-            whitespace around it instead of consuming the whole viewport. */}
-        <div className="w-full max-w-3xl">{interactive}</div>
+        {/* Same 2xl cap as splitscreen halves so focus and splitscreen render
+            games at the same size. */}
+        <div className="w-full max-w-2xl">{interactive}</div>
       </div>
     </>
   );
