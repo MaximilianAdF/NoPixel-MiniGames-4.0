@@ -12,6 +12,12 @@ import type { LobbyMessage } from '@/lib/lobby/messages';
 import type { GameType } from '@/interfaces/user';
 import type { GameResult } from '@/app/game/types';
 import { orbitron } from '@/app/fonts';
+import {
+  trackMatchStarted,
+  trackMatchCompleted,
+  trackMatchForfeited,
+  trackMatchTimedOut,
+} from '@/app/utils/gtm';
 import MatchView from './MatchView';
 
 // Games available for 1v1 (RepairKit excluded — real-time mechanic).
@@ -178,6 +184,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     if (myResult || opponentResult) return;
     const fire = () => {
       setMatchExpired(true);
+      trackMatchTimedOut({ lobby_code: code, game_type: match.game });
       void publish({ type: 'match:timeout' });
     };
     const delay = matchStartTime + MATCH_MAX_MS - Date.now();
@@ -187,7 +194,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     }
     const handle = setTimeout(fire, delay);
     return () => clearTimeout(handle);
-  }, [match, matchStartTime, matchExpired, myResult, opponentResult, publish]);
+  }, [match, matchStartTime, matchExpired, myResult, opponentResult, code, publish]);
 
   // Host arbiter: derive and broadcast the canonical match:outcome once we
   // have enough info. If only one side has a result yet, wait briefly for
@@ -206,6 +213,15 @@ export default function LobbyClient({ code }: LobbyClientProps) {
         reason: decision.reason,
       });
       setOutcome(decision);
+      if (match) {
+        trackMatchCompleted({
+          lobby_code: code,
+          game_type: match.game,
+          reason: decision.reason,
+          has_winner: decision.winnerClientId !== null,
+          duration_ms: matchStartTime ? Date.now() - matchStartTime : 0,
+        });
+      }
     };
 
     // Both results in hand (or matchExpired) — decide immediately.
@@ -217,7 +233,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     // Only one side reported. Give the other ~600ms to land before locking.
     const handle = setTimeout(() => publishAndSet(decide()), 600);
     return () => clearTimeout(handle);
-  }, [isHost, myResult, opponentResult, matchExpired, outcome, user?.id, opponentClientId, publish]);
+  }, [isHost, myResult, opponentResult, matchExpired, outcome, user?.id, opponentClientId, publish, code, match, matchStartTime]);
 
   // Non-host fallback: if the host's match:outcome doesn't arrive within a
   // couple of seconds (host disconnected mid-match), derive locally so the
@@ -258,6 +274,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     setNow(startNow);
     setGoAt(newGoAt);
     setMatchStartTime(newGoAt);
+    trackMatchStarted({ lobby_code: code, game_type: game, focus_mode: focusMode });
     await publish({
       type: 'match:start',
       game,
@@ -293,8 +310,11 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     const elapsedMs = matchStartTime ? Date.now() - matchStartTime : 0;
     const result: GameResult = { won: false, score: 0, elapsedMs };
     setMyResult(result);
+    if (match) {
+      trackMatchForfeited({ lobby_code: code, game_type: match.game, duration_ms: elapsedMs });
+    }
     void publish({ type: 'match:result', won: false, score: 0, elapsedMs });
-  }, [myResult, matchStartTime, publish]);
+  }, [myResult, matchStartTime, match, code, publish]);
 
   const handleBackToLobby = () => {
     setMatch(null);

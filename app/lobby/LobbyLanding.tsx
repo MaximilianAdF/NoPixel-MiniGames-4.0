@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Swords } from 'lucide-react';
 import { useUser } from '@/app/contexts/UserContext';
 import { generateLobbyCode, isValidLobbyCode } from '@/lib/lobby/code';
+import { trackLobbyCreated, trackLobbyJoined } from '@/app/utils/gtm';
 
 export default function LobbyLanding() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function LobbyLanding() {
 
   const handleCreate = () => {
     const code = generateLobbyCode();
+    trackLobbyCreated({ lobby_code: code });
     router.push(`/lobby/${code}`);
   };
 
@@ -26,6 +28,7 @@ export default function LobbyLanding() {
       setError('Invalid code — should be 6 characters.');
       return;
     }
+    trackLobbyJoined({ lobby_code: normalized });
     router.push(`/lobby/${normalized}`);
   };
 
