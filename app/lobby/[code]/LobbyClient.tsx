@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Copy, Check, Loader2, LogOut } from 'lucide-react';
+import { ArrowLeft, Copy, Check, Loader2, LogOut, Share2 } from 'lucide-react';
 import { useUser } from '@/app/contexts/UserContext';
 import { useAblyChannel, type ChannelStatus } from '@/app/utils/useAblyChannel';
 import { generateMatchSeed } from '@/lib/lobby/seededRandom';
@@ -45,6 +45,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   const { user, isLoggedIn } = useUser();
   const router = useRouter();
   const [copied, setCopied] = useState(false);
+  const [shared, setShared] = useState(false);
   const [match, setMatch] = useState<{ game: GameType; seed: number } | null>(null);
   const [myResult, setMyResult] = useState<GameResult | null>(null);
   const [opponentResult, setOpponentResult] = useState<GameResult | null>(null);
@@ -258,6 +259,33 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     }
   };
 
+  const handleShare = async () => {
+    if (typeof window === 'undefined') return;
+    const url = window.location.href;
+    const shareData = {
+      title: '1v1 — NoPixel Hacks',
+      text: `Join my 1v1 lobby (code: ${code})`,
+      url,
+    };
+    // Prefer the native share sheet (iOS / macOS Safari / Android) — falls
+    // back to clipboard so desktop browsers still get a useful action.
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setShared(true);
+      setTimeout(() => setShared(false), 1500);
+    } catch {
+      // Silent fail.
+    }
+  };
+
   const handleStart = async (game: GameType) => {
     const seed = generateMatchSeed();
     const startNow = Date.now();
@@ -393,39 +421,57 @@ export default function LobbyClient({ code }: LobbyClientProps) {
 
   return (
     <div className="min-h-screen p-4 md:p-8">
-      <div className="max-w-lg mx-auto pt-12">
+      <div className="max-w-md mx-auto pt-8 md:pt-12 pb-12">
         <Link
           href="/lobby"
-          className="inline-flex items-center gap-2 text-white/40 hover:text-white/70 text-sm transition-colors mb-12"
+          className="inline-flex items-center gap-2 text-white/40 hover:text-white/80 text-sm transition-colors mb-10"
         >
           <ArrowLeft className="w-4 h-4" />
           Leave lobby
         </Link>
 
-        <div className="text-center mb-12">
-          <p className="text-white/30 text-xs uppercase tracking-wider mb-3">Lobby code</p>
+        {/* Hero: lobby code + share actions */}
+        <section className="text-center mb-8">
+          <p className="text-white/30 text-[10px] uppercase tracking-[0.25em] font-medium mb-5">
+            Lobby Code
+          </p>
           <button
             onClick={handleCopy}
-            className="group inline-flex items-center gap-3 px-4 py-2 -mx-4 -my-2 rounded-2xl hover:bg-white/[0.03] transition-colors"
+            className="group inline-flex items-center gap-3 px-5 py-3 -mx-5 -my-3 rounded-2xl hover:bg-white/[0.04] transition-colors mb-6"
             aria-label="Copy lobby code"
           >
-            <span className="text-6xl md:text-7xl font-bold text-white tracking-[0.18em] font-mono">
+            <span className="text-6xl md:text-7xl font-bold text-white tracking-[0.2em] font-mono">
               {code}
             </span>
             {copied ? (
               <Check className="w-5 h-5 text-[#54FFA4]" />
             ) : (
-              <Copy className="w-5 h-5 text-white/30 group-hover:text-white/60 transition-colors" />
+              <Copy className="w-5 h-5 text-white/30 group-hover:text-white/70 transition-colors" />
             )}
           </button>
-          <p className="text-white/40 text-sm mt-4">Share this with your friend</p>
-        </div>
 
-        <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5 mb-3">
+          <div className="flex items-center justify-center gap-2">
+            <ActionPill
+              onClick={handleCopy}
+              active={copied}
+              icon={copied ? Check : Copy}
+              label={copied ? 'Code copied' : 'Copy code'}
+            />
+            <ActionPill
+              onClick={handleShare}
+              active={shared}
+              icon={shared ? Check : Share2}
+              label={shared ? 'Link copied' : 'Share link'}
+            />
+          </div>
+        </section>
+
+        {/* Players */}
+        <section className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-5 mb-3">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-white/90 font-medium text-sm">
-              Players <span className="text-white/30">·</span>{' '}
-              <span className="text-white/50">{presence.length}</span>
+            <h2 className="text-white/90 font-semibold text-sm tracking-wide">
+              Players <span className="text-white/30 ml-1">·</span>{' '}
+              <span className="text-white/50">{presence.length}/2</span>
             </h2>
             <ConnectionStatus status={status} />
           </div>
@@ -439,28 +485,37 @@ export default function LobbyClient({ code }: LobbyClientProps) {
               {presence.map((member) => (
                 <li
                   key={member.clientId}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.02] transition-colors"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#54FFA4]" />
-                  <span className="text-white/90 text-sm flex-1">{member.data.displayName}</span>
+                  <span className="relative flex">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-[#54FFA4]/40 animate-ping opacity-50" />
+                    <span className="relative w-2 h-2 rounded-full bg-[#54FFA4]" />
+                  </span>
+                  <span className="text-white/90 text-sm flex-1 truncate">{member.data.displayName}</span>
                   {member.clientId === hostClientId && (
-                    <span className="text-white/50 text-xs px-2 py-0.5 rounded-full bg-white/5">
+                    <span className="text-[10px] uppercase tracking-wider text-[#54FFA4]/80 px-2 py-0.5 rounded-full bg-[#54FFA4]/10 border border-[#54FFA4]/20 font-semibold">
                       host
                     </span>
                   )}
                   {member.clientId === user?.id && (
-                    <span className="text-white/40 text-xs">you</span>
+                    <span className="text-white/30 text-[10px] uppercase tracking-wider">you</span>
                   )}
                 </li>
               ))}
+              {presence.length === 1 && (
+                <li className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-dashed border-white/[0.06]">
+                  <span className="w-2 h-2 rounded-full bg-white/15" />
+                  <span className="text-white/30 text-sm flex-1 italic">Waiting for opponent…</span>
+                </li>
+              )}
             </ul>
           )}
-        </div>
+        </section>
 
         {isHost && presence.length >= 2 && (
-          <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-white/70 text-sm">Start a match</p>
+          <section className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-white/90 font-semibold text-sm tracking-wide">Start a match</h2>
               <FocusToggle enabled={focusMode} onChange={setFocusMode} />
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -471,26 +526,31 @@ export default function LobbyClient({ code }: LobbyClientProps) {
                   <button
                     key={entry.id}
                     onClick={() => handleStart(entry.id)}
-                    className={`rounded-xl bg-white/[0.04] hover:bg-[#54FFA4] hover:text-black text-white/90 py-3 px-4 text-sm font-medium transition-colors ${lastSolo ? 'col-span-2' : ''}`}
+                    className={`group rounded-xl bg-white/[0.04] hover:bg-[#54FFA4]/10 border border-white/[0.06] hover:border-[#54FFA4]/40 text-white/90 hover:text-[#54FFA4] py-3.5 px-4 text-sm font-medium transition-all duration-200 active:scale-[0.98] ${lastSolo ? 'col-span-2' : ''}`}
                   >
                     {entry.label}
                   </button>
                 );
               })}
             </div>
-          </div>
+          </section>
         )}
 
         {isHost && presence.length < 2 && (
-          <p className="text-white/40 text-xs text-center">
-            Waiting for someone to join before starting a match…
-          </p>
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.01] px-5 py-4 text-center">
+            <p className="text-white/50 text-xs">
+              Share the lobby code or link to invite a friend.
+            </p>
+          </div>
         )}
 
         {!isHost && presence.length >= 2 && (
-          <p className="text-white/40 text-xs text-center">
-            Waiting for the host to start a match…
-          </p>
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.01] px-5 py-4 text-center">
+            <p className="text-white/50 text-xs inline-flex items-center gap-2">
+              <Loader2 className="w-3 h-3 animate-spin" />
+              Waiting for the host to start a match…
+            </p>
+          </div>
         )}
       </div>
 
@@ -500,6 +560,33 @@ export default function LobbyClient({ code }: LobbyClientProps) {
         </div>
       )}
     </div>
+  );
+}
+
+function ActionPill({
+  onClick,
+  active,
+  icon: Icon,
+  label,
+}: {
+  onClick: () => void;
+  active: boolean;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+        active
+          ? 'bg-[#54FFA4]/12 text-[#54FFA4] border border-[#54FFA4]/30'
+          : 'bg-white/[0.04] hover:bg-white/[0.08] text-white/80 border border-white/[0.08] hover:border-white/15'
+      }`}
+    >
+      <Icon className="w-4 h-4" />
+      <span>{label}</span>
+    </button>
   );
 }
 
@@ -747,17 +834,17 @@ function FocusToggle({
     <button
       type="button"
       onClick={() => onChange(!enabled)}
-      className="group inline-flex items-center gap-2 text-xs text-white/50 hover:text-white/90 transition-colors"
+      className="group inline-flex items-center gap-2.5 text-xs text-white/55 hover:text-white/90 transition-colors"
       title="Hide the opponent's board — show only their progress"
     >
-      <span>Focus mode</span>
+      <span className="font-medium">Focus mode</span>
       <span
-        className={`relative inline-block w-8 h-4 rounded-full transition-colors ${
+        className={`relative inline-block w-9 h-5 rounded-full transition-colors ${
           enabled ? 'bg-[#54FFA4]' : 'bg-white/10 group-hover:bg-white/20'
         }`}
       >
         <span
-          className={`absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-white transition-transform ${
+          className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-md shadow-black/30 transition-transform ${
             enabled ? 'translate-x-4' : 'translate-x-0'
           }`}
         />
