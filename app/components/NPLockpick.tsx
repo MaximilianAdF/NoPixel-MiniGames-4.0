@@ -128,14 +128,7 @@ const NPLockpickView: FC<NPLockpickViewProps> = ({
       >
         <div
           className="aspect-square flex items-center justify-center relative"
-          style={{
-            width: '100%',
-            // Compact (1v1) caps at 55vh so the square SVG takes a
-            // consistent ~55% of viewport height on every monitor instead
-            // of inheriting a fixed-pixel wrapper budget that looks small
-            // on 1440p+ and dominant on 1080p-.
-            maxWidth: compact ? '55vh' : `calc(100vh - 298px)`,
-          }}
+          style={{ width: '100%', maxWidth: `calc(100vh - 298px)` }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

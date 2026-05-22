@@ -121,13 +121,16 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     }
   }, [match, matchStartTime, myResult, opponentResult, matchExpired]);
 
-  // Idle-lobby timeout: only counts when no match is in progress.
+  // Idle-lobby timeout: skip only while a match is actively running. The
+  // outcome view (and the countdown before a new match) both count toward
+  // idle so users can't park there forever.
+  const isInActiveMatch = !!(match && !myResult && !opponentResult && !matchExpired);
   useEffect(() => {
-    if (match) return;
+    if (isInActiveMatch) return;
     if (now - lobbyLastActivity >= LOBBY_IDLE_MS) {
       router.push('/lobby');
     }
-  }, [match, now, lobbyLastActivity, router]);
+  }, [isInActiveMatch, now, lobbyLastActivity, router]);
 
   // Schedule a re-render at each second boundary of the countdown, all
   // anchored on goAt. Without this the 1Hz interval fires at whatever phase

@@ -162,10 +162,7 @@ function Half({
 }) {
   return (
     <div className="flex items-center justify-center p-6 sm:p-10 lg:p-14 xl:p-20 min-h-screen xl:min-h-0">
-      {/* No max-width — each game caps itself with a vh-based formula in
-          compact mode, so they take a consistent fraction of the viewport
-          regardless of monitor size instead of being capped at fixed px. */}
-      <div className="w-full flex flex-col">
+      <div className="w-full max-w-2xl flex flex-col">
         <div
           className={`text-xs uppercase tracking-[0.2em] mb-3 font-semibold ${
             accent ? 'text-[#54FFA4]' : 'text-white/40'
@@ -193,9 +190,7 @@ function FocusLayout({
     <>
       <div className="fixed top-3 left-4 z-40">{summary}</div>
       <div className="min-h-screen flex items-center justify-center p-6 sm:p-10 lg:p-14 xl:p-20">
-        {/* Same as the splitscreen halves: no wrapper cap, games size
-            themselves via vh-based formulas. */}
-        <div className="w-full">{interactive}</div>
+        <div className="w-full max-w-2xl">{interactive}</div>
       </div>
     </>
   );
