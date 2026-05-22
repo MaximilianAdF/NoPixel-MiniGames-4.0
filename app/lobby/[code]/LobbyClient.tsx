@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Copy, Check, Loader2, LogOut } from 'lucide-react';
@@ -107,9 +107,15 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     return () => clearInterval(interval);
   }, []);
 
-  // Anyone joining/leaving the lobby counts as activity — resets the idle clock.
+  // Only a new joiner counts as activity. If the opponent gets idle-kicked
+  // first, the host's presence drops 2→1; we don't want that to reset the
+  // host's own idle clock and let them sit forever.
+  const prevPresenceLenRef = useRef(0);
   useEffect(() => {
-    setLobbyLastActivity(Date.now());
+    if (presence.length > prevPresenceLenRef.current) {
+      setLobbyLastActivity(Date.now());
+    }
+    prevPresenceLenRef.current = presence.length;
   }, [presence.length]);
 
   // When a match ends (back to lobby), reset activity so the next idle window
@@ -121,16 +127,22 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     }
   }, [match, matchStartTime, myResult, opponentResult, matchExpired]);
 
-  // Idle-lobby timeout: skip only while a match is actively running. The
-  // outcome view (and the countdown before a new match) both count toward
-  // idle so users can't park there forever.
+  // Idle-lobby timeout: schedule a setTimeout aligned to the deadline rather
+  // than polling `now` each tick. Polling could quietly miss firing if the
+  // 1Hz interval was throttled (background tab) or out of phase; setTimeout
+  // fires once at the right moment. Skipped only while a match is actively
+  // running — the outcome view and pre-match countdown count toward idle.
   const isInActiveMatch = !!(match && !myResult && !opponentResult && !matchExpired);
   useEffect(() => {
     if (isInActiveMatch) return;
-    if (now - lobbyLastActivity >= LOBBY_IDLE_MS) {
+    const delay = lobbyLastActivity + LOBBY_IDLE_MS - Date.now();
+    if (delay <= 0) {
       router.push('/lobby');
+      return;
     }
-  }, [isInActiveMatch, now, lobbyLastActivity, router]);
+    const handle = setTimeout(() => router.push('/lobby'), delay);
+    return () => clearTimeout(handle);
+  }, [isInActiveMatch, lobbyLastActivity, router]);
 
   // Schedule a re-render at each second boundary of the countdown, all
   // anchored on goAt. Without this the 1Hz interval fires at whatever phase
@@ -146,18 +158,26 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     return () => handles.forEach(clearTimeout);
   }, [goAt]);
 
-  // Match max-duration: first client to expire publishes match:timeout so both
-  // converge on a draw without UI flicker. Guard against firing after the
-  // match is already resolved (e.g., opponent forfeited at 2:30, timer would
-  // otherwise still fire at 3:00 and flip the outcome to a fake draw).
+  // Match max-duration: also setTimeout-based so it can't be missed by a
+  // throttled tick. First client to expire publishes match:timeout so both
+  // converge on a draw without UI flicker. Guards prevent firing after the
+  // match is already resolved (e.g., opponent forfeited at 2:30 and the
+  // timer would otherwise still flip the outcome to a fake draw at 3:00).
   useEffect(() => {
     if (!match || matchStartTime === null || matchExpired) return;
     if (myResult || opponentResult) return;
-    if (now - matchStartTime >= MATCH_MAX_MS) {
+    const fire = () => {
       setMatchExpired(true);
       void publish({ type: 'match:timeout' });
+    };
+    const delay = matchStartTime + MATCH_MAX_MS - Date.now();
+    if (delay <= 0) {
+      fire();
+      return;
     }
-  }, [match, matchStartTime, now, matchExpired, myResult, opponentResult, publish]);
+    const handle = setTimeout(fire, delay);
+    return () => clearTimeout(handle);
+  }, [match, matchStartTime, matchExpired, myResult, opponentResult, publish]);
 
   const handleCopy = async () => {
     try {
