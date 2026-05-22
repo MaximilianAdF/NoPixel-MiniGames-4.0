@@ -80,13 +80,13 @@ export default function PlayerAvatar({
       {emote && (
         <div
           key={emote.key}
-          className="emote-bubble absolute -top-12 left-1/2 -translate-x-1/2 z-20 p-1 rounded-full bg-black/80 backdrop-blur-sm border border-white/15 shadow-xl shadow-black/50 pointer-events-none"
+          className="emote-bubble absolute -top-14 left-1/2 -translate-x-1/2 z-20 p-1.5 rounded-full bg-black/80 backdrop-blur-sm border border-white/15 shadow-xl shadow-black/50 pointer-events-none"
         >
           <EmoteImage
             primaryUrl={emote.primaryUrl}
             fallbackUrl={emote.fallbackUrl}
             label={emote.label}
-            size={36}
+            size={48}
             className="block"
           />
         </div>

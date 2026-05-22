@@ -1,24 +1,33 @@
 // Preset quick-reactions shipped over the Ably lobby channel. Each emote
-// has an animated WebP from Google's Noto Animated Emoji set and a static
-// Fluent UI 3D PNG fallback (used when Noto doesn't cover a particular
-// face). Wire format stores the stable `id`.
+// has THREE rendering URLs: the animated WebP (for the floating bubble /
+// inline chip), a static PNG of the same Noto face (for the always-
+// visible picker bar — running five animated 512px WebPs at once was
+// enough to crash some browsers), and a Fluent UI 3D PNG fallback used
+// via <img onError> if Noto 404s.
 export interface EmoteDef {
   id: string;
   // Unicode glyph — also handy as alt text / lookup key.
   unicode: string;
-  // Animated WebP from Google Noto Animated Emoji (Google Fonts CDN).
+  // Animated WebP from Google Noto Animated Emoji. Used in the floating
+  // bubble / inline chip when an emote actually fires.
   animatedUrl: string;
-  // Static Fluent UI 3D PNG, used as <img> onError fallback.
+  // Static PNG from the same Noto set, used in the always-visible emote
+  // picker bar so it doesn't decode five animated WebPs at all times.
   staticUrl: string;
+  // Static Fluent UI 3D PNG, used as <img> onError fallback if Noto 404s.
+  fallbackUrl: string;
   // Short label used as tooltip / aria-label on the button.
   label: string;
 }
 
-// Google only publishes the animated WebP at the 512 size on this CDN —
-// other sizes return HTML 404 pages, which would silently fall back to the
-// static Fluent PNG. The browser scales it down via the <img>'s width/height.
+// Google only publishes the animated WebP at the 512 size on this CDN;
+// other sizes return HTML 404. The 512 PNG is the static counterpart.
 function notoAnimated(codepoint: string): string {
   return `https://fonts.gstatic.com/s/e/notoemoji/latest/${codepoint}/512.webp`;
+}
+
+function notoStatic(codepoint: string): string {
+  return `https://fonts.gstatic.com/s/e/notoemoji/latest/${codepoint}/512.png`;
 }
 
 function fluentStatic(name: string): string {
@@ -31,35 +40,40 @@ export const EMOTES: EmoteDef[] = [
     id: 'laugh',
     unicode: '😆',
     animatedUrl: notoAnimated('1f606'),
-    staticUrl: fluentStatic('Grinning squinting face'),
+    staticUrl: notoStatic('1f606'),
+    fallbackUrl: fluentStatic('Grinning squinting face'),
     label: 'LOL',
   },
   {
     id: 'cry',
     unicode: '😭',
     animatedUrl: notoAnimated('1f62d'),
-    staticUrl: fluentStatic('Loudly crying face'),
+    staticUrl: notoStatic('1f62d'),
+    fallbackUrl: fluentStatic('Loudly crying face'),
     label: 'Cry',
   },
   {
     id: 'clown',
     unicode: '🤡',
     animatedUrl: notoAnimated('1f921'),
-    staticUrl: fluentStatic('Clown face'),
+    staticUrl: notoStatic('1f921'),
+    fallbackUrl: fluentStatic('Clown face'),
     label: 'Clown',
   },
   {
     id: 'angry',
     unicode: '😡',
     animatedUrl: notoAnimated('1f621'),
-    staticUrl: fluentStatic('Pouting face'),
+    staticUrl: notoStatic('1f621'),
+    fallbackUrl: fluentStatic('Pouting face'),
     label: 'Mad',
   },
   {
     id: 'rip',
     unicode: '💀',
     animatedUrl: notoAnimated('1f480'),
-    staticUrl: fluentStatic('Skull'),
+    staticUrl: notoStatic('1f480'),
+    fallbackUrl: fluentStatic('Skull'),
     label: 'RIP',
   },
 ];

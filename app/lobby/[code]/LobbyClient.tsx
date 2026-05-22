@@ -103,8 +103,10 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     setEmotes((prev) => ({
       ...prev,
       [fromClientId]: {
+        // Triggered emote is always rendered animated; if the animated WebP
+        // 404s for some reason we fall back to the Fluent 3D PNG.
         primaryUrl: def.animatedUrl,
-        fallbackUrl: def.staticUrl,
+        fallbackUrl: def.fallbackUrl,
         label: def.label,
         key,
       },
@@ -856,11 +858,14 @@ function EmoteBar({ onSend }: { onSend: (emoteId: string) => void }) {
           aria-label={emote.label}
           className="p-1.5 rounded-xl hover:bg-white/10 transition-colors active:scale-90"
         >
+          {/* Picker bar uses the STATIC Noto PNG — animated WebPs sitting
+              here at all times were heavy enough to crash some browsers.
+              The animated version only fires when an emote is sent. */}
           <EmoteImage
-            primaryUrl={emote.animatedUrl}
-            fallbackUrl={emote.staticUrl}
+            primaryUrl={emote.staticUrl}
+            fallbackUrl={emote.fallbackUrl}
             label={emote.label}
-            size={36}
+            size={44}
             className="block"
           />
         </button>
@@ -1117,9 +1122,9 @@ function InlineEmote({
   return (
     <span
       key={emoteKey}
-      className="emote-inline inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/[0.05] border border-white/15 shrink-0"
+      className="emote-inline inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/[0.05] border border-white/15 shrink-0"
     >
-      <EmoteImage primaryUrl={primaryUrl} fallbackUrl={fallbackUrl} label={label} size={20} />
+      <EmoteImage primaryUrl={primaryUrl} fallbackUrl={fallbackUrl} label={label} size={26} />
     </span>
   );
 }
