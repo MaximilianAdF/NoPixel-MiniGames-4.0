@@ -85,7 +85,12 @@ const ThermiteView: FC<ThermiteViewProps> = ({
           !onSquareClick && 'pointer-events-none',
         )}
         style={{
-          maxWidth: `calc(calc(calc(calc(calc(100vh - 236px) - ${4 * (state.rows - 1)}px) / ${state.rows}) * ${state.columns}) + ${2 * (state.columns - 1)}px)`,
+          // Compact (1v1) anchors the grid height at 55vh so the board takes
+          // a consistent fraction of every viewport. Solo keeps the original
+          // 100vh-based formula so the page-chrome buffer still applies.
+          maxWidth: compact
+            ? `calc(calc(calc(55vh - ${4 * (state.rows - 1)}px) / ${state.rows}) * ${state.columns} + ${2 * (state.columns - 1)}px)`
+            : `calc(calc(calc(calc(calc(100vh - 236px) - ${4 * (state.rows - 1)}px) / ${state.rows}) * ${state.columns}) + ${2 * (state.columns - 1)}px)`,
           width: '100%',
           gridTemplateRows: `repeat(${state.rows}, minmax(0, 1fr))`,
           gridTemplateColumns: `repeat(${state.columns}, minmax(0, 1fr))`,
