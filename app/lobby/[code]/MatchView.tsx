@@ -193,9 +193,9 @@ function FocusLayout({
     <>
       <div className="fixed top-3 left-4 z-40">{summary}</div>
       <div className="min-h-screen flex items-center justify-center p-6 sm:p-10 lg:p-14 xl:p-20">
-        {/* Cap is generous (5xl) so single-pane focus mode scales up on
-            large displays without going edge-to-edge on 4K. */}
-        <div className="w-full max-w-5xl">{interactive}</div>
+        {/* Single-pane focus mode: cap at 3xl so the lone game has visible
+            whitespace around it instead of consuming the whole viewport. */}
+        <div className="w-full max-w-3xl">{interactive}</div>
       </div>
     </>
   );
