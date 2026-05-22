@@ -162,7 +162,9 @@ function Half({
 }) {
   return (
     <div className="flex items-center justify-center p-4 sm:p-6 xl:p-10 min-h-screen xl:min-h-0">
-      <div className="w-full max-w-2xl flex flex-col">
+      {/* No max-width — each half takes ~50vw on splitscreen so the games
+          actually grow on larger displays. */}
+      <div className="w-full flex flex-col">
         <div
           className={`text-xs uppercase tracking-[0.2em] mb-3 font-semibold ${
             accent ? 'text-[#54FFA4]' : 'text-white/40'
@@ -190,7 +192,9 @@ function FocusLayout({
     <>
       <div className="fixed top-3 left-4 z-40">{summary}</div>
       <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 xl:p-10">
-        <div className="w-full max-w-2xl">{interactive}</div>
+        {/* Cap is generous (5xl) so single-pane focus mode scales up on
+            large displays without going edge-to-edge on 4K. */}
+        <div className="w-full max-w-5xl">{interactive}</div>
       </div>
     </>
   );

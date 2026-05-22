@@ -8,6 +8,10 @@ export interface MatchStartMessage {
   game: GameType;
   seed: number;
   startedAt: number;
+  // Wall-clock moment in the host's Date.now() frame at which both clients
+  // should unblock the game. Both sides compare against their own Date.now()
+  // — same wall-clock fire if clocks are NTP-synced (the typical case).
+  goAt: number;
   // Focus mode: hide the opponent's mirrored board, render only a compact
   // progress summary on the opponent's half of the splitscreen.
   focusMode: boolean;

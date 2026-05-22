@@ -47,10 +47,11 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   const [matchExpired, setMatchExpired] = useState(false);
   const [lobbyLastActivity, setLobbyLastActivity] = useState(() => Date.now());
   const [now, setNow] = useState(() => Date.now());
-  // Each client times its own 3-second countdown from when it receives the
-  // match:start. This gives a consistent 3-2-1 display on both sides (no
-  // leaked clock skew) at the cost of ~50ms host network-latency advantage,
-  // which is negligible compared to human reaction time.
+  // Synced go-time in the host's Date.now() frame, shipped on match:start.
+  // Both clients compare to their own Date.now() — same wall-clock fire if
+  // their clocks are NTP-synced (typical for browsers). Display is driven by
+  // per-second setTimeouts aligned to goAt so the digits tick exactly at
+  // second boundaries instead of waiting on a stale 1Hz interval.
   const [goAt, setGoAt] = useState<number | null>(null);
   // Host-controlled per-lobby setting. Persists across matches in the same lobby.
   const [focusMode, setFocusMode] = useState(false);
@@ -68,12 +69,19 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       setOpponentInputs([]);
       setMatchExpired(false);
       setMatchFocusMode(msg.focusMode);
-      // Time the countdown locally so the display stays in sync with the
-      // host's regardless of clock skew between the two browsers.
-      const localGoAt = Date.now() + COUNTDOWN_MS;
-      setGoAt(localGoAt);
+      // Use the host's goAt. Cap to a sane local range so a wildly-skewed
+      // peer clock can't make the countdown last minutes or fire instantly.
+      const receiveNow = Date.now();
+      const cappedGoAt = Math.min(
+        Math.max(msg.goAt, receiveNow + 500),
+        receiveNow + COUNTDOWN_MS + 1500,
+      );
+      // Sync `now` atomically so the first countdown render isn't off by
+      // however stale the 1Hz interval state happened to be.
+      setNow(receiveNow);
+      setGoAt(cappedGoAt);
       // Match timer starts counting from GO, not from when match:start arrived.
-      setMatchStartTime(localGoAt);
+      setMatchStartTime(cappedGoAt);
     } else if (msg.type === 'match:result') {
       setOpponentResult({ won: msg.won, score: msg.score, elapsedMs: msg.elapsedMs });
     } else if (msg.type === 'match:input') {
@@ -121,14 +129,18 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     }
   }, [match, now, lobbyLastActivity, router]);
 
-  // Precision tick aligned to goAt so the countdown→match transition fires
-  // exactly at the synced go-time, not at the next 1Hz tick boundary.
+  // Schedule a re-render at each second boundary of the countdown, all
+  // anchored on goAt. Without this the 1Hz interval fires at whatever phase
+  // it landed on at lobby-mount, so the "1" digit might only flash for a
+  // few hundred ms before the match starts.
   useEffect(() => {
     if (!goAt) return;
-    const delay = goAt - Date.now();
-    if (delay <= 0) return;
-    const handle = setTimeout(() => setNow(Date.now()), delay);
-    return () => clearTimeout(handle);
+    const handles: ReturnType<typeof setTimeout>[] = [];
+    for (let target = goAt - 2000; target <= goAt; target += 1000) {
+      const delay = Math.max(0, target - Date.now());
+      handles.push(setTimeout(() => setNow(Date.now()), delay));
+    }
+    return () => handles.forEach(clearTimeout);
   }, [goAt]);
 
   // Match max-duration: first client to expire publishes match:timeout so both
@@ -156,20 +168,25 @@ export default function LobbyClient({ code }: LobbyClientProps) {
 
   const handleStart = async (game: GameType) => {
     const seed = generateMatchSeed();
-    const newGoAt = Date.now() + COUNTDOWN_MS;
+    const startNow = Date.now();
+    const newGoAt = startNow + COUNTDOWN_MS;
     setMatch({ game, seed });
     setMyResult(null);
     setOpponentResult(null);
     setOpponentInputs([]);
     setMatchExpired(false);
     setMatchFocusMode(focusMode);
+    // Sync `now` atomically with goAt so the initial countdown render shows
+    // exactly 3 instead of 4 (the 1Hz interval state can be up to 1s stale).
+    setNow(startNow);
     setGoAt(newGoAt);
     setMatchStartTime(newGoAt);
     await publish({
       type: 'match:start',
       game,
       seed,
-      startedAt: Date.now(),
+      startedAt: startNow,
+      goAt: newGoAt,
       focusMode,
     });
   };
