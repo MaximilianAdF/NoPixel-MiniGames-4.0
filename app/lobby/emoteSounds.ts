@@ -1,16 +1,7 @@
-// Emote sound effects. Three are real recorded sounds (laugh / clown horn
-// / angry growl) served from /public/audio. Two (cry / skull) are still
-// synthesised via the Web Audio API — they shape well as oscillator + LFO
-// and avoid more mp3s.
-//
-// Note: the three mp3s currently in /public/audio/ are placeholder clips;
-// swap them for properly-licensed audio before going to production.
-
-import { AudioPlayer } from '@/public/audio/AudioManager';
-
-const laughPlayer = new AudioPlayer('/audio/emote-laugh.mp3');
-const clownPlayer = new AudioPlayer('/audio/emote-clown.mp3');
-const angryPlayer = new AudioPlayer('/audio/emote-angry.mp3');
+// Emote sound effects. All synthesised via the Web Audio API — no asset
+// files needed, one shared AudioContext for the tab. Each sound follows
+// the same pattern as cry/skull: a single oscillator with a smooth pitch
+// sweep, an LFO for vibrato/wobble, and an envelope. No chopped pulses.
 
 let ctx: AudioContext | null = null;
 
@@ -33,19 +24,144 @@ function getCtx(): AudioContext | null {
   return ctx;
 }
 
-// 😆  Real cartoon laugh mp3.
+// 😆  Bouncy "hehehehe" — triangle wave with rapid pitch + amplitude
+// vibrato in sync, so each LFO cycle reads as one "ha" syllable.
 function playLaugh() {
-  laughPlayer.play();
+  const c = getCtx();
+  if (!c) return;
+  const t = c.currentTime;
+  const dur = 1.0;
+
+  const osc = c.createOscillator();
+  osc.type = 'triangle';
+  // Slight downward inflection like a real falling-off laugh.
+  osc.frequency.setValueAtTime(440, t);
+  osc.frequency.exponentialRampToValueAtTime(340, t + dur);
+
+  // Pitch LFO: 8Hz wobble (~8 ha/sec, natural laughter rate).
+  const pitchLFO = c.createOscillator();
+  pitchLFO.type = 'sine';
+  pitchLFO.frequency.value = 8;
+  const pitchLFOGain = c.createGain();
+  pitchLFOGain.gain.value = 90;
+  pitchLFO.connect(pitchLFOGain);
+  pitchLFOGain.connect(osc.frequency);
+
+  // Amplitude tremolo at the same rate to split the wobble into discrete
+  // "ha" pulses. Sine LFO output is [-0.5, +0.5] times depth; chained
+  // onto a base 0.5 gain it oscillates the signal between ~0 and ~1.
+  const tremolo = c.createGain();
+  tremolo.gain.value = 0.5;
+  const ampLFO = c.createOscillator();
+  ampLFO.type = 'sine';
+  ampLFO.frequency.value = 8;
+  const ampLFOGain = c.createGain();
+  ampLFOGain.gain.value = 0.5;
+  ampLFO.connect(ampLFOGain);
+  ampLFOGain.connect(tremolo.gain);
+
+  // Master envelope: quick attack, sustain, exponential decay.
+  const env = c.createGain();
+  env.gain.setValueAtTime(0, t);
+  env.gain.linearRampToValueAtTime(0.22, t + 0.05);
+  env.gain.setValueAtTime(0.22, t + 0.7);
+  env.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+  osc.connect(tremolo).connect(env).connect(c.destination);
+  osc.start(t);
+  pitchLFO.start(t);
+  ampLFO.start(t);
+  osc.stop(t + dur + 0.05);
+  pitchLFO.stop(t + dur + 0.05);
+  ampLFO.stop(t + dur + 0.05);
 }
 
-// 🤡  Real bicycle / clown honk mp3.
+// 🤡  Cartoon slide-whistle — sine wave swooping up-down-up-down with a
+// goofy vibrato. Reads as "boing-boing" rather than honks.
 function playClown() {
-  clownPlayer.play();
+  const c = getCtx();
+  if (!c) return;
+  const t = c.currentTime;
+  const dur = 0.75;
+
+  const osc = c.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(300, t);
+  osc.frequency.exponentialRampToValueAtTime(900, t + 0.2);
+  osc.frequency.exponentialRampToValueAtTime(380, t + 0.4);
+  osc.frequency.exponentialRampToValueAtTime(820, t + 0.55);
+  osc.frequency.exponentialRampToValueAtTime(340, t + dur);
+
+  // Light vibrato for cartoon texture.
+  const lfo = c.createOscillator();
+  lfo.type = 'sine';
+  lfo.frequency.value = 11;
+  const lfoGain = c.createGain();
+  lfoGain.gain.value = 30;
+  lfo.connect(lfoGain);
+  lfoGain.connect(osc.frequency);
+
+  const env = c.createGain();
+  env.gain.setValueAtTime(0, t);
+  env.gain.linearRampToValueAtTime(0.2, t + 0.03);
+  env.gain.setValueAtTime(0.2, t + dur - 0.1);
+  env.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+  osc.connect(env).connect(c.destination);
+  osc.start(t);
+  lfo.start(t);
+  osc.stop(t + dur + 0.05);
+  lfo.stop(t + dur + 0.05);
 }
 
-// 😡  Real growl mp3.
+// 😡  Menacing growl — low sawtooth with slow pitch wobble and a fast
+// amplitude tremolo for rumble texture. Same skeleton as cry/skull but
+// pitched way down with a square LFO on amplitude for the aggressive
+// "GRRRR" buzz.
 function playAngry() {
-  angryPlayer.play();
+  const c = getCtx();
+  if (!c) return;
+  const t = c.currentTime;
+  const dur = 1.0;
+
+  const osc = c.createOscillator();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(140, t);
+  osc.frequency.exponentialRampToValueAtTime(85, t + dur);
+
+  // Slow ~4Hz pitch wobble — menacing.
+  const pitchLFO = c.createOscillator();
+  pitchLFO.type = 'sine';
+  pitchLFO.frequency.value = 4;
+  const pitchLFOGain = c.createGain();
+  pitchLFOGain.gain.value = 18;
+  pitchLFO.connect(pitchLFOGain);
+  pitchLFOGain.connect(osc.frequency);
+
+  // Fast square-wave amplitude tremolo for the "rrrrr" rumble.
+  const tremolo = c.createGain();
+  tremolo.gain.value = 0.75;
+  const ampLFO = c.createOscillator();
+  ampLFO.type = 'square';
+  ampLFO.frequency.value = 22;
+  const ampLFOGain = c.createGain();
+  ampLFOGain.gain.value = 0.25;
+  ampLFO.connect(ampLFOGain);
+  ampLFOGain.connect(tremolo.gain);
+
+  const env = c.createGain();
+  env.gain.setValueAtTime(0, t);
+  env.gain.linearRampToValueAtTime(0.26, t + 0.02);
+  env.gain.setValueAtTime(0.26, t + 0.75);
+  env.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+  osc.connect(tremolo).connect(env).connect(c.destination);
+  osc.start(t);
+  pitchLFO.start(t);
+  ampLFO.start(t);
+  osc.stop(t + dur + 0.05);
+  pitchLFO.stop(t + dur + 0.05);
+  ampLFO.stop(t + dur + 0.05);
 }
 
 // 😭  Long "WAAAH" — sustained triangle sweeping 600 → 180Hz with vibrato.
