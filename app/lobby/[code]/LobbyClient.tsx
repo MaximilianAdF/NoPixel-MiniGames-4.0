@@ -81,6 +81,8 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   // match" panel can show a "Requested" badge, and the non-host's suggest
   // panel can show their own selection.
   const [suggestedGame, setSuggestedGame] = useState<GameType | null>(null);
+  // Last few matches played in this lobby (in-memory; resets on reload).
+  const [matchHistory, setMatchHistory] = useState<MatchHistoryEntry[]>([]);
 
   const displayName = user?.displayName ?? user?.username ?? 'Player';
 
@@ -303,6 +305,29 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     const handle = setTimeout(() => publishAndSet(decide()), 600);
     return () => clearTimeout(handle);
   }, [isHost, myResult, opponentResult, matchExpired, outcome, user?.id, opponentClientId, publish, code, match, matchStartTime]);
+
+  // Append to match history once the canonical outcome lands, deduped by
+  // match.seed so multiple effect runs don't push the same row twice.
+  useEffect(() => {
+    if (!outcome || !match) return;
+    setMatchHistory((prev) => {
+      if (prev.some((e) => e.seed === match.seed)) return prev;
+      const winner = outcome.winnerClientId
+        ? presence.find((p) => p.clientId === outcome.winnerClientId)
+        : null;
+      const entry: MatchHistoryEntry = {
+        seed: match.seed,
+        game: match.game,
+        winnerClientId: outcome.winnerClientId,
+        winnerName: winner?.data.displayName,
+        winnerDiscordId: winner?.data.discordId,
+        winnerAvatarHash: winner?.data.avatarHash,
+        durationMs: matchStartTime ? Date.now() - matchStartTime : 0,
+        endedAt: Date.now(),
+      };
+      return [entry, ...prev].slice(0, 5);
+    });
+  }, [outcome, match, presence, matchStartTime]);
 
   // Non-host fallback: if the host's match:outcome doesn't arrive within a
   // couple of seconds (host disconnected mid-match), derive locally so the
@@ -632,6 +657,19 @@ export default function LobbyClient({ code }: LobbyClientProps) {
           )}
         </section>
 
+        {matchHistory.length > 0 && (
+          <section className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-5 mb-3">
+            <h2 className="text-white/90 font-semibold text-sm tracking-wide mb-3">
+              Recent matches
+            </h2>
+            <ul className="space-y-1.5">
+              {matchHistory.map((entry) => (
+                <MatchHistoryRow key={entry.seed} entry={entry} />
+              ))}
+            </ul>
+          </section>
+        )}
+
         {isHost && presence.length >= 2 && (
           <section className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-5">
             <div className="flex items-center justify-between mb-4">
@@ -722,6 +760,52 @@ export default function LobbyClient({ code }: LobbyClientProps) {
         </div>
       )}
     </div>
+  );
+}
+
+interface MatchHistoryEntry {
+  seed: number;
+  game: GameType;
+  winnerClientId: string | null;
+  winnerName?: string;
+  winnerDiscordId?: string;
+  winnerAvatarHash?: string;
+  durationMs: number;
+  endedAt: number;
+}
+
+function MatchHistoryRow({ entry }: { entry: MatchHistoryEntry }) {
+  const gameLabel = ONEV_ONE_GAMES.find((g) => g.id === entry.game)?.label ?? entry.game;
+  const isDraw = entry.winnerClientId === null;
+  return (
+    <li className="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/[0.02]">
+      <span className="text-[11px] text-white/45 uppercase tracking-wider w-24 shrink-0 truncate">
+        {gameLabel}
+      </span>
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        {isDraw ? (
+          <span className="text-xs text-amber-300/90 font-medium">Draw</span>
+        ) : (
+          <>
+            <PlayerAvatar
+              userId={entry.winnerClientId ?? ''}
+              displayName={entry.winnerName ?? '?'}
+              discordId={entry.winnerDiscordId}
+              avatarHash={entry.winnerAvatarHash}
+              size={20}
+              linkable={!!entry.winnerClientId}
+            />
+            <span className="text-xs text-white/80 truncate">{entry.winnerName ?? 'Unknown'}</span>
+            <span className="text-[10px] uppercase tracking-wider text-[#54FFA4]/80 shrink-0">
+              won
+            </span>
+          </>
+        )}
+      </div>
+      <span className="text-[10px] text-white/35 font-mono tabular-nums shrink-0">
+        {(entry.durationMs / 1000).toFixed(1)}s
+      </span>
+    </li>
   );
 }
 
