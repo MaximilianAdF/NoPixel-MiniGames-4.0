@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type FC } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FC, type ReactNode } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { successPlayer, checkBeepPlayer, timerBeepPlayer } from '@/public/audio/AudioManager';
 import usePersistantState from '@/app/utils/usePersistentState';
@@ -13,8 +13,10 @@ import { NPSettingsRange } from '@/app/components/NPSettings';
 import GameStatsTracker from '@/app/components/GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
-import type { GameMode, GameResult } from '@/app/game/types';
-import { choppingEngine } from './engine';
+import type { GameMode, GamePhase, GameResult } from '@/app/game/types';
+import { useReplayedState } from '@/app/utils/useReplayedState';
+import OpponentSummary from '@/app/lobby/OpponentSummary';
+import { choppingEngine, type ChoppingState } from './engine';
 import { GridRow, defaultGridCols } from './ChoppingGrid';
 import '../../../public/Chopping/Chopping.css';
 
@@ -22,7 +24,90 @@ const ALLOWED_KEYS = ['Q', 'q', 'W', 'w', 'E', 'e', 'R', 'r', 'A', 'a', 'S', 's'
 const defaultNumLetters = 15;
 const defaultDuration = 7;
 
-const Chopping: FC = () => {
+interface ChoppingViewProps {
+  state: ChoppingState;
+  phase: GamePhase;
+  result: GameResult | null;
+  runId: number;
+  durationMs: number;
+  hideTimer?: boolean;
+  // Splitscreen layouts (1v1) drop the touch-friendly min-width so two boards
+  // can sit side by side without overflowing.
+  compact?: boolean;
+  // Interactive-only: refs/handlers that wire the grid wrapper into mobile keyboard
+  // activation. Spectator views omit these.
+  wrapperRef?: React.Ref<HTMLDivElement>;
+  onInteraction?: () => void;
+  // Interactive-only: hidden mobile input rendered inside the GameShell.
+  mobileInput?: ReactNode;
+  settings?: React.ComponentProps<typeof GameShell>['settings'];
+}
+
+// Presentational shell + grid. Driven by external state so both the interactive
+// host (useGameHost) and the 1v1 spectator (useReplayedState) can render it.
+const ChoppingView: FC<ChoppingViewProps> = ({
+  state,
+  phase,
+  result,
+  runId,
+  durationMs,
+  hideTimer,
+  compact,
+  wrapperRef,
+  onInteraction,
+  mobileInput,
+  settings,
+}) => (
+  <GameShell
+    title="Alphabet"
+    description="Tap the letters in order"
+    phase={phase}
+    result={result}
+    durationMs={durationMs}
+    runId={runId}
+    statusMessage={result ? (result.won ? 'Success!' : 'Failed!') : ''}
+    hideTimer={hideTimer}
+    settings={settings}
+  >
+    {mobileInput}
+    <div
+      ref={wrapperRef}
+      className={`${compact ? '' : 'min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px] '}w-full max-w-full flex-1 min-h-0 rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-center text-white p-1 sm:p-4 mx-auto`}
+      onTouchStartCapture={onInteraction}
+      onPointerDownCapture={onInteraction}
+      style={{ scrollMarginTop: '15vh', overflow: 'visible' }}
+    >
+      <div className="game-grid" style={{ height: '100%', width: '100%' }}>
+        {Array.from({ length: Math.ceil(state.board.length / defaultGridCols) }).map(
+          (_, rowIndex) => (
+            <GridRow
+              key={rowIndex}
+              rowIndex={rowIndex}
+              board={state.board}
+              stateBoard={state.stateBoard}
+              activeIndex={state.activeIndex}
+              numLetters={state.board.length}
+              gridCols={defaultGridCols}
+            />
+          ),
+        )}
+      </div>
+    </div>
+  </GameShell>
+);
+
+interface ChoppingProps {
+  // 1v1 match mode: defaults override saved prefs, engine seeds from this value, no auto-restart.
+  seed?: number;
+  // Fires when the match ends (win or loss) so the lobby can move on to the outcome view.
+  onMatchEnd?: (result: GameResult) => void;
+  // Fires for every accepted key. The lobby streams these to the opponent so their
+  // spectator view can replay this game in real time.
+  onInput?: (input: string) => void;
+}
+
+const Chopping: FC<ChoppingProps> = ({ seed, onMatchEnd, onInput }) => {
+  const isMatch = seed !== undefined;
   const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const searchParams = useSearchParams();
   const isCompetitive = searchParams?.get('competitive') === 'true';
@@ -38,14 +123,16 @@ const Chopping: FC = () => {
   );
   const settingsHydrated = timerHydrated && lettersHydrated;
 
-  const activeNumLetters =
-    isChallengeMode && challengeData
+  const activeNumLetters = isMatch
+    ? defaultNumLetters
+    : isChallengeMode && challengeData
       ? challengeData.numLetters || defaultNumLetters
       : isCompetitive
         ? defaultNumLetters
         : savedNumLetters;
-  const activeTimer =
-    isChallengeMode && challengeData
+  const activeTimer = isMatch
+    ? defaultDuration
+    : isChallengeMode && challengeData
       ? challengeData.targetTime
         ? Math.floor(challengeData.targetTime / 1000)
         : defaultDuration
@@ -53,11 +140,13 @@ const Chopping: FC = () => {
         ? defaultDuration
         : savedTimer;
 
-  const mode: GameMode = isChallengeMode && !isCompleted
-    ? 'daily-challenge'
-    : isCompetitive
-      ? 'competitive'
-      : 'practice';
+  const mode: GameMode = isMatch
+    ? 'competitive'
+    : isChallengeMode && !isCompleted
+      ? 'daily-challenge'
+      : isCompetitive
+        ? 'competitive'
+        : 'practice';
 
   const lastResultRef = useRef<GameResult | null>(null);
   const userRef = useRef(user);
@@ -70,11 +159,15 @@ const Chopping: FC = () => {
     config: { numLetters: activeNumLetters },
     durationMs: activeTimer * 1000,
     mode,
-    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
+    seed: isMatch ? seed : undefined,
+    ready: isMatch || (settingsHydrated && (!isChallengeMode || challengeData != null)),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {
       lastResultRef.current = gameResult;
+      if (isMatch) onMatchEnd?.(gameResult);
     },
+    onInput,
+    noTimer: isMatch,
   });
 
   const outerContainerRef = useRef<HTMLDivElement>(null);
@@ -226,87 +319,115 @@ const Chopping: FC = () => {
 
   return (
     <>
-      <GameStatsTracker
-        game="chopping"
-        gameStatus={legacyStatus}
-        score={result ? result.score : state.activeIndex}
-        elapsedMs={result?.elapsedMs ?? 0}
-        targetScore={activeNumLetters}
-        wonStatus={3}
-        lostStatus={2}
-        gameSettings={{ letters: activeNumLetters, timer: activeTimer }}
-      />
+      {!isMatch && (
+        <GameStatsTracker
+          game="chopping"
+          gameStatus={legacyStatus}
+          score={result ? result.score : state.activeIndex}
+          elapsedMs={result?.elapsedMs ?? 0}
+          targetScore={activeNumLetters}
+          wonStatus={3}
+          lostStatus={2}
+          gameSettings={{ letters: activeNumLetters, timer: activeTimer }}
+        />
+      )}
       <div ref={outerContainerRef} className="flex flex-col gap-4">
         {mobile.isMobile && mobile.showHint && (
           <div className="rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
             Tap the puzzle, then type the letters to play.
           </div>
         )}
-        <GameShell
-          title="Alphabet"
-          description="Tap the letters in order"
+        <ChoppingView
+          state={state}
           phase={phase}
           result={result}
-          durationMs={activeTimer * 1000}
           runId={runId}
-          statusMessage={result ? (result.won ? 'Success!' : 'Failed!') : ''}
-          settings={isChallengeMode ? undefined : settings}
-        >
-          {mobile.isMobile && phase === 'playing' && (
-            <input
-              ref={mobileInputRef}
-              type="text"
-              inputMode="text"
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="characters"
-              className="opacity-0"
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '1px',
-                height: '1px',
-                background: 'transparent',
-              }}
-              onInput={handleMobileInput}
-              onKeyDown={handleMobileKeyDown}
-              onFocus={() => mobile.focusInput()}
-              onBlur={(e) => {
-                if (phase === 'playing') {
-                  e.preventDefault();
-                  e.target.focus();
-                }
-              }}
-              aria-label="Type letters here"
-            />
-          )}
-          <div
-            ref={gameWrapperRef}
-            className="min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px] w-full max-w-full flex-1 min-h-0 rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-center text-white p-1 sm:p-4 mx-auto"
-            onTouchStartCapture={mobile.handleInteraction}
-            onPointerDownCapture={mobile.handleInteraction}
-            style={{ scrollMarginTop: '15vh', overflow: 'visible' }}
-          >
-            <div className="game-grid" style={{ height: '100%', width: '100%' }}>
-              {Array.from({ length: Math.ceil(state.board.length / defaultGridCols) }).map(
-                (_, rowIndex) => (
-                  <GridRow
-                    key={rowIndex}
-                    rowIndex={rowIndex}
-                    board={state.board}
-                    stateBoard={state.stateBoard}
-                    activeIndex={state.activeIndex}
-                    numLetters={state.board.length}
-                    gridCols={defaultGridCols}
-                  />
-                ),
-              )}
-            </div>
-          </div>
-        </GameShell>
+          durationMs={activeTimer * 1000}
+          compact={isMatch}
+          hideTimer={isMatch}
+          wrapperRef={gameWrapperRef}
+          onInteraction={mobile.handleInteraction}
+          settings={isMatch || isChallengeMode ? undefined : settings}
+          mobileInput={
+            mobile.isMobile && phase === 'playing' ? (
+              <input
+                ref={mobileInputRef}
+                type="text"
+                inputMode="text"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="characters"
+                className="opacity-0"
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  width: '1px',
+                  height: '1px',
+                  background: 'transparent',
+                }}
+                onInput={handleMobileInput}
+                onKeyDown={handleMobileKeyDown}
+                onFocus={() => mobile.focusInput()}
+                onBlur={(e) => {
+                  if (phase === 'playing') {
+                    e.preventDefault();
+                    e.target.focus();
+                  }
+                }}
+                aria-label="Type letters here"
+              />
+            ) : null
+          }
+        />
       </div>
     </>
+  );
+};
+
+interface ChoppingSpectatorProps {
+  seed: number;
+  inputs: string[];
+}
+
+// Replays a 1v1 opponent's chopping game from streamed inputs. No interaction,
+// no timer — purely a live mirror of what the opponent sees.
+export const ChoppingSpectator: FC<ChoppingSpectatorProps> = ({ seed, inputs }) => {
+  const config = useMemo(() => ({ numLetters: defaultNumLetters }), []);
+  const { state, outcome } = useReplayedState(choppingEngine, config, seed, inputs);
+
+  const phase: GamePhase = outcome === 'won' ? 'won' : outcome === 'lost' ? 'lost' : 'playing';
+  const result: GameResult | null =
+    outcome === 'playing'
+      ? null
+      : { won: outcome === 'won', score: state.activeIndex, elapsedMs: 0 };
+
+  return (
+    <ChoppingView
+      state={state}
+      phase={phase}
+      result={result}
+      runId={1}
+      durationMs={defaultDuration * 1000}
+      compact
+      hideTimer
+    />
+  );
+};
+
+// Focus-mode summary: same replayed state as the spectator, but rendered as a
+// compact progress widget instead of the full board.
+export const ChoppingSummary: FC<ChoppingSpectatorProps> = ({ seed, inputs }) => {
+  const config = useMemo(() => ({ numLetters: defaultNumLetters }), []);
+  const { state, outcome } = useReplayedState(choppingEngine, config, seed, inputs);
+  return (
+    <OpponentSummary
+      title="Chopping"
+      metricLabel="Letters"
+      metricValue={`${state.activeIndex} / ${state.board.length}`}
+      progress={{ current: state.activeIndex, total: state.board.length }}
+      outcome={outcome}
+    />
   );
 };
 

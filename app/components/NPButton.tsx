@@ -14,6 +14,11 @@ interface NPButtonProps {
     onClick?: (() => MouseEventHandler | void);
     children?: string;
     className?: string;
+    // Increments on each opponent button-press in 1v1 spectator views.
+    // When it changes we remount the button via the React `key`, which
+    // replays the np-button-pulse animation from scratch. Undefined ⇒
+    // no pulse behaviour (interactive case).
+    pulseKey?: number;
 }
 
 const NPButton: React.FC<NPButtonProps> = ({
@@ -25,7 +30,8 @@ const NPButton: React.FC<NPButtonProps> = ({
     disabled,
     onClick,
     children,
-    className
+    className,
+    pulseKey
 }) => {
 
     const props = {
@@ -45,6 +51,7 @@ const NPButton: React.FC<NPButtonProps> = ({
             color === "purple" ? "bg-vivid-violet-600/25 text-vivid-violet-600 enabled:hover:bg-vivid-violet-600/50" :
             color === "green" ? "bg-turquoise-400/25 text-turquoise-400 enabled:hover:bg-turquoise-400/50" : "",
             color === "red" ? "bg-rose-400/25 text-rose-400 enabled:hover:bg-rose-400/50" : "",
+            pulseKey !== undefined && "np-button-pulse",
         ),
         'aria-label': label || children?.toString(),
         disabled: disabled,
@@ -60,13 +67,13 @@ const NPButton: React.FC<NPButtonProps> = ({
 
     if (!href) {
         return (
-            <button {...props}>
+            <button key={pulseKey ?? 'static'} {...props}>
                 { childrenElements }
             </button>
         );
     } else {
         return (
-            <Link href={ href } {...props}>
+            <Link key={pulseKey ?? 'static'} href={ href } {...props}>
                 { childrenElements }
             </Link>
         );

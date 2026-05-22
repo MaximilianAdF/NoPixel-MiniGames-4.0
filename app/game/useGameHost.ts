@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { seededRandom } from '@/lib/lobby/seededRandom';
 import type { GameEngine, GameMode, GamePhase, GameResult } from './types';
 
 const AUTO_RESTART_MS = 3000;
@@ -11,9 +12,20 @@ interface UseGameHostArgs<State, Config, Input> {
   durationMs: number;
   mode: GameMode;
   ready?: boolean;
-  rng?: () => number;
+  // Determinism seed. When provided, every engine.init call (lazy useState
+  // init, restart, etc.) gets its own fresh seededRandom(seed) closure, so
+  // React Strict-Mode double-invokes and the ready-effect's extra start()
+  // call don't leak rng state between inits — every init produces identical
+  // state, matching what useReplayedState sees on the spectator side.
+  seed?: number;
   onTick?: () => void;
   onResult?: (result: GameResult) => void;
+  // Fires for every accepted input. 1v1 streams these to the opponent so they
+  // can replay the same engine in their spectator view.
+  onInput?: (input: Input) => void;
+  // 1v1 mode: no countdown expiry, no per-second tick. The match ends only on
+  // engine-driven win/loss (a player completing or making a fatal mistake).
+  noTimer?: boolean;
 }
 
 export interface GameHost<State, Input> {
@@ -32,12 +44,22 @@ export function useGameHost<State, Config, Input>({
   durationMs,
   mode,
   ready = true,
-  rng = Math.random,
+  seed,
   onTick,
   onResult,
+  onInput,
+  noTimer = false,
 }: UseGameHostArgs<State, Config, Input>): GameHost<State, Input> {
+  // Factory, not a stateful rng — so every engine.init call below gets a
+  // fresh closure. Math.random is itself stateless from our perspective
+  // (the global PRNG advances either way), so reusing it across calls is fine.
+  const rngFactory = useMemo<() => () => number>(
+    () => (seed !== undefined ? () => seededRandom(seed) : () => Math.random),
+    [seed],
+  );
+
   const [phase, setPhase] = useState<GamePhase>('idle');
-  const [state, setState] = useState<State>(() => engine.init(config, rng));
+  const [state, setState] = useState<State>(() => engine.init(config, rngFactory()));
   const [result, setResult] = useState<GameResult | null>(null);
   const [runId, setRunId] = useState(0);
 
@@ -45,17 +67,19 @@ export function useGameHost<State, Config, Input>({
   const phaseRef = useRef(phase);
   const startTimeRef = useRef(0);
   const configRef = useRef(config);
-  const rngRef = useRef(rng);
+  const rngFactoryRef = useRef(rngFactory);
   const onTickRef = useRef(onTick);
   const onResultRef = useRef(onResult);
+  const onInputRef = useRef(onInput);
 
   // Mirror latest props into refs so the callbacks below stay referentially stable.
   useEffect(() => {
     phaseRef.current = phase;
     configRef.current = config;
-    rngRef.current = rng;
+    rngFactoryRef.current = rngFactory;
     onTickRef.current = onTick;
     onResultRef.current = onResult;
+    onInputRef.current = onInput;
   });
 
   const endGame = useCallback(
@@ -74,7 +98,7 @@ export function useGameHost<State, Config, Input>({
   );
 
   const start = useCallback(() => {
-    const initial = engine.init(configRef.current, rngRef.current);
+    const initial = engine.init(configRef.current, rngFactoryRef.current());
     stateRef.current = initial;
     setState(initial);
     setResult(null);
@@ -85,6 +109,7 @@ export function useGameHost<State, Config, Input>({
   const submitInput = useCallback(
     (input: Input) => {
       if (phaseRef.current !== 'playing') return;
+      onInputRef.current?.(input);
       const { state: next, outcome } = engine.applyInput(stateRef.current, input);
       stateRef.current = next;
       setState(next);
@@ -101,16 +126,18 @@ export function useGameHost<State, Config, Input>({
   }, [ready, configKey, durationMs, start]);
 
   // Countdown: per-second tick and expiry, scoped to a single playing run.
+  // Skipped in noTimer mode (1v1 is decided by engine outcomes, not the clock).
   useEffect(() => {
     if (phase !== 'playing') return;
     startTimeRef.current = Date.now();
+    if (noTimer) return;
     const expiry = setTimeout(() => endGame(false), durationMs);
     const tick = setInterval(() => onTickRef.current?.(), 1000);
     return () => {
       clearTimeout(expiry);
       clearInterval(tick);
     };
-  }, [runId, phase, durationMs, endGame]);
+  }, [runId, phase, durationMs, endGame, noTimer]);
 
   // After a result: practice and failed daily challenges loop; won challenges and competitive runs end terminally.
   useEffect(() => {

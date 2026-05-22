@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type FC } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import classNames from 'classnames';
@@ -14,14 +14,122 @@ import NPButton from '@/app/components/NPButton';
 import GameStatsTracker from '@/app/components/GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
-import type { GameMode, GameResult } from '@/app/game/types';
+import type { GameMode, GamePhase, GameResult } from '@/app/game/types';
+import { useReplayedState } from '@/app/utils/useReplayedState';
+import OpponentSummary from '@/app/lobby/OpponentSummary';
 import { presets } from './utils';
-import { thermiteEngine } from './engine';
+import { thermiteEngine, type ThermiteInput, type ThermiteState } from './engine';
 import { ThermiteSquare } from './ThermiteGrid';
 import backgroundImg from '@/public/images/thermite/background.svg';
 import './style.css';
 
-const Thermite: FC = () => {
+interface ThermiteViewProps {
+  state: ThermiteState;
+  phase: GamePhase;
+  result: GameResult | null;
+  runId: number;
+  durationMs: number;
+  hideTimer?: boolean;
+  // Splitscreen layouts (1v1) drop the touch-friendly min-width so two boards
+  // can sit side by side without overflowing.
+  compact?: boolean;
+  // Interactive-only. When omitted, the board is rendered non-interactive
+  // (spectator views in 1v1).
+  onSquareClick?: (row: number, col: number) => void;
+  settings?: React.ComponentProps<typeof GameShell>['settings'];
+}
+
+const noop = () => {};
+
+// Presentational shell + grid. Both the interactive host (useGameHost) and the
+// 1v1 spectator (useReplayedState) feed it state. The combo notice lives in
+// here so the spectator gets the "CRC Bypassed!" animation for free when the
+// opponent lands a combo.
+const ThermiteView: FC<ThermiteViewProps> = ({
+  state,
+  phase,
+  result,
+  runId,
+  durationMs,
+  hideTimer,
+  compact,
+  onSquareClick,
+  settings,
+}) => {
+  const [showComboNotice, setShowComboNotice] = useState(false);
+  const prevTotalCombosRef = useRef(0);
+  useEffect(() => {
+    if (state.totalCombos > prevTotalCombosRef.current) setShowComboNotice(true);
+    prevTotalCombosRef.current = state.totalCombos;
+  }, [state.totalCombos]);
+
+  return (
+    <GameShell
+      title="Mazer"
+      description="Decrypt the required number of bytes"
+      phase={phase}
+      result={result}
+      durationMs={durationMs}
+      runId={runId}
+      statusMessage={result ? (result.won ? 'Success!' : 'Failed!') : ''}
+      score={result ? result.score : state.score}
+      targetScore={state.targetScore}
+      hideTimer={hideTimer}
+      settings={settings}
+    >
+      <div
+        className={classNames(
+          'thermite',
+          !compact && 'min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px]',
+          phase === 'idle' && 'blur',
+          !onSquareClick && 'pointer-events-none',
+        )}
+        style={{
+          maxWidth: `calc(calc(calc(calc(calc(100vh - 236px) - ${4 * (state.rows - 1)}px) / ${state.rows}) * ${state.columns}) + ${2 * (state.columns - 1)}px)`,
+          width: '100%',
+          gridTemplateRows: `repeat(${state.rows}, minmax(0, 1fr))`,
+          gridTemplateColumns: `repeat(${state.columns}, minmax(0, 1fr))`,
+        }}
+      >
+        {state.board.map((boardRow, rowIndex) =>
+          boardRow.map((square, columnIndex) => (
+            <ThermiteSquare
+              key={`${rowIndex}_${columnIndex}`}
+              square={square}
+              row={rowIndex}
+              col={columnIndex}
+              outOfMoves={state.outOfMoves}
+              animateHighlight={phase === 'playing'}
+              onSquareClick={onSquareClick ?? noop}
+            />
+          )),
+        )}
+        <div className="notice">
+          <span
+            style={{ animationName: showComboNotice ? 'notice' : 'none' }}
+            onAnimationEnd={() => setShowComboNotice(false)}
+          >
+            CRC Bypassed!
+          </span>
+        </div>
+        <Image src={backgroundImg} alt="" fill />
+      </div>
+    </GameShell>
+  );
+};
+
+interface ThermiteProps {
+  // 1v1 match mode: defaults override saved prefs, engine seeds from this value, no auto-restart.
+  seed?: number;
+  // Fires when the match ends so the lobby can move on to the outcome view.
+  onMatchEnd?: (result: GameResult) => void;
+  // Fires for every accepted click so the lobby can stream it to the opponent
+  // and replay it in their spectator view.
+  onInput?: (input: ThermiteInput) => void;
+}
+
+const Thermite: FC<ThermiteProps> = ({ seed, onMatchEnd, onInput }) => {
+  const isMatch = seed !== undefined;
   const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const searchParams = useSearchParams();
   const isCompetitive = searchParams?.get('competitive') === 'true';
@@ -47,38 +155,44 @@ const Thermite: FC = () => {
   const settingsHydrated =
     presetHydrated && timerHydrated && targetScoreHydrated && rowsHydrated && columnsHydrated;
 
-  const activeTargetScore =
-    isChallengeMode && challengeData
+  const activeTargetScore = isMatch
+    ? presets[0].targetScore
+    : isChallengeMode && challengeData
       ? challengeData.targetScore || presets[0].targetScore
       : isCompetitive
         ? presets[0].targetScore
         : savedTargetScore;
-  const activeTimer =
-    isChallengeMode && challengeData
+  const activeTimer = isMatch
+    ? presets[0].timer
+    : isChallengeMode && challengeData
       ? challengeData.targetTime
         ? Math.floor(challengeData.targetTime / 1000)
         : presets[0].timer
       : isCompetitive
         ? presets[0].timer
         : savedTimer;
-  const activeRows =
-    isChallengeMode && challengeData
+  const activeRows = isMatch
+    ? presets[0].rows
+    : isChallengeMode && challengeData
       ? challengeData.rows || presets[0].rows
       : isCompetitive
         ? presets[0].rows
         : savedRows;
-  const activeColumns =
-    isChallengeMode && challengeData
+  const activeColumns = isMatch
+    ? presets[0].columns
+    : isChallengeMode && challengeData
       ? challengeData.columns || presets[0].columns
       : isCompetitive
         ? presets[0].columns
         : savedColumns;
 
-  const mode: GameMode = isChallengeMode && !isCompleted
-    ? 'daily-challenge'
-    : isCompetitive
-      ? 'competitive'
-      : 'practice';
+  const mode: GameMode = isMatch
+    ? 'competitive'
+    : isChallengeMode && !isCompleted
+      ? 'daily-challenge'
+      : isCompetitive
+        ? 'competitive'
+        : 'practice';
 
   const lastResultRef = useRef<GameResult | null>(null);
   const userRef = useRef(user);
@@ -91,15 +205,16 @@ const Thermite: FC = () => {
     config: { rows: activeRows, columns: activeColumns, targetScore: activeTargetScore },
     durationMs: activeTimer * 1000,
     mode,
-    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
+    seed: isMatch ? seed : undefined,
+    ready: isMatch || (settingsHydrated && (!isChallengeMode || challengeData != null)),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {
       lastResultRef.current = gameResult;
+      if (isMatch) onMatchEnd?.(gameResult);
     },
+    onInput,
+    noTimer: isMatch,
   });
-
-  const prevTotalCombosRef = useRef(0);
-  const [showComboNotice, setShowComboNotice] = useState(false);
 
   // Preload sound effects.
   useEffect(() => {
@@ -126,12 +241,6 @@ const Thermite: FC = () => {
       session_game_count: count,
     });
   }, [runId]);
-
-  // Show the combo notice whenever the engine registers a new combo.
-  useEffect(() => {
-    if (state.totalCombos > prevTotalCombosRef.current) setShowComboNotice(true);
-    prevTotalCombosRef.current = state.totalCombos;
-  }, [state.totalCombos]);
 
   const handleSquareClick = useCallback(
     (row: number, col: number) => {
@@ -249,70 +358,85 @@ const Thermite: FC = () => {
 
   return (
     <>
-      <GameStatsTracker
-        game="thermite"
-        gameStatus={legacyStatus}
-        score={result ? result.score : state.score}
-        elapsedMs={result?.elapsedMs ?? 0}
-        targetScore={activeTargetScore}
-        wonStatus={3}
-        lostStatus={2}
-        gameSettings={{
-          timer: activeTimer,
-          targetScore: activeTargetScore,
-          rows: activeRows,
-          columns: activeColumns,
-        }}
-      />
-      <GameShell
-        title="Mazer"
-        description="Decrypt the required number of bytes"
+      {!isMatch && (
+        <GameStatsTracker
+          game="thermite"
+          gameStatus={legacyStatus}
+          score={result ? result.score : state.score}
+          elapsedMs={result?.elapsedMs ?? 0}
+          targetScore={activeTargetScore}
+          wonStatus={3}
+          lostStatus={2}
+          gameSettings={{
+            timer: activeTimer,
+            targetScore: activeTargetScore,
+            rows: activeRows,
+            columns: activeColumns,
+          }}
+        />
+      )}
+      <ThermiteView
+        state={state}
         phase={phase}
         result={result}
-        durationMs={activeTimer * 1000}
         runId={runId}
-        statusMessage={result ? (result.won ? 'Success!' : 'Failed!') : ''}
-        score={result ? result.score : state.score}
-        targetScore={state.targetScore}
-        settings={isChallengeMode ? undefined : settings}
-      >
-        <div
-          className={classNames(
-            'thermite min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px]',
-            phase === 'idle' && 'blur',
-          )}
-          style={{
-            maxWidth: `calc(calc(calc(calc(calc(100vh - 236px) - ${4 * (state.rows - 1)}px) / ${state.rows}) * ${state.columns}) + ${2 * (state.columns - 1)}px)`,
-            width: '100%',
-            gridTemplateRows: `repeat(${state.rows}, minmax(0, 1fr))`,
-            gridTemplateColumns: `repeat(${state.columns}, minmax(0, 1fr))`,
-          }}
-        >
-          {state.board.map((boardRow, rowIndex) =>
-            boardRow.map((square, columnIndex) => (
-              <ThermiteSquare
-                key={`${rowIndex}_${columnIndex}`}
-                square={square}
-                row={rowIndex}
-                col={columnIndex}
-                outOfMoves={state.outOfMoves}
-                animateHighlight={phase === 'playing'}
-                onSquareClick={handleSquareClick}
-              />
-            )),
-          )}
-          <div className="notice">
-            <span
-              style={{ animationName: showComboNotice ? 'notice' : 'none' }}
-              onAnimationEnd={() => setShowComboNotice(false)}
-            >
-              CRC Bypassed!
-            </span>
-          </div>
-          <Image src={backgroundImg} alt="" fill />
-        </div>
-      </GameShell>
+        durationMs={activeTimer * 1000}
+        hideTimer={isMatch}
+        compact={isMatch}
+        onSquareClick={handleSquareClick}
+        settings={isMatch || isChallengeMode ? undefined : settings}
+      />
     </>
+  );
+};
+
+interface ThermiteSpectatorProps {
+  seed: number;
+  inputs: ThermiteInput[];
+}
+
+// Replays a 1v1 opponent's thermite game from streamed inputs (including the
+// click timestamps that drive combo windows).
+export const ThermiteSpectator: FC<ThermiteSpectatorProps> = ({ seed, inputs }) => {
+  const config = useMemo(
+    () => ({ rows: presets[0].rows, columns: presets[0].columns, targetScore: presets[0].targetScore }),
+    [],
+  );
+  const { state, outcome } = useReplayedState(thermiteEngine, config, seed, inputs);
+
+  const phase: GamePhase = outcome === 'won' ? 'won' : outcome === 'lost' ? 'lost' : 'playing';
+  const result: GameResult | null =
+    outcome === 'playing'
+      ? null
+      : { won: outcome === 'won', score: state.score, elapsedMs: 0 };
+
+  return (
+    <ThermiteView
+      state={state}
+      phase={phase}
+      result={result}
+      runId={1}
+      durationMs={presets[0].timer * 1000}
+      compact
+      hideTimer
+    />
+  );
+};
+
+export const ThermiteSummary: FC<ThermiteSpectatorProps> = ({ seed, inputs }) => {
+  const config = useMemo(
+    () => ({ rows: presets[0].rows, columns: presets[0].columns, targetScore: presets[0].targetScore }),
+    [],
+  );
+  const { state, outcome } = useReplayedState(thermiteEngine, config, seed, inputs);
+  return (
+    <OpponentSummary
+      title="Thermite"
+      metricLabel="Bytes"
+      metricValue={`${state.score} / ${state.targetScore}`}
+      progress={{ current: state.score, total: state.targetScore }}
+      outcome={outcome}
+    />
   );
 };
 

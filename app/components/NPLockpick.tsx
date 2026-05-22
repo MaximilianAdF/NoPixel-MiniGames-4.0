@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type FC } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FC } from 'react';
 import classNames from 'classnames';
 import { checkBeepPlayer, successPlayer, timerBeepPlayer } from '@/public/audio/AudioManager';
 import usePersistantState from '@/app/utils/usePersistentState';
@@ -12,9 +12,174 @@ import { NPSettingsRange } from '@/app/components/NPSettings';
 import GameStatsTracker from './GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
-import type { GameMode, GameResult } from '@/app/game/types';
-import { lockpickEngine, degInterval, positions } from './lockpickEngine';
+import type { GameMode, GamePhase, GameResult } from '@/app/game/types';
+import { useReplayedState } from '@/app/utils/useReplayedState';
+import OpponentSummary from '@/app/lobby/OpponentSummary';
+import {
+  lockpickEngine,
+  degInterval,
+  positions,
+  type LockpickInput,
+  type LockpickState,
+} from './lockpickEngine';
 import { LockpickRing } from './LockpickRing';
+
+const ROTATE_LEFT_KEYS = ['ArrowLeft', 'a', 'A'];
+const ROTATE_RIGHT_KEYS = ['ArrowRight', 'd', 'D'];
+const UNLOCK_KEYS = ['Enter', ' '];
+
+interface NPLockpickViewProps {
+  state: LockpickState;
+  phase: GamePhase;
+  result: GameResult | null;
+  runId: number;
+  durationMs: number;
+  title: string;
+  hideTimer?: boolean;
+  compact?: boolean;
+  // Interactive-only. When omitted, no buttons render and the board is non-interactive.
+  onRotateLeft?: () => void;
+  onRotateRight?: () => void;
+  onUnlock?: () => void;
+  // 1v1 spectator: per-button counters that increment on each opponent
+  // press, triggering a pulse animation on the corresponding button.
+  pulseKeys?: { rotateLeft?: number; rotateRight?: number; unlock?: number };
+  settings?: React.ComponentProps<typeof GameShell>['settings'];
+}
+
+// Presentational shell + ring SVG. Driven by external state so both the
+// interactive host (useGameHost) and the spectator (useReplayedState) can
+// render it.
+const NPLockpickView: FC<NPLockpickViewProps> = ({
+  state,
+  phase,
+  result,
+  runId,
+  durationMs,
+  title,
+  hideTimer,
+  compact,
+  onRotateLeft,
+  onRotateRight,
+  onUnlock,
+  pulseKeys,
+  settings,
+}) => {
+  const legacyStatus =
+    phase === 'won' ? 3 : phase === 'lost' ? 2 : phase === 'ended' ? (result?.won ? 3 : 2) : 1;
+  const svgSize = 50 * (state.rings.length * 2 + 1);
+
+  // Always render the button rows so the spectator side has the same height
+  // as the interactive side; just disable everything when no handler is wired.
+  const noop = () => {};
+  const buttons = [
+    [
+      {
+        label: 'Rotate Left',
+        color: 'purple' as const,
+        callback: onRotateLeft ?? noop,
+        disabled: !onRotateLeft || phase !== 'playing',
+        pulseKey: pulseKeys?.rotateLeft,
+      },
+      {
+        label: 'Rotate Right',
+        color: 'purple' as const,
+        callback: onRotateRight ?? noop,
+        disabled: !onRotateRight || phase !== 'playing',
+        pulseKey: pulseKeys?.rotateRight,
+      },
+    ],
+    [
+      {
+        label: 'Unlock',
+        color: 'green' as const,
+        callback: onUnlock ?? noop,
+        disabled: !onUnlock || phase !== 'playing',
+        pulseKey: pulseKeys?.unlock,
+      },
+    ],
+  ];
+
+  return (
+    <GameShell
+      title={title}
+      description="Unlock each lock"
+      phase={phase}
+      result={result}
+      durationMs={durationMs}
+      runId={runId}
+      statusMessage={
+        result
+          ? result.won
+            ? 'The lock was picked successfully.'
+            : 'The lockpick bent out of shape.'
+          : ''
+      }
+      buttons={buttons}
+      hideTimer={hideTimer}
+      settings={settings}
+    >
+      <div
+        className={classNames(
+          'w-full max-w-full rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-center',
+          !compact && 'min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px]',
+          phase === 'idle' && 'blur',
+        )}
+      >
+        <div
+          className="aspect-square flex items-center justify-center relative"
+          style={{ width: '100%', maxWidth: `calc(100vh - 298px)` }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            version="1.1"
+            className="
+              size-full aspect-square
+              *:origin-center
+              data-[stroke=gray]:*:stroke-[rgb(173_173_173)]
+              data-[stroke=fail]:*:stroke-[rgb(255_84_84)]
+              data-[stroke=win]:*:stroke-[rgb(48_221_189/0.816)]
+              *:*:origin-center
+              data-[stroke=blue]:*:*:stroke-[rgb(46_134_213)]
+              data-[stroke=yellow]:*:*:stroke-[rgb(239_181_17)]
+              data-[stroke=red]:*:*:stroke-[rgb(202_39_97)]
+              data-[stroke=fail]:*:*:stroke-[rgb(255_84_84)]
+              data-[stroke=win]:*:*:stroke-[rgb(48_221_189/0.816)]
+              data-[fill=blue]:*:*:fill-[rgb(46_134_213)]
+              data-[fill=yellow]:*:*:fill-[rgb(239_181_17)]
+              data-[fill=red]:*:*:fill-[rgb(202_39_97)]
+              data-[fill=fail]:*:*:fill-[rgb(255_84_84)]
+              data-[fill=win]:*:*:fill-[rgb(48_221_189/0.816)]
+            "
+            viewBox={`0 0 ${svgSize} ${svgSize}`}
+          >
+            <g className="*:stroke-[1.2px] *:origin-center *:stroke-[rgb(142_142_142)]">
+              {[...Array(positions / 2)].map((_, index) => (
+                <line
+                  key={index}
+                  x1={35}
+                  x2={svgSize - 35}
+                  y1={svgSize / 2}
+                  y2={svgSize / 2}
+                  transform={`rotate(${index * degInterval})`}
+                />
+              ))}
+            </g>
+            {state.rings.map((ring, ringIndex) => (
+              <LockpickRing
+                key={ringIndex}
+                ring={ring}
+                ringIndex={ringIndex}
+                level={state.level}
+                status={legacyStatus}
+              />
+            ))}
+          </svg>
+        </div>
+      </div>
+    </GameShell>
+  );
+};
 
 interface NPLockpickProps {
   countdownDuration: number;
@@ -22,11 +187,13 @@ interface NPLockpickProps {
   title: string;
   gameId?: string;
   isCompetitive?: boolean;
+  // 1v1 match mode: defaults override saved prefs, engine seeds from this value, no auto-restart.
+  seed?: number;
+  // Fires when the match ends so the lobby can move on to the outcome view.
+  onMatchEnd?: (result: GameResult) => void;
+  // Streams each input to the lobby for the opponent's spectator replay.
+  onInput?: (input: LockpickInput) => void;
 }
-
-const ROTATE_LEFT_KEYS = ['ArrowLeft', 'a', 'A'];
-const ROTATE_RIGHT_KEYS = ['ArrowRight', 'd', 'D'];
-const UNLOCK_KEYS = ['Enter', ' '];
 
 const NPLockpick: FC<NPLockpickProps> = ({
   countdownDuration,
@@ -34,7 +201,11 @@ const NPLockpick: FC<NPLockpickProps> = ({
   title,
   gameId = 'lockpick',
   isCompetitive = false,
+  seed,
+  onMatchEnd,
+  onInput,
 }) => {
+  const isMatch = seed !== undefined;
   const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const { user } = useUser();
 
@@ -48,14 +219,16 @@ const NPLockpick: FC<NPLockpickProps> = ({
   );
   const settingsHydrated = levelsHydrated && timerHydrated;
 
-  const activeLevels =
-    isChallengeMode && challengeData
+  const activeLevels = isMatch
+    ? maxLevels
+    : isChallengeMode && challengeData
       ? challengeData.levels || maxLevels
       : isCompetitive
         ? maxLevels
         : savedLevels;
-  const activeTimer =
-    isChallengeMode && challengeData
+  const activeTimer = isMatch
+    ? countdownDuration
+    : isChallengeMode && challengeData
       ? challengeData.targetTime
         ? Math.floor(challengeData.targetTime / 1000)
         : countdownDuration
@@ -63,11 +236,13 @@ const NPLockpick: FC<NPLockpickProps> = ({
         ? countdownDuration
         : savedTimer;
 
-  const mode: GameMode = isChallengeMode && !isCompleted
-    ? 'daily-challenge'
-    : isCompetitive
-      ? 'competitive'
-      : 'practice';
+  const mode: GameMode = isMatch
+    ? 'competitive'
+    : isChallengeMode && !isCompleted
+      ? 'daily-challenge'
+      : isCompetitive
+        ? 'competitive'
+        : 'practice';
 
   const lastResultRef = useRef<GameResult | null>(null);
   const userRef = useRef(user);
@@ -80,11 +255,15 @@ const NPLockpick: FC<NPLockpickProps> = ({
     config: { levels: activeLevels },
     durationMs: activeTimer * 1000,
     mode,
-    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
+    seed: isMatch ? seed : undefined,
+    ready: isMatch || (settingsHydrated && (!isChallengeMode || challengeData != null)),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {
       lastResultRef.current = gameResult;
+      if (isMatch) onMatchEnd?.(gameResult);
     },
+    onInput,
+    noTimer: isMatch,
   });
 
   const prevLevelRef = useRef(0);
@@ -195,112 +374,120 @@ const NPLockpick: FC<NPLockpickProps> = ({
   const legacyStatus =
     phase === 'won' ? 3 : phase === 'lost' ? 2 : phase === 'ended' ? (result?.won ? 3 : 2) : 1;
 
-  const svgSize = 50 * (state.rings.length * 2 + 1);
-
   return (
     <>
-      <GameStatsTracker
-        game={gameId as any}
-        gameStatus={legacyStatus}
-        score={result ? result.score : state.level}
-        elapsedMs={result?.elapsedMs ?? 0}
-        targetScore={activeLevels}
-        wonStatus={3}
-        lostStatus={2}
-        gameSettings={{ levels: activeLevels, timer: activeTimer }}
-      />
-      <GameShell
-        title={title}
-        description="Unlock each lock"
+      {!isMatch && (
+        <GameStatsTracker
+          game={gameId as any}
+          gameStatus={legacyStatus}
+          score={result ? result.score : state.level}
+          elapsedMs={result?.elapsedMs ?? 0}
+          targetScore={activeLevels}
+          wonStatus={3}
+          lostStatus={2}
+          gameSettings={{ levels: activeLevels, timer: activeTimer }}
+        />
+      )}
+      <NPLockpickView
+        state={state}
         phase={phase}
         result={result}
-        durationMs={activeTimer * 1000}
         runId={runId}
-        statusMessage={
-          result
-            ? result.won
-              ? 'The lock was picked successfully.'
-              : 'The lockpick bent out of shape.'
-            : ''
-        }
-        buttons={[
-          [
-            {
-              label: 'Rotate Left',
-              color: 'purple',
-              callback: rotateLeft,
-              disabled: phase !== 'playing',
-            },
-            {
-              label: 'Rotate Right',
-              color: 'purple',
-              callback: rotateRight,
-              disabled: phase !== 'playing',
-            },
-          ],
-          [{ label: 'Unlock', color: 'green', callback: unlock, disabled: phase !== 'playing' }],
-        ]}
-        settings={isChallengeMode ? undefined : settings}
-      >
-        <div
-          className={classNames(
-            'w-full max-w-full min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px] rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-center',
-            phase === 'idle' && 'blur',
-          )}
-        >
-          <div
-            className="aspect-square flex items-center justify-center relative"
-            style={{ width: '100%', maxWidth: `calc(100vh - 298px)` }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              version="1.1"
-              className="
-                size-full aspect-square
-                *:origin-center
-                data-[stroke=gray]:*:stroke-[rgb(173_173_173)]
-                data-[stroke=fail]:*:stroke-[rgb(255_84_84)]
-                data-[stroke=win]:*:stroke-[rgb(48_221_189/0.816)]
-                *:*:origin-center
-                data-[stroke=blue]:*:*:stroke-[rgb(46_134_213)]
-                data-[stroke=yellow]:*:*:stroke-[rgb(239_181_17)]
-                data-[stroke=red]:*:*:stroke-[rgb(202_39_97)]
-                data-[stroke=fail]:*:*:stroke-[rgb(255_84_84)]
-                data-[stroke=win]:*:*:stroke-[rgb(48_221_189/0.816)]
-                data-[fill=blue]:*:*:fill-[rgb(46_134_213)]
-                data-[fill=yellow]:*:*:fill-[rgb(239_181_17)]
-                data-[fill=red]:*:*:fill-[rgb(202_39_97)]
-                data-[fill=fail]:*:*:fill-[rgb(255_84_84)]
-                data-[fill=win]:*:*:fill-[rgb(48_221_189/0.816)]
-              "
-              viewBox={`0 0 ${svgSize} ${svgSize}`}
-            >
-              <g className="*:stroke-[1.2px] *:origin-center *:stroke-[rgb(142_142_142)]">
-                {[...Array(positions / 2)].map((_, index) => (
-                  <line
-                    key={index}
-                    x1={35}
-                    x2={svgSize - 35}
-                    y1={svgSize / 2}
-                    y2={svgSize / 2}
-                    transform={`rotate(${index * degInterval})`}
-                  />
-                ))}
-              </g>
-              {state.rings.map((ring, ringIndex) => (
-                <LockpickRing
-                  key={ringIndex}
-                  ring={ring}
-                  ringIndex={ringIndex}
-                  level={state.level}
-                  status={legacyStatus}
-                />
-              ))}
-            </svg>
-          </div>
-        </div>
-      </GameShell>
+        durationMs={activeTimer * 1000}
+        title={title}
+        hideTimer={isMatch}
+        compact={isMatch}
+        onRotateLeft={rotateLeft}
+        onRotateRight={rotateRight}
+        onUnlock={unlock}
+        settings={isMatch || isChallengeMode ? undefined : settings}
+      />
     </>
+  );
+};
+
+interface NPLockpickSpectatorProps {
+  seed: number;
+  inputs: LockpickInput[];
+  // Match the host's config so the engine init produces the same rings.
+  levels: number;
+  title: string;
+  countdownDuration: number;
+}
+
+// Replays a 1v1 opponent's lockpick/laundromat game from streamed rotate/unlock
+// inputs.
+export const NPLockpickSpectator: FC<NPLockpickSpectatorProps> = ({
+  seed,
+  inputs,
+  levels,
+  title,
+  countdownDuration,
+}) => {
+  const config = useMemo(() => ({ levels }), [levels]);
+  const { state, outcome } = useReplayedState(lockpickEngine, config, seed, inputs);
+
+  // Count each kind of opponent input so the corresponding button pulses
+  // whenever a new occurrence lands. `0 → undefined` so the pulse doesn't
+  // fire on the initial render.
+  const pulseKeys = useMemo(() => {
+    let left = 0;
+    let right = 0;
+    let unlock = 0;
+    for (const input of inputs) {
+      if (input.type === 'rotate') {
+        if (input.direction === -1) left += 1;
+        else right += 1;
+      } else if (input.type === 'unlock') {
+        unlock += 1;
+      }
+    }
+    return {
+      rotateLeft: left || undefined,
+      rotateRight: right || undefined,
+      unlock: unlock || undefined,
+    };
+  }, [inputs]);
+
+  const phase: GamePhase = outcome === 'won' ? 'won' : outcome === 'lost' ? 'lost' : 'playing';
+  const result: GameResult | null =
+    outcome === 'playing'
+      ? null
+      : { won: outcome === 'won', score: state.level, elapsedMs: 0 };
+
+  return (
+    <NPLockpickView
+      state={state}
+      phase={phase}
+      result={result}
+      runId={1}
+      durationMs={countdownDuration * 1000}
+      title={title}
+      compact
+      hideTimer
+      pulseKeys={pulseKeys}
+    />
+  );
+};
+
+interface NPLockpickSummaryProps {
+  seed: number;
+  inputs: LockpickInput[];
+  levels: number;
+  title: string;
+}
+
+export const NPLockpickSummary: FC<NPLockpickSummaryProps> = ({ seed, inputs, levels, title }) => {
+  const config = useMemo(() => ({ levels }), [levels]);
+  const { state, outcome } = useReplayedState(lockpickEngine, config, seed, inputs);
+  return (
+    <OpponentSummary
+      title={title}
+      metricLabel="Level"
+      metricValue={`${state.level} / ${state.rings.length}`}
+      progress={{ current: state.level, total: state.rings.length }}
+      outcome={outcome}
+    />
   );
 };
 

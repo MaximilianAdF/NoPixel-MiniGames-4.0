@@ -65,6 +65,40 @@ export interface SettingsChangeEvent {
   setting_value: string | number | boolean;
 }
 
+// 1v1 lobby + match events.
+export interface LobbyCreatedEvent {
+  lobby_code: string;
+}
+
+export interface LobbyJoinedEvent {
+  lobby_code: string;
+}
+
+export interface MatchStartedEvent {
+  lobby_code: string;
+  game_type: string;
+  focus_mode: boolean;
+}
+
+export interface MatchCompletedEvent {
+  lobby_code: string;
+  game_type: string;
+  reason: 'finished' | 'timeout';
+  has_winner: boolean;
+  duration_ms: number;
+}
+
+export interface MatchForfeitedEvent {
+  lobby_code: string;
+  game_type: string;
+  duration_ms: number;
+}
+
+export interface MatchTimedOutEvent {
+  lobby_code: string;
+  game_type: string;
+}
+
 // Main GTM push function
 function pushToDataLayer(data: Record<string, any>) {
   if (typeof window !== 'undefined' && window.dataLayer) {
@@ -170,6 +204,48 @@ export function trackSettingsChange(data: SettingsChangeEvent) {
     event: 'settings_change',
     ...data,
   });
+}
+
+/**
+ * Track when a 1v1 lobby is created (host clicks Create).
+ */
+export function trackLobbyCreated(data: LobbyCreatedEvent) {
+  pushToDataLayer({ event: 'lobby_created', ...data });
+}
+
+/**
+ * Track when a user joins an existing 1v1 lobby via code.
+ */
+export function trackLobbyJoined(data: LobbyJoinedEvent) {
+  pushToDataLayer({ event: 'lobby_joined', ...data });
+}
+
+/**
+ * Track when a 1v1 match starts (host clicks a game button).
+ */
+export function trackMatchStarted(data: MatchStartedEvent) {
+  pushToDataLayer({ event: 'match_started', ...data });
+}
+
+/**
+ * Track when a 1v1 match completes (canonical outcome derived by host).
+ */
+export function trackMatchCompleted(data: MatchCompletedEvent) {
+  pushToDataLayer({ event: 'match_completed', ...data });
+}
+
+/**
+ * Track when a player forfeits a 1v1 match.
+ */
+export function trackMatchForfeited(data: MatchForfeitedEvent) {
+  pushToDataLayer({ event: 'match_forfeited', ...data });
+}
+
+/**
+ * Track when a 1v1 match hits its max duration without resolution.
+ */
+export function trackMatchTimedOut(data: MatchTimedOutEvent) {
+  pushToDataLayer({ event: 'match_timed_out', ...data });
 }
 
 /**

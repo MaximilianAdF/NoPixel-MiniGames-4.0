@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type FC } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { useSearchParams } from 'next/navigation';
 import classNames from 'classnames';
 import { timerBeepPlayer } from '@/public/audio/AudioManager';
@@ -12,15 +12,109 @@ import { NPSettingsRange } from '@/app/components/NPSettings';
 import GameStatsTracker from '@/app/components/GameStatsTracker';
 import { useGameHost } from '@/app/game/useGameHost';
 import GameShell from '@/app/game/GameShell';
-import type { GameMode, GameResult } from '@/app/game/types';
-import { roofRunningEngine } from './engine';
+import type { GameMode, GamePhase, GameResult } from '@/app/game/types';
+import { useReplayedState } from '@/app/utils/useReplayedState';
+import OpponentSummary from '@/app/lobby/OpponentSummary';
+import { roofRunningEngine, type RoofRunningInput, type RoofRunningState } from './engine';
 import { RoofTile } from './RoofRunningGrid';
 
 const defaultRows = 8;
 const defaultColumns = 11;
 const defaultDuration = 25;
 
-const RoofRunning: FC = () => {
+interface RoofRunningViewProps {
+  state: RoofRunningState;
+  phase: GamePhase;
+  result: GameResult | null;
+  runId: number;
+  durationMs: number;
+  hideTimer?: boolean;
+  compact?: boolean;
+  // Interactive-only. When omitted, the board renders non-interactively.
+  onTileClick?: (index: number) => void;
+  settings?: React.ComponentProps<typeof GameShell>['settings'];
+}
+
+const noop = () => {};
+
+// Presentational shell + grid. Driven by external state so the interactive
+// host (useGameHost) and the spectator (useReplayedState) can both render it.
+const RoofRunningView: FC<RoofRunningViewProps> = ({
+  state,
+  phase,
+  result,
+  runId,
+  durationMs,
+  hideTimer,
+  compact,
+  onTileClick,
+  settings,
+}) => (
+  <GameShell
+    title="Same Game"
+    description="Click on matching groups of blocks"
+    phase={phase}
+    result={result}
+    durationMs={durationMs}
+    runId={runId}
+    statusMessage={result ? (result.won ? 'Success!' : 'Failed!') : ''}
+    hideTimer={hideTimer}
+    settings={settings}
+  >
+    <div
+      className={classNames(
+        `
+          grid
+          gap-x-0.5 gap-y-1
+          mx-auto
+          *:aspect-square
+          data-[color=red]:*:bg-gradient-to-b
+          data-[color=red]:*:from-[#f30308]
+          data-[color=red]:*:to-[#92393b]
+          data-[color=red]:*:[box-shadow:0px_5px_0px_#5c2829]
+          data-[color=green]:*:bg-gradient-to-b
+          data-[color=green]:*:from-[#8ab357]
+          data-[color=green]:*:to-[#668a3d]
+          data-[color=green]:*:[box-shadow:0px_5px_0px_#48612f]
+          data-[color=blue]:*:bg-gradient-to-b
+          data-[color=blue]:*:from-[#5490b2]
+          data-[color=blue]:*:to-[#3a7494]
+          data-[color=blue]:*:[box-shadow:0px_5px_0px_#345066]
+          *:overflow-hidden
+          *:*:size-full
+          *:*:opacity-50
+          *:*:overflow-visible
+          *:data-[color=empty]:*:hidden
+        `,
+        !compact && 'min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px]',
+        phase === 'idle' && 'blur',
+        !onTileClick && 'pointer-events-none',
+      )}
+      style={{
+        maxWidth: `calc(calc(calc(calc(calc(100vh - 208px) - ${4 * (state.rows - 1)}px) / ${state.rows}) * ${state.columns}) + ${2 * (state.columns - 1)}px)`,
+        width: '100%',
+        gridTemplateRows: `repeat(${state.rows}, minmax(0, 1fr))`,
+        gridTemplateColumns: `repeat(${state.columns}, minmax(0, 1fr))`,
+      }}
+    >
+      {state.board.map((color, index) => (
+        <RoofTile key={index} index={index} color={color} onTileClick={onTileClick ?? noop} />
+      ))}
+    </div>
+  </GameShell>
+);
+
+interface RoofRunningProps {
+  // 1v1 match mode: defaults override saved prefs, engine seeds from this value, no auto-restart.
+  seed?: number;
+  // Fires when the match ends so the lobby can move on to the outcome view.
+  onMatchEnd?: (result: GameResult) => void;
+  // Streams each click to the lobby for the opponent's spectator replay.
+  onInput?: (input: RoofRunningInput) => void;
+}
+
+const RoofRunning: FC<RoofRunningProps> = ({ seed, onMatchEnd, onInput }) => {
+  const isMatch = seed !== undefined;
   const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
   const searchParams = useSearchParams();
   const isCompetitive = searchParams?.get('competitive') === 'true';
@@ -40,20 +134,23 @@ const RoofRunning: FC = () => {
   );
   const settingsHydrated = rowsHydrated && columnsHydrated && timerHydrated;
 
-  const activeRows =
-    isChallengeMode && challengeData
+  const activeRows = isMatch
+    ? defaultRows
+    : isChallengeMode && challengeData
       ? challengeData.rows || defaultRows
       : isCompetitive
         ? defaultRows
         : savedRows;
-  const activeColumns =
-    isChallengeMode && challengeData
+  const activeColumns = isMatch
+    ? defaultColumns
+    : isChallengeMode && challengeData
       ? challengeData.columns || defaultColumns
       : isCompetitive
         ? defaultColumns
         : savedColumns;
-  const activeTimer =
-    isChallengeMode && challengeData
+  const activeTimer = isMatch
+    ? defaultDuration
+    : isChallengeMode && challengeData
       ? challengeData.targetTime
         ? Math.floor(challengeData.targetTime / 1000)
         : defaultDuration
@@ -61,11 +158,13 @@ const RoofRunning: FC = () => {
         ? defaultDuration
         : savedTimer;
 
-  const mode: GameMode = isChallengeMode && !isCompleted
-    ? 'daily-challenge'
-    : isCompetitive
-      ? 'competitive'
-      : 'practice';
+  const mode: GameMode = isMatch
+    ? 'competitive'
+    : isChallengeMode && !isCompleted
+      ? 'daily-challenge'
+      : isCompetitive
+        ? 'competitive'
+        : 'practice';
 
   const lastResultRef = useRef<GameResult | null>(null);
   const userRef = useRef(user);
@@ -78,11 +177,15 @@ const RoofRunning: FC = () => {
     config: { rows: activeRows, columns: activeColumns },
     durationMs: activeTimer * 1000,
     mode,
-    ready: settingsHydrated && (!isChallengeMode || challengeData != null),
+    seed: isMatch ? seed : undefined,
+    ready: isMatch || (settingsHydrated && (!isChallengeMode || challengeData != null)),
     onTick: () => timerBeepPlayer.play(),
     onResult: (gameResult) => {
       lastResultRef.current = gameResult;
+      if (isMatch) onMatchEnd?.(gameResult);
     },
+    onInput,
+    noTimer: isMatch,
   });
 
   // Preload sound effects.
@@ -207,67 +310,79 @@ const RoofRunning: FC = () => {
 
   return (
     <>
-      <GameStatsTracker
-        game="roof-running"
-        gameStatus={legacyStatus}
-        score={result ? result.score : state.board.filter((v) => v === 'empty').length}
-        elapsedMs={result?.elapsedMs ?? 0}
-        targetScore={activeRows * activeColumns}
-        wonStatus={3}
-        lostStatus={2}
-        gameSettings={{ rows: activeRows, columns: activeColumns, timer: activeTimer }}
-      />
-      <GameShell
-        title="Same Game"
-        description="Click on matching groups of blocks"
+      {!isMatch && (
+        <GameStatsTracker
+          game="roof-running"
+          gameStatus={legacyStatus}
+          score={result ? result.score : state.board.filter((v) => v === 'empty').length}
+          elapsedMs={result?.elapsedMs ?? 0}
+          targetScore={activeRows * activeColumns}
+          wonStatus={3}
+          lostStatus={2}
+          gameSettings={{ rows: activeRows, columns: activeColumns, timer: activeTimer }}
+        />
+      )}
+      <RoofRunningView
+        state={state}
         phase={phase}
         result={result}
-        durationMs={activeTimer * 1000}
         runId={runId}
-        statusMessage={result ? (result.won ? 'Success!' : 'Failed!') : ''}
-        settings={isChallengeMode ? undefined : settings}
-      >
-        <div
-          className={classNames(
-            `
-              grid
-              gap-x-0.5 gap-y-1
-              mx-auto
-              min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px]
-              *:aspect-square
-              data-[color=red]:*:bg-gradient-to-b
-              data-[color=red]:*:from-[#f30308]
-              data-[color=red]:*:to-[#92393b]
-              data-[color=red]:*:[box-shadow:0px_5px_0px_#5c2829]
-              data-[color=green]:*:bg-gradient-to-b
-              data-[color=green]:*:from-[#8ab357]
-              data-[color=green]:*:to-[#668a3d]
-              data-[color=green]:*:[box-shadow:0px_5px_0px_#48612f]
-              data-[color=blue]:*:bg-gradient-to-b
-              data-[color=blue]:*:from-[#5490b2]
-              data-[color=blue]:*:to-[#3a7494]
-              data-[color=blue]:*:[box-shadow:0px_5px_0px_#345066]
-              *:overflow-hidden
-              *:*:size-full
-              *:*:opacity-50
-              *:*:overflow-visible
-              *:data-[color=empty]:*:hidden
-            `,
-            phase === 'idle' ? 'blur' : '',
-          )}
-          style={{
-            maxWidth: `calc(calc(calc(calc(calc(100vh - 208px) - ${4 * (state.rows - 1)}px) / ${state.rows}) * ${state.columns}) + ${2 * (state.columns - 1)}px)`,
-            width: '100%',
-            gridTemplateRows: `repeat(${state.rows}, minmax(0, 1fr))`,
-            gridTemplateColumns: `repeat(${state.columns}, minmax(0, 1fr))`,
-          }}
-        >
-          {state.board.map((color, index) => (
-            <RoofTile key={index} index={index} color={color} onTileClick={handleTileClick} />
-          ))}
-        </div>
-      </GameShell>
+        durationMs={activeTimer * 1000}
+        hideTimer={isMatch}
+        compact={isMatch}
+        onTileClick={handleTileClick}
+        settings={isMatch || isChallengeMode ? undefined : settings}
+      />
     </>
+  );
+};
+
+interface RoofRunningSpectatorProps {
+  seed: number;
+  inputs: RoofRunningInput[];
+}
+
+// Replays a 1v1 opponent's roof-running game from streamed tile clicks.
+export const RoofRunningSpectator: FC<RoofRunningSpectatorProps> = ({ seed, inputs }) => {
+  const config = useMemo(() => ({ rows: defaultRows, columns: defaultColumns }), []);
+  const { state, outcome } = useReplayedState(roofRunningEngine, config, seed, inputs);
+
+  const phase: GamePhase = outcome === 'won' ? 'won' : outcome === 'lost' ? 'lost' : 'playing';
+  const result: GameResult | null =
+    outcome === 'playing'
+      ? null
+      : {
+          won: outcome === 'won',
+          score: state.board.filter((v) => v === 'empty').length,
+          elapsedMs: 0,
+        };
+
+  return (
+    <RoofRunningView
+      state={state}
+      phase={phase}
+      result={result}
+      runId={1}
+      durationMs={defaultDuration * 1000}
+      compact
+      hideTimer
+    />
+  );
+};
+
+export const RoofRunningSummary: FC<RoofRunningSpectatorProps> = ({ seed, inputs }) => {
+  const config = useMemo(() => ({ rows: defaultRows, columns: defaultColumns }), []);
+  const { state, outcome } = useReplayedState(roofRunningEngine, config, seed, inputs);
+  const cleared = state.board.filter((v) => v === 'empty').length;
+  const total = state.board.length;
+  return (
+    <OpponentSummary
+      title="Same Game"
+      metricLabel="Cleared"
+      metricValue={`${cleared} / ${total}`}
+      progress={{ current: cleared, total }}
+      outcome={outcome}
+    />
   );
 };
 
