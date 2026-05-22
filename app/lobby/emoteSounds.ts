@@ -1,7 +1,7 @@
-// Programmatically-generated emote sound effects via the Web Audio API.
-// No asset files to ship; one shared AudioContext for the lifetime of the
-// tab. Each sound is a few oscillator + gain envelope ops, so cost is
-// negligible and they're recognisably distinct from each other.
+// Cartoony emote sound effects via the Web Audio API — no asset files to
+// ship, one shared AudioContext for the lifetime of the tab. Each sound is
+// tuned to read as the corresponding Fluent UI emoji ("WAAAH" for cry,
+// "HONK HONK HONK" for clown, etc.) rather than a generic beep.
 
 let ctx: AudioContext | null = null;
 
@@ -24,154 +24,143 @@ function getCtx(): AudioContext | null {
   return ctx;
 }
 
-function pulse(
-  c: AudioContext,
-  freq: number,
-  startOffset: number,
-  duration: number,
-  peakGain: number,
-  type: OscillatorType = 'sine',
-) {
-  const osc = c.createOscillator();
-  const gain = c.createGain();
-  osc.type = type;
-  osc.frequency.value = freq;
-  osc.connect(gain);
-  gain.connect(c.destination);
-  const t0 = c.currentTime + startOffset;
-  gain.gain.setValueAtTime(peakGain, t0);
-  gain.gain.exponentialRampToValueAtTime(0.001, t0 + duration);
-  osc.start(t0);
-  osc.stop(t0 + duration + 0.02);
-}
-
-// Rapid pulses ascending → descending, "ha ha ha".
+// 😆  "HA HA HA HA" — five bright triangle pulses bouncing between two pitches.
 function playLaugh() {
   const c = getCtx();
   if (!c) return;
-  [600, 750, 850, 700, 800, 650].forEach((f, i) =>
-    pulse(c, f, i * 0.07, 0.06, 0.13, 'triangle'),
-  );
+  [720, 880, 720, 880, 720].forEach((f, i) => {
+    const osc = c.createOscillator();
+    const gain = c.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = f;
+    osc.connect(gain);
+    gain.connect(c.destination);
+    const t0 = c.currentTime + i * 0.09;
+    gain.gain.setValueAtTime(0.18, t0);
+    gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.08);
+    osc.start(t0);
+    osc.stop(t0 + 0.1);
+  });
 }
 
-// Long descending wail.
+// 😭  Long "WAAAH" — sustained triangle sweeping 600 → 200Hz with vibrato.
 function playCry() {
-  const c = getCtx();
-  if (!c) return;
-  const osc = c.createOscillator();
-  const gain = c.createGain();
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(450, c.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(120, c.currentTime + 0.7);
-  osc.connect(gain);
-  gain.connect(c.destination);
-  gain.gain.setValueAtTime(0.18, c.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.7);
-  osc.start();
-  osc.stop(c.currentTime + 0.72);
-}
-
-// Two short square-wave honks.
-function playHonk() {
-  const c = getCtx();
-  if (!c) return;
-  [0, 0.16].forEach((d) => pulse(c, 180, d, 0.13, 0.13, 'square'));
-}
-
-// Major chord arpeggio (C E G).
-function playHandshake() {
-  const c = getCtx();
-  if (!c) return;
-  [523, 659, 784].forEach((f, i) => pulse(c, f, i * 0.08, 0.3, 0.13, 'sine'));
-}
-
-// Frequency sweep from high to low.
-function playWhoosh() {
-  const c = getCtx();
-  if (!c) return;
-  const osc = c.createOscillator();
-  const gain = c.createGain();
-  osc.type = 'sawtooth';
-  osc.frequency.setValueAtTime(900, c.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(200, c.currentTime + 0.35);
-  osc.connect(gain);
-  gain.connect(c.destination);
-  gain.gain.setValueAtTime(0.1, c.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.35);
-  osc.start();
-  osc.stop(c.currentTime + 0.37);
-}
-
-// Single white-noise burst.
-function playClap() {
-  const c = getCtx();
-  if (!c) return;
-  const dur = 0.06;
-  const buf = c.createBuffer(1, Math.max(1, Math.floor(c.sampleRate * dur)), c.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < data.length; i++) {
-    data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
-  }
-  const src = c.createBufferSource();
-  src.buffer = buf;
-  const gain = c.createGain();
-  gain.gain.value = 0.35;
-  src.connect(gain);
-  gain.connect(c.destination);
-  src.start();
-}
-
-// Short low buzz.
-function playSnort() {
-  const c = getCtx();
-  if (!c) return;
-  const osc = c.createOscillator();
-  const gain = c.createGain();
-  osc.type = 'sawtooth';
-  osc.frequency.setValueAtTime(180, c.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(70, c.currentTime + 0.2);
-  osc.connect(gain);
-  gain.connect(c.destination);
-  gain.gain.setValueAtTime(0.16, c.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.22);
-  osc.start();
-  osc.stop(c.currentTime + 0.24);
-}
-
-// Low sine with vibrato (LFO modulating frequency).
-function playGhost() {
   const c = getCtx();
   if (!c) return;
   const osc = c.createOscillator();
   const lfo = c.createOscillator();
   const lfoGain = c.createGain();
   const gain = c.createGain();
-  osc.type = 'sine';
-  osc.frequency.value = 280;
+
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(600, c.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(350, c.currentTime + 0.5);
+  osc.frequency.exponentialRampToValueAtTime(180, c.currentTime + 1.1);
+
   lfo.type = 'sine';
-  lfo.frequency.value = 8;
-  lfoGain.gain.value = 50;
+  lfo.frequency.value = 6;
+  lfoGain.gain.value = 35;
   lfo.connect(lfoGain);
   lfoGain.connect(osc.frequency);
+
   osc.connect(gain);
   gain.connect(c.destination);
-  gain.gain.setValueAtTime(0.13, c.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.6);
+  gain.gain.setValueAtTime(0, c.currentTime);
+  gain.gain.linearRampToValueAtTime(0.25, c.currentTime + 0.08);
+  gain.gain.setValueAtTime(0.25, c.currentTime + 0.7);
+  gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 1.1);
+
   osc.start();
   lfo.start();
-  osc.stop(c.currentTime + 0.62);
-  lfo.stop(c.currentTime + 0.62);
+  osc.stop(c.currentTime + 1.15);
+  lfo.stop(c.currentTime + 1.15);
+}
+
+// 🤡  "HONK HONK HONK" — three square-wave honks at clown-horn pitch.
+function playClown() {
+  const c = getCtx();
+  if (!c) return;
+  [0, 0.18, 0.36].forEach((delay) => {
+    const osc = c.createOscillator();
+    const gain = c.createGain();
+    osc.type = 'square';
+    osc.frequency.value = 170;
+    osc.connect(gain);
+    gain.connect(c.destination);
+    const t0 = c.currentTime + delay;
+    gain.gain.setValueAtTime(0.18, t0);
+    gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.14);
+    osc.start(t0);
+    osc.stop(t0 + 0.16);
+  });
+}
+
+// 😡  "GRRRR" — low sawtooth growl with fast modulation for a buzzy edge.
+function playAngry() {
+  const c = getCtx();
+  if (!c) return;
+  const osc = c.createOscillator();
+  const lfo = c.createOscillator();
+  const lfoGain = c.createGain();
+  const gain = c.createGain();
+
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(140, c.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(80, c.currentTime + 0.45);
+
+  lfo.type = 'square';
+  lfo.frequency.value = 28;
+  lfoGain.gain.value = 18;
+  lfo.connect(lfoGain);
+  lfoGain.connect(osc.frequency);
+
+  osc.connect(gain);
+  gain.connect(c.destination);
+  gain.gain.setValueAtTime(0.22, c.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.45);
+
+  osc.start();
+  lfo.start();
+  osc.stop(c.currentTime + 0.5);
+  lfo.stop(c.currentTime + 0.5);
+}
+
+// 💀  "ooooOOOoo" — descending sine with strong vibrato (ghost / RIP).
+function playSkull() {
+  const c = getCtx();
+  if (!c) return;
+  const osc = c.createOscillator();
+  const lfo = c.createOscillator();
+  const lfoGain = c.createGain();
+  const gain = c.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(320, c.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(170, c.currentTime + 0.9);
+
+  lfo.type = 'sine';
+  lfo.frequency.value = 9;
+  lfoGain.gain.value = 70;
+  lfo.connect(lfoGain);
+  lfoGain.connect(osc.frequency);
+
+  osc.connect(gain);
+  gain.connect(c.destination);
+  gain.gain.setValueAtTime(0.18, c.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.9);
+
+  osc.start();
+  lfo.start();
+  osc.stop(c.currentTime + 0.95);
+  lfo.stop(c.currentTime + 0.95);
 }
 
 const EMOTE_SOUNDS: Record<string, () => void> = {
   laugh: playLaugh,
   cry: playCry,
-  clown: playHonk,
-  gg: playHandshake,
-  wp: playWhoosh,
-  nice: playClap,
-  angry: playSnort,
-  rip: playGhost,
+  clown: playClown,
+  angry: playAngry,
+  rip: playSkull,
 };
 
 export function playEmoteSound(emoteId: string) {

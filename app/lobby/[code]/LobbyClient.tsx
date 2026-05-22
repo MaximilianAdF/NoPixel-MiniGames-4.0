@@ -76,7 +76,9 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     reason: 'finished' | 'timeout';
   } | null>(null);
   // Recent emote per player — wiped 3s after each emote so the bubble fades.
-  const [emotes, setEmotes] = useState<Record<string, { emote: string; key: number }>>({});
+  const [emotes, setEmotes] = useState<
+    Record<string, { imageUrl: string; label: string; key: number }>
+  >({});
   const lastEmoteSentRef = useRef(0);
   // Non-host's suggestion is mirrored on both clients so the host's "Start a
   // match" panel can show a "Requested" badge, and the non-host's suggest
@@ -95,9 +97,12 @@ export default function LobbyClient({ code }: LobbyClientProps) {
 
   const showEmote = useCallback((emoteId: string, fromClientId: string) => {
     const def = EMOTE_BY_ID[emoteId];
-    const display = def?.emoji ?? emoteId;
+    if (!def) return;
     const key = Date.now();
-    setEmotes((prev) => ({ ...prev, [fromClientId]: { emote: display, key } }));
+    setEmotes((prev) => ({
+      ...prev,
+      [fromClientId]: { imageUrl: def.imageUrl, label: def.label, key },
+    }));
     // Sound for both sender (immediate gesture) and receiver. The shared
     // AudioContext is created lazily and resumes on first user interaction,
     // so a receiver who's already clicked anywhere will hear it.
@@ -645,7 +650,8 @@ export default function LobbyClient({ code }: LobbyClientProps) {
                   <span className="text-white/90 text-sm truncate min-w-0">{member.data.displayName}</span>
                   {emotes[member.clientId] && (
                     <InlineEmote
-                      emote={emotes[member.clientId].emote}
+                      imageUrl={emotes[member.clientId].imageUrl}
+                      label={emotes[member.clientId].label}
                       emoteKey={emotes[member.clientId].key}
                     />
                   )}
@@ -841,9 +847,17 @@ function EmoteBar({ onSend }: { onSend: (emoteId: string) => void }) {
           onClick={() => onSend(emote.id)}
           title={emote.label}
           aria-label={emote.label}
-          className="px-2.5 py-1 rounded-xl text-xl hover:bg-white/10 transition-colors active:scale-90"
+          className="p-1.5 rounded-xl hover:bg-white/10 transition-colors active:scale-90"
         >
-          {emote.emoji}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={emote.imageUrl}
+            alt={emote.label}
+            width={36}
+            height={36}
+            className="w-9 h-9 block"
+            draggable={false}
+          />
         </button>
       ))}
     </div>
@@ -940,7 +954,7 @@ function OutcomeView({
   opponentResult: GameResult | null;
   me: PresenceMember | null;
   opponent: PresenceMember | null;
-  emotes: Record<string, { emote: string; key: number }>;
+  emotes: Record<string, { imageUrl: string; label: string; key: number }>;
   onBack: () => void;
 }) {
   const title = isDraw ? 'Draw' : iWon ? 'You won' : 'You lost';
@@ -1042,7 +1056,7 @@ function ResultRow({
 }: {
   label: string;
   member: PresenceMember | null;
-  emote: { emote: string; key: number } | null;
+  emote: { imageUrl: string; label: string; key: number } | null;
   result: GameResult | null;
   pendingLabel: string;
 }) {
@@ -1063,7 +1077,7 @@ function ResultRow({
         <span className="text-white/70 text-sm truncate min-w-0">
           {member ? member.data.displayName : label}
         </span>
-        {emote && <InlineEmote emote={emote.emote} emoteKey={emote.key} />}
+        {emote && <InlineEmote imageUrl={emote.imageUrl} label={emote.label} emoteKey={emote.key} />}
       </div>
       {result ? (
         <span className="text-white/90 text-sm font-mono tabular-nums shrink-0">
@@ -1077,13 +1091,22 @@ function ResultRow({
   );
 }
 
-function InlineEmote({ emote, emoteKey }: { emote: string; emoteKey: number }) {
+function InlineEmote({
+  imageUrl,
+  label,
+  emoteKey,
+}: {
+  imageUrl: string;
+  label: string;
+  emoteKey: number;
+}) {
   return (
     <span
       key={emoteKey}
-      className="emote-inline inline-flex items-center px-2 py-0.5 rounded-md bg-white/[0.06] border border-white/15 text-base whitespace-nowrap shrink-0"
+      className="emote-inline inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/[0.05] border border-white/15 shrink-0"
     >
-      {emote}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={imageUrl} alt={label} width={20} height={20} className="w-5 h-5" />
     </span>
   );
 }

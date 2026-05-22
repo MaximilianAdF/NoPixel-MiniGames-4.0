@@ -47,7 +47,7 @@ interface MatchViewProps {
   opponent: PresenceMember | null;
   // Recent emotes keyed by clientId; rendered as a floating bubble above
   // the corresponding avatar.
-  emotes: Record<string, { emote: string; key: number }>;
+  emotes: Record<string, { imageUrl: string; label: string; key: number }>;
 }
 
 // Renders the chosen game in 1v1 match mode. In normal mode, it's a
@@ -182,8 +182,8 @@ function Splitscreen({
   theirs: React.ReactNode;
   me: PresenceMember | null;
   opponent: PresenceMember | null;
-  myEmote: { emote: string; key: number } | null;
-  opponentEmote: { emote: string; key: number } | null;
+  myEmote: { imageUrl: string; label: string; key: number } | null;
+  opponentEmote: { imageUrl: string; label: string; key: number } | null;
 }) {
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-2 divide-y xl:divide-y-0 xl:divide-x divide-white/10">
@@ -213,7 +213,7 @@ function Half({
 }: {
   label: string;
   member: PresenceMember | null;
-  emote: { emote: string; key: number } | null;
+  emote: { imageUrl: string; label: string; key: number } | null;
   accent?: boolean;
   children: React.ReactNode;
 }) {
@@ -267,7 +267,7 @@ function FocusLayout({
   interactive: React.ReactNode;
   summary: React.ReactNode;
   opponent: PresenceMember | null;
-  opponentEmote: { emote: string; key: number } | null;
+  opponentEmote: { imageUrl: string; label: string; key: number } | null;
 }) {
   return (
     <>

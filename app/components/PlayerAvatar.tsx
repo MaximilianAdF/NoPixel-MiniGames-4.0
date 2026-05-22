@@ -21,7 +21,7 @@ interface PlayerAvatarProps {
   ringClass?: string;
   // Optional floating emote bubble above the avatar. `key` should change per
   // emote so the CSS animation restarts on each new one.
-  emote?: { emote: string; key: number } | null;
+  emote?: { imageUrl: string; label: string; key: number } | null;
 }
 
 export default function PlayerAvatar({
@@ -79,9 +79,16 @@ export default function PlayerAvatar({
       {emote && (
         <div
           key={emote.key}
-          className="emote-bubble absolute -top-10 left-1/2 -translate-x-1/2 z-20 px-3 py-1 rounded-full bg-black/90 backdrop-blur-sm border border-white/15 text-2xl leading-none whitespace-nowrap shadow-xl shadow-black/50 pointer-events-none"
+          className="emote-bubble absolute -top-12 left-1/2 -translate-x-1/2 z-20 p-1 rounded-full bg-black/80 backdrop-blur-sm border border-white/15 shadow-xl shadow-black/50 pointer-events-none"
         >
-          {emote.emote}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={emote.imageUrl}
+            alt={emote.label}
+            width={36}
+            height={36}
+            className="w-9 h-9 block"
+          />
         </div>
       )}
       {body}
