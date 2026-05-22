@@ -8,7 +8,8 @@ import { useUser } from '@/app/contexts/UserContext';
 import { useAblyChannel, type ChannelStatus, type PresenceMember } from '@/app/utils/useAblyChannel';
 import { checkBeepPlayer, successPlayer } from '@/public/audio/AudioManager';
 import PlayerAvatar from '@/app/components/PlayerAvatar';
-import { EMOTES, EMOTE_THROTTLE_MS, EMOTE_DURATION_MS } from '@/app/lobby/emotes';
+import { EMOTES, EMOTE_BY_ID, EMOTE_THROTTLE_MS, EMOTE_DURATION_MS } from '@/app/lobby/emotes';
+import { playEmoteSound } from '@/app/lobby/emoteSounds';
 import { generateMatchSeed } from '@/lib/lobby/seededRandom';
 import { determineHost } from '@/lib/lobby/host';
 import type { LobbyMessage } from '@/lib/lobby/messages';
@@ -92,9 +93,15 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     successPlayer.whenReady();
   }, []);
 
-  const showEmote = useCallback((emote: string, fromClientId: string) => {
+  const showEmote = useCallback((emoteId: string, fromClientId: string) => {
+    const def = EMOTE_BY_ID[emoteId];
+    const display = def?.emoji ?? emoteId;
     const key = Date.now();
-    setEmotes((prev) => ({ ...prev, [fromClientId]: { emote, key } }));
+    setEmotes((prev) => ({ ...prev, [fromClientId]: { emote: display, key } }));
+    // Sound for both sender (immediate gesture) and receiver. The shared
+    // AudioContext is created lazily and resumes on first user interaction,
+    // so a receiver who's already clicked anywhere will hear it.
+    playEmoteSound(emoteId);
     setTimeout(() => {
       setEmotes((prev) => {
         if (prev[fromClientId]?.key !== key) return prev;
@@ -452,15 +459,15 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   };
 
   const sendEmote = useCallback(
-    (emote: string) => {
+    (emoteId: string) => {
       const nowMs = Date.now();
       if (nowMs - lastEmoteSentRef.current < EMOTE_THROTTLE_MS) return;
       if (!user?.id) return;
       lastEmoteSentRef.current = nowMs;
       // Show on my own side immediately (echo is disabled — we won't get our
-      // own message back).
-      showEmote(emote, user.id);
-      void publish({ type: 'emote', emote, fromClientId: user.id });
+      // own message back). showEmote also plays the sound.
+      showEmote(emoteId, user.id);
+      void publish({ type: 'emote', emote: emoteId, fromClientId: user.id });
     },
     [user?.id, publish, showEmote],
   );
@@ -824,17 +831,19 @@ function MatchHistoryRow({ entry }: { entry: MatchHistoryEntry }) {
   );
 }
 
-function EmoteBar({ onSend }: { onSend: (emote: string) => void }) {
+function EmoteBar({ onSend }: { onSend: (emoteId: string) => void }) {
   return (
-    <div className="flex items-center gap-1 rounded-2xl bg-black/65 backdrop-blur-md border border-white/10 p-1.5 shadow-xl shadow-black/40">
+    <div className="flex items-center gap-1 rounded-2xl bg-black/70 backdrop-blur-md border border-white/10 p-1.5 shadow-xl shadow-black/40">
       {EMOTES.map((emote) => (
         <button
-          key={emote}
+          key={emote.id}
           type="button"
-          onClick={() => onSend(emote)}
-          className="px-3 py-1.5 rounded-xl text-white/75 hover:text-white hover:bg-white/10 text-xs font-semibold transition-colors active:scale-95"
+          onClick={() => onSend(emote.id)}
+          title={emote.label}
+          aria-label={emote.label}
+          className="px-2.5 py-1 rounded-xl text-xl hover:bg-white/10 transition-colors active:scale-90"
         >
-          {emote}
+          {emote.emoji}
         </button>
       ))}
     </div>
@@ -1072,7 +1081,7 @@ function InlineEmote({ emote, emoteKey }: { emote: string; emoteKey: number }) {
   return (
     <span
       key={emoteKey}
-      className="emote-inline inline-flex items-center px-2 py-0.5 rounded-md bg-[#54FFA4]/15 border border-[#54FFA4]/30 text-[#54FFA4] text-[11px] font-semibold whitespace-nowrap shrink-0"
+      className="emote-inline inline-flex items-center px-2 py-0.5 rounded-md bg-white/[0.06] border border-white/15 text-base whitespace-nowrap shrink-0"
     >
       {emote}
     </span>

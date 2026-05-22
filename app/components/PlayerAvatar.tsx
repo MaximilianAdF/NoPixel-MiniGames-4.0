@@ -79,7 +79,7 @@ export default function PlayerAvatar({
       {emote && (
         <div
           key={emote.key}
-          className="emote-bubble absolute -top-9 left-1/2 -translate-x-1/2 z-20 px-3 py-1.5 rounded-full bg-black/90 backdrop-blur-sm border border-white/15 text-white text-xs font-semibold whitespace-nowrap shadow-xl shadow-black/50 pointer-events-none"
+          className="emote-bubble absolute -top-10 left-1/2 -translate-x-1/2 z-20 px-3 py-1 rounded-full bg-black/90 backdrop-blur-sm border border-white/15 text-2xl leading-none whitespace-nowrap shadow-xl shadow-black/50 pointer-events-none"
         >
           {emote.emote}
         </div>
