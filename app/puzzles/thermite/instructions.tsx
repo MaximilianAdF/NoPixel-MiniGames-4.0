@@ -6,139 +6,126 @@ export default function ThermiteInstructions() {
         <>
             <InstructionSection id="overview" title="What is the Thermite Hack?" icon={<Info className="w-5 h-5" />}>
                 <p>
-                    The Thermite minigame is one of the most challenging memory-based puzzles in NoPixel 4.0. 
-                    It tests your ability to memorize and recreate complex sequences of highlighted tiles under 
-                    intense time pressure. Originally designed to simulate disabling laser security systems during 
-                    bank heists, this minigame has become a staple test of criminal skill in the NoPixel universe.
+                    The Thermite minigame in NoPixel 4.0 is a chain-reaction puzzle played on a 6×6 grid. Every cell holds a piece with one of three ranges — short, medium, or long — and a status that decays from full to half to empty each time you click it. Your goal is to keep the chain alive: every click highlights a new set of squares determined by the clicked piece&apos;s range, and the only valid next moves are those highlighted squares.
                 </p>
                 <p>
-                    Success requires exceptional pattern recognition, spatial memory, and the ability to stay 
-                    calm under pressure. Even experienced players can struggle with higher difficulty levels, 
-                    making practice absolutely essential before attempting real heists in-game.
+                    Reach the target score before you click yourself into a corner. Run out of highlighted squares and the hack fails. It tests spatial planning and reading the board — not memorization or twitch reflexes.
                 </p>
             </InstructionSection>
 
             <InstructionSection id="howtoplay" title="How to Play - Step by Step" icon={<Gamepad className="w-5 h-5" />}>
                 <ol className="list-decimal pl-5 space-y-2">
-                    <li><strong>Wait for the pattern</strong> - The game will display a grid of tiles</li>
-                    <li><strong>Watch carefully</strong> as tiles light up one by one in sequence</li>
-                    <li><strong>Memorize the exact order</strong> - pay attention to both position and timing</li>
-                    <li><strong>Wait for the sequence to end</strong> - don&apos;t click during the display phase</li>
-                    <li><strong>Recreate the pattern</strong> - click each tile in the exact same order</li>
-                    <li><strong>Complete perfectly</strong> - one wrong click fails the entire attempt</li>
-                    <li><strong>Advance to next level</strong> - patterns get longer and faster</li>
+                    <li><strong>The board populates</strong> — a 6×6 grid of pieces, with one or more squares highlighted as your starting move</li>
+                    <li><strong>Click a highlighted square</strong> — its status drops one step (full → half → empty)</li>
+                    <li><strong>Watch the new highlights propagate</strong> — squares within the clicked piece&apos;s range get highlighted as your next legal moves</li>
+                    <li><strong>Earn a kill</strong> — taking a square from half to empty scores +1 point</li>
+                    <li><strong>Chain combos</strong> — three kills within one second of each other triggers a combo bonus</li>
+                    <li><strong>Plan to keep chains going</strong> — every click reassigns the clicked square to a fresh random piece, so your range options keep changing</li>
+                    <li><strong>Win at the target score</strong> — reach the target (24 for sewer, 28 for vault) and the hack succeeds</li>
+                    <li><strong>Lose if you stall</strong> — if a click highlights zero new squares, you&apos;re out of moves and the hack fails</li>
                 </ol>
             </InstructionSection>
 
             <InstructionSection id="scoring" title="Understanding the Scoring System" icon={<Trophy className="w-5 h-5" />}>
                 <p>
-                    Your score is calculated using multiple factors. Speed is important, but accuracy is paramount. 
-                    The scoring algorithm considers:
+                    Score comes from two sources: kills and combos. The math is simple but the strategy isn&apos;t.
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Completion time</strong> - Faster recall = higher multiplier</li>
-                    <li><strong>Sequence length</strong> - Longer patterns award exponentially more points</li>
-                    <li><strong>Difficulty level</strong> - Higher difficulties have better base scores</li>
-                    <li><strong>Perfect streaks</strong> - Consecutive successes build combo bonuses</li>
-                    <li><strong>First-attempt bonus</strong> - Getting it right on the first try awards extra points</li>
+                    <li><strong>Kills (+1 each)</strong> — taking a square from half → empty awards one point</li>
+                    <li><strong>Combo bonus</strong> — three kills within a one-second rolling window awards <code>2^N</code> points, where N is the number of combos you&apos;ve already chained in this run</li>
+                    <li><strong>First combo</strong> = +1 bonus, <strong>second</strong> = +2, <strong>third</strong> = +4, <strong>fourth</strong> = +8, and so on (exponential)</li>
+                    <li><strong>Full → half clicks award nothing</strong> — they&apos;re setup moves to position the next kill</li>
+                    <li><strong>Target score</strong> — the win condition. Sewer preset = 24, Vault preset = 28</li>
                 </ul>
+                <p className="mt-3">
+                    Late-run combos are wildly more valuable than early ones. A skilled player will set up a fast 3-kill burst near the end rather than collect kills slowly throughout.
+                </p>
             </InstructionSection>
 
             <InstructionSection id="tips" title="Advanced Tips & Strategies" icon={<Lightbulb className="w-5 h-5" />}>
                 <p>
-                    Professional players use specific techniques to master Thermite hacks:
+                    The chain is everything. Top players think two clicks ahead, not just one:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Chunking technique</strong> - Break long sequences into groups of 2-3 tiles. Instead of remembering &quot;1-2-3-4-5-6&quot;, think &quot;12, 34, 56&quot;</li>
-                    <li><strong>Pattern visualization</strong> - See the sequence as a shape or path across the grid, like drawing a letter or symbol</li>
-                    <li><strong>Verbal encoding</strong> - Quietly say positions out loud: &quot;top-left, bottom-right, center, top-right&quot;</li>
-                    <li><strong>Muscle memory practice</strong> - Physically move your mouse along the pattern path during display</li>
-                    <li><strong>Corner anchoring</strong> - Always note if the pattern starts or ends in a corner - these are easier to remember</li>
-                    <li><strong>Elimination of distractions</strong> - Close other apps, mute notifications, focus completely</li>
-                    <li><strong>Rehearsal timing</strong> - Mentally replay the sequence 2-3 times before clicking</li>
+                    <li><strong>Know the piece patterns</strong> — short highlights immediate neighbors, medium highlights cells two away on a checkerboard pattern, long reaches three cells out. Each pattern leaves a different set of follow-up options</li>
+                    <li><strong>Pre-stage your kills</strong> — click full squares (no score) to leave a cluster of half squares ready to be killed in a fast burst for the combo</li>
+                    <li><strong>Combos require speed</strong> — three kills in one second means you need to know your next two clicks before you start. Plan the sequence, then execute</li>
+                    <li><strong>Long-range pieces are gold</strong> — they reach across the board and give you the most flexibility for the next click. Save them for when you&apos;re in a corner</li>
+                    <li><strong>Avoid dead-end squares</strong> — never click a square if you can predict it will leave zero highlighted cells. That&apos;s game over</li>
+                    <li><strong>The reassigned piece is random</strong> — you can&apos;t control what range the clicked square becomes, only what it was. Account for this volatility</li>
+                    <li><strong>Edges and corners are dangerous</strong> — they highlight fewer follow-up squares than center cells. Lean toward the middle when you can</li>
                 </ul>
             </InstructionSection>
 
             <InstructionSection id="difficulty" title="Difficulty Progression Breakdown" icon={<TrendingUp className="w-5 h-5" />}>
                 <p>
-                    Understanding what to expect at each level helps you prepare mentally:
+                    The two presets correspond to the in-game heists, but you can also configure custom difficulty in settings:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Beginner (Levels 1-3)</strong> - 3-4 tiles, slow flash speed, wide timing window</li>
-                    <li><strong>Intermediate (Levels 4-6)</strong> - 5-6 tiles, moderate speed, requires focused attention</li>
-                    <li><strong>Advanced (Levels 7-9)</strong> - 7-8 tiles, fast flashing, minimal margin for error</li>
-                    <li><strong>Expert (Levels 10+)</strong> - 9+ tiles, extremely rapid sequences, professional-level skill required</li>
+                    <li><strong>Sewer Generators</strong> — 6×6 grid, target score 24, 60-second timer. The standard Maze Bank sewer hack</li>
+                    <li><strong>Vault</strong> — 6×6 grid, target score 28, 60-second timer. Same board size as sewer but a higher score requirement means you have to chain combos to win in time</li>
+                    <li><strong>Custom</strong> — open settings to change grid dimensions, target score, and timer duration. Useful for practicing combo timing on smaller boards or stress-testing your reads on larger ones</li>
                 </ul>
                 <p>
-                    Many heists in NoPixel require completion of specific difficulty levels. Practice mode allows 
-                    you to train at any level, but actual heists lock you into predetermined difficulties based 
-                    on the target location.
+                    The default preset matches what you&apos;ll see in-game. Practice on Sewer until you&apos;re consistent, then graduate to Vault — the score difference forces you to start using combos.
                 </p>
             </InstructionSection>
 
             <InstructionSection id="mistakes" title="Common Mistakes to Avoid" icon={<AlertTriangle className="w-5 h-5" />}>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Looking away during the sequence</strong> - Even a split-second distraction can cause you to miss a tile</li>
-                    <li><strong>Clicking during the display phase</strong> - Wait until the pattern fully completes before clicking</li>
-                    <li><strong>Rushing your response</strong> - Take an extra 2 seconds to mentally confirm the pattern</li>
-                    <li><strong>Not tracking the first tile</strong> - Forgetting where the sequence started is the #1 cause of failure</li>
-                    <li><strong>Confusing adjacent tiles</strong> - Double-check similar positions like top-left vs top-center</li>
-                    <li><strong>Panic clicking after mistakes</strong> - If you mess up early, don&apos;t randomly click hoping to recover</li>
-                    <li><strong>Practicing only easy modes</strong> - Challenge yourself with harder difficulties regularly</li>
+                    <li><strong>Clicking the first highlighted thing you see</strong> — without checking what it will highlight next, you risk dead-ending the chain</li>
+                    <li><strong>Ignoring the piece type before clicking</strong> — short, medium, and long pieces produce wildly different next-move sets. Always check the piece before committing</li>
+                    <li><strong>Trying to combo without setup</strong> — combos need three half squares within range of each other. If you don&apos;t pre-stage half squares, you&apos;ll never hit the timing</li>
+                    <li><strong>Killing every half square the moment you can</strong> — sometimes you want to leave a half square alive as a future combo piece</li>
+                    <li><strong>Treating corners and edges the same as the middle</strong> — corner cells have fewer neighbors at every range, so they&apos;re much higher risk to click</li>
+                    <li><strong>Chasing high-value combos when you&apos;re behind on the clock</strong> — sometimes the safer 1-point kill wins the round better than a risky 4-point combo attempt</li>
                 </ul>
             </InstructionSection>
 
             <InstructionSection id="nopixel" title="NoPixel Roleplay Context" icon={<Briefcase className="w-5 h-5" />}>
                 <p>
-                    In the NoPixel GTA RP server, Thermite hacks are essential for some of the most lucrative 
-                    and prestigious criminal activities. These include:
+                    In NoPixel 4.0, the Thermite minigame is triggered when disabling laser security systems during major heists. The two presets here mirror the actual in-game configurations:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Fleeca Bank robberies</strong> - Entry-level heists requiring basic Thermite skills</li>
-                    <li><strong>Paleto Bay Bank</strong> - Intermediate difficulty with higher rewards</li>
-                    <li><strong>Pacific Standard Bank</strong> - Advanced Thermite sequences with massive payouts</li>
-                    <li><strong>Vault heists</strong> - Multiple Thermite hacks in sequence, expert-level only</li>
-                    <li><strong>Jewelry Store robberies</strong> - Occasional Thermite requirements</li>
+                    <li><strong>Maze Bank sewer generators</strong> — the entry hack for the sewer infiltration route. Lower target score, faster to complete</li>
+                    <li><strong>Maze Bank vault</strong> — the final hack inside the vault itself. Higher target score, you need combos to make the timer</li>
                 </ul>
                 <p>
-                    Failing a Thermite hack in-game doesn&apos;t just mean losing progress - it alerts police, 
-                    wastes expensive materials, and can end your entire heist crew&apos;s operation. This is why 
-                    serious criminals in NoPixel spend hours practicing on external trainers before attempting 
-                    real jobs.
+                    Other heist locations may require Thermite hacks with different parameters, but the mechanic — chain-attack with range-based highlights — is the same everywhere. Practice the core mechanic here and it transfers to whatever the server throws at you.
+                </p>
+                <p>
+                    Failing a Thermite mid-heist wastes the consumable, alerts security, and often ends the crew&apos;s run. This is why every serious heister practices on external trainers before attempting real jobs.
                 </p>
             </InstructionSection>
 
             <InstructionSection id="training" title="Training Recommendations" icon={<GraduationCap className="w-5 h-5" />} defaultOpen={false}>
                 <p>
-                    To truly master Thermite hacks, follow this practice regimen:
+                    A productive practice routine looks like:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Daily practice</strong> - 15-30 minutes per day builds consistent muscle memory</li>
-                    <li><strong>Gradual progression</strong> - Don&apos;t jump to expert mode immediately; master each level first</li>
-                    <li><strong>Pressure simulation</strong> - Set personal time limits to simulate heist pressure</li>
-                    <li><strong>Review failures</strong> - Understand why you failed specific patterns</li>
+                    <li><strong>Start on Sewer</strong> — get to a consistent win rate without using combos. This builds your board-reading reflexes</li>
+                    <li><strong>Then practice setups</strong> — on Sewer, deliberately try to land at least one 3-kill combo every run, even if it costs you wins at first</li>
+                    <li><strong>Graduate to Vault</strong> — the higher target forces combos. You won&apos;t hit 28 in 60 seconds with single kills alone</li>
+                    <li><strong>Shrink the grid</strong> — practice on smaller custom boards (4×4, 5×5) to drill combo timing in a constrained space</li>
+                    <li><strong>Review failed runs</strong> — when a hack fails on out-of-moves, replay the last 3 clicks in your head. What should you have clicked instead?</li>
                 </ul>
             </InstructionSection>
 
-            <InstructionSection id="memory" title="Memory Enhancement Techniques" icon={<Brain className="w-5 h-5" />} defaultOpen={false}>
+            <InstructionSection id="memory" title="Reading the Board" icon={<Brain className="w-5 h-5" />} defaultOpen={false}>
                 <p>
-                    Improve your overall memory capacity for better Thermite performance:
+                    The mental skill that matters most isn&apos;t memory — it&apos;s rapid pattern recognition. Train these reads:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>The Method of Loci</strong> - Associate each grid position with a location in a familiar place</li>
-                    <li><strong>Number-shape system</strong> - Assign numbers to positions and remember them as number sequences</li>
-                    <li><strong>Color association</strong> - If tiles have colors, link them to memorable objects</li>
-                    <li><strong>Story creation</strong> - Build a mini-story about visiting each position in order</li>
+                    <li><strong>Range silhouettes</strong> — learn the shape of each piece&apos;s reach. Glance at any piece and immediately see its kill zone</li>
+                    <li><strong>Half-square clusters</strong> — scan the board for any 3 half squares within range of a single piece. That&apos;s a combo waiting to happen</li>
+                    <li><strong>Branch counting</strong> — before clicking, estimate how many cells the next click will highlight. Aim for clicks that produce more options, not fewer</li>
+                    <li><strong>Edge awareness</strong> — develop a habit of mentally flagging which highlighted squares are in corners or edges. Click those last; they have fewer follow-ups</li>
                 </ul>
             </InstructionSection>
 
             <InstructionSection id="why" title="Why This Matters" icon={<Target className="w-5 h-5" />} defaultOpen={false}>
                 <p>
-                    Thermite proficiency isn&apos;t just about completing a minigame - it&apos;s a status symbol 
-                    in the NoPixel community. Players who can consistently hit 8+ tile sequences are recruited 
-                    for elite heist crews, earn respect from their criminal organizations, and unlock access to 
-                    the server&apos;s most exclusive content. Master this skill, and you&apos;ll find doors opening 
-                    throughout your NoPixel career.
+                    Thermite is the gatekeeper to the most valuable heists in NoPixel — Fleeca, Paleto, Pacific Standard, vault crews. Players who can consistently hit Vault preset under timer pressure get recruited for elite crews and pull the big scores. Practice this mechanic until the chain reads are automatic, and you&apos;ll find yourself trusted with hacks the rest of the server can&apos;t reliably finish.
                 </p>
             </InstructionSection>
         </>

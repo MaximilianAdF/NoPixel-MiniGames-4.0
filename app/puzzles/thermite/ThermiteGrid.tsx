@@ -25,7 +25,7 @@ export const ThermiteSquare = memo<ThermiteSquareProps>(
       onClick={() => onSquareClick(row, col)}
     >
       <span className="piece">
-        <Image src={pieceImages[square.piece.type]} alt="" width={75} height={75} />
+        <Image src={pieceImages[square.piece.type]} alt={`${square.piece.type} range piece`} width={75} height={75} />
       </span>
       <div className="crosses">
         <Image src={crossImg} alt="" width={16} height={16} />
