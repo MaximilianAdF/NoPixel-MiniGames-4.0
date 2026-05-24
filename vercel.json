@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/admin/cleanup-guests",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}
