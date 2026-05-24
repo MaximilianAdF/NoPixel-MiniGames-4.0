@@ -41,6 +41,10 @@ const RepairKit: FC = () => {
     userRef.current = user;
   }, [user]);
 
+  // Track per-round elapsed time so GameStatsTracker reports real durations, not 0.
+  const playingSinceRef = useRef<number | null>(null);
+  const [elapsedMs, setElapsedMs] = useState(0);
+
   const startRound = useCallback(() => {
     setEngineState(repairKitEngine.init({}, Math.random));
     setRoundId((r) => r + 1);
@@ -66,6 +70,7 @@ const RepairKit: FC = () => {
       return () => clearTimeout(timer);
     }
     if (phase === 'playing') {
+      playingSinceRef.current = performance.now();
       const loseMs = (engineState.losePoint / 100) * durationMs;
       const timer = setTimeout(() => {
         setPhase((p) =>
@@ -77,6 +82,10 @@ const RepairKit: FC = () => {
       return () => clearTimeout(timer);
     }
     if (phase === 'won' || phase === 'lost') {
+      if (playingSinceRef.current !== null) {
+        setElapsedMs(performance.now() - playingSinceRef.current);
+        playingSinceRef.current = null;
+      }
       const timer = setTimeout(startRound, resultMs);
       return () => clearTimeout(timer);
     }
@@ -127,10 +136,12 @@ const RepairKit: FC = () => {
       <GameStatsTracker
         game="repair-kit"
         gameStatus={legacyStatus}
-        score={0}
-        elapsedMs={0}
+        score={phase === 'won' ? 1 : 0}
+        elapsedMs={elapsedMs}
+        targetScore={1}
         wonStatus={3}
         lostStatus={2}
+        gameSettings={{ speed }}
       />
       <div
         className={classNames(
