@@ -90,10 +90,26 @@ export function useDailyChallenge() {
     dailyChallengeStatus?.challengeId === challengeId &&
     !!dailyChallengeStatus?.completed;
 
+  // Snapshot of isCompleted at the moment it first becomes knowable (after dailyChallengeStatus loads).
+  // Stays stable for the rest of the session — so puzzle mode logic doesn't flip mid-run when the
+  // player wins (which would cause useGameHost to auto-restart the game behind the win dialog).
+  const [initialIsCompleted, setInitialIsCompleted] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (initialIsCompleted !== null) return;
+    if (!challengeId) {
+      setInitialIsCompleted(false);
+      return;
+    }
+    if (dailyChallengeStatus === undefined) return; // still loading
+    setInitialIsCompleted(isCompleted);
+  }, [challengeId, dailyChallengeStatus, isCompleted, initialIsCompleted]);
+
   return {
     isChallengeMode: !!challengeId,
     challengeData,
     isLoading,
     isCompleted,
+    // Use this (not isCompleted) for `mode` decisions in puzzle components.
+    initialIsCompleted: initialIsCompleted ?? false,
   };
 }

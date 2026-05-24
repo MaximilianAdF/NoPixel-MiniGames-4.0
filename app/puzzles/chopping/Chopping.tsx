@@ -108,7 +108,7 @@ interface ChoppingProps {
 
 const Chopping: FC<ChoppingProps> = ({ seed, onMatchEnd, onInput }) => {
   const isMatch = seed !== undefined;
-  const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
+  const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted, initialIsCompleted } = useDailyChallenge();
   const searchParams = useSearchParams();
   const isCompetitive = searchParams?.get('competitive') === 'true';
   const { user } = useUser();
@@ -142,7 +142,7 @@ const Chopping: FC<ChoppingProps> = ({ seed, onMatchEnd, onInput }) => {
 
   const mode: GameMode = isMatch
     ? 'competitive'
-    : isChallengeMode && !isCompleted
+    : isChallengeMode && !initialIsCompleted
       ? 'daily-challenge'
       : isCompetitive
         ? 'competitive'

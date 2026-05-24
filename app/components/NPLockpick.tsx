@@ -206,7 +206,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
   onInput,
 }) => {
   const isMatch = seed !== undefined;
-  const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted } = useDailyChallenge();
+  const { isChallengeMode, challengeData, isLoading: isChallengeLoading, isCompleted, initialIsCompleted } = useDailyChallenge();
   const { user } = useUser();
 
   const [savedLevels, setSavedLevels, levelsHydrated] = usePersistantState(
@@ -238,7 +238,7 @@ const NPLockpick: FC<NPLockpickProps> = ({
 
   const mode: GameMode = isMatch
     ? 'competitive'
-    : isChallengeMode && !isCompleted
+    : isChallengeMode && !initialIsCompleted
       ? 'daily-challenge'
       : isCompetitive
         ? 'competitive'
