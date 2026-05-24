@@ -16,58 +16,56 @@ export async function GET(request: NextRequest) {
     let session = await getSession();
     let guestDeviceId = request.headers.get('x-guest-device-id');
 
-    // If no session but we have a guest ID, try to find or create a guest user
+    // Reject malicious / oversized device IDs. UUIDs are 36 chars; cap at 64 for headroom.
+    if (guestDeviceId && guestDeviceId.length > 64) {
+      return NextResponse.json({ error: 'Invalid guest device ID' }, { status: 400 });
+    }
+
+    // If no session but we have a guest ID, find or create a guest user atomically.
     if (!session && guestDeviceId) {
       const client = await clientPromise;
       const db = client.db('nopixel');
 
-      // Try to find existing guest user
-      let user = await db.collection('users').findOne({
+      const now = new Date();
+      const discriminator = crypto.randomUUID().slice(0, 6).toUpperCase();
+      const newGuestDefaults = {
+        username: `Guest#${discriminator}`,
+        displayName: `Guest#${discriminator}`,
+        discriminator: discriminator,
+        avatar: '',
         guestDeviceId: guestDeviceId,
-      });
+        isGuest: true,
+        verified: false,
+        level: 1,
+        totalXP: 0,
+        totalGamesPlayed: 0,
+        totalTimePlayedMs: 0,
+        currentDailyStreak: 0,
+        longestDailyStreak: 0,
+        achievements: [],
+        badges: [],
+        preferences: {
+          volume: 50,
+          notifications: true,
+          publicProfile: true,
+          theme: 'dark',
+        },
+        createdAt: now,
+        joinedAt: now,
+      };
 
-      // If not found, create new guest user
-      if (!user) {
-        const now = new Date();
-        const discriminator = crypto.randomUUID().slice(0, 6).toUpperCase();
-        const guestUser = {
-          username: `Guest#${discriminator}`,
-          displayName: `Guest#${discriminator}`,
-          discriminator: discriminator,
-          avatar: '', // Default avatar
-          guestDeviceId: guestDeviceId,
-          isGuest: true,
-          verified: false,
-          level: 1,
-          totalXP: 0,
-          totalGamesPlayed: 0,
-          totalTimePlayedMs: 0,
-          currentDailyStreak: 0,
-          longestDailyStreak: 0,
-          achievements: [],
-          badges: [],
-          preferences: {
-            volume: 50,
-            notifications: true,
-            publicProfile: true,
-            theme: 'dark',
-          },
-          createdAt: now,
-          updatedAt: now,
-          joinedAt: now,
-          lastSeenAt: now,
-        };
+      // Atomic upsert: prevents duplicate guests when concurrent requests share a device ID.
+      // $setOnInsert applies only on first create; $set updates lastSeenAt + updatedAt on every call.
+      const result = await db.collection('users').findOneAndUpdate(
+        { guestDeviceId: guestDeviceId },
+        {
+          $setOnInsert: newGuestDefaults,
+          $set: { lastSeenAt: now, updatedAt: now },
+        },
+        { upsert: true, returnDocument: 'after' }
+      );
 
-        const result = await db.collection('users').insertOne(guestUser);
-        user = { ...guestUser, _id: result.insertedId };
-      } else {
-        // Update lastSeenAt for returning guest
-        await db.collection('users').updateOne(
-          { _id: user._id },
-          { $set: { lastSeenAt: new Date() } }
-        );
-        user.lastSeenAt = new Date();
-      }
+      const user = result!;
 
       // Calculate days until cleanup for guest warning
       const lastSeen = new Date(user.lastSeenAt || user.createdAt);
