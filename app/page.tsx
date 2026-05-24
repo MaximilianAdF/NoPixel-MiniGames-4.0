@@ -523,12 +523,6 @@ export default function Home() {
             </Link>
           </div>
         </footer>
-        
-        {/* <DonateContainer title="Donate" description="If you like this project, consider donating to support development" className="absolute bottom-0 left-0 px-5 py-5 w-80">
-          <a href="https://www.buymeacoffee.com/MaximilianAdF" target="_blank" rel="noreferrer">
-              <img src={bmcLogo.src} alt="Buy Me A Coffee" className="rounded-lg bg-spring-green-300" style={{ height: 60 }} />
-          </a>
-        </DonateContainer> */}
 
       </main>
   );
