@@ -57,6 +57,32 @@ const context = await browser.newContext({
   },
 });
 
+// CSS injected on every page to hide site chrome and dev overlays so the
+// screenshot captures only the game itself.
+const HIDE_CHROME_CSS = `
+  /* NavigationMenu — hamburger button (top-4 left-4), slim vertical tab
+     (top-1/2 left-0), side panel (top-0 left-0 h-full), backdrop overlay
+     when open (inset-0). */
+  .fixed.top-4,
+  .fixed.top-0,
+  .fixed.top-1\\/2,
+  .fixed.left-0,
+  .fixed.right-0,
+  .fixed.inset-0,
+  /* LoginButton (top-4) and its dropdown class hook. */
+  .user-menu,
+  /* Contextual hints, global loading spinner, cookie banner. */
+  [class*="ContextualHint"],
+  [class*="GlobalLoading"],
+  /* Next.js dev tooling overlays. */
+  nextjs-portal,
+  [data-nextjs-toast],
+  [data-nextjs-dialog-overlay],
+  #__next-build-watcher {
+    display: none !important;
+  }
+`;
+
 console.log(`Capturing ${PUZZLES.length} thumbnails from ${BASE_URL}...`);
 const t0 = Date.now();
 
@@ -66,14 +92,18 @@ const results = await Promise.allSettled(
     try {
       const url = `${BASE_URL}/puzzles/${game}`;
       await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      // Hide chrome before paint.
+      await page.addStyleTag({ content: HIDE_CHROME_CSS });
       // Let the game's first auto-frame settle (random tiles, animations, etc.).
       await page.waitForTimeout(SETTLE_MS);
+      // Full-viewport screenshot — game is centered, chrome is hidden via CSS.
+      // animations:'disabled' freezes CSS animations so games with continuous
+      // motion (rotating lockpick rings, falling tiles, combos) screenshot cleanly.
       const outPath = join(OUT_DIR, `${game}.png`);
       await page.screenshot({
         path: outPath,
         type: 'png',
-        // Skip the nav bar at the top.
-        clip: { x: 0, y: 60, width: WIDTH, height: HEIGHT - 60 },
+        animations: 'disabled',
       });
       return { game, outPath, ok: true };
     } finally {
