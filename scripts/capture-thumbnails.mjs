@@ -68,34 +68,61 @@ const PREP_CSS = `
   *:has(> svg.fa-gear) {
     display: none !important;
   }
+  /* Strip backgrounds from every ancestor of the game card so omitBackground
+     can produce transparent pixels in the rounded-corner gaps. The game
+     card itself (rgb(7,19,32)) is solid colour, not a gradient, so this
+     doesn't touch it. */
+  html, body,
+  body > div, body > div > main,
+  body > div > main > div, body > div > main > div > div,
+  [class*="puzzle"], [class*="puzzle"] > div {
+    background: transparent !important;
+    background-image: none !important;
+  }
+  /* globals.css paints html::before and body::before/::after with fixed
+     gradients at z-index -100 — these are pseudo-elements that no element-
+     level inline style can touch, so kill them via CSS. */
+  html::before, html::after,
+  body::before, body::after {
+    display: none !important;
+    background: transparent !important;
+    background-image: none !important;
+    content: none !important;
+  }
 `;
 
-// JS injected in-page to strip ONLY page/body/layout bgs (not the game card).
-// Targets bgs that are gradients or specific page-chrome colours; leaves
-// rgb(7, 19, 32) (the game card) alone.
-const STRIP_PAGE_BGS_FN = `() => {
-  const PAGE_BGS = new Set([
-    'rgb(2, 6, 23)',
-    'rgb(15, 23, 42)',
-    'rgb(5, 15, 25)',
-    'rgb(10, 25, 40)',
-  ]);
-  for (const el of [document.documentElement, document.body]) {
-    el.style.setProperty('background-color', 'transparent', 'important');
-    el.style.setProperty('background-image', 'none', 'important');
-  }
+// JS injected in-page: finds the game card (rgb(7, 19, 32)), then walks
+// UP its ancestor chain and strips every ancestor's bg-color/bg-image
+// inline with !important. Guarantees the game card itself stays painted
+// while every layer behind it becomes truly transparent.
+const STRIP_ANCESTORS_FN = `(() => {
+  // Find the game card by bg colour.
+  let card = null;
   document.querySelectorAll('*').forEach((el) => {
     const cs = getComputedStyle(el);
-    // Strip gradients (page layout gradient) but only on big layout elements.
-    // The game card itself uses solid colour, not gradient, so it's safe.
-    if (cs.backgroundImage.includes('linear-gradient')) {
-      el.style.setProperty('background-image', 'none', 'important');
-    }
-    if (PAGE_BGS.has(cs.backgroundColor)) {
-      el.style.setProperty('background-color', 'transparent', 'important');
+    if (cs.backgroundColor === 'rgb(7, 19, 32)') {
+      const r = el.getBoundingClientRect();
+      const area = r.width * r.height;
+      if (!card || area > card._area) {
+        card = el;
+        card._area = area;
+      }
     }
   });
-}`;
+  if (!card) return 'no-card-found';
+
+  // Strip every ancestor's bg up to html.
+  let cur = card.parentElement;
+  while (cur) {
+    cur.style.setProperty('background-color', 'transparent', 'important');
+    cur.style.setProperty('background-image', 'none', 'important');
+    cur = cur.parentElement;
+  }
+  // Also html itself.
+  document.documentElement.style.setProperty('background-color', 'transparent', 'important');
+  document.documentElement.style.setProperty('background-image', 'none', 'important');
+  return 'ok';
+})()`;
 
 if (!existsSync(OUT_DIR)) {
   mkdirSync(OUT_DIR, { recursive: true });
@@ -129,7 +156,10 @@ const results = await Promise.allSettled(
       await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
       await page.addStyleTag({ content: PREP_CSS });
       await page.waitForTimeout(SETTLE_MS);
-      await page.evaluate(STRIP_PAGE_BGS_FN);
+      const stripResult = await page.evaluate(STRIP_ANCESTORS_FN);
+      if (stripResult !== 'ok') {
+        console.warn(`  ⚠ ${game}: ${stripResult}`);
+      }
 
       // Find the game card's bounding box. Every game wraps its content in an
       // element with backgroundColor: rgb(7, 19, 32) — that's the dark card
