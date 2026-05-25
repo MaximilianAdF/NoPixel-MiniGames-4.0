@@ -211,7 +211,7 @@ export default function Home() {
               {puzzles.map((puzzle, index) => (
                   <Link href={puzzle.href} key={puzzle.href} className="group">
                     <div
-                      className="relative overflow-hidden rounded-lg border border-spring-green-500/20 hover:border-spring-green-400/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-spring-green-500/10 hover:-translate-y-1"
+                      className="relative overflow-hidden rounded-lg bg-gradient-to-br from-mirage-900/50 via-mirage-900/40 to-mirage-800/50 border border-spring-green-500/20 hover:border-spring-green-400/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-spring-green-500/10 hover:-translate-y-1"
                       style={{ 
                         minHeight: '320px',
                         display: 'flex',
@@ -235,8 +235,6 @@ export default function Home() {
                           height={225}
                           priority={index < 4}
                           loading={index < 4 ? "eager" : "lazy"}
-                          placeholder="blur"
-                          blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgZmlsbD0iIzFhMjkzMCIvPjwvc3ZnPg=="
                           className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         />
