@@ -210,8 +210,8 @@ export default function Home() {
               {/* Puzzle Cards - render immediately without skeleton */}
               {puzzles.map((puzzle, index) => (
                   <Link href={puzzle.href} key={puzzle.href} className="group">
-                    <div 
-                      className="relative overflow-hidden rounded-lg bg-gradient-to-br from-mirage-900/50 via-mirage-900/40 to-mirage-800/50 border border-spring-green-500/20 hover:border-spring-green-400/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-spring-green-500/10 hover:-translate-y-1"
+                    <div
+                      className="relative overflow-hidden rounded-lg border border-spring-green-500/20 hover:border-spring-green-400/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-spring-green-500/10 hover:-translate-y-1"
                       style={{ 
                         minHeight: '320px',
                         display: 'flex',
@@ -227,7 +227,7 @@ export default function Home() {
                       {/* Top Data Bar */}
                       <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-spring-green-500/20 to-transparent group-hover:via-spring-green-400/40 transition-colors duration-300" />
                       
-                      <div className="aspect-video relative overflow-hidden flex-shrink-0 bg-mirage-800/60">
+                      <div className="aspect-video relative overflow-hidden flex-shrink-0">
                         <Image
                           src={puzzle.img}
                           alt={puzzle.title}
@@ -240,7 +240,6 @@ export default function Home() {
                           className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-mirage-950 via-mirage-950/30 to-transparent opacity-70 group-hover:opacity-50 transition-opacity duration-300" />
                       </div>
                       
                       <div className="p-3 space-y-1 flex flex-col flex-grow">
