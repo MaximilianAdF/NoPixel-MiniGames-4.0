@@ -68,17 +68,6 @@ const PREP_CSS = `
   *:has(> svg.fa-gear) {
     display: none !important;
   }
-  /* Strip backgrounds from every ancestor of the game card so omitBackground
-     can produce transparent pixels in the rounded-corner gaps. The game
-     card itself (rgb(7,19,32)) is solid colour, not a gradient, so this
-     doesn't touch it. */
-  html, body,
-  body > div, body > div > main,
-  body > div > main > div, body > div > main > div > div,
-  [class*="puzzle"], [class*="puzzle"] > div {
-    background: transparent !important;
-    background-image: none !important;
-  }
   /* globals.css paints html::before and body::before/::after with fixed
      gradients at z-index -100 — these are pseudo-elements that no element-
      level inline style can touch, so kill them via CSS. */
@@ -91,37 +80,63 @@ const PREP_CSS = `
   }
 `;
 
-// JS injected in-page: finds the game card (rgb(7, 19, 32)), then walks
-// UP its ancestor chain and strips every ancestor's bg-color/bg-image
-// inline with !important. Guarantees the game card itself stays painted
-// while every layer behind it becomes truly transparent.
+// JS injected in-page: finds the game card and walks UP its ancestor chain,
+// stripping every ancestor's bg-color/bg-image inline with !important.
+// The game card itself is left alone so its own paint stays in the screenshot.
+//
+// "Game card" is defined as the largest visible non-fixed element inside
+// <main> that isn't itself page-sized, and (preferring) has its own bg
+// colour or bg gradient (so we don't pick a transparent wrapper).
 const STRIP_ANCESTORS_FN = `(() => {
-  // Find the game card by bg colour.
-  let card = null;
-  document.querySelectorAll('*').forEach((el) => {
-    const cs = getComputedStyle(el);
-    if (cs.backgroundColor === 'rgb(7, 19, 32)') {
-      const r = el.getBoundingClientRect();
-      const area = r.width * r.height;
-      if (!card || area > card._area) {
-        card = el;
-        card._area = area;
-      }
-    }
-  });
-  if (!card) return 'no-card-found';
+  const main = document.querySelector('main');
+  if (!main) return 'no-main';
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const viewportArea = vw * vh;
 
-  // Strip every ancestor's bg up to html.
-  let cur = card.parentElement;
+  let pickedCard = null;
+  let pickedArea = 0;
+  const walk = (el) => {
+    if (!(el instanceof HTMLElement)) {
+      // Recurse into SVG children but don't consider SVGs as cards.
+      for (const c of el.children) walk(c);
+      return;
+    }
+    const cs = getComputedStyle(el);
+    if (cs.position === 'fixed') return;
+    if (cs.display === 'none' || cs.visibility === 'hidden') return;
+    const r = el.getBoundingClientRect();
+    const area = r.width * r.height;
+    const centerY = r.top + r.height / 2;
+    const hasBg = cs.backgroundColor !== 'rgba(0, 0, 0, 0)' || cs.backgroundImage !== 'none';
+    if (
+      hasBg &&
+      area > 5000 &&
+      area < viewportArea * 0.8 &&
+      centerY > 0 && centerY < vh &&
+      area > pickedArea
+    ) {
+      pickedArea = area;
+      pickedCard = el;
+    }
+    for (const c of el.children) walk(c);
+  };
+  walk(main);
+  if (!pickedCard) return 'no-card';
+
+  // Strip ancestors only — leave pickedCard alone.
+  let cur = pickedCard.parentElement;
   while (cur) {
     cur.style.setProperty('background-color', 'transparent', 'important');
     cur.style.setProperty('background-image', 'none', 'important');
     cur = cur.parentElement;
   }
-  // Also html itself.
   document.documentElement.style.setProperty('background-color', 'transparent', 'important');
   document.documentElement.style.setProperty('background-image', 'none', 'important');
-  return 'ok';
+
+  // Return the picked card's bounds so the caller can reuse them.
+  const r = pickedCard.getBoundingClientRect();
+  return { x: r.left, y: r.top, width: r.width, height: r.height };
 })()`;
 
 if (!existsSync(OUT_DIR)) {
@@ -156,71 +171,11 @@ const results = await Promise.allSettled(
       await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
       await page.addStyleTag({ content: PREP_CSS });
       await page.waitForTimeout(SETTLE_MS);
-      const stripResult = await page.evaluate(STRIP_ANCESTORS_FN);
-      if (stripResult !== 'ok') {
-        console.warn(`  ⚠ ${game}: ${stripResult}`);
+      // Strip ancestors AND get the game card's bounding box in one pass.
+      const box = await page.evaluate(STRIP_ANCESTORS_FN);
+      if (typeof box === 'string') {
+        throw new Error(`game element not found: ${box}`);
       }
-
-      // Find the game card's bounding box. Every game wraps its content in an
-      // element with backgroundColor: rgb(7, 19, 32) — that's the dark card
-      // (NPHackContainer-like). Target it specifically; if not found, fall
-      // back to the largest visible non-fixed HTML element (skip SVG/g
-      // elements since they often overflow their parents and report wrong
-      // sizes).
-      const box = await page.evaluate(() => {
-        const main = document.querySelector('main');
-        if (!main) return null;
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-        const viewportArea = vw * vh;
-
-        // Primary: find the largest element with the game-card bg colour.
-        let cardBest = null;
-        let cardArea = 0;
-        // Fallback: largest visible HTML (non-SVG) element, like before.
-        let fallbackBest = null;
-        let fallbackArea = 0;
-
-        const walk = (el) => {
-          if (!(el instanceof Element)) return;
-          const cs = getComputedStyle(el);
-          if (cs.position === 'fixed') return;
-          if (cs.display === 'none' || cs.visibility === 'hidden') return;
-          const r = el.getBoundingClientRect();
-          const area = r.width * r.height;
-          const centerY = r.top + r.height / 2;
-          const inView = centerY > 0 && centerY < vh;
-
-          if (cs.backgroundColor === 'rgb(7, 19, 32)' && inView && area > cardArea) {
-            cardArea = area;
-            cardBest = r;
-          }
-
-          // Fallback only counts plain HTML elements (skip SVG, g, path —
-          // those can over-report size due to overflow).
-          const isHtml = el instanceof HTMLElement;
-          if (
-            isHtml &&
-            area > 5000 &&
-            area < viewportArea * 0.8 &&
-            inView &&
-            area > fallbackArea
-          ) {
-            fallbackArea = area;
-            fallbackBest = r;
-          }
-
-          for (const child of el.children) walk(child);
-        };
-        walk(main);
-
-        const picked = cardBest || fallbackBest;
-        return picked
-          ? { x: picked.left, y: picked.top, width: picked.width, height: picked.height }
-          : null;
-      });
-
-      if (!box) throw new Error('Could not find game element in <main>');
 
       const clip = {
         x: Math.max(0, Math.floor(box.x)),
