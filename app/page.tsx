@@ -227,7 +227,7 @@ export default function Home() {
                       {/* Top Data Bar */}
                       <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-spring-green-500/20 to-transparent group-hover:via-spring-green-400/40 transition-colors duration-300" />
                       
-                      <div className="aspect-[4/3] relative overflow-hidden flex-shrink-0 bg-mirage-800/60">
+                      <div className="aspect-video relative overflow-hidden flex-shrink-0 bg-mirage-800/60">
                         <Image
                           src={puzzle.img}
                           alt={puzzle.title}
