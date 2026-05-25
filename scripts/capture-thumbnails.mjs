@@ -1,8 +1,9 @@
 // Auto-screenshot each puzzle page using Playwright; output to public/puzzles/<game>.png.
 //
-// Output is a uniform 1200×675 PNG for every game — each game's actual UI is
-// tight-cropped and composited centered onto the site background colour, so
-// all 8 thumbnails have identical dimensions and identical centering.
+// Each thumbnail is just the game's own card — clipped tight to the rendered
+// element with a transparent background outside the card's rounded corners.
+// Natural aspect per game (no forced uniform canvas), so the home page can
+// display each at its actual proportions via object-contain on the card.
 //
 // Usage:
 //   1. Start the app:  npm run dev   (or npm run build && npm start)
@@ -10,23 +11,13 @@
 //
 // Optional env vars:
 //   THUMB_BASE_URL    — defaults to http://localhost:3000
-//   THUMB_CANVAS_W    — output PNG width  (default 1200)
-//   THUMB_CANVAS_H    — output PNG height (default 675)
-//   THUMB_PADDING     — px of game-bg padding around the captured element (default 30)
 //   THUMB_OUT_DIR     — output dir (default public/puzzles)
 import { chromium } from 'playwright';
-import sharp from 'sharp';
 import { mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 
 const BASE_URL = process.env.THUMB_BASE_URL || 'http://localhost:3000';
-const CANVAS_W = parseInt(process.env.THUMB_CANVAS_W || '1200', 10);
-const CANVAS_H = parseInt(process.env.THUMB_CANVAS_H || '675', 10);
-const PADDING = parseInt(process.env.THUMB_PADDING || '30', 10);
 const OUT_DIR = process.env.THUMB_OUT_DIR || 'public/puzzles';
-
-// Site bg colour (mirage-950: #0F1B21). Sharp wants RGB ints.
-const BG = { r: 15, g: 27, b: 33 };
 
 // Viewport — wide enough that the largest games (Thermite/Lockpick grid) fit
 // without scrolling; tall enough that the puzzle layout's min-height kicks in.
@@ -47,28 +38,32 @@ const PUZZLES = [
 // Time to let the game render an interesting first state before screenshotting.
 const SETTLE_MS = 1500;
 
-// CSS injected on every page to hide site chrome and dev overlays.
+// CSS injected on every page to hide site chrome and dev overlays AND strip
+// page-level backgrounds so omitBackground:true produces transparent pixels
+// outside the game card's rounded corners.
 const HIDE_CHROME_CSS = `
-  /* NavigationMenu — hamburger button (top-4 left-4), slim vertical tab
-     (top-1/2 left-0), side panel (top-0 left-0 h-full), backdrop overlay
-     when open (inset-0). */
+  /* Site chrome (nav, login, dropdowns) */
   .fixed.top-4,
   .fixed.top-0,
   .fixed.top-1\\/2,
   .fixed.left-0,
   .fixed.right-0,
   .fixed.inset-0,
-  /* LoginButton (top-4) and its dropdown class hook. */
   .user-menu,
-  /* Contextual hints, global loading spinner, cookie banner. */
   [class*="ContextualHint"],
   [class*="GlobalLoading"],
-  /* Next.js dev tooling overlays. */
+  /* Next.js dev tooling overlays */
   nextjs-portal,
   [data-nextjs-toast],
   [data-nextjs-dialog-overlay],
   #__next-build-watcher {
     display: none !important;
+  }
+  /* Strip all chrome bgs so omitBackground produces real transparency
+     around the game card. The game card itself keeps its own bg. */
+  html, body, main, main > div, main > div > div, [class*="puzzle"] {
+    background: transparent !important;
+    background-image: none !important;
   }
 `;
 
@@ -94,7 +89,7 @@ const context = await browser.newContext({
   },
 });
 
-console.log(`Capturing ${PUZZLES.length} thumbnails (${CANVAS_W}×${CANVAS_H}) from ${BASE_URL}...`);
+console.log(`Capturing ${PUZZLES.length} natural-aspect thumbnails from ${BASE_URL}...`);
 const t0 = Date.now();
 
 const results = await Promise.allSettled(
@@ -148,49 +143,27 @@ const results = await Promise.allSettled(
 
       if (!box) throw new Error('Could not find game element in <main>');
 
-      // Clip to game box + padding, staying inside the viewport.
+      // Clip exactly to the game card's bounding box. omitBackground:true
+      // gives transparent pixels outside the rounded corners — so the home
+      // card's background shows through and the game card appears to "sit
+      // on" the home card.
       const clip = {
-        x: Math.max(0, Math.floor(box.x - PADDING)),
-        y: Math.max(0, Math.floor(box.y - PADDING)),
-        width: Math.min(VIEWPORT_W, Math.ceil(box.width + PADDING * 2)),
-        height: Math.min(VIEWPORT_H, Math.ceil(box.height + PADDING * 2)),
+        x: Math.max(0, Math.floor(box.x)),
+        y: Math.max(0, Math.floor(box.y)),
+        width: Math.min(VIEWPORT_W, Math.ceil(box.width)),
+        height: Math.min(VIEWPORT_H, Math.ceil(box.height)),
       };
-      // Don't let clip extend past the viewport edges (Playwright errors).
       clip.width = Math.min(clip.width, VIEWPORT_W - clip.x);
       clip.height = Math.min(clip.height, VIEWPORT_H - clip.y);
 
-      const tightBuffer = await page.screenshot({
+      const outPath = join(OUT_DIR, `${game}.png`);
+      await page.screenshot({
         type: 'png',
+        path: outPath,
         clip,
         animations: 'disabled',
+        omitBackground: true,
       });
-
-      // Scale the tight game capture to fill as much of the canvas as
-      // possible while preserving aspect ratio. Small games (Word Memory,
-      // PinCracker, Repair Kit) get enlarged so they don't sit as a tiny
-      // island in a big background. Tall games (Thermite, Lockpick) get
-      // letterboxed on the sides; wide games (Repair Kit) on top/bottom.
-      const fitted = await sharp(tightBuffer)
-        .resize({
-          width: CANVAS_W,
-          height: CANVAS_H,
-          fit: 'inside',
-        })
-        .toBuffer();
-
-      // Composite onto a uniform canvas, centered.
-      const outPath = join(OUT_DIR, `${game}.png`);
-      await sharp({
-        create: {
-          width: CANVAS_W,
-          height: CANVAS_H,
-          channels: 3,
-          background: BG,
-        },
-      })
-        .composite([{ input: fitted, gravity: 'center' }])
-        .png({ compressionLevel: 9 })
-        .toFile(outPath);
 
       return { game, outPath, ok: true, captured: clip };
     } finally {
@@ -207,7 +180,7 @@ for (const r of results) {
   if (r.status === 'fulfilled') {
     ok++;
     const { game, outPath, captured } = r.value;
-    console.log(`  ✓ ${game.padEnd(13)}→ ${outPath}  (${captured.width}×${captured.height} → ${CANVAS_W}×${CANVAS_H})`);
+    console.log(`  ✓ ${game.padEnd(13)}→ ${outPath}  (${captured.width}×${captured.height})`);
   } else {
     fail++;
     console.error(`  ✗ ${r.reason?.message || r.reason}`);
