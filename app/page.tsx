@@ -227,7 +227,18 @@ export default function Home() {
                       {/* Top Data Bar */}
                       <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-spring-green-500/20 to-transparent group-hover:via-spring-green-400/40 transition-colors duration-300" />
                       
-                      <div className="aspect-video relative overflow-hidden flex-shrink-0">
+                      <div className="aspect-video relative flex-shrink-0 p-4 pb-2">
+                        {/* Soft radial spotlight behind the thumbnail —
+                            intensifies on hover to give the game a "lit-from-
+                            behind" feel. */}
+                        <div
+                          aria-hidden="true"
+                          className="absolute inset-4 rounded-md bg-[radial-gradient(ellipse_at_center,rgba(84,255,164,0.10),transparent_70%)] opacity-60 group-hover:opacity-100 transition-opacity duration-500"
+                        />
+                        {/* The actual game thumbnail. drop-shadow gives the
+                            game pieces a floating-above-the-card feel; on
+                            hover the shadow deepens and the image lifts +
+                            tilts subtly for a 3D pop. */}
                         <Image
                           src={puzzle.img}
                           alt={puzzle.title}
@@ -235,7 +246,7 @@ export default function Home() {
                           height={225}
                           priority={index < 4}
                           loading={index < 4 ? "eager" : "lazy"}
-                          className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                          className="relative w-full h-full object-contain transition-all duration-500 ease-out [filter:drop-shadow(0_6px_14px_rgba(0,0,0,0.5))] group-hover:[filter:drop-shadow(0_14px_28px_rgba(84,255,164,0.25))_drop-shadow(0_6px_14px_rgba(0,0,0,0.4))] group-hover:-translate-y-1 group-hover:[transform:translateY(-4px)_perspective(800px)_rotateX(4deg)]"
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         />
                       </div>
