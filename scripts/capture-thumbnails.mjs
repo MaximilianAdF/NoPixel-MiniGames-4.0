@@ -13,8 +13,23 @@
 //   THUMB_BASE_URL    — defaults to http://localhost:3000
 //   THUMB_OUT_DIR     — output dir (default public/puzzles)
 import { chromium } from 'playwright';
+import sharp from 'sharp';
 import { mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
+
+// Dark "card chrome" colours to make transparent in post-processing.
+// Anything in the captured PNG within COLOR_TOLERANCE of these turns alpha=0.
+// Pulled from the inspection of html bg, body gradient, puzzle-layout
+// gradient, and the rgb(7,19,32) inner card.
+const CHROME_COLORS = [
+  [7, 19, 32],
+  [5, 15, 25],
+  [10, 25, 40],
+  [2, 6, 23],
+  [15, 23, 42],
+  [0, 0, 0], // pure black for the background image's darkest pixels
+];
+const COLOR_TOLERANCE = 18; // generous enough to catch gradient interpolations
 
 const BASE_URL = process.env.THUMB_BASE_URL || 'http://localhost:3000';
 const OUT_DIR = process.env.THUMB_OUT_DIR || 'public/puzzles';
@@ -49,6 +64,10 @@ const HIDE_CHROME_CSS = `
   .fixed.left-0,
   .fixed.right-0,
   .fixed.inset-0,
+  /* Root layout's <Background> fixed image — fills the whole viewport
+     behind everything, so we have to hide it for transparency. */
+  .fixed.w-screen,
+  .fixed.-z-50,
   .user-menu,
   [class*="ContextualHint"],
   [class*="GlobalLoading"],
@@ -59,9 +78,14 @@ const HIDE_CHROME_CSS = `
   #__next-build-watcher {
     display: none !important;
   }
-  /* Strip all chrome bgs so omitBackground produces real transparency
-     around the game card. The game card itself keeps its own bg. */
-  html, body, main, main > div, main > div > div, [class*="puzzle"] {
+  /* Strip backgrounds from every ancestor in the path down to the
+     game card so omitBackground produces real transparent pixels.
+     Covers: html → body → puzzle-layout div → main → centering div
+     → game wrapper. */
+  html, body,
+  body > div, body > div > main,
+  body > div > main > div, body > div > main > div > div,
+  [class*="puzzle"], [class*="puzzle"] > div {
     background: transparent !important;
     background-image: none !important;
   }
@@ -100,6 +124,41 @@ const results = await Promise.allSettled(
       await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
       await page.addStyleTag({ content: HIDE_CHROME_CSS });
       await page.waitForTimeout(SETTLE_MS);
+
+      // Strip ALL backgrounds via inline !important so omitBackground:true
+      // produces real transparent pixels around the game pieces. Targets
+      // the dark page/layout/card chrome. Game pieces with their own
+      // bg-color (Thermite tiles, Roof Running cubes, buttons) keep their
+      // colours because their style attribute or computed bg isn't dark
+      // grey/transparent — we only nuke "chrome" colours.
+      //
+      // Why JS, not CSS: the root <html> and <body> have inline style
+      // background-image with a linear-gradient. External CSS !important
+      // _should_ beat inline non-important, but Playwright's addStyleTag
+      // ordering doesn't reliably win against React-rendered inline
+      // styles in this layout. Inline !important via JS is bulletproof.
+      await page.evaluate(() => {
+        const CHROME_BGS = new Set([
+          'rgb(7, 19, 32)',     // outer dark card on every game
+          'rgb(2, 6, 23)',      // body bg
+          'rgb(15, 23, 42)',    // body gradient midpoint
+          'rgb(5, 15, 25)',     // puzzle layout gradient start
+          'rgb(10, 25, 40)',    // puzzle layout gradient mid
+        ]);
+        // Always nuke html + body chrome
+        for (const el of [document.documentElement, document.body]) {
+          el.style.setProperty('background-color', 'transparent', 'important');
+          el.style.setProperty('background-image', 'none', 'important');
+        }
+        // Walk everything else and nuke matching chrome bgs
+        document.querySelectorAll('*').forEach((el) => {
+          const cs = getComputedStyle(el);
+          if (CHROME_BGS.has(cs.backgroundColor) || cs.backgroundImage.includes('linear-gradient')) {
+            el.style.setProperty('background-color', 'transparent', 'important');
+            el.style.setProperty('background-image', 'none', 'important');
+          }
+        });
+      });
 
       // Find the bounding box of the game's actual UI card. Heuristic:
       // largest visible non-fixed element inside <main> that isn't itself
@@ -156,14 +215,47 @@ const results = await Promise.allSettled(
       clip.width = Math.min(clip.width, VIEWPORT_W - clip.x);
       clip.height = Math.min(clip.height, VIEWPORT_H - clip.y);
 
-      const outPath = join(OUT_DIR, `${game}.png`);
-      await page.screenshot({
+      const rgbBuffer = await page.screenshot({
         type: 'png',
-        path: outPath,
         clip,
         animations: 'disabled',
         omitBackground: true,
       });
+
+      // Post-process: color-key the dark "card chrome" pixels to transparent.
+      // Playwright's omitBackground only handles BODY/HTML bgs, not the
+      // nested card-chrome paints, so we do it after capture in pixel space.
+      const { data, info } = await sharp(rgbBuffer)
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+
+      // Walk pixels; set alpha=0 where the RGB is within COLOR_TOLERANCE of
+      // any CHROME_COLOR. Game pieces with their own bright colours (Thermite
+      // tiles, Roof Running cubes, buttons) aren't dark grey/blue so they
+      // stay opaque.
+      const out = Buffer.from(data);
+      for (let i = 0; i < out.length; i += 4) {
+        const r = out[i], g = out[i + 1], b = out[i + 2];
+        for (let c = 0; c < CHROME_COLORS.length; c++) {
+          const [tr, tg, tb] = CHROME_COLORS[c];
+          if (
+            Math.abs(r - tr) <= COLOR_TOLERANCE &&
+            Math.abs(g - tg) <= COLOR_TOLERANCE &&
+            Math.abs(b - tb) <= COLOR_TOLERANCE
+          ) {
+            out[i + 3] = 0;
+            break;
+          }
+        }
+      }
+
+      const outPath = join(OUT_DIR, `${game}.png`);
+      await sharp(out, {
+        raw: { width: info.width, height: info.height, channels: 4 },
+      })
+        .png({ compressionLevel: 9 })
+        .toFile(outPath);
 
       return { game, outPath, ok: true, captured: clip };
     } finally {
