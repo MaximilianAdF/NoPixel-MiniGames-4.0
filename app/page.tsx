@@ -15,49 +15,49 @@ import HomeHeroBanners from "./components/HomeHeroBanners";
 const puzzles = [
   {
     href: "/puzzles/thermite",
-    img: "/puzzles/thermite.png",
+    img: "/puzzles/thermite.png?v=2",
     title: "Thermite",
     description: "Replica of the Thermite hack that is triggered when disabling lasers inside the Maze Bank on NoPixel 4.0",
   },
   {
     href: "/puzzles/roof-running",
-    img: "/puzzles/roof-running.png",
+    img: "/puzzles/roof-running.png?v=2",
     title: "Roof Running",
     description: "Replica of the Roof Running hack that is triggered when robbing AC-Units on NoPixel 4.0"
   },
   {
     href: "/puzzles/laundromat",
-    img: "/puzzles/laundromat.png",
+    img: "/puzzles/laundromat.png?v=2",
     title: "Laundromat",
     description: "Replica of the Laundromat hack that is triggered when robbing the safe inside the south-side Laundromat on NoPixel 4.0"
   },
   {
     href: "/puzzles/lockpick",
-    img: "/puzzles/lockpick.png",
+    img: "/puzzles/lockpick.png?v=2",
     title: "LockPick",
     description: "Replica of the LockPick hack that is triggered when lockpicking vehicles, among other things, on NoPixel 4.0"
   },
   {
     href: "/puzzles/repair-kit",
-    img: "/puzzles/repair-kit.png",
+    img: "/puzzles/repair-kit.png?v=2",
     title: "RepairKit",
     description: "Replica of the RepairKit hack that is triggered when repairing vehicles on NoPixel 4.0"
   },
   {
     href: "/puzzles/word-memory",
-    img: "/puzzles/word-memory.png",
+    img: "/puzzles/word-memory.png?v=2",
     title: "Word Memory",
     description: "Replica of the Word Memory hack that is triggered when hacking the Maze Bank on NoPixel 4.0"
   },
   {
     href: "/puzzles/chopping",
-    img: "/puzzles/chopping.png",
+    img: "/puzzles/chopping.png?v=2",
     title: "Chopping",
     description: "Replica of the Chopping hack that is triggered when chopping vehicles on NoPixel 4.0"
   },
   {
     href: "/puzzles/pincracker",
-    img: "/puzzles/pincracker.png",
+    img: "/puzzles/pincracker.png?v=2",
     title: "PinCracker",
     description: "Replica of the PinCracker hack that is triggered when hacking the Maze Bank on NoPixel 4.0"
   }
