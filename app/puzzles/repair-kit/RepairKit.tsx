@@ -16,7 +16,9 @@ import { repairKitEngine, type RepairKitState } from './engine';
 const HandIcon = Hand as unknown as FC<any>;
 
 const STOP_KEYS = ['e', 'E'];
-const defaultSpeed = 5;
+// defaultSpeed = 40 is the slowest (4000ms travel) → easiest mode. Players
+// can cycle to faster/harder speeds (20, 10, 5) via the difficulty button.
+const defaultSpeed = 40;
 const idleMs = 250;
 const resultMs = 1000;
 
