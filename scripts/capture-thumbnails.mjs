@@ -61,6 +61,13 @@ const PREP_CSS = `
   #__next-build-watcher {
     display: none !important;
   }
+  /* Hide the settings gear button inside the game's title bar — clutters
+     the thumbnail and isn't relevant to a preview. :has() selector picks
+     the parent button div so the empty space collapses too. */
+  *:has(> .svg-inline--fa.fa-gear),
+  *:has(> svg.fa-gear) {
+    display: none !important;
+  }
 `;
 
 // JS injected in-page to strip ONLY page/body/layout bgs (not the game card).
@@ -124,16 +131,26 @@ const results = await Promise.allSettled(
       await page.waitForTimeout(SETTLE_MS);
       await page.evaluate(STRIP_PAGE_BGS_FN);
 
-      // Find the game card's bounding box: largest visible non-fixed element
-      // whose centre is in the viewport and isn't itself page-sized.
+      // Find the game card's bounding box. Every game wraps its content in an
+      // element with backgroundColor: rgb(7, 19, 32) — that's the dark card
+      // (NPHackContainer-like). Target it specifically; if not found, fall
+      // back to the largest visible non-fixed HTML element (skip SVG/g
+      // elements since they often overflow their parents and report wrong
+      // sizes).
       const box = await page.evaluate(() => {
         const main = document.querySelector('main');
         if (!main) return null;
         const vw = window.innerWidth;
         const vh = window.innerHeight;
         const viewportArea = vw * vh;
-        let best = null;
-        let bestArea = 0;
+
+        // Primary: find the largest element with the game-card bg colour.
+        let cardBest = null;
+        let cardArea = 0;
+        // Fallback: largest visible HTML (non-SVG) element, like before.
+        let fallbackBest = null;
+        let fallbackArea = 0;
+
         const walk = (el) => {
           if (!(el instanceof Element)) return;
           const cs = getComputedStyle(el);
@@ -141,18 +158,35 @@ const results = await Promise.allSettled(
           if (cs.display === 'none' || cs.visibility === 'hidden') return;
           const r = el.getBoundingClientRect();
           const area = r.width * r.height;
-          if (area > 5000 && area < viewportArea * 0.8) {
-            const centerY = r.top + r.height / 2;
-            if (centerY > 0 && centerY < vh && area > bestArea) {
-              bestArea = area;
-              best = r;
-            }
+          const centerY = r.top + r.height / 2;
+          const inView = centerY > 0 && centerY < vh;
+
+          if (cs.backgroundColor === 'rgb(7, 19, 32)' && inView && area > cardArea) {
+            cardArea = area;
+            cardBest = r;
           }
+
+          // Fallback only counts plain HTML elements (skip SVG, g, path —
+          // those can over-report size due to overflow).
+          const isHtml = el instanceof HTMLElement;
+          if (
+            isHtml &&
+            area > 5000 &&
+            area < viewportArea * 0.8 &&
+            inView &&
+            area > fallbackArea
+          ) {
+            fallbackArea = area;
+            fallbackBest = r;
+          }
+
           for (const child of el.children) walk(child);
         };
         walk(main);
-        return best
-          ? { x: best.left, y: best.top, width: best.width, height: best.height }
+
+        const picked = cardBest || fallbackBest;
+        return picked
+          ? { x: picked.left, y: picked.top, width: picked.width, height: picked.height }
           : null;
       });
 
