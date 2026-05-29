@@ -117,6 +117,12 @@ export default function LobbyLanding() {
   const handleCreate = () => {
     const fresh = generateLobbyCode();
     trackLobbyCreated({ lobby_code: fresh });
+    // Durable counter (GA4-independent). Fire-and-forget; navigation follows.
+    void fetch('/api/lobby/stats', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: 'lobby_created' }),
+    }).catch(() => {});
     router.push(`/lobby/${fresh}`);
   };
 

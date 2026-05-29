@@ -74,6 +74,19 @@ const LOBBY_WARN_MS = 60 * 1000;       // show warning toast last 60s
 const MATCH_MAX_MS = 3 * 60 * 1000;    // cap any single match at 3 min → draw
 const COUNTDOWN_MS = 3 * 1000;         // sync the start: both clients unblock at the same goAt
 
+// Fire-and-forget durable counter (lib/lobby/stats). Independent of GA4/GTM
+// so 1v1 usage is queryable from Mongo regardless of tag-manager config.
+type LobbyStatEvent =
+  | 'match_started' | 'match_completed' | 'match_forfeited'
+  | 'match_timed_out' | 'lobby_created';
+function recordLobbyStat(event: LobbyStatEvent, game?: GameType): void {
+  void fetch('/api/lobby/stats', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ event, game }),
+  }).catch(() => {});
+}
+
 interface LobbyClientProps {
   code: string;
 }
@@ -405,6 +418,42 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     });
   }, [outcome, match, presence, matchStartTime]);
 
+  // Persist the finished match — once per seed, host only — to:
+  //   1. recentMatches  → the public "live activity" ticker on /lobby
+  //   2. lobbyStats      → the durable all-time counter (source of truth)
+  // Both are best-effort and fire from the host so each match counts once.
+  const recordedSeedsRef = useRef<Set<number>>(new Set());
+  useEffect(() => {
+    if (!outcome || !match || !isHost) return;
+    if (recordedSeedsRef.current.has(match.seed)) return;
+    recordedSeedsRef.current.add(match.seed);
+
+    const winner = outcome.winnerClientId
+      ? presence.find((p) => p.clientId === outcome.winnerClientId)
+      : null;
+    const loser = outcome.winnerClientId
+      ? presence.find((p) => p.clientId !== outcome.winnerClientId)
+      : null;
+
+    void fetch('/api/lobby/recent-matches', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        game: match.game,
+        winnerName: winner?.data.displayName ?? null,
+        winnerDiscordId: winner?.data.discordId,
+        winnerAvatarHash: winner?.data.avatarHash,
+        opponentName: loser?.data.displayName ?? null,
+        durationMs: matchStartTime ? Date.now() - matchStartTime : 0,
+      }),
+    }).catch(() => {});
+
+    void recordLobbyStat(
+      outcome.reason === 'timeout' ? 'match_timed_out' : 'match_completed',
+      match.game,
+    );
+  }, [outcome, match, isHost, presence, matchStartTime]);
+
   // Non-host fallback: if the host's match:outcome doesn't arrive within a
   // couple of seconds (host disconnected mid-match), derive locally so the
   // outcome view still renders.
@@ -561,6 +610,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     setGoAt(newGoAt);
     setMatchStartTime(newGoAt);
     trackMatchStarted({ lobby_code: code, game_type: game, focus_mode: focusMode });
+    recordLobbyStat('match_started', game);
     await publish({
       type: 'match:start',
       game,
