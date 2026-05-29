@@ -5,9 +5,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  ArrowLeft, Copy, Check, Loader2, LogOut, Share2, Trophy, Crown, Info,
+  ArrowLeft, Copy, Check, Loader2, LogOut, Trophy, Crown, Info,
   Flame, WashingMachine, Blocks, Key, Brain, Keyboard, Fingerprint, Globe, Lock,
-  Play, Radio,
+  Play,
 } from 'lucide-react';
 
 // Per-game lucide icon + accent color for the picker tiles. Mirrors
@@ -103,7 +103,6 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     ?? user?.username
     ?? (guestId ? `Guest ${guestId.slice(-4).toUpperCase()}` : 'Player');
   const [copied, setCopied] = useState(false);
-  const [shared, setShared] = useState(false);
   const [match, setMatch] = useState<{ game: GameType; seed: number } | null>(null);
   const [myResult, setMyResult] = useState<GameResult | null>(null);
   const [opponentResult, setOpponentResult] = useState<GameResult | null>(null);
@@ -485,9 +484,11 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       }
     };
     void ping();
+    // 15s heartbeat (TTL is 45s) so the listing stays alive while the host
+    // is here but expires quickly once they leave.
     const interval = setInterval(() => {
       if (!cancelled) void ping();
-    }, 30_000);
+    }, 15_000);
     return () => {
       cancelled = true;
       clearInterval(interval);
@@ -498,6 +499,18 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   // would clean up eventually, but firing the DELETE removes the listing
   // immediately so other browsers see the change on next refresh.
   const wasPublishedRef = useRef(false);
+  // Mirror the live host/code into refs so the unmount cleanup below (which
+  // runs with an empty dep array) sees the *current* values, not the ones
+  // captured at mount — at mount isLoggedInHost is still false, so without
+  // this a host who closes the tab while public never unlists the lobby and
+  // it lingers in the pool the full TTL.
+  const isLoggedInHostRef = useRef(isLoggedInHost);
+  const codeRef = useRef(code);
+  useEffect(() => {
+    isLoggedInHostRef.current = isLoggedInHost;
+    codeRef.current = code;
+  }, [isLoggedInHost, code]);
+
   useEffect(() => {
     if (publishGame) {
       wasPublishedRef.current = true;
@@ -509,8 +522,8 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   }, [publishGame, isLoggedInHost, code]);
   useEffect(() => {
     return () => {
-      if (wasPublishedRef.current && isLoggedInHost) {
-        void fetch(`/api/lobby/public/${code}`, { method: 'DELETE' }).catch(() => {});
+      if (wasPublishedRef.current && isLoggedInHostRef.current) {
+        void fetch(`/api/lobby/public/${codeRef.current}`, { method: 'DELETE' }).catch(() => {});
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -518,8 +531,11 @@ export default function LobbyClient({ code }: LobbyClientProps) {
 
 
   const handleCopy = async () => {
+    if (typeof window === 'undefined') return;
     try {
-      await navigator.clipboard.writeText(code);
+      // Copy the full invite URL (not just the code) so a paste is a
+      // one-click join for whoever receives it.
+      await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
@@ -527,32 +543,6 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     }
   };
 
-  const handleShare = async () => {
-    if (typeof window === 'undefined') return;
-    const url = window.location.href;
-    const shareData = {
-      title: '1v1 — NoPixel Hacks',
-      text: `Join my 1v1 lobby (code: ${code})`,
-      url,
-    };
-    // Prefer the native share sheet (iOS / macOS Safari / Android) — falls
-    // back to clipboard so desktop browsers still get a useful action.
-    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
-      try {
-        await navigator.share(shareData);
-        return;
-      } catch (err) {
-        if (err instanceof DOMException && err.name === 'AbortError') return;
-      }
-    }
-    try {
-      await navigator.clipboard.writeText(url);
-      setShared(true);
-      setTimeout(() => setShared(false), 1500);
-    } catch {
-      // Silent fail.
-    }
-  };
 
   const handleStart = async (game: GameType) => {
     const seed = generateMatchSeed();
@@ -702,128 +692,70 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   // Lobby view.
   const lobbyRemainingMs = Math.max(0, lobbyLastActivity + LOBBY_IDLE_MS - now);
   const showIdleWarning = lobbyRemainingMs <= LOBBY_WARN_MS;
+  const meMember = presence.find((p) => p.clientId === effectiveClientId) ?? null;
+  const opponentMember = presence.find((p) => p.clientId !== effectiveClientId) ?? null;
 
   return (
-    <div className="min-h-screen p-4 md:p-8 relative overflow-hidden">
-      {/* Ambient backdrop matches the landing page so the transition into the
-          lobby room feels continuous. */}
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse 70rem 40rem at 50% -5%, rgba(84,255,164,0.08) 0%, transparent 55%)',
-        }}
-      />
+    <main className="relative min-h-screen flex flex-col bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950">
+      <LobbyBackdrop />
 
-      <div className="relative max-w-4xl mx-auto pt-6 md:pt-10 pb-32 px-1 sm:px-2">
-        {/* Top utility row: leave + session HUD chip + live status */}
-        <div className="flex items-center justify-between gap-3 mb-8">
-          <Link
-            href="/lobby"
-            className="group inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-mirage-900/70 backdrop-blur-sm border border-white/[0.08] text-white/65 hover:text-spring-green-300 hover:border-spring-green-300/60 transition-all"
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm font-medium">Leave</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <span className="hidden sm:inline-flex items-center gap-1.5 text-white/45 text-[10px] uppercase tracking-[0.25em] font-bold">
-              <Radio className="w-3 h-3" />
-              Session
-            </span>
+      <div className="relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-6 pb-32">
+        {/* Top utility row — 3-column grid so the code chip is dead-centre
+            regardless of how wide the Leave / status sides are. */}
+        <div className="grid grid-cols-3 items-center gap-3 mb-12">
+          <div className="justify-self-start">
+            <Link
+              href="/lobby"
+              className="group inline-flex items-center gap-2 text-gray-400 hover:text-spring-green-300 text-sm font-medium transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              Leave
+            </Link>
+          </div>
+
+          <div className="justify-self-center">
+            <CodeChip code={code} copied={copied} onCopy={handleCopy} />
+          </div>
+
+          <div className="justify-self-end">
             <ConnectionStatus status={status} />
           </div>
         </div>
 
-        {/* Hero: lobby code as a HUD readout + share actions */}
-        <section className="relative rounded-2xl border border-spring-green-300/25 bg-gradient-to-b from-spring-green-300/[0.05] to-transparent px-6 py-8 md:py-10 mb-6 overflow-hidden text-center">
-          <span className="absolute top-0 left-0 w-4 h-4 border-t border-l border-spring-green-300/45 rounded-tl-2xl pointer-events-none" />
-          <span className="absolute top-0 right-0 w-4 h-4 border-t border-r border-spring-green-300/45 rounded-tr-2xl pointer-events-none" />
-          <span className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-spring-green-300/45 rounded-bl-2xl pointer-events-none" />
-          <span className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-spring-green-300/45 rounded-br-2xl pointer-events-none" />
-
-          <p className="text-spring-green-300/85 text-[10px] uppercase tracking-[0.35em] font-bold mb-3">
-            Lobby Code
-          </p>
-          <button
-            onClick={handleCopy}
-            className="group inline-flex items-center gap-3 px-5 py-3 -mx-5 -my-3 rounded-2xl hover:bg-white/[0.03] transition-colors mb-5"
-            aria-label="Copy lobby code"
-          >
-            <span
-              className={`${orbitron.className} text-5xl sm:text-6xl md:text-7xl font-black tracking-[0.18em] select-all`}
-              style={{
-                color: 'transparent',
-                backgroundImage:
-                  'linear-gradient(135deg, #ffffff 0%, #d8fff0 30%, #54FFA4 100%)',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                textShadow: '0 0 60px rgba(84, 255, 164, 0.2)',
-              }}
-            >
-              {code}
-            </span>
-            {copied ? (
-              <Check className="w-5 h-5 text-spring-green-300" />
-            ) : (
-              <Copy className="w-5 h-5 text-white/30 group-hover:text-white/70 transition-colors" />
-            )}
-          </button>
-
-          <div className="flex items-center justify-center gap-2 flex-wrap">
-            <ActionPill
-              onClick={handleCopy}
-              active={copied}
-              icon={copied ? Check : Copy}
-              label={copied ? 'Code copied' : 'Copy code'}
-            />
-            <ActionPill
-              onClick={handleShare}
-              active={shared}
-              icon={shared ? Check : Share2}
-              label={shared ? 'Link copied' : 'Share link'}
-            />
-          </div>
-        </section>
-
-        {/* Players — VS-style head-to-head layout */}
-        <section className="rounded-2xl bg-mirage-900/40 border border-white/[0.08] p-5 sm:p-6 mb-3">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-white text-base font-bold uppercase tracking-[0.15em] flex items-center gap-2">
-              Players
-              <span className="text-white/30 text-sm font-mono tabular-nums">
-                {presence.length}/2
-              </span>
-            </h2>
-          </div>
-
-          {presence.length === 0 ? (
-            <div className="py-8 text-center">
-              <Loader2 className="w-5 h-5 animate-spin text-white/30 mx-auto" />
+        {/* Players — the head-to-head hero */}
+        <section className="mb-12">
+          {status === 'failed' ? (
+            <div className="rounded-lg bg-error-500/[0.06] border border-error-500/30 px-5 py-6 text-center">
+              <p className="text-error-300 text-sm font-medium mb-1">
+                Couldn&apos;t connect to the lobby
+              </p>
+              <p className="text-gray-400 text-xs mb-4">
+                The realtime connection failed. Check your network and try again.
+              </p>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-spring-green-400/40 text-white/90 hover:text-spring-green-300 px-4 py-2 text-sm font-semibold transition-all"
+              >
+                Retry
+              </button>
+            </div>
+          ) : presence.length === 0 ? (
+            <div className="py-12 text-center">
+              <Loader2 className="w-5 h-5 animate-spin text-spring-green-400/40 mx-auto mb-3" />
+              <p className="text-gray-500 text-xs font-mono">connecting to lobby…</p>
             </div>
           ) : (
             <PlayersVs
-              me={presence.find((p) => p.clientId === effectiveClientId) ?? null}
-              opponent={presence.find((p) => p.clientId !== effectiveClientId) ?? null}
+              me={meMember}
+              opponent={opponentMember}
               hostClientId={hostClientId}
               emotes={emotes}
             />
           )}
         </section>
 
-        {matchHistory.length > 0 && (
-          <section className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-5 mb-3">
-            <h2 className="text-white/90 font-semibold text-sm tracking-wide mb-3">
-              Recent matches
-            </h2>
-            <ul className="space-y-1.5">
-              {matchHistory.map((entry) => (
-                <MatchHistoryRow key={entry.seed} entry={entry} />
-              ))}
-            </ul>
-          </section>
-        )}
-
+        {/* Host gets the game picker; the guest waits. */}
         {isHost ? (
           <GamePicker
             isAlone={presence.length < 2}
@@ -835,13 +767,29 @@ export default function LobbyClient({ code }: LobbyClientProps) {
             loggedIn={!!user?.id}
           />
         ) : presence.length >= 2 ? (
-          <div className="rounded-2xl bg-white/[0.03] border border-white/[0.06] px-5 py-5 flex items-center gap-3">
-            <Loader2 className="w-4 h-4 text-white/40 animate-spin shrink-0" />
-            <div className="text-white/65 text-sm">
-              Waiting for the host to start the match…
+          <div className="rounded-lg bg-mirage-900/40 border border-white/[0.08] px-5 py-5 flex items-center gap-3">
+            <Loader2 className="w-4 h-4 text-spring-green-400/50 animate-spin shrink-0" />
+            <div className="text-gray-300 text-sm">
+              Waiting for the host to pick a game…
             </div>
           </div>
         ) : null}
+
+        {matchHistory.length > 0 && (
+          <section className="mt-8">
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-sm font-bold bg-gradient-to-r from-spring-green-400 to-aquamarine-400 bg-clip-text text-transparent">
+                Recent matches
+              </h2>
+              <span className="flex-1 h-px bg-gradient-to-r from-spring-green-500/20 to-transparent" />
+            </div>
+            <ul className="space-y-1.5">
+              {matchHistory.map((entry) => (
+                <MatchHistoryRow key={entry.seed} entry={entry} />
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
 
       {/* Floating emote bar — visible in the lobby and outcome views. */}
@@ -852,12 +800,74 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       )}
 
       {showIdleWarning && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl bg-amber-500/15 backdrop-blur-md border border-amber-500/35 text-amber-200 text-xs shadow-2xl shadow-amber-500/10 inline-flex items-center gap-2 tabular-nums">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-amber-500/15 backdrop-blur-md border border-amber-500/35 text-amber-200 text-xs shadow-2xl shadow-amber-500/10 inline-flex items-center gap-2 tabular-nums">
           <Loader2 className="w-3.5 h-3.5 animate-spin" />
           Lobby closes in {Math.ceil(lobbyRemainingMs / 1000)}s
         </div>
       )}
-    </div>
+    </main>
+  );
+}
+
+/* Backdrop — mirrors the home page: faint green grid + soft ambient
+   glow blobs over the mirage gradient. Keeps the room visually
+   continuous with the rest of the site. */
+function LobbyBackdrop() {
+  return (
+    <>
+      <div className="fixed inset-0 opacity-10 pointer-events-none" aria-hidden="true">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(9, 222, 110, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(9, 222, 110, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px',
+          }}
+        />
+      </div>
+      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-20" aria-hidden="true">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-spring-green-500/10 rounded-full blur-2xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-aquamarine-500/10 rounded-full blur-2xl" />
+      </div>
+    </>
+  );
+}
+
+/* Compact lobby-code chip — sits in the top bar. Click the code or the
+   icon to copy; the second icon shares the room URL. */
+// Single button: shows the lobby code, click copies the full invite URL.
+function CodeChip({
+  code,
+  copied,
+  onCopy,
+}: {
+  code: string;
+  copied: boolean;
+  onCopy: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onCopy}
+      title="Copy invite link"
+      className="group inline-flex items-center gap-2.5 rounded-lg bg-mirage-900/60 border border-spring-green-500/20 hover:border-spring-green-400/50 px-4 py-2 transition-colors"
+    >
+      <span
+        className={`${orbitron.className} text-base font-black tracking-[0.2em] text-white`}
+      >
+        {code}
+      </span>
+      {copied ? (
+        <span className="inline-flex items-center gap-1 text-spring-green-400 text-xs font-medium">
+          <Check className="w-3.5 h-3.5" />
+          Copied
+        </span>
+      ) : (
+        <Copy className="w-3.5 h-3.5 text-gray-400 group-hover:text-spring-green-300 transition-colors" />
+      )}
+    </button>
   );
 }
 
@@ -906,27 +916,16 @@ function _PlayersVs({
         <EmptySlot label="You" side="left" />
       )}
 
-      {/* VS centerpiece — larger, with hex-style accent lines. When both
-          players are present the "VS" gets a subtle pulse to signal "ready". */}
+      {/* VS centerpiece — gradient-clip in the site's spring→aqua accent */}
       <div className="flex flex-col items-center select-none px-1">
-        <span className="hidden sm:block h-px w-12 bg-gradient-to-r from-transparent via-spring-green-300/40 to-transparent mb-3" />
+        <span className="hidden sm:block h-px w-10 bg-gradient-to-r from-transparent via-spring-green-500/30 to-transparent mb-3" />
         <span
-          className={`${orbitron.className} text-4xl sm:text-5xl md:text-6xl font-black tracking-tight ${
-            me && opponent ? 'animate-pulse' : ''
-          }`}
-          style={{
-            color: 'transparent',
-            backgroundImage:
-              'linear-gradient(180deg, #ffffff 0%, #54FFA4 100%)',
-            WebkitBackgroundClip: 'text',
-            backgroundClip: 'text',
-            textShadow: '0 0 30px rgba(84, 255, 164, 0.3)',
-          }}
+          className={`${orbitron.className} text-4xl sm:text-5xl font-black tracking-tight bg-gradient-to-br from-spring-green-300 to-aquamarine-400 bg-clip-text text-transparent`}
           aria-hidden
         >
           VS
         </span>
-        <span className="hidden sm:block h-px w-12 bg-gradient-to-r from-transparent via-spring-green-300/40 to-transparent mt-3" />
+        <span className="hidden sm:block h-px w-10 bg-gradient-to-r from-transparent via-spring-green-500/30 to-transparent mt-3" />
       </div>
 
       {opponent ? (
@@ -959,10 +958,10 @@ function PlayerSlot({
 }) {
   return (
     <div
-      className={`relative rounded-xl border p-4 flex flex-col items-center gap-2 min-w-0 transition-colors ${
+      className={`relative rounded-xl border p-5 sm:p-6 flex flex-col items-center gap-3 min-w-0 transition-colors ${
         isSelf
-          ? 'border-spring-green-300/40 bg-spring-green-300/[0.05]'
-          : 'border-white/[0.10] bg-mirage-950/40'
+          ? 'border-spring-green-500/40 bg-spring-green-500/[0.04]'
+          : 'border-white/[0.10] bg-mirage-900/40'
       }`}
     >
       <div className="relative">
@@ -971,11 +970,11 @@ function PlayerSlot({
           displayName={member.data.displayName}
           discordId={member.data.discordId}
           avatarHash={member.data.avatarHash}
-          size={64}
+          size={80}
           ringClass={
             isSelf
-              ? 'ring-2 ring-spring-green-300 ring-offset-2 ring-offset-mirage-900'
-              : 'ring-2 ring-white/20 ring-offset-2 ring-offset-mirage-900'
+              ? 'ring-2 ring-spring-green-400 ring-offset-2 ring-offset-mirage-950'
+              : 'ring-2 ring-white/20 ring-offset-2 ring-offset-mirage-950'
           }
           emote={emote}
           emoteAnchor={anchor}
@@ -990,21 +989,21 @@ function PlayerSlot({
           </span>
         )}
         {/* Online dot — bottom right of avatar */}
-        <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-spring-green-400 border-2 border-mirage-900" />
+        <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-spring-green-400 border-2 border-mirage-950" />
       </div>
       <span
-        className={`text-sm font-bold truncate max-w-full text-center ${
-          isSelf ? 'text-white' : 'text-white/95'
+        className={`text-base font-bold truncate max-w-full text-center ${
+          isSelf ? 'text-white' : 'text-gray-100'
         }`}
       >
         {member.data.displayName}
       </span>
       <span
-        className={`text-[10px] uppercase tracking-[0.2em] font-bold ${
-          isSelf ? 'text-spring-green-300' : 'text-white/40'
+        className={`text-[11px] font-mono ${
+          isSelf ? 'text-spring-green-400' : 'text-gray-500'
         }`}
       >
-        {isSelf ? 'You' : 'Opponent'}
+        {isSelf ? 'you' : 'opponent'}
       </span>
     </div>
   );
@@ -1012,15 +1011,15 @@ function PlayerSlot({
 
 function EmptySlot({ label, side }: { label: string; side: 'left' | 'right' }) {
   return (
-    <div className="relative rounded-xl border border-dashed border-white/15 bg-white/[0.02] p-4 flex flex-col items-center gap-2 min-w-0">
-      <div className="w-16 h-16 rounded-full bg-white/[0.03] border border-white/10 flex items-center justify-center ring-2 ring-white/5 ring-offset-2 ring-offset-mirage-900">
-        <Loader2 className="w-4 h-4 text-white/30 animate-spin" />
+    <div className="relative rounded-xl border border-dashed border-white/15 bg-white/[0.02] p-5 sm:p-6 flex flex-col items-center gap-3 min-w-0">
+      <div className="w-20 h-20 rounded-full bg-white/[0.03] border border-dashed border-white/15 flex items-center justify-center">
+        <Loader2 className="w-5 h-5 text-spring-green-400/30 animate-spin" />
       </div>
-      <span className="text-white/55 text-sm font-medium truncate max-w-full text-center">
+      <span className="text-gray-400 text-base font-medium truncate max-w-full text-center">
         {label}
       </span>
-      <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/30">
-        Open Slot
+      <span className="text-[11px] font-mono text-gray-600">
+        {side === 'right' ? 'share the code →' : 'open slot'}
       </span>
     </div>
   );
@@ -1091,33 +1090,6 @@ const EmoteBar = memo(function EmoteBar({ onSend }: { onSend: (emoteId: string) 
     </div>
   );
 });
-
-function ActionPill({
-  onClick,
-  active,
-  icon: Icon,
-  label,
-}: {
-  onClick: () => void;
-  active: boolean;
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-        active
-          ? 'bg-[#54FFA4]/12 text-[#54FFA4] border border-[#54FFA4]/30'
-          : 'bg-white/[0.04] hover:bg-white/[0.08] text-white/80 border border-white/[0.08] hover:border-white/15'
-      }`}
-    >
-      <Icon className="w-4 h-4" />
-      <span>{label}</span>
-    </button>
-  );
-}
 
 function MatchHeader({
   remainingMs,
@@ -1528,13 +1500,10 @@ function Countdown({ remainingMs }: { remainingMs: number }) {
   );
 }
 
-// One unified host picker that does double duty:
-//   - Alone:      tile click = publish lobby with that game tag (and lists
-//                 it on /lobby). Re-click clears.
-//   - 2 players:  tile click = start the match with that game.
-// Same chips, same place — the surrounding copy + intent change with
-// state. When the host isn't logged in and is alone we fall back to a
-// quieter "share the code or log in to publish" hint.
+// Host control. Two distinct jobs, cleanly separated:
+//   - Alone:      set lobby visibility (Private vs Public). Public also
+//                 needs a game to list the lobby under on /lobby.
+//   - 2 players:  pick a game to start the match.
 function GamePicker({
   isAlone,
   publishGame,
@@ -1552,164 +1521,176 @@ function GamePicker({
   onFocusModeChange: (next: boolean) => void;
   loggedIn: boolean;
 }) {
-  const canPublish = loggedIn;
-  const publishedLabel = publishGame
-    ? ONEV_ONE_GAMES.find((g) => g.id === publishGame)?.label
-    : null;
-
-  const title = isAlone ? 'Pick a minigame' : 'Choose the match';
-  const subtitle = isAlone
-    ? publishedLabel
-      ? `Lobby is live on /lobby as ${publishedLabel} — anyone can join.`
-      : canPublish
-        ? 'Tap a game to publish your lobby publicly, or just share the code.'
-        : 'Share the code above to invite a friend. Log in to also publish.'
-    : 'Tap any game to launch the match immediately.';
+  if (isAlone) {
+    return (
+      <VisibilityControl
+        publishGame={publishGame}
+        onPublishChange={onPublishChange}
+        loggedIn={loggedIn}
+      />
+    );
+  }
 
   return (
-    <section className="relative rounded-2xl bg-mirage-900/40 border border-white/[0.08] p-5 sm:p-6 overflow-hidden">
-      {/* Section header with status pill on the right */}
-      <div className="flex items-start justify-between gap-3 mb-1.5">
-        <div className="flex items-center gap-2">
-          <Play className="w-4 h-4 text-spring-green-300" strokeWidth={2.5} />
-          <h2 className="text-white text-base font-bold uppercase tracking-[0.15em]">
-            {title}
-          </h2>
-        </div>
-        {!isAlone && (
-          <FocusToggle enabled={focusMode} onChange={onFocusModeChange} />
-        )}
+    <section>
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <h2 className="text-lg font-semibold text-white">Pick a game to start</h2>
+        <FocusToggle enabled={focusMode} onChange={onFocusModeChange} />
       </div>
-      <p className="text-white/45 text-xs leading-snug mb-5">{subtitle}</p>
-
-      {/* 2/3/4-col responsive thumbnail grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-        {ONEV_ONE_GAMES.map((entry) => {
-          const isPublishedTile = isAlone && publishGame === entry.id;
-          const disabled = isAlone && !canPublish;
-          const handleClick = () => {
-            if (isAlone) {
-              if (!canPublish) return;
-              onPublishChange(isPublishedTile ? null : entry.id);
-            } else {
-              onStart(entry.id);
-            }
-          };
-          return (
-            <GameTile
-              key={entry.id}
-              gameId={entry.id}
-              label={entry.label}
-              isPublished={isPublishedTile}
-              disabled={disabled}
-              isLive={!isAlone}
-              onClick={handleClick}
-            />
-          );
-        })}
+      <div className="flex flex-wrap justify-center gap-3">
+        {ONEV_ONE_GAMES.map((entry) => (
+          <GameTile
+            key={entry.id}
+            gameId={entry.id}
+            label={entry.label}
+            mode="start"
+            selected={false}
+            onClick={() => onStart(entry.id)}
+          />
+        ))}
       </div>
-
-      {isAlone && publishedLabel && (
-        <button
-          type="button"
-          onClick={() => onPublishChange(null)}
-          className="mt-4 w-full text-center text-[11px] text-white/45 hover:text-white/80 transition-colors uppercase tracking-wider font-semibold"
-        >
-          Stop listing
-        </button>
-      )}
-
-      {disabled_help_message_for_alone_unauth(isAlone, canPublish)}
     </section>
   );
 }
 
-// Inline helper so the disabled hint doesn't clutter the main render path.
-function disabled_help_message_for_alone_unauth(isAlone: boolean, canPublish: boolean) {
-  if (!isAlone || canPublish) return null;
+// Visibility — explicit Private/Public switch. Private (publishGame=null)
+// means code-only; Public lists the lobby on /lobby under a chosen game.
+function VisibilityControl({
+  publishGame,
+  onPublishChange,
+  loggedIn,
+}: {
+  publishGame: GameType | null;
+  onPublishChange: (next: GameType | null) => void;
+  loggedIn: boolean;
+}) {
+  const isPublic = publishGame !== null;
+  // Switching to public needs a game to list under; default to the first.
+  const goPublic = () => onPublishChange(publishGame ?? ONEV_ONE_GAMES[0].id);
+
   return (
-    <p className="mt-4 text-center text-[10px] text-white/35 uppercase tracking-wider font-semibold">
-      Log in to publish your lobby publicly
-    </p>
+    <section>
+      <h2 className="text-lg font-semibold text-white mb-1">
+        Waiting for an opponent
+      </h2>
+      <p className="text-gray-400 text-sm mb-5">
+        Share your code, or open the lobby to anyone. The game is picked once
+        someone joins.
+      </p>
+
+      {/* Private / Public segmented switch */}
+      <div className="grid grid-cols-2 gap-1 p-1 rounded-lg bg-mirage-950/60 border border-white/10">
+        <button
+          type="button"
+          onClick={() => onPublishChange(null)}
+          className={`flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-medium transition-colors ${
+            !isPublic
+              ? 'bg-spring-green-500 text-mirage-950'
+              : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <Lock className="w-4 h-4" />
+          Private
+        </button>
+        <button
+          type="button"
+          onClick={goPublic}
+          disabled={!loggedIn}
+          className={`flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed ${
+            isPublic
+              ? 'bg-spring-green-500 text-mirage-950'
+              : 'text-gray-400 hover:text-white disabled:opacity-40 disabled:hover:text-gray-400'
+          }`}
+        >
+          <Globe className="w-4 h-4" />
+          Public
+        </button>
+      </div>
+
+      {!loggedIn && (
+        <p className="text-gray-500 text-xs mt-3">
+          Log in to list your lobby publicly.
+        </p>
+      )}
+
+      {/* When public, choose which game the listing shows under. */}
+      {isPublic && (
+        <div className="mt-6">
+          <h3 className="text-sm font-medium text-gray-300 mb-3 text-center">
+            Listed under
+          </h3>
+          <div className="flex flex-wrap justify-center gap-3">
+            {ONEV_ONE_GAMES.map((entry) => (
+              <GameTile
+                key={entry.id}
+                gameId={entry.id}
+                label={entry.label}
+                mode="select"
+                selected={publishGame === entry.id}
+                onClick={() => onPublishChange(entry.id)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
 
-/* Single tile in the game picker — uses the auto-generated thumbnail. */
+/* Game thumbnail tile. mode 'start' shows a Start overlay on hover;
+   mode 'select' shows a check when chosen. */
 function GameTile({
   gameId,
   label,
-  isPublished,
-  disabled,
-  isLive,
+  mode,
+  selected,
   onClick,
 }: {
   gameId: GameType;
   label: string;
-  isPublished: boolean;
-  disabled: boolean;
-  isLive: boolean;
+  mode: 'start' | 'select';
+  selected: boolean;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      disabled={disabled}
-      title={disabled ? 'Log in to publish your lobby' : label}
-      className={`group relative rounded-xl border overflow-hidden transition-all duration-300 ease-out flex flex-col text-left active:scale-[0.98] ${
-        isPublished
-          ? 'border-spring-green-300/70 bg-spring-green-300/[0.06] shadow-lg shadow-spring-green-500/15'
-          : 'border-white/[0.08] bg-mirage-950/40 hover:border-spring-green-300/50 hover:bg-spring-green-300/[0.04]'
-      } ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
+      title={label}
+      className={`group relative w-36 sm:w-40 overflow-hidden rounded-lg flex flex-col text-left transition-all duration-200 active:scale-[0.98] ${
+        selected
+          ? 'bg-spring-green-500/10 border-2 border-spring-green-400'
+          : 'bg-mirage-900/50 border border-white/10 hover:border-spring-green-400/50 hover:-translate-y-0.5'
+      }`}
     >
-      {/* Thumbnail area — fixed aspect, padded so the transparent PNG breathes */}
-      <div className="relative aspect-[4/3] flex items-center justify-center p-3 overflow-hidden">
-        {/* Radial green spotlight that intensifies on hover (mirror of home cards) */}
-        <div
-          aria-hidden
-          className={`absolute inset-3 rounded-md bg-[radial-gradient(ellipse_at_center,rgba(84,255,164,0.10),transparent_70%)] transition-opacity duration-500 ${
-            isPublished ? 'opacity-100' : 'opacity-40 group-hover:opacity-100'
-          }`}
-        />
+      <div className="relative aspect-[4/3] flex items-center justify-center p-3">
         <Image
           src={GAME_THUMB[gameId]}
           alt={label}
           width={240}
           height={180}
-          className="relative w-full h-full object-contain transition-all duration-500 ease-out [filter:drop-shadow(0_4px_10px_rgba(0,0,0,0.5))] group-hover:[filter:drop-shadow(0_10px_20px_rgba(84,255,164,0.25))_drop-shadow(0_4px_10px_rgba(0,0,0,0.4))] group-hover:-translate-y-1"
+          className="relative w-full h-full object-contain transition-transform duration-200 group-hover:scale-105 [filter:drop-shadow(0_4px_10px_rgba(0,0,0,0.4))]"
           unoptimized
         />
-        {/* PUBLISHED / LIVE badge — top-right */}
-        {isPublished && (
-          <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-spring-green-300/20 border border-spring-green-300/55 text-spring-green-200 text-[9px] uppercase tracking-wider font-bold backdrop-blur-sm">
-            <Globe className="w-2.5 h-2.5" />
-            Live
+        {selected && (
+          <span className="absolute top-2 right-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-spring-green-500 text-mirage-950">
+            <Check className="w-3 h-3" strokeWidth={3} />
           </span>
         )}
-        {/* "PLAY" overlay on hover when both players present */}
-        {isLive && !disabled && (
-          <span className="absolute inset-0 flex items-center justify-center bg-spring-green-300/0 group-hover:bg-spring-green-300/[0.12] transition-colors duration-200 opacity-0 group-hover:opacity-100">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-spring-green-300 text-mirage-950 text-xs font-bold uppercase tracking-wider shadow-lg shadow-spring-green-500/40">
-              <Play className="w-3 h-3" fill="currentColor" strokeWidth={0} />
+        {mode === 'start' && (
+          <span className="absolute inset-0 flex items-center justify-center bg-mirage-950/0 group-hover:bg-mirage-950/40 transition-colors duration-200 opacity-0 group-hover:opacity-100">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-spring-green-500 text-mirage-950 text-sm font-semibold shadow-lg">
+              <Play className="w-3.5 h-3.5" fill="currentColor" strokeWidth={0} />
               Start
             </span>
           </span>
         )}
       </div>
-      {/* Label strip below */}
-      <div
-        className={`px-3 py-2.5 border-t text-center ${
-          isPublished
-            ? 'border-spring-green-300/30 bg-spring-green-300/[0.05]'
-            : 'border-white/[0.06] bg-mirage-950/40 group-hover:border-spring-green-300/20 group-hover:bg-spring-green-300/[0.03]'
-        } transition-colors`}
-      >
+      <div className="px-3 py-2.5 border-t border-white/10">
         <span
-          className={`text-xs font-bold uppercase tracking-[0.1em] truncate inline-block max-w-full ${
-            isPublished
-              ? 'text-spring-green-200'
-              : 'text-white/85 group-hover:text-spring-green-200'
-          } transition-colors`}
+          className={`text-sm font-medium truncate inline-block max-w-full ${
+            selected ? 'text-spring-green-300' : 'text-gray-200'
+          }`}
         >
           {label}
         </span>

@@ -26,6 +26,10 @@ interface UseAblyChannelArgs<TMsg> {
   presenceData: PresenceData;
   onMessage?: (msg: TMsg) => void;
   enabled?: boolean;
+  // Optional clientId to forward as `?clientId=…` on the token request.
+  // Used to give anonymous visitors a stable guest identity per browser
+  // tab — logged-in users can omit this (the server uses their session id).
+  clientId?: string;
 }
 
 interface UseAblyChannelReturn<TMsg> {
@@ -41,6 +45,7 @@ export function useAblyChannel<TMsg>({
   presenceData,
   onMessage,
   enabled = true,
+  clientId,
 }: UseAblyChannelArgs<TMsg>): UseAblyChannelReturn<TMsg> {
   const [status, setStatus] = useState<ChannelStatus>('connecting');
   const [presence, setPresence] = useState<PresenceMember[]>([]);
@@ -65,7 +70,11 @@ export function useAblyChannel<TMsg>({
     // echoMessages: false — we apply our own actions locally before publishing,
     // so we don't want them echoed back and double-applied (especially the
     // match:input stream that drives the spectator view).
-    const client = new Ably.Realtime({ authUrl: '/api/ably/token', echoMessages: false });
+    const client = new Ably.Realtime({
+      authUrl: '/api/ably/token',
+      authParams: clientId ? { clientId } : undefined,
+      echoMessages: false,
+    });
 
     client.connection.on((change) => {
       if (cancelled) return;
@@ -129,13 +138,16 @@ export function useAblyChannel<TMsg>({
 
     return () => {
       cancelled = true;
-      void channel.presence.leave().catch(() => {});
-      channel.unsubscribe();
-      channel.presence.unsubscribe();
-      client.close();
+      // Each teardown call can throw if Ably is already mid-close (Strict-mode
+      // double-mount, navigation interrupting auth). Swallow individually so
+      // one failure doesn't leak through and bubble up as a runtime error.
+      try { void channel.presence.leave().catch(() => {}); } catch {}
+      try { channel.unsubscribe(); } catch {}
+      try { channel.presence.unsubscribe(); } catch {}
+      try { client.close(); } catch {}
       channelRef.current = null;
     };
-  }, [enabled, channelName, presenceDataKey]);
+  }, [enabled, channelName, presenceDataKey, clientId]);
 
   const publish = async (msg: TMsg) => {
     if (!channelRef.current) {

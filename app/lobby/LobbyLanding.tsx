@@ -4,15 +4,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  ArrowLeft,
-  ArrowRight,
-  Loader2,
-  Plus,
-  Radio,
-  Sparkles,
-  Users,
-} from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, Plus, Swords, Trophy } from 'lucide-react';
 import { useUser } from '@/app/contexts/UserContext';
 import { orbitron } from '@/app/fonts';
 import { generateLobbyCode, isValidLobbyCode } from '@/lib/lobby/code';
@@ -30,9 +22,16 @@ interface PublicLobby {
   suggestedGame?: GameType;
 }
 
-// Per-game metadata (label + cache-busted thumbnail). Single source of
-// truth used by the empty-state grid and by the open-lobby rows so the
-// landing page always looks like the home page.
+interface RecentMatch {
+  game: GameType;
+  winnerName: string | null;
+  opponentName: string | null;
+  durationMs: number;
+  endedAt: string;
+}
+
+// Per-game metadata (label + cache-busted thumbnail). Same thumbnails the
+// home page uses, so the lobby reads as part of the same product.
 const GAME_META: Record<GameType, { label: string; img: string }> = {
   thermite: { label: 'Thermite', img: '/puzzles/thermite.png?v=3' },
   lockpick: { label: 'Lockpick', img: '/puzzles/lockpick.png?v=3' },
@@ -44,21 +43,16 @@ const GAME_META: Record<GameType, { label: string; img: string }> = {
   'repair-kit': { label: 'Repair Kit', img: '/puzzles/repair-kit.png?v=3' },
 };
 
-const ALL_GAMES = Object.keys(GAME_META) as GameType[];
-
 export default function LobbyLanding() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isLoading } = useUser();
   const [error, setError] = useState('');
   const [publicLobbies, setPublicLobbies] = useState<PublicLobby[] | null>(null);
+  const [recentMatches, setRecentMatches] = useState<RecentMatch[]>([]);
   const [fullNotice, setFullNotice] = useState(searchParams?.get('full') === '1');
-
-  // Six-char code input split into six boxes for a HUD feel; the state is
-  // a single 6-element array so backspace can hop slots and submit gates
-  // on "all filled".
-  const [codeChars, setCodeChars] = useState<string[]>(['', '', '', '', '', '']);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [code, setCode] = useState('');
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -73,94 +67,112 @@ export default function LobbyLanding() {
       }
     };
     void load();
-    const interval = setInterval(load, 7000);
+    // Poll every 4s so filled / abandoned / privated lobbies drop off the
+    // list quickly, and refetch immediately whenever the tab regains focus
+    // (covers the gap between polls when someone tabs back in).
+    const interval = setInterval(load, 4000);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void load();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
+    };
+  }, []);
+
+  // Recent finished matches — refreshed on a slower cadence than the lobby
+  // list since the feed is ambient flavour, not something you act on.
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const res = await fetch('/api/lobby/recent-matches', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = (await res.json()) as { matches: RecentMatch[] };
+        if (!cancelled) setRecentMatches(data.matches);
+      } catch {
+        // Cosmetic — ignore.
+      }
+    };
+    void load();
+    const interval = setInterval(load, 20000);
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
   }, []);
 
-  const joinedCode = codeChars.join('');
-  const codeReady = joinedCode.length === 6 && isValidLobbyCode(joinedCode);
+  const codeReady = code.length === 6 && isValidLobbyCode(code);
 
-  const setCharAt = (idx: number, raw: string) => {
-    // Allow paste of a full 6-char string into any box.
-    const cleaned = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    if (cleaned.length > 1) {
-      const next = ['', '', '', '', '', ''];
-      for (let i = 0; i < 6 && i < cleaned.length; i++) {
-        next[i] = cleaned[i];
-      }
-      setCodeChars(next);
-      const lastFilled = Math.min(cleaned.length, 6) - 1;
-      inputRefs.current[Math.min(lastFilled + 1, 5)]?.focus();
-      return;
-    }
-    const next = [...codeChars];
-    next[idx] = cleaned;
-    setCodeChars(next);
-    if (cleaned && idx < 5) inputRefs.current[idx + 1]?.focus();
+  const handleCodeChange = (raw: string) => {
+    // Uppercase, strip anything that isn't a code char, cap at 6.
+    setCode(raw.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6));
     if (error) setError('');
   };
 
-  const onKeyDownChar = (
-    idx: number,
-    e: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
-    if (e.key === 'Backspace' && !codeChars[idx] && idx > 0) {
-      inputRefs.current[idx - 1]?.focus();
-    }
-    if (e.key === 'ArrowLeft' && idx > 0) inputRefs.current[idx - 1]?.focus();
-    if (e.key === 'ArrowRight' && idx < 5) inputRefs.current[idx + 1]?.focus();
-  };
-
   const handleCreate = () => {
-    const code = generateLobbyCode();
-    trackLobbyCreated({ lobby_code: code });
-    router.push(`/lobby/${code}`);
+    const fresh = generateLobbyCode();
+    trackLobbyCreated({ lobby_code: fresh });
+    router.push(`/lobby/${fresh}`);
   };
 
   const handleJoin = (e: FormEvent) => {
     e.preventDefault();
     setError('');
     if (!codeReady) {
-      setError('Code must be 6 characters');
+      setError('Enter the 6-character code');
+      inputRef.current?.focus();
       return;
     }
-    trackLobbyJoined({ lobby_code: joinedCode });
-    router.push(`/lobby/${joinedCode}`);
-  };
-
-  const handleJoinPublic = (code: string) => {
     trackLobbyJoined({ lobby_code: code });
     router.push(`/lobby/${code}`);
   };
 
+  const handleJoinPublic = (joinCode: string) => {
+    trackLobbyJoined({ lobby_code: joinCode });
+    router.push(`/lobby/${joinCode}`);
+  };
+
   return (
-    <div className="min-h-screen relative overflow-x-hidden">
-      {/* Ambient scenography */}
-      <BackgroundFx />
+    <main className="relative flex min-h-screen flex-col items-center bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950">
+      <LobbyBackdrop />
 
-      {/* Sticky top utility bar: leave button + live count. Echoes a
-          broadcast lower-third / HUD overlay. */}
-      <div className="relative z-10 pt-6 px-4 md:px-8 max-w-7xl mx-auto flex items-center justify-between">
-        <Link
-          href="/"
-          className="group inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-mirage-900/70 backdrop-blur-sm border border-white/[0.08] text-white/65 hover:text-spring-green-300 hover:border-spring-green-300/60 transition-all"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">Back to home</span>
-        </Link>
-        <LiveBadge count={publicLobbies?.length} />
-      </div>
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Top utility row */}
+        <div className="flex items-center justify-between gap-3 pt-2">
+          <Link
+            href="/"
+            className="group inline-flex items-center gap-2 text-gray-400 hover:text-spring-green-300 text-sm font-medium transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            Back to home
+          </Link>
+          <LiveBadge count={publicLobbies?.length} />
+        </div>
 
-      <main className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 pt-10 md:pt-14 pb-24">
+        {/* Hero */}
+        <header className="text-center pt-12 pb-10 sm:pt-16 sm:pb-12">
+          <h1
+            className={`${orbitron.className} text-6xl sm:text-7xl md:text-8xl font-black leading-none text-white`}
+            style={{ letterSpacing: '0.04em' }}
+          >
+            1<span className="text-spring-green-400">v</span>1
+          </h1>
+          <p className="mt-4 text-gray-400 text-base sm:text-lg">
+            Go head-to-head on the same minigame — fastest finish wins.
+          </p>
+        </header>
+
         {fullNotice && (
           <div
             role="status"
-            className="mx-auto max-w-2xl mb-10 rounded-xl border border-amber-400/30 bg-amber-400/[0.06] px-4 py-3 text-amber-200 text-xs flex items-center justify-between gap-3"
+            className="mx-auto max-w-md mb-8 rounded-lg border border-amber-400/30 bg-amber-400/[0.06] px-4 py-3 text-amber-200 text-sm flex items-center justify-between gap-3"
           >
-            <span>That lobby filled up before you got in. Try another below.</span>
+            <span>That lobby filled up. Try another below.</span>
             <button
               type="button"
               onClick={() => setFullNotice(false)}
@@ -172,259 +184,185 @@ export default function LobbyLanding() {
           </div>
         )}
 
-        {/* Hero */}
-        <header className="text-center mb-14 md:mb-16">
-          <div className="inline-flex items-center gap-2 text-spring-green-300 text-[10px] uppercase tracking-[0.35em] font-bold mb-6">
-            <span className="inline-block w-8 h-px bg-spring-green-300/60" />
-            Head to head
-            <span className="inline-block w-8 h-px bg-spring-green-300/60" />
-          </div>
-          <h1
-            className={`${orbitron.className} text-6xl sm:text-7xl md:text-8xl font-black mb-4 leading-[0.9]`}
-            style={{
-              color: 'transparent',
-              backgroundImage:
-                'linear-gradient(135deg, #ffffff 0%, #d8fff0 30%, #54FFA4 70%, #54FFA4 100%)',
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              letterSpacing: '-0.02em',
-              textShadow: '0 0 80px rgba(84, 255, 164, 0.15)',
-            }}
-          >
-            1V1 MODE
-          </h1>
-          <p className="text-white/55 text-base md:text-lg max-w-xl mx-auto">
-            Race a friend on the same minigame. Same seed, same start,
-            <br className="hidden sm:block" /> fastest finish wins.
-          </p>
-        </header>
-
         {isLoading ? (
-          <div className="flex items-center justify-center h-72" aria-busy="true">
-            <Loader2 className="w-6 h-6 text-white/30 animate-spin" />
+          <div className="flex items-center justify-center h-64" aria-busy="true">
+            <Loader2 className="w-6 h-6 text-spring-green-400/50 animate-spin" />
           </div>
         ) : (
           <>
-            {/* Two-up action panel: Create | Join. On mobile they stack. */}
-            <section className="grid md:grid-cols-2 gap-4 md:gap-6 mb-14 md:mb-16">
-              <CreatePanel onCreate={handleCreate} />
-              <JoinPanel
-                codeChars={codeChars}
-                inputRefs={inputRefs}
-                onCharChange={setCharAt}
-                onKeyDownChar={onKeyDownChar}
-                onSubmit={handleJoin}
-                ready={codeReady}
-                error={error}
-              />
+            {/* Single focused action card: create (primary) + join by code */}
+            <section className="max-w-md mx-auto mb-16">
+              <div className="rounded-xl bg-gradient-to-br from-mirage-900/80 to-mirage-950/80 border-2 border-spring-green-500/30 p-6 sm:p-7 shadow-lg shadow-spring-green-900/10">
+                <button
+                  type="button"
+                  onClick={handleCreate}
+                  className="group/btn relative w-full overflow-hidden rounded-lg bg-spring-green-500 hover:bg-spring-green-400 text-mirage-950 py-3.5 font-bold tracking-wide transition-all duration-200 active:scale-[0.99] shadow-lg shadow-spring-green-500/20 hover:shadow-spring-green-500/40 inline-flex items-center justify-center gap-2"
+                >
+                  <Plus className="w-4 h-4" strokeWidth={3} />
+                  Create a lobby
+                  <ArrowRight className="w-4 h-4 -translate-x-1 opacity-0 group-hover/btn:translate-x-0 group-hover/btn:opacity-100 transition-all" />
+                </button>
+
+                {/* divider */}
+                <div className="flex items-center gap-3 my-5">
+                  <span className="h-px flex-1 bg-white/10" />
+                  <span className="text-gray-500 text-xs">or join with a code</span>
+                  <span className="h-px flex-1 bg-white/10" />
+                </div>
+
+                <form onSubmit={handleJoin} className="space-y-3">
+                  <input
+                    ref={inputRef}
+                    value={code}
+                    onChange={(e) => handleCodeChange(e.target.value)}
+                    onFocus={(e) => e.currentTarget.select()}
+                    inputMode="text"
+                    autoCapitalize="characters"
+                    autoComplete="off"
+                    spellCheck={false}
+                    maxLength={6}
+                    placeholder="ABC123"
+                    aria-label="Lobby code"
+                    className={`${orbitron.className} w-full rounded-lg bg-mirage-950/60 border border-white/10 focus:border-spring-green-400/60 focus:ring-2 focus:ring-spring-green-500/20 focus:outline-none text-center text-2xl sm:text-3xl font-bold tracking-[0.3em] uppercase text-white placeholder-white/15 py-3 transition-all`}
+                  />
+                  {error && (
+                    <p className="text-error-400 text-xs text-center">{error}</p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={!codeReady}
+                    className="w-full rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-spring-green-400/40 text-white/90 hover:text-spring-green-300 py-3 font-semibold tracking-wide transition-all duration-200 active:scale-[0.99] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white/[0.04] disabled:hover:border-white/10 disabled:hover:text-white/90 inline-flex items-center justify-center gap-2"
+                  >
+                    Join lobby
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </form>
+              </div>
             </section>
 
             {/* Live feed */}
-            <PublicLobbyList
-              lobbies={publicLobbies}
-              onJoin={handleJoinPublic}
-            />
+            <PublicLobbyList lobbies={publicLobbies} onJoin={handleJoinPublic} />
           </>
         )}
-      </main>
+      </div>
+
+      {/* Ambient activity ticker — pinned to the bottom, cycles through the
+          most recent finished matches. Hidden entirely when there's nothing
+          to show (no fake filler). */}
+      <RecentMatchesTicker matches={recentMatches} />
+    </main>
+  );
+}
+
+/* Bottom activity ticker — fades through recent matches one at a time. */
+function RecentMatchesTicker({ matches }: { matches: RecentMatch[] }) {
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    if (matches.length <= 1) return;
+    const t = setInterval(() => setIdx((i) => (i + 1) % matches.length), 3500);
+    return () => clearInterval(t);
+  }, [matches.length]);
+
+  // Keep the index valid as the feed shrinks/grows.
+  useEffect(() => {
+    if (idx >= matches.length) setIdx(0);
+  }, [matches.length, idx]);
+
+  if (matches.length === 0) return null;
+  const m = matches[Math.min(idx, matches.length - 1)];
+  const label = GAME_META[m.game]?.label ?? m.game;
+  const seconds = (m.durationMs / 1000).toFixed(1);
+
+  return (
+    <div className="sticky bottom-0 z-20 w-full border-t border-white/[0.06] bg-mirage-950/80 backdrop-blur-sm">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-3 text-sm">
+        <span className="inline-flex items-center gap-1.5 text-spring-green-400 shrink-0">
+          <Swords className="w-3.5 h-3.5" />
+          <span className="text-xs font-mono uppercase tracking-wider hidden sm:inline">
+            Latest
+          </span>
+        </span>
+        {/* key on endedAt+idx so each change re-triggers the fade-in */}
+        <p
+          key={`${m.endedAt}-${idx}`}
+          className="min-w-0 flex-1 truncate text-gray-300 animate-fade-in"
+        >
+          {m.winnerName ? (
+            <>
+              <span className="text-white font-semibold">{m.winnerName}</span>
+              <span className="text-gray-500"> beat </span>
+              <span className="text-gray-300">{m.opponentName ?? 'their opponent'}</span>
+            </>
+          ) : (
+            <span className="text-gray-300">A match ended in a draw</span>
+          )}
+          <span className="text-gray-600"> · </span>
+          <span className="text-gray-400">{label}</span>
+          <span className="text-gray-600"> · </span>
+          <span className="text-gray-500 font-mono tabular-nums">{seconds}s</span>
+        </p>
+        <Trophy className="w-3.5 h-3.5 text-amber-400/70 shrink-0" />
+      </div>
     </div>
   );
 }
 
 /* ──────────────────────────────────────────────────────────
- * Background — soft green pool at top + faint terminal grid.
- * Heavier than the previous version to set the "arena" mood.
+ * Backdrop — mirrors the home page exactly: faint green grid +
+ * two soft ambient glow blobs over the mirage gradient.
  * ─────────────────────────────────────────────────────────*/
-function BackgroundFx() {
+function LobbyBackdrop() {
   return (
     <>
+      <div className="fixed inset-0 opacity-10 pointer-events-none" aria-hidden="true">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(9, 222, 110, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(9, 222, 110, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px',
+          }}
+        />
+      </div>
       <div
-        aria-hidden
-        className="absolute inset-x-0 top-0 h-[42rem] pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse 80rem 45rem at 50% -10%, rgba(84,255,164,0.14) 0%, transparent 55%)',
-        }}
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none opacity-[0.04]"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(84,255,164,1) 1px, transparent 1px), linear-gradient(90deg, rgba(84,255,164,1) 1px, transparent 1px)',
-          backgroundSize: '56px 56px',
-          maskImage:
-            'radial-gradient(ellipse 70rem 50rem at 50% 30%, black 0%, transparent 75%)',
-        }}
-      />
+        className="fixed inset-0 overflow-hidden pointer-events-none opacity-20"
+        aria-hidden="true"
+      >
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-spring-green-500/10 rounded-full blur-2xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-aquamarine-500/10 rounded-full blur-2xl" />
+      </div>
     </>
   );
 }
 
-/* Live-count chip — top right, broadcast-overlay style. */
+/* Live-count chip — minimal, mono. */
 function LiveBadge({ count }: { count: number | undefined }) {
   if (count === undefined) {
     return (
-      <span className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-mirage-900/70 backdrop-blur-sm border border-white/[0.08] text-white/40 text-xs">
+      <span className="inline-flex items-center gap-2 text-gray-500 text-xs font-mono">
         <Loader2 className="w-3 h-3 animate-spin" />
-        Loading…
+        loading
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-mirage-900/70 backdrop-blur-sm border border-spring-green-300/30 text-xs">
+    <span className="inline-flex items-center gap-2 text-xs font-mono">
       <span className="relative flex h-2 w-2">
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-spring-green-400 opacity-60" />
         <span className="relative inline-flex rounded-full h-2 w-2 bg-spring-green-400" />
       </span>
-      <span className="text-spring-green-200 font-semibold tracking-wider uppercase text-[10px]">
-        {count} live
+      <span className="text-spring-green-300 font-semibold tabular-nums">
+        {count} <span className="text-gray-500">live</span>
       </span>
     </span>
   );
 }
 
 /* ──────────────────────────────────────────────────────────
- * CREATE panel — primary CTA. The button gets the strongest
- * visual weight on the page.
- * ─────────────────────────────────────────────────────────*/
-function CreatePanel({ onCreate }: { onCreate: () => void }) {
-  return (
-    <div className="relative group rounded-2xl border border-spring-green-300/30 bg-gradient-to-br from-spring-green-300/[0.06] to-transparent p-6 md:p-8 overflow-hidden">
-      {/* Corner brackets — terminal frame */}
-      <CornerBrackets />
-
-      <div className="relative">
-        <div className="inline-flex items-center gap-1.5 text-spring-green-300/85 text-[10px] uppercase tracking-[0.3em] font-bold mb-3">
-          <Sparkles className="w-3 h-3" />
-          Host
-        </div>
-        <h2 className="text-white text-2xl md:text-3xl font-bold mb-2">
-          Create a lobby
-        </h2>
-        <p className="text-white/50 text-sm leading-relaxed mb-6">
-          Spin up a fresh room and pick the minigame.
-          Share the code with a friend, or publish it for anyone to join.
-        </p>
-
-        <button
-          type="button"
-          onClick={onCreate}
-          className="group/btn relative w-full rounded-xl bg-gradient-to-r from-spring-green-300 to-spring-green-400 hover:from-spring-green-200 hover:to-spring-green-300 text-mirage-950 py-4 font-bold text-base transition-all duration-200 active:scale-[0.99] shadow-lg shadow-spring-green-500/20 hover:shadow-spring-green-500/40 overflow-hidden"
-        >
-          <span className="relative z-10 inline-flex items-center gap-2">
-            <Plus className="w-4 h-4" strokeWidth={3} />
-            CREATE ROOM
-            <ArrowRight className="w-4 h-4 -translate-x-1 opacity-0 group-hover/btn:translate-x-0 group-hover/btn:opacity-100 transition-all" />
-          </span>
-          <span
-            aria-hidden
-            className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-white/70 to-transparent"
-          />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* ──────────────────────────────────────────────────────────
- * JOIN panel — six-char HUD code input. Each character gets
- * its own little box, like an unlock keypad.
- * ─────────────────────────────────────────────────────────*/
-function JoinPanel({
-  codeChars,
-  inputRefs,
-  onCharChange,
-  onKeyDownChar,
-  onSubmit,
-  ready,
-  error,
-}: {
-  codeChars: string[];
-  inputRefs: React.MutableRefObject<(HTMLInputElement | null)[]>;
-  onCharChange: (idx: number, raw: string) => void;
-  onKeyDownChar: (idx: number, e: React.KeyboardEvent<HTMLInputElement>) => void;
-  onSubmit: (e: FormEvent) => void;
-  ready: boolean;
-  error: string;
-}) {
-  return (
-    <div className="relative rounded-2xl border border-white/[0.08] bg-mirage-900/40 p-6 md:p-8 overflow-hidden">
-      <CornerBrackets />
-
-      <div className="relative">
-        <div className="inline-flex items-center gap-1.5 text-white/55 text-[10px] uppercase tracking-[0.3em] font-bold mb-3">
-          <Users className="w-3 h-3" />
-          Join
-        </div>
-        <h2 className="text-white text-2xl md:text-3xl font-bold mb-2">
-          Have a code?
-        </h2>
-        <p className="text-white/50 text-sm leading-relaxed mb-6">
-          Enter the 6-character lobby code your friend gave you.
-        </p>
-
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div
-            className="flex items-center justify-between gap-1.5 sm:gap-2"
-            role="group"
-            aria-label="Lobby code"
-          >
-            {codeChars.map((ch, i) => (
-              <input
-                key={i}
-                ref={(el) => {
-                  inputRefs.current[i] = el;
-                }}
-                value={ch}
-                onChange={(e) => onCharChange(i, e.target.value)}
-                onKeyDown={(e) => onKeyDownChar(i, e)}
-                onFocus={(e) => e.currentTarget.select()}
-                maxLength={6}
-                inputMode="text"
-                autoCapitalize="characters"
-                autoComplete="off"
-                spellCheck={false}
-                aria-label={`Code character ${i + 1}`}
-                className={`${orbitron.className} flex-1 min-w-0 aspect-square max-h-16 rounded-lg bg-white/[0.04] border border-white/[0.08] focus:border-spring-green-300/60 focus:bg-spring-green-300/[0.06] focus:ring-2 focus:ring-spring-green-300/20 focus:outline-none text-center text-2xl sm:text-3xl uppercase font-bold text-white placeholder-white/15 transition-all`}
-                placeholder="·"
-              />
-            ))}
-          </div>
-
-          {error && (
-            <p className="text-red-400/85 text-xs text-center -mt-1">{error}</p>
-          )}
-
-          <button
-            type="submit"
-            disabled={!ready}
-            className="w-full rounded-xl bg-white/[0.06] hover:bg-spring-green-300/[0.12] border border-white/[0.08] hover:border-spring-green-300/40 text-white/90 hover:text-spring-green-200 py-3.5 font-semibold transition-all duration-200 active:scale-[0.99] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white/[0.06] disabled:hover:border-white/[0.08] disabled:hover:text-white/90 inline-flex items-center justify-center gap-2"
-          >
-            JOIN LOBBY
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-/* Decorative L-shaped corner brackets — terminal frame motif. */
-function CornerBrackets() {
-  return (
-    <>
-      <span className="absolute top-0 left-0 w-4 h-4 border-t border-l border-spring-green-300/40 rounded-tl-2xl pointer-events-none" />
-      <span className="absolute top-0 right-0 w-4 h-4 border-t border-r border-spring-green-300/40 rounded-tr-2xl pointer-events-none" />
-      <span className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-spring-green-300/40 rounded-bl-2xl pointer-events-none" />
-      <span className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-spring-green-300/40 rounded-br-2xl pointer-events-none" />
-    </>
-  );
-}
-
-/* ──────────────────────────────────────────────────────────
- * Public lobby list — broadcast-feed style. Each open lobby
- * shows the minigame thumbnail prominently.
+ * Public lobby list.
  * ─────────────────────────────────────────────────────────*/
 function PublicLobbyList({
   lobbies,
@@ -458,18 +396,15 @@ function PublicLobbyList({
   }, [lobbies, gameFilter]);
 
   return (
-    <section>
-      <div className="flex items-center gap-3 mb-5">
-        <Radio className="w-4 h-4 text-spring-green-300" />
-        <h2 className="text-white/85 text-sm font-bold uppercase tracking-[0.2em]">
-          Live Lobbies
-        </h2>
-        <div className="flex-1 h-px bg-gradient-to-r from-white/15 to-transparent" />
-        {lobbies && (
-          <span className="text-white/40 text-[11px] font-mono tabular-nums">
-            {filtered?.length ?? 0} / {lobbies.length}
+    <section className="pb-20">
+      <div className="flex items-baseline gap-3 mb-5">
+        <h2 className="text-lg font-semibold text-white">Open lobbies</h2>
+        {lobbies && lobbies.length > 0 && (
+          <span className="text-gray-500 text-sm tabular-nums">
+            {filtered?.length ?? 0}
           </span>
         )}
+        <span className="flex-1 h-px bg-white/10" />
       </div>
 
       {/* Game filter chips */}
@@ -494,8 +429,8 @@ function PublicLobbyList({
       )}
 
       {filtered === null ? (
-        <div className="h-40 rounded-xl bg-white/[0.02] border border-white/[0.04] flex items-center justify-center">
-          <Loader2 className="w-5 h-5 text-white/30 animate-spin" />
+        <div className="h-40 rounded-lg bg-mirage-900/40 border border-white/[0.06] flex items-center justify-center">
+          <Loader2 className="w-5 h-5 text-spring-green-400/40 animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
         <EmptyState />
@@ -527,16 +462,14 @@ function FilterChip({
       onClick={onClick}
       className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
         active
-          ? 'bg-spring-green-300/15 border-spring-green-300/55 text-spring-green-200'
-          : 'bg-white/[0.03] border-white/[0.08] text-white/65 hover:bg-white/[0.06] hover:border-white/15 hover:text-white/90'
+          ? 'bg-spring-green-500/15 border-spring-green-500/50 text-spring-green-300'
+          : 'bg-white/[0.03] border-white/[0.08] text-gray-400 hover:bg-white/[0.06] hover:border-white/15 hover:text-white/90'
       }`}
     >
       <span>{label}</span>
       <span
         className={`text-[10px] font-mono tabular-nums px-1.5 rounded ${
-          active
-            ? 'bg-spring-green-300/15 text-spring-green-200/90'
-            : 'bg-white/[0.06] text-white/55'
+          active ? 'bg-spring-green-500/15 text-spring-green-300/90' : 'bg-white/[0.06] text-gray-500'
         }`}
       >
         {count}
@@ -545,7 +478,7 @@ function FilterChip({
   );
 }
 
-/* Single open lobby — thumbnail-led card. */
+/* Single open lobby — home-style card: thumbnail tile + host + join. */
 function LobbyRow({
   lobby,
   onJoin,
@@ -559,27 +492,28 @@ function LobbyRow({
       <button
         type="button"
         onClick={() => onJoin(lobby.code)}
-        className="group relative w-full rounded-xl border border-white/[0.08] hover:border-spring-green-300/50 bg-mirage-900/40 hover:bg-spring-green-300/[0.04] overflow-hidden transition-all flex items-stretch min-h-[6.5rem] text-left"
+        className="group relative w-full overflow-hidden rounded-lg bg-gradient-to-br from-mirage-900/50 via-mirage-900/40 to-mirage-800/50 border border-spring-green-500/20 hover:border-spring-green-400/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-spring-green-500/10 hover:-translate-y-1 flex items-stretch min-h-[6.5rem] text-left"
       >
-        {/* Thumbnail tile on the left */}
-        <div className="relative w-32 sm:w-36 shrink-0 bg-gradient-to-br from-mirage-900/60 to-mirage-800/40 border-r border-white/[0.06] overflow-hidden flex items-center justify-center">
+        {/* Thumbnail tile */}
+        <div className="relative w-32 sm:w-36 shrink-0 border-r border-spring-green-500/10 overflow-hidden flex items-center justify-center">
+          <div
+            aria-hidden
+            className="absolute inset-3 rounded-md bg-[radial-gradient(ellipse_at_center,rgba(84,255,164,0.10),transparent_70%)] opacity-50 group-hover:opacity-100 transition-opacity duration-500"
+          />
           {meta ? (
             <Image
               src={meta.img}
               alt={meta.label}
               width={160}
               height={120}
-              className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+              className="relative w-full h-full object-contain p-3 transition-transform duration-300 group-hover:scale-105 [filter:drop-shadow(0_4px_10px_rgba(0,0,0,0.5))]"
               unoptimized
             />
           ) : (
-            <div className="text-white/20 text-[10px] uppercase tracking-wider font-semibold">
-              No game
-              <br />
-              picked
+            <div className="text-gray-600 text-[10px] uppercase tracking-wider font-mono text-center">
+              no game
             </div>
           )}
-          {/* Live pulse dot */}
           <span className="absolute top-2 left-2 flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-spring-green-400 opacity-60" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-spring-green-400" />
@@ -589,37 +523,32 @@ function LobbyRow({
         {/* Body */}
         <div className="flex-1 min-w-0 p-3 sm:p-4 flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-1.5">
               <PlayerAvatar
                 userId={lobby.hostClientId}
                 displayName={lobby.hostName}
                 discordId={lobby.hostDiscordId}
                 avatarHash={lobby.hostAvatarHash}
-                size={24}
+                size={22}
                 linkable={false}
               />
-              <span className="text-white/95 text-sm font-semibold truncate">
+              <span className="text-white text-sm font-semibold truncate">
                 {lobby.hostName}
               </span>
             </div>
-            {meta ? (
-              <div className="text-white/45 text-[11px] font-mono uppercase tracking-wider truncate">
-                {meta.label}
-              </div>
-            ) : (
-              <div className="text-white/30 text-[11px] italic">
-                no game selected
-              </div>
-            )}
+            <div className="text-gray-500 text-[11px] font-mono uppercase tracking-wider truncate">
+              {meta ? meta.label : 'no game selected'}
+            </div>
           </div>
 
           <div className="flex items-center justify-between mt-2">
-            <span className="text-[10px] text-white/40 font-mono tabular-nums">
+            <span className="text-[10px] text-gray-500 font-mono tabular-nums">
               {lobby.playerCount}/2
             </span>
-            <span className="inline-flex items-center gap-1 text-spring-green-300 text-xs font-bold uppercase tracking-wider">
-              Join
-              <ArrowRight className="w-3.5 h-3.5 -translate-x-1 group-hover:translate-x-0 transition-transform" />
+            <span className="inline-flex items-center text-spring-green-400 text-xs font-mono font-semibold tracking-wider group-hover:text-spring-green-300">
+              <span className="mr-1 text-spring-green-500/60">›</span>
+              JOIN
+              <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
             </span>
           </div>
         </div>
@@ -628,35 +557,13 @@ function LobbyRow({
   );
 }
 
-/* Empty state — instead of plain text, show a teaser strip of all 8
-   games to remind the player what they could host. */
+/* Empty state — plain, no decoration. */
 function EmptyState() {
   return (
-    <div className="rounded-2xl border border-white/[0.06] bg-mirage-900/30 px-6 py-8 text-center">
-      <div className="text-white/55 text-sm font-medium mb-1">
-        No open lobbies right now
-      </div>
-      <p className="text-white/35 text-xs mb-6">
-        Be the first to host one of these:
+    <div className="rounded-lg border border-white/[0.06] px-6 py-12 text-center">
+      <p className="text-gray-400 text-sm">
+        No open lobbies right now. Create one to get started.
       </p>
-      <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 max-w-2xl mx-auto opacity-70">
-        {ALL_GAMES.map((g) => (
-          <div
-            key={g}
-            className="aspect-square rounded-lg bg-white/[0.03] border border-white/[0.05] flex items-center justify-center p-1.5 hover:opacity-100 hover:border-spring-green-300/30 transition-all"
-            title={GAME_META[g].label}
-          >
-            <Image
-              src={GAME_META[g].img}
-              alt={GAME_META[g].label}
-              width={72}
-              height={72}
-              className="w-full h-full object-contain"
-              unoptimized
-            />
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

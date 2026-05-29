@@ -1,12 +1,8 @@
 // Emote sound effects. All synthesised via the Web Audio API — no asset
-// files needed, one shared AudioContext for the tab. Each sound runs
-// for ~3s to match how long the emoji bubble stays visible (see
-// EMOTE_DURATION_MS in ./emotes.ts).
-//
-// All five follow the same shape: a single voice oscillator with a
-// smooth pitch sweep, an LFO for vibrato / wobble, and a master
-// envelope. No chopped pulses, no aggressive square-wave tremolo —
-// that's what made the old mad sound feel weird.
+// files needed, one shared AudioContext for the tab. Each sound's
+// duration matches the emote's `loopMs` window from ./emotes.ts, and
+// where the visual has discrete beats the pitch sweep parks a peak on
+// each one so the audio lines up with the WebP.
 
 let ctx: AudioContext | null = null;
 
@@ -29,72 +25,59 @@ function getCtx(): AudioContext | null {
   return ctx;
 }
 
-// 😆  Bouncy "hahahaha" — triangle wave with synced 8Hz pitch + amplitude
-// LFOs so each cycle reads as one "ha". The LFO depths taper off so the
-// laughter mellows out by the end instead of holding intensity for 3s.
+// 😆  Discrete "ha-ha-ha" — one triangle pulse per visible bounce frame
+// from the Noto WebP. Each pulse is a brief pitch swell + amplitude pop,
+// and the peak pitch drops as the laugh tails off.
 function playLaugh() {
   const c = getCtx();
   if (!c) return;
   const t = c.currentTime;
-  const dur = 3.0;
+  const dur = 2.5;
+  // Visible ha-beats from the per-frame motion analysis of 1f606 512.webp,
+  // trimmed to fit inside the loopMs window with a safety buffer.
+  const beats = [0.09, 0.39, 0.69, 0.99, 1.29, 1.59, 1.89, 2.19, 2.34];
+  // Peak pitches drift down so the laugh sounds like it's calming.
+  const peaks = [500, 490, 480, 470, 460, 450, 440, 430, 420];
 
   const osc = c.createOscillator();
   osc.type = 'triangle';
-  osc.frequency.setValueAtTime(440, t);
-  osc.frequency.exponentialRampToValueAtTime(300, t + dur);
-
-  // Pitch wobble — starts wide, narrows toward the end (laugh dying off).
-  const pitchLFO = c.createOscillator();
-  pitchLFO.type = 'sine';
-  pitchLFO.frequency.value = 8;
-  const pitchLFODepth = c.createGain();
-  pitchLFODepth.gain.setValueAtTime(95, t);
-  pitchLFODepth.gain.linearRampToValueAtTime(35, t + dur);
-  pitchLFO.connect(pitchLFODepth).connect(osc.frequency);
-
-  // Amplitude tremolo in sync — splits the wobble into discrete "ha"s.
-  // Base 0.5 + ±0.5 modulation = swings 0 → 1.
-  const tremolo = c.createGain();
-  tremolo.gain.value = 0.5;
-  const ampLFO = c.createOscillator();
-  ampLFO.type = 'sine';
-  ampLFO.frequency.value = 8;
-  const ampLFODepth = c.createGain();
-  ampLFODepth.gain.value = 0.5;
-  ampLFO.connect(ampLFODepth).connect(tremolo.gain);
+  osc.frequency.setValueAtTime(380, t);
 
   const env = c.createGain();
   env.gain.setValueAtTime(0, t);
-  env.gain.linearRampToValueAtTime(0.22, t + 0.05);
-  env.gain.setValueAtTime(0.22, t + dur - 0.4);
+
+  beats.forEach((beat, i) => {
+    const peak = t + beat;
+    osc.frequency.setValueAtTime(380, peak - 0.05);
+    osc.frequency.linearRampToValueAtTime(peaks[i], peak);
+    osc.frequency.exponentialRampToValueAtTime(360, peak + 0.10);
+    env.gain.setValueAtTime(0.005, peak - 0.04);
+    env.gain.linearRampToValueAtTime(0.26, peak);
+    env.gain.exponentialRampToValueAtTime(0.005, peak + 0.13);
+  });
   env.gain.exponentialRampToValueAtTime(0.001, t + dur);
 
-  osc.connect(tremolo).connect(env).connect(c.destination);
+  osc.connect(env).connect(c.destination);
   osc.start(t);
-  pitchLFO.start(t);
-  ampLFO.start(t);
   osc.stop(t + dur + 0.05);
-  pitchLFO.stop(t + dur + 0.05);
-  ampLFO.stop(t + dur + 0.05);
 }
 
-// 😭  Long "WAAAH" — sustained triangle sweeping down with vibrato, then
-// drifting back up and down again over 3s.
+// 😭  Two-wail "WAAH WAAH" — triangle with 6Hz vibrato. Pitch swells
+// into the visible first wail (~550ms), dips, then swells again into the
+// second wail (~1575ms), resolving low. Matches Noto's two-sob loop.
 function playCry() {
   const c = getCtx();
   if (!c) return;
   const t = c.currentTime;
-  const dur = 3.0;
+  const dur = 1.6;
 
   const osc = c.createOscillator();
   osc.type = 'triangle';
-  osc.frequency.setValueAtTime(620, t);
-  osc.frequency.exponentialRampToValueAtTime(330, t + 1.0);
-  osc.frequency.exponentialRampToValueAtTime(180, t + 1.8);
-  // Second wail
-  osc.frequency.exponentialRampToValueAtTime(500, t + 2.0);
-  osc.frequency.exponentialRampToValueAtTime(280, t + 2.6);
-  osc.frequency.exponentialRampToValueAtTime(140, t + dur);
+  osc.frequency.setValueAtTime(550, t);
+  osc.frequency.exponentialRampToValueAtTime(700, t + 0.5);
+  osc.frequency.exponentialRampToValueAtTime(280, t + 1.0);
+  osc.frequency.exponentialRampToValueAtTime(640, t + 1.4);
+  osc.frequency.exponentialRampToValueAtTime(180, t + dur);
 
   const lfo = c.createOscillator();
   lfo.type = 'sine';
@@ -106,7 +89,7 @@ function playCry() {
   const env = c.createGain();
   env.gain.setValueAtTime(0, t);
   env.gain.linearRampToValueAtTime(0.25, t + 0.08);
-  env.gain.setValueAtTime(0.25, t + dur - 0.4);
+  env.gain.setValueAtTime(0.25, t + dur - 0.3);
   env.gain.exponentialRampToValueAtTime(0.001, t + dur);
 
   osc.connect(env).connect(c.destination);
@@ -116,107 +99,133 @@ function playCry() {
   lfo.stop(t + dur + 0.05);
 }
 
-// 🤡  Cartoon slide-whistle — base pitch slowly drifting, with a wide
-// 1.5Hz LFO that sweeps the pitch up and down ~4-5 times across 3s.
-// Reads as multiple "boings" rather than honks.
+// 🤡  Cartoon slide-whistle — sine with 11Hz vibrato. Pitch peaks parked
+// on each of Noto's five honk frames (~180, 510, 1080, 1260, 1380ms):
+// two quick honks early, a brief lull, then a triple honk into resolve.
 function playClown() {
   const c = getCtx();
   if (!c) return;
   const t = c.currentTime;
-  const dur = 3.0;
+  const dur = 1.6;
 
   const osc = c.createOscillator();
   osc.type = 'sine';
-  osc.frequency.setValueAtTime(480, t);
-  osc.frequency.exponentialRampToValueAtTime(380, t + dur);
+  osc.frequency.setValueAtTime(300, t);
+  osc.frequency.exponentialRampToValueAtTime(800, t + 0.18);
+  osc.frequency.exponentialRampToValueAtTime(380, t + 0.35);
+  osc.frequency.exponentialRampToValueAtTime(750, t + 0.51);
+  osc.frequency.exponentialRampToValueAtTime(380, t + 0.85);
+  osc.frequency.exponentialRampToValueAtTime(700, t + 1.08);
+  osc.frequency.exponentialRampToValueAtTime(450, t + 1.20);
+  osc.frequency.exponentialRampToValueAtTime(820, t + 1.26);
+  osc.frequency.exponentialRampToValueAtTime(450, t + 1.33);
+  osc.frequency.exponentialRampToValueAtTime(720, t + 1.38);
+  osc.frequency.exponentialRampToValueAtTime(340, t + dur);
 
-  // Wide slow LFO for the boing-boing pitch sweep.
-  const boingLFO = c.createOscillator();
-  boingLFO.type = 'sine';
-  boingLFO.frequency.value = 1.5;
-  const boingLFODepth = c.createGain();
-  boingLFODepth.gain.value = 300;
-  boingLFO.connect(boingLFODepth).connect(osc.frequency);
-
-  // Fast vibrato on top for goofy texture.
-  const vib = c.createOscillator();
-  vib.type = 'sine';
-  vib.frequency.value = 11;
-  const vibDepth = c.createGain();
-  vibDepth.gain.value = 22;
-  vib.connect(vibDepth).connect(osc.frequency);
+  const lfo = c.createOscillator();
+  lfo.type = 'sine';
+  lfo.frequency.value = 11;
+  const lfoGain = c.createGain();
+  lfoGain.gain.value = 30;
+  lfo.connect(lfoGain).connect(osc.frequency);
 
   const env = c.createGain();
   env.gain.setValueAtTime(0, t);
-  env.gain.linearRampToValueAtTime(0.2, t + 0.06);
-  env.gain.setValueAtTime(0.2, t + dur - 0.3);
+  env.gain.linearRampToValueAtTime(0.2, t + 0.03);
+  env.gain.setValueAtTime(0.2, t + dur - 0.15);
   env.gain.exponentialRampToValueAtTime(0.001, t + dur);
 
   osc.connect(env).connect(c.destination);
   osc.start(t);
-  boingLFO.start(t);
-  vib.start(t);
+  lfo.start(t);
   osc.stop(t + dur + 0.05);
-  boingLFO.stop(t + dur + 0.05);
-  vib.stop(t + dur + 0.05);
+  lfo.stop(t + dur + 0.05);
 }
 
-// 😡  Smooth low growl — sawtooth filtered through a low-pass (kills the
-// buzzy edge), with a 5Hz pitch wobble for the menacing "rrrr". Same
-// pattern as cry/skull, just pitched way down. No more square-wave
-// tremolo.
+// 😡  Gritty growl — low sawtooth body (chest rumble) layered with
+// band-passed white noise (raspy throat). A 6Hz tremolo gates both for
+// the "GRRR-GRR-GRR" pulse pattern, with sawtooth pitch swells on each
+// of Noto's four early action frames (330, 750, 1050, 1170ms).
 function playAngry() {
   const c = getCtx();
   if (!c) return;
   const t = c.currentTime;
-  const dur = 3.0;
+  const dur = 1.8;
 
-  const osc = c.createOscillator();
-  osc.type = 'sawtooth';
-  osc.frequency.setValueAtTime(120, t);
-  osc.frequency.exponentialRampToValueAtTime(75, t + dur);
+  // Body: low sawtooth for chest growl, with pitch accents on visual beats.
+  const body = c.createOscillator();
+  body.type = 'sawtooth';
+  body.frequency.setValueAtTime(90, t);
+  body.frequency.exponentialRampToValueAtTime(115, t + 0.33);
+  body.frequency.exponentialRampToValueAtTime(85, t + 0.55);
+  body.frequency.exponentialRampToValueAtTime(110, t + 0.75);
+  body.frequency.exponentialRampToValueAtTime(80, t + 0.95);
+  body.frequency.exponentialRampToValueAtTime(120, t + 1.05);
+  body.frequency.exponentialRampToValueAtTime(100, t + 1.17);
+  body.frequency.exponentialRampToValueAtTime(70, t + dur);
 
-  // Low-pass takes the brittle edge off the sawtooth and leaves a warm
-  // chesty growl in its place.
-  const filter = c.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = 320;
-  filter.Q.value = 3;
+  const bodyFilter = c.createBiquadFilter();
+  bodyFilter.type = 'lowpass';
+  bodyFilter.frequency.value = 700;
+  bodyFilter.Q.value = 1.5;
 
-  // 5Hz pitch wobble for the "rrrr" character.
-  const pitchLFO = c.createOscillator();
-  pitchLFO.type = 'sine';
-  pitchLFO.frequency.value = 5;
-  const pitchLFODepth = c.createGain();
-  pitchLFODepth.gain.value = 14;
-  pitchLFO.connect(pitchLFODepth).connect(osc.frequency);
+  // Grit: white noise through a narrow bandpass for raspy throat texture.
+  const noiseBuf = c.createBuffer(1, Math.ceil(c.sampleRate * dur), c.sampleRate);
+  const noiseData = noiseBuf.getChannelData(0);
+  for (let i = 0; i < noiseData.length; i++) noiseData[i] = Math.random() * 2 - 1;
+  const noise = c.createBufferSource();
+  noise.buffer = noiseBuf;
+
+  const noiseFilter = c.createBiquadFilter();
+  noiseFilter.type = 'bandpass';
+  noiseFilter.frequency.value = 450;
+  noiseFilter.Q.value = 3;
+
+  const noiseGain = c.createGain();
+  noiseGain.gain.value = 0.18;
+
+  // Shared 6Hz tremolo — same gate for body + grit so they pulse together.
+  const grrr = c.createGain();
+  grrr.gain.value = 0.7;
+  const grrrLFO = c.createOscillator();
+  grrrLFO.type = 'sine';
+  grrrLFO.frequency.value = 6;
+  const grrrLFODepth = c.createGain();
+  grrrLFODepth.gain.value = 0.3;
+  grrrLFO.connect(grrrLFODepth).connect(grrr.gain);
 
   const env = c.createGain();
   env.gain.setValueAtTime(0, t);
-  env.gain.linearRampToValueAtTime(0.3, t + 0.05);
-  env.gain.setValueAtTime(0.3, t + dur - 0.4);
+  env.gain.linearRampToValueAtTime(0.32, t + 0.04);
+  env.gain.setValueAtTime(0.32, t + dur - 0.4);
   env.gain.exponentialRampToValueAtTime(0.001, t + dur);
 
-  osc.connect(filter).connect(env).connect(c.destination);
-  osc.start(t);
-  pitchLFO.start(t);
-  osc.stop(t + dur + 0.05);
-  pitchLFO.stop(t + dur + 0.05);
+  body.connect(bodyFilter).connect(grrr);
+  noise.connect(noiseFilter).connect(noiseGain).connect(grrr);
+  grrr.connect(env).connect(c.destination);
+
+  body.start(t);
+  noise.start(t);
+  grrrLFO.start(t);
+  body.stop(t + dur + 0.05);
+  noise.stop(t + dur + 0.05);
+  grrrLFO.stop(t + dur + 0.05);
 }
 
-// 💀  "ooooOOOoo" — descending sine with strong vibrato (ghost / RIP).
-// Drifts down, briefly drifts back up, and resolves low.
+// 💀  Sustained ghost moan — single sine sweeping slowly down with a
+// strong 9Hz vibrato. A subtle midway swell adds eeriness without
+// breaking the continuous wail.
 function playSkull() {
   const c = getCtx();
   if (!c) return;
   const t = c.currentTime;
-  const dur = 3.0;
+  const dur = 3.5;
 
   const osc = c.createOscillator();
   osc.type = 'sine';
-  osc.frequency.setValueAtTime(340, t);
-  osc.frequency.exponentialRampToValueAtTime(190, t + 1.2);
-  osc.frequency.exponentialRampToValueAtTime(260, t + 1.8);
+  osc.frequency.setValueAtTime(320, t);
+  osc.frequency.exponentialRampToValueAtTime(220, t + 1.5);
+  osc.frequency.exponentialRampToValueAtTime(260, t + 2.2);
   osc.frequency.exponentialRampToValueAtTime(140, t + dur);
 
   const lfo = c.createOscillator();
@@ -228,8 +237,8 @@ function playSkull() {
 
   const env = c.createGain();
   env.gain.setValueAtTime(0, t);
-  env.gain.linearRampToValueAtTime(0.18, t + 0.06);
-  env.gain.setValueAtTime(0.18, t + dur - 0.4);
+  env.gain.linearRampToValueAtTime(0.20, t + 0.1);
+  env.gain.setValueAtTime(0.20, t + dur - 0.5);
   env.gain.exponentialRampToValueAtTime(0.001, t + dur);
 
   osc.connect(env).connect(c.destination);

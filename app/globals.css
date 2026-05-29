@@ -204,21 +204,63 @@
   }
 }
 
-/* Emote bubble that floats up above a player's avatar for ~3s, then fades. */
-@keyframes emoteFloat {
-  0% { transform: translate(-50%, 12px) scale(0.7); opacity: 0; }
-  15% { transform: translate(-50%, 0) scale(1.15); opacity: 1; }
-  25% { transform: translate(-50%, 0) scale(1); opacity: 1; }
-  85% { transform: translate(-50%, -2px) scale(1); opacity: 1; }
+/* Emote bubble — three anchor variants depending on which side of the
+   parent layout the avatar sits on. 'left' (avatar on the left) leans the
+   bubble up-and-right, 'right' leans up-and-left, 'center' stays directly
+   above. The 3s default is always overridden inline per emote via loopMs. */
+@keyframes emoteFloatCenter {
+  0%   { transform: translate(-50%, 12px) scale(0.7); opacity: 0; }
+  15%  { transform: translate(-50%, 0) scale(1.15);   opacity: 1; }
+  25%  { transform: translate(-50%, 0) scale(1);      opacity: 1; }
+  85%  { transform: translate(-50%, -2px) scale(1);   opacity: 1; }
   100% { transform: translate(-50%, -10px) scale(0.95); opacity: 0; }
 }
-.emote-bubble {
-  animation: emoteFloat 3s ease-out forwards;
+@keyframes emoteFloatLeft {
+  0%   { transform: translate(0, 12px) scale(0.7); opacity: 0; }
+  15%  { transform: translate(0, 0) scale(1.15);   opacity: 1; }
+  25%  { transform: translate(0, 0) scale(1);      opacity: 1; }
+  85%  { transform: translate(0, -2px) scale(1);   opacity: 1; }
+  100% { transform: translate(0, -10px) scale(0.95); opacity: 0; }
 }
+@keyframes emoteFloatRight {
+  0%   { transform: translate(0, 12px) scale(0.7); opacity: 0; }
+  15%  { transform: translate(0, 0) scale(1.15);   opacity: 1; }
+  25%  { transform: translate(0, 0) scale(1);      opacity: 1; }
+  85%  { transform: translate(0, -2px) scale(1);   opacity: 1; }
+  100% { transform: translate(0, -10px) scale(0.95); opacity: 0; }
+}
+.emote-bubble {
+  transform-origin: bottom center;
+}
+.emote-bubble--center {
+  bottom: calc(100% + 12px);
+  left: 50%;
+  animation: emoteFloatCenter 3s ease-out forwards;
+}
+.emote-bubble--left {
+  /* Avatar on the left side of the layout — bubble points up-and-right. */
+  bottom: calc(100% + 8px);
+  left: 60%;
+  transform-origin: bottom left;
+  animation: emoteFloatLeft 3s ease-out forwards;
+}
+.emote-bubble--right {
+  /* Avatar on the right side of the layout — bubble points up-and-left. */
+  bottom: calc(100% + 8px);
+  right: 60%;
+  transform-origin: bottom right;
+  animation: emoteFloatRight 3s ease-out forwards;
+}
+.emote-bubble__tail {
+  bottom: -4px;
+}
+.emote-bubble__tail--center { left: 50%; transform: translateX(-50%); }
+.emote-bubble__tail--left   { left: 8px; }
+.emote-bubble__tail--right  { right: 8px; }
 
 /* Inline emote chip (player list / outcome rows where a floating bubble
    would overflow into a neighbouring row). Pops in once and stays put;
-   parent removes it after EMOTE_DURATION_MS. */
+   parent removes it after the emote's loopMs window. */
 @keyframes emoteInline {
   0% { transform: scale(0.5); opacity: 0; }
   20% { transform: scale(1.2); opacity: 1; }
@@ -286,6 +328,17 @@
 
 .animate-slide-in-right {
   animation: slide-in-right 0.3s ease-out forwards;
+}
+
+/* Gentle "still alive" pulse for status pills (e.g. the 1v1 NEW badge).
+   Lighter than Tailwind's default animate-pulse so it doesn't compete
+   with neighbouring text. */
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+.animate-pulse-soft {
+  animation: pulseSoft 2.5s ease-in-out infinite;
 }
 
 /* Volume slider styling */

@@ -21,8 +21,24 @@ interface PlayerAvatarProps {
   // Ring colour around the avatar (spring-green for "this is me" / "host", etc).
   ringClass?: string;
   // Optional floating emote bubble above the avatar. `key` should change per
-  // emote so the CSS animation restarts on each new one.
-  emote?: { primaryUrl: string; fallbackUrl: string; label: string; key: number } | null;
+  // emote so the CSS animation restarts on each new one. `loopMs` is the
+  // bubble's visible lifetime, applied as an inline animation-duration so
+  // the float resolves on the same frame the parent removes the bubble.
+  emote?: {
+    primaryUrl: string;
+    fallbackUrl: string;
+    label: string;
+    loopMs: number;
+    key: number;
+  } | null;
+  // Which side of the avatar to anchor the bubble to. 'left' leans the
+  // bubble up-and-right (use for avatars on the left side of a layout so
+  // the bubble points inward toward the action), 'right' leans up-and-left,
+  // 'center' (default) renders directly above.
+  emoteAnchor?: 'left' | 'right' | 'center';
+  // Bubble size override — useful in match views where the emote should
+  // read clearly from across the screen.
+  emoteSize?: number;
 }
 
 export default function PlayerAvatar({
@@ -35,6 +51,8 @@ export default function PlayerAvatar({
   linkable = true,
   ringClass,
   emote,
+  emoteAnchor = 'center',
+  emoteSize = 48,
 }: PlayerAvatarProps) {
   const [imgError, setImgError] = useState(false);
   // The session sometimes hands us the full Discord CDN URL in `avatarHash`
@@ -64,8 +82,10 @@ export default function PlayerAvatar({
     />
   ) : (
     <div
-      className="rounded-full flex items-center justify-center bg-gradient-to-br from-white/15 to-white/5 text-white/70 font-semibold"
-      style={{ width: size, height: size, fontSize: Math.max(11, size * 0.4) }}
+      // Matches the canonical no-avatar fallback used on profile pages:
+      // solid dark fill with a spring-green initial.
+      className="rounded-full flex items-center justify-center bg-[#0F1B21] text-[#54FFA4] font-bold"
+      style={{ width: size, height: size, fontSize: Math.max(11, size * 0.45) }}
       aria-hidden
     >
       {initial}
@@ -80,14 +100,25 @@ export default function PlayerAvatar({
       {emote && (
         <div
           key={emote.key}
-          className="emote-bubble absolute -top-14 left-1/2 -translate-x-1/2 z-20 p-1.5 rounded-full bg-black/80 backdrop-blur-sm border border-white/15 shadow-xl shadow-black/50 pointer-events-none"
+          className={`emote-bubble emote-bubble--${emoteAnchor} absolute z-20 rounded-full bg-black/80 backdrop-blur-sm border border-white/15 shadow-xl shadow-black/50 pointer-events-none flex items-center justify-center`}
+          style={{
+            animationDuration: `${emote.loopMs}ms`,
+            // Explicit square box so the bubble never collapses into a tall thin
+            // pill when the parent does shrink-to-fit width resolution.
+            width: emoteSize + 16,
+            height: emoteSize + 16,
+          }}
         >
           <EmoteImage
             primaryUrl={emote.primaryUrl}
             fallbackUrl={emote.fallbackUrl}
             label={emote.label}
-            size={48}
+            size={emoteSize}
             className="block"
+          />
+          <span
+            aria-hidden
+            className={`emote-bubble__tail emote-bubble__tail--${emoteAnchor} absolute block w-2.5 h-2.5 rounded-full bg-black/80 border border-white/15`}
           />
         </div>
       )}
@@ -95,7 +126,9 @@ export default function PlayerAvatar({
     </div>
   );
 
-  if (linkable) {
+  // Guest clientIds (`guest-…`) have no profile page, so render as a static
+  // avatar even when linkable=true (the call site usually doesn't know).
+  if (linkable && !userId.startsWith('guest-')) {
     return (
       <Link
         href={`/profile/${userId}`}

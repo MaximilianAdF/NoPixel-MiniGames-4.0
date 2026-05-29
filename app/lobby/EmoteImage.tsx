@@ -39,7 +39,10 @@ export default function EmoteImage({
         if (src !== fallbackUrl) setSrc(fallbackUrl);
       }}
       className={className}
-      style={{ width: size, height: size }}
+      // maxWidth: 'none' overrides Tailwind's preflight `img { max-width: 100% }`
+      // which otherwise caves the emote when the containing block (the bubble)
+      // is doing shrink-to-fit width resolution.
+      style={{ width: size, height: size, maxWidth: 'none' }}
     />
   );
 }

@@ -23,6 +23,7 @@ import {
   Gamepad2,
   Settings,
   Calendar,
+  Swords,
   CheckCircle2,
   Clock,
   Mail,
@@ -407,6 +408,20 @@ export default function NavigationMenu() {
                   <span>{timeUntilNext.hours}h {timeUntilNext.minutes}m</span>
                 </div>
               )}
+            </Link>
+
+            {/* Play 1v1 */}
+            <Link
+              href="/lobby"
+              onClick={handleLinkClick}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                pathname?.startsWith('/lobby')
+                  ? 'bg-[#54FFA4]/20 text-[#54FFA4] border border-[#54FFA4]/50'
+                  : 'text-gray-300 hover:bg-[#1a2930] hover:text-white'
+              }`}
+            >
+              <Swords className="w-5 h-5" />
+              <span className="font-medium">Play 1v1</span>
             </Link>
           </div>
 

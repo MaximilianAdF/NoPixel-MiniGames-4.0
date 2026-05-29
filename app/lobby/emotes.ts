@@ -18,6 +18,10 @@ export interface EmoteDef {
   fallbackUrl: string;
   // Short label used as tooltip / aria-label on the button.
   label: string;
+  // How long the emote bubble stays visible. Sized to end just after the
+  // WebP's last visible motion (and before the loop would restart), so
+  // the bubble fades on cue and the sound effect runs for this same span.
+  loopMs: number;
 }
 
 // Google only publishes the animated WebP at the 512 size on this CDN;
@@ -43,6 +47,7 @@ export const EMOTES: EmoteDef[] = [
     staticUrl: notoStatic('1f606'),
     fallbackUrl: fluentStatic('Grinning squinting face'),
     label: 'LOL',
+    loopMs: 2500,
   },
   {
     id: 'cry',
@@ -51,6 +56,7 @@ export const EMOTES: EmoteDef[] = [
     staticUrl: notoStatic('1f62d'),
     fallbackUrl: fluentStatic('Loudly crying face'),
     label: 'Cry',
+    loopMs: 1600,
   },
   {
     id: 'clown',
@@ -59,6 +65,7 @@ export const EMOTES: EmoteDef[] = [
     staticUrl: notoStatic('1f921'),
     fallbackUrl: fluentStatic('Clown face'),
     label: 'Clown',
+    loopMs: 1600,
   },
   {
     id: 'angry',
@@ -67,6 +74,7 @@ export const EMOTES: EmoteDef[] = [
     staticUrl: notoStatic('1f621'),
     fallbackUrl: fluentStatic('Pouting face'),
     label: 'Mad',
+    loopMs: 1800,
   },
   {
     id: 'rip',
@@ -75,6 +83,7 @@ export const EMOTES: EmoteDef[] = [
     staticUrl: notoStatic('1f480'),
     fallbackUrl: fluentStatic('Skull'),
     label: 'RIP',
+    loopMs: 3500,
   },
 ];
 
@@ -84,5 +93,3 @@ export const EMOTE_BY_ID: Record<string, EmoteDef> = Object.fromEntries(
 
 // Client-side throttle so a user can't flood the channel with emotes.
 export const EMOTE_THROTTLE_MS = 1500;
-// How long an emote bubble stays visible. Matches the CSS animation length.
-export const EMOTE_DURATION_MS = 3000;

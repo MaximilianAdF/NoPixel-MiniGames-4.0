@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import type { GameType } from '@/interfaces/user';
 import type { GameResult } from '@/app/game/types';
 import type { PresenceMember } from '@/app/utils/useAblyChannel';
@@ -47,7 +48,7 @@ interface MatchViewProps {
   opponent: PresenceMember | null;
   // Recent emotes keyed by clientId; rendered as a floating bubble above
   // the corresponding avatar.
-  emotes: Record<string, { primaryUrl: string; fallbackUrl: string; label: string; key: number }>;
+  emotes: Record<string, { primaryUrl: string; fallbackUrl: string; label: string; loopMs: number; key: number }>;
 }
 
 // Renders the chosen game in 1v1 match mode. In normal mode, it's a
@@ -182,15 +183,15 @@ function Splitscreen({
   theirs: React.ReactNode;
   me: PresenceMember | null;
   opponent: PresenceMember | null;
-  myEmote: { primaryUrl: string; fallbackUrl: string; label: string; key: number } | null;
-  opponentEmote: { primaryUrl: string; fallbackUrl: string; label: string; key: number } | null;
+  myEmote: { primaryUrl: string; fallbackUrl: string; label: string; loopMs: number; key: number } | null;
+  opponentEmote: { primaryUrl: string; fallbackUrl: string; label: string; loopMs: number; key: number } | null;
 }) {
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-2 divide-y xl:divide-y-0 xl:divide-x divide-white/10">
-      <Half label="You" member={me} emote={myEmote} accent>
+      <Half member={me} emote={myEmote} side="left" accent>
         {mine}
       </Half>
-      <Half label="Opponent" member={opponent} emote={opponentEmote}>
+      <Half member={opponent} emote={opponentEmote} side="right">
         {theirs}
       </Half>
     </div>
@@ -205,50 +206,73 @@ function Splitscreen({
 const GAME_MAX_W = 'max(42rem, 35vw)';
 
 function Half({
-  label,
   member,
   emote,
+  side,
   accent,
   children,
 }: {
-  label: string;
   member: PresenceMember | null;
-  emote: { primaryUrl: string; fallbackUrl: string; label: string; key: number } | null;
+  emote: { primaryUrl: string; fallbackUrl: string; label: string; loopMs: number; key: number } | null;
+  side: 'left' | 'right';
   accent?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex items-center justify-center p-6 sm:p-10 lg:p-14 xl:p-20 min-h-screen xl:min-h-0">
       <div className="w-full flex flex-col" style={{ maxWidth: GAME_MAX_W }}>
-        <div className="flex items-center gap-2.5 mb-3">
-          {member ? (
-            <PlayerAvatar
-              userId={member.clientId}
-              displayName={member.data.displayName}
-              discordId={member.data.discordId}
-              avatarHash={member.data.avatarHash}
-              size={26}
-              ringClass={accent ? 'ring-2 ring-[#54FFA4]/40' : undefined}
-              emote={emote}
-            />
-          ) : (
-            <div className="w-6 h-6 rounded-full bg-white/10" />
-          )}
-          <div className="flex items-baseline gap-2 min-w-0">
-            <span
-              className={`text-xs uppercase tracking-[0.2em] font-semibold ${
-                accent ? 'text-[#54FFA4]' : 'text-white/40'
-              }`}
-            >
-              {label}
-            </span>
-            {member && (
-              <span className="text-xs text-white/55 truncate">
-                {member.data.displayName}
-              </span>
-            )}
+        {member ? (
+          (() => {
+            // Guest clientIds (`guest-…`) have no profile page, so skip the
+            // link wrapper and render the same row as a static block.
+            const isGuest = member.clientId.startsWith('guest-');
+            const avatarAndName = (
+              <>
+                <PlayerAvatar
+                  userId={member.clientId}
+                  displayName={member.data.displayName}
+                  discordId={member.data.discordId}
+                  avatarHash={member.data.avatarHash}
+                  size={36}
+                  linkable={false}
+                  ringClass={
+                    accent
+                      ? 'ring-2 ring-[#54FFA4] ring-offset-2 ring-offset-[#0a0c10]'
+                      : 'ring-2 ring-white/15 ring-offset-2 ring-offset-[#0a0c10]'
+                  }
+                  emote={emote}
+                  emoteAnchor={side}
+                  emoteSize={72}
+                />
+                <span
+                  className={`text-base font-semibold truncate transition-colors ${
+                    isGuest ? 'text-white/85' : 'text-white/90 group-hover:text-white'
+                  }`}
+                >
+                  {member.data.displayName}
+                </span>
+              </>
+            );
+            return isGuest ? (
+              <div className="inline-flex items-center gap-3 mb-4 px-1 py-1 w-fit">
+                {avatarAndName}
+              </div>
+            ) : (
+              <Link
+                href={`/profile/${member.clientId}`}
+                title={`Open ${member.data.displayName}'s profile`}
+                className="group inline-flex items-center gap-3 mb-4 rounded-lg -mx-1 px-1 py-1 hover:bg-white/[0.04] transition-colors w-fit"
+              >
+                {avatarAndName}
+              </Link>
+            );
+          })()
+        ) : (
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-full bg-white/[0.05] border border-white/10" />
+            <span className="text-base font-semibold text-white/30 italic">Empty</span>
           </div>
-        </div>
+        )}
         {children}
       </div>
     </div>
@@ -267,7 +291,7 @@ function FocusLayout({
   interactive: React.ReactNode;
   summary: React.ReactNode;
   opponent: PresenceMember | null;
-  opponentEmote: { primaryUrl: string; fallbackUrl: string; label: string; key: number } | null;
+  opponentEmote: { primaryUrl: string; fallbackUrl: string; label: string; loopMs: number; key: number } | null;
 }) {
   return (
     <>
@@ -281,6 +305,8 @@ function FocusLayout({
               avatarHash={opponent.data.avatarHash}
               size={22}
               emote={opponentEmote}
+              emoteAnchor="left"
+              emoteSize={72}
             />
             <span className="text-white/85 text-xs font-medium truncate">
               {opponent.data.displayName}
