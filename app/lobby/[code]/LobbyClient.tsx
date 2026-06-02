@@ -1529,7 +1529,7 @@ function InlineEmote({
   );
 }
 
-function Countdown({ remainingMs }: { remainingMs: number }) {
+export function Countdown({ remainingMs }: { remainingMs: number }) {
   const seconds = Math.max(1, Math.ceil(remainingMs / 1000));
   return (
     <div

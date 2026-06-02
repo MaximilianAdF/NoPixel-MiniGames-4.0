@@ -4,12 +4,13 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Loader2, Plus, Swords, Trophy } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Ghost, Loader2, Plus, Swords, Trophy } from 'lucide-react';
 import { useUser } from '@/app/contexts/UserContext';
 import { orbitron } from '@/app/fonts';
 import { generateLobbyCode, isValidLobbyCode } from '@/lib/lobby/code';
 import { trackLobbyCreated, trackLobbyJoined } from '@/app/utils/gtm';
 import PlayerAvatar from '@/app/components/PlayerAvatar';
+import { getRacedGhostIds } from '@/app/lobby/ghostHistory';
 import type { GameType } from '@/interfaces/user';
 
 interface PublicLobby {
@@ -246,6 +247,10 @@ export default function LobbyLanding() {
               </div>
             </section>
 
+            {/* Race a ghost — recorded runs you can challenge solo, so there's
+                always something to play even with nobody else online. */}
+            <GhostRaceCallout initialGame={searchParams?.get('ghost')} />
+
             {/* Live feed */}
             <PublicLobbyList lobbies={publicLobbies} onJoin={handleJoinPublic} />
           </>
@@ -257,6 +262,102 @@ export default function LobbyLanding() {
           to show (no fake filler). */}
       <RecentMatchesTicker matches={recentMatches} />
     </main>
+  );
+}
+
+interface GhostSummary {
+  id: string;
+  game: GameType;
+  recorderName: string;
+  recorderDiscordId?: string;
+  recorderAvatarHash?: string;
+  recorderClientId: string;
+  result: { won: boolean; score: number; elapsedMs: number };
+  timesRaced: number;
+  timesBeaten: number;
+}
+
+// "Race a ghost" — surfaces recorded runs you can challenge solo. Launch game
+// is Chopping (most-played, best ghost feel); a future version can let you
+// pick the game. Hides ghosts you've already raced (Option B); falls back to
+// re-showing them rather than dead-ending.
+function GhostRaceCallout({ initialGame }: { initialGame?: string | null }) {
+  const router = useRouter();
+  const game: GameType = (initialGame && initialGame in GAME_META
+    ? (initialGame as GameType)
+    : 'chopping');
+  const [ghost, setGhost] = useState<GhostSummary | null>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/lobby/ghosts?game=${game}&sort=fast&limit=20`, { cache: 'no-store' });
+        if (!res.ok) { if (!cancelled) setLoaded(true); return; }
+        const data = (await res.json()) as { ghosts: GhostSummary[] };
+        if (cancelled) return;
+        const raced = new Set(getRacedGhostIds());
+        // Prefer an unraced ghost (novelty); fall back to the fastest overall
+        // so a player who's raced them all still gets a challenge.
+        const unraced = data.ghosts.filter((g) => !raced.has(g.id));
+        const pick = (unraced[0] ?? data.ghosts[0]) || null;
+        setGhost(pick);
+        setLoaded(true);
+      } catch {
+        if (!cancelled) setLoaded(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [game]);
+
+  // Nothing to offer yet — render nothing (no empty filler).
+  if (!loaded || !ghost) return null;
+
+  const label = GAME_META[ghost.game]?.label ?? ghost.game;
+  const time = (ghost.result.elapsedMs / 1000).toFixed(1);
+
+  return (
+    <section className="max-w-3xl mx-auto mb-16">
+      <div className="flex items-center gap-3 mb-5">
+        <h2 className="text-lg font-semibold text-white inline-flex items-center gap-2">
+          <Ghost className="w-4 h-4 text-spring-green-400" />
+          Race a ghost
+        </h2>
+        <span className="flex-1 h-px bg-white/10" />
+        <span className="text-gray-500 text-xs">no opponent needed</span>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => router.push(`/lobby/ghost/${ghost.id}`)}
+        className="group relative w-full overflow-hidden rounded-lg bg-gradient-to-br from-mirage-900/60 via-mirage-900/40 to-mirage-800/60 border border-spring-green-500/25 hover:border-spring-green-400/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-spring-green-500/10 hover:-translate-y-0.5 flex items-center gap-4 p-4 text-left"
+      >
+        <PlayerAvatar
+          userId={ghost.recorderClientId}
+          displayName={ghost.recorderName}
+          discordId={ghost.recorderDiscordId}
+          avatarHash={ghost.recorderAvatarHash}
+          size={44}
+          linkable={false}
+        />
+        <div className="flex-1 min-w-0">
+          <div className="text-white text-sm font-semibold truncate">
+            Beat {ghost.recorderName}&apos;s run
+          </div>
+          <div className="text-gray-500 text-[11px] font-mono uppercase tracking-wider mt-0.5">
+            {label} · {time}s
+            {ghost.timesRaced > 0 && (
+              <span className="text-gray-600"> · beaten {ghost.timesBeaten}/{ghost.timesRaced}</span>
+            )}
+          </div>
+        </div>
+        <span className="inline-flex items-center text-spring-green-400 text-xs font-mono font-semibold tracking-wider group-hover:text-spring-green-300 shrink-0">
+          RACE
+          <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+        </span>
+      </button>
+    </section>
   );
 }
 
