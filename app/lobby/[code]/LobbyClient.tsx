@@ -121,6 +121,14 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   const [opponentResult, setOpponentResult] = useState<GameResult | null>(null);
   const [opponentInputs, setOpponentInputs] = useState<unknown[]>([]);
   const [matchStartTime, setMatchStartTime] = useState<number | null>(null);
+  // My own timestamped input stream for the current match. The winner posts
+  // this as a ghost (it has accurate per-input timing; the host only sees the
+  // opponent's network-jittered stream). Reset at the start of every match.
+  const myInputLogRef = useRef<{ t: number; input: unknown }[]>([]);
+  const matchStartTimeRef = useRef<number | null>(null);
+  useEffect(() => {
+    matchStartTimeRef.current = matchStartTime;
+  }, [matchStartTime]);
   const [matchExpired, setMatchExpired] = useState(false);
   const [lobbyLastActivity, setLobbyLastActivity] = useState(() => Date.now());
   const [now, setNow] = useState(() => Date.now());
@@ -199,6 +207,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       setMyResult(null);
       setOpponentResult(null);
       setOpponentInputs([]);
+      myInputLogRef.current = [];
       setMatchExpired(false);
       setMatchFocusMode(msg.focusMode);
       setOutcome(null);
@@ -454,6 +463,39 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     );
   }, [outcome, match, isHost, presence, matchStartTime]);
 
+  // Harvest a ghost — winner-only, recorded by the WINNER's own client (it
+  // holds the accurately-timed input log). Conditions: I won, the match
+  // actually finished (not a timeout/forfeit), my result says won, and I have
+  // a sane number of recorded inputs. Deduped per seed. Best-effort; this is
+  // what fills the async-race pool. See docs/async-ghost-spec.md.
+  const ghostRecordedSeedsRef = useRef<Set<number>>(new Set());
+  useEffect(() => {
+    if (!outcome || !match || !effectiveClientId) return;
+    if (ghostRecordedSeedsRef.current.has(match.seed)) return;
+    const iWon = outcome.winnerClientId === effectiveClientId;
+    if (!iWon || outcome.reason !== 'finished') return;
+    if (!myResult?.won) return; // my own engine confirms a genuine completion
+    const inputs = myInputLogRef.current;
+    if (inputs.length < 2) return; // too few moves — skip degenerate runs
+    ghostRecordedSeedsRef.current.add(match.seed);
+
+    const me = presence.find((p) => p.clientId === effectiveClientId);
+    void fetch('/api/lobby/ghosts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        game: match.game,
+        seed: match.seed,
+        inputs,
+        result: myResult,
+        recorderName: me?.data.displayName ?? effectiveDisplayName,
+        recorderDiscordId: me?.data.discordId,
+        recorderAvatarHash: me?.data.avatarHash,
+        recorderClientId: effectiveClientId,
+      }),
+    }).catch(() => {});
+  }, [outcome, match, effectiveClientId, myResult, presence, effectiveDisplayName]);
+
   // Non-host fallback: if the host's match:outcome doesn't arrive within a
   // couple of seconds (host disconnected mid-match), derive locally so the
   // outcome view still renders.
@@ -601,6 +643,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     setMyResult(null);
     setOpponentResult(null);
     setOpponentInputs([]);
+    myInputLogRef.current = [];
     setMatchExpired(false);
     setMatchFocusMode(focusMode);
     setOutcome(null);
@@ -636,6 +679,13 @@ export default function LobbyClient({ code }: LobbyClientProps) {
 
   const handleInput = useCallback(
     (input: unknown) => {
+      // Log my own input with a timestamp relative to match start, so if I win
+      // this run can be replayed as a ghost at its true cadence (capped at
+      // MAX so a pathological run can't grow unbounded).
+      const start = matchStartTimeRef.current;
+      if (start !== null && myInputLogRef.current.length < 5000) {
+        myInputLogRef.current.push({ t: Math.max(0, Date.now() - start), input });
+      }
       void publish({ type: 'match:input', input });
     },
     [publish],

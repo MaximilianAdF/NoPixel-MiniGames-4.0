@@ -1,13 +1,14 @@
 /**
  * One-shot: clear all 1v1 runtime data so production launches clean.
  *
- * Wipes the two ephemeral 1v1 collections:
+ * Wipes the ephemeral 1v1 collections:
  *   - publicLobbies  (the open-lobby browser listings)
  *   - recentMatches  (the /lobby activity feed)
+ *   - ghosts         (recorded async-race runs)
  *
- * Both are self-expiring (TTL) at runtime, so this is only needed to clear
+ * All are self-expiring (TTL) at runtime, so this is only needed to clear
  * accumulated dev/test rows before a deploy. It does NOT touch users,
- * stats, challenges, or anything persistent.
+ * lobbyStats (the cumulative counter), challenges, or anything persistent.
  *
  * Dry-run by default (just reports counts). Pass --apply to actually delete:
  *   node scripts/reset-1v1-data.mjs            # preview
@@ -35,7 +36,7 @@ if (!uri) {
 }
 
 const DRY_RUN = !process.argv.includes('--apply');
-const COLLECTIONS = ['publicLobbies', 'recentMatches'];
+const COLLECTIONS = ['publicLobbies', 'recentMatches', 'ghosts'];
 
 const client = new MongoClient(uri);
 

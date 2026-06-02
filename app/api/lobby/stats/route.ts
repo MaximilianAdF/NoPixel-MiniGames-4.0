@@ -12,6 +12,7 @@ const ALLOWED_GAMES: GameType[] = [
 
 const ALLOWED_EVENTS: LobbyStatEvent[] = [
   'match_started', 'match_completed', 'match_forfeited', 'match_timed_out', 'lobby_created',
+  'ghost_recorded', 'ghost_race_started', 'ghost_race_won',
 ];
 
 /**

@@ -261,14 +261,37 @@ export default function LobbyLanding() {
 }
 
 /* Bottom activity ticker — fades through recent matches one at a time. */
+// Compact relative time: "just now", "5m ago", "3h ago", "2d ago".
+// Falls back to a date once it's older than a week.
+function timeAgo(iso: string, now: number): string {
+  const then = new Date(iso).getTime();
+  if (!Number.isFinite(then)) return '';
+  const diff = Math.max(0, now - then);
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return 'just now';
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}h ago`;
+  const days = Math.floor(hr / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(then).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
 function RecentMatchesTicker({ matches }: { matches: RecentMatch[] }) {
   const [idx, setIdx] = useState(0);
+  // Re-render once a minute so the "Xm ago" label stays current without a fetch.
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
     if (matches.length <= 1) return;
     const t = setInterval(() => setIdx((i) => (i + 1) % matches.length), 3500);
     return () => clearInterval(t);
   }, [matches.length]);
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(t);
+  }, []);
 
   // Keep the index valid as the feed shrinks/grows.
   useEffect(() => {
@@ -279,6 +302,7 @@ function RecentMatchesTicker({ matches }: { matches: RecentMatch[] }) {
   const m = matches[Math.min(idx, matches.length - 1)];
   const label = GAME_META[m.game]?.label ?? m.game;
   const seconds = (m.durationMs / 1000).toFixed(1);
+  const when = timeAgo(m.endedAt, now);
 
   return (
     <div className="sticky bottom-0 z-20 w-full border-t border-white/[0.06] bg-mirage-950/80 backdrop-blur-sm">
@@ -307,6 +331,12 @@ function RecentMatchesTicker({ matches }: { matches: RecentMatch[] }) {
           <span className="text-gray-400">{label}</span>
           <span className="text-gray-600"> · </span>
           <span className="text-gray-500 font-mono tabular-nums">{seconds}s</span>
+          {when && (
+            <>
+              <span className="text-gray-600"> · </span>
+              <span className="text-gray-500">{when}</span>
+            </>
+          )}
         </p>
         <Trophy className="w-3.5 h-3.5 text-amber-400/70 shrink-0" />
       </div>

@@ -15,7 +15,11 @@ export type LobbyStatEvent =
   | 'match_completed'
   | 'match_forfeited'
   | 'match_timed_out'
-  | 'lobby_created';
+  | 'lobby_created'
+  // Async ghost mode (see docs/async-ghost-spec.md).
+  | 'ghost_recorded'
+  | 'ghost_race_started'
+  | 'ghost_race_won';
 
 const STAT_DOC_ID = 'global';
 
@@ -26,6 +30,10 @@ export interface LobbyStatsDoc {
   matchesForfeited: number;
   matchesTimedOut: number;
   lobbiesCreated: number;
+  // Async ghost counters.
+  ghostsRecorded: number;
+  ghostRacesStarted: number;
+  ghostRacesWon: number;
   // Per-game start/complete tallies, keyed by GameType.
   byGame: Record<string, { started: number; completed: number }>;
   firstEventAt: Date;
@@ -39,6 +47,9 @@ const FIELD_FOR_EVENT: Record<LobbyStatEvent, keyof LobbyStatsDoc> = {
   match_forfeited: 'matchesForfeited',
   match_timed_out: 'matchesTimedOut',
   lobby_created: 'lobbiesCreated',
+  ghost_recorded: 'ghostsRecorded',
+  ghost_race_started: 'ghostRacesStarted',
+  ghost_race_won: 'ghostRacesWon',
 };
 
 let indexEnsured = false;
