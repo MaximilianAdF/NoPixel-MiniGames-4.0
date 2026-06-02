@@ -209,7 +209,12 @@ matches populate `ghosts`. Low-risk — does not touch the solo `/puzzles` flow.
 **Phase 2 — Race:**
 `useGhostPlayback` scheduler (§2); solo ghost-race flow feeding `MatchView`
 spectator from a stored timed stream; outcome vs ghost; ghost picker UI on
-`/lobby`; "Race another".
+`/lobby`; "Race another". Per-player "already raced" hiding — see §12.
+Recommended internal order: (1) determinism harness — replay a real captured
+ghost through its engine, assert it reaches the stored `result`, per game;
+(2) `useGhostPlayback` + a dev page racing one ghost; (3) solo race flow +
+outcome; (4) picker + "race another" + counters. Ship **Chopping-first**
+(most-played, fast/continuous → best ghost feel), then fan out.
 
 **Phase 3 — Flywheel & polish:**
 "Save your run" CTA; `timesRaced/Beaten` social proof; ghost telemetry; solo
@@ -233,4 +238,53 @@ replay verification.
 4. **Config:** not stored in the doc — the per-game `Spectator` components
    rebuild their default config for replay (match mode always uses defaults).
    Revisit if/when matches support custom configs.
-5. Backfill a few seed ghosts per game before Phase 2 launch — open.
+5. **Ghost lifecycle: per-player hiding (Option B).** A ghost is never
+   consumed/deleted on race; it stays in the pool for everyone, but an
+   individual stops being *offered* a ghost once they've raced it. Reuse for
+   the pool (liquidity) + novelty for the individual (engagement). Full design
+   in §12. Resolved.
+6. Backfill a few seed ghosts per game before Phase 2 launch — open.
+
+---
+
+## 12. Ghost lifecycle — per-player hiding (Option B)
+
+**Principle:** ghosts are reusable content, not a consumable. **Never delete a
+ghost on race** — the 30-day TTL (§11.3) is the only retirement mechanism. But
+each player should get a *fresh* opponent each time, so we hide ghosts a player
+has already raced *from that player only*. (Rejected: "drop globally after one
+race" — that drains the pool as fast as people play and re-creates the empty-
+lobby problem; the whole point is liquidity.)
+
+**Tracking "have I raced this ghost?" — split by identity:**
+- **Logged-in users:** server-side. A lightweight `ghostRaces` record keyed by
+  `userId` holding the set of raced ghost IDs (or a small per-user array).
+  Durable, cross-device.
+- **Guests** (the majority — most matches are `Guest#…`): `localStorage` list
+  of raced ghost IDs, filtered client-side. Device-bound and clears with cache,
+  which is acceptable — guests are inherently device-bound anyway.
+
+**Where the filter applies:** extend the existing `GET /api/lobby/ghosts`
+`exclude` mechanism. Today it excludes the caller's *own* recorder id; add an
+`excludeRaced` set (logged-in: resolved server-side from `ghostRaces`; guest:
+sent from `localStorage`). The picker only shows ghosts the player hasn't faced.
+
+**Marking a race:** when a race *starts* (or completes), record the ghost id
+against the player — server-side for logged-in (`ghostRaces`), `localStorage`
+for guests. Mark on start (not just win) so quitting mid-race doesn't resurface
+the same ghost immediately.
+
+**Critical fallback — never dead-end.** A heavy player will eventually exhaust
+the unraced pool for a game. When `excludeRaced` would leave zero ghosts, the
+picker must **fall back to re-showing already-raced ghosts** (e.g. fastest, or
+"rematch your closest loss") rather than showing an empty list. Novelty-first,
+but never empty. This fallback is mandatory, not optional — without it, the
+mode silently breaks for the most engaged users.
+
+**Ordering within the unraced set:** prefer variety — surface less-raced
+ghosts (`timesRaced` asc) and/or fastest, with a "random" option. `timesRaced`/
+`timesBeaten` also power social proof ("beaten 8 of 23 times").
+
+**Guest→login migration (minor, defer):** a guest who later logs in loses their
+`localStorage` raced-history (it won't merge into `ghostRaces`). Acceptable —
+worst case they see a few already-raced ghosts again. Not worth solving in v1.
