@@ -134,7 +134,7 @@ export default function PrivacyPage() {
               <p className="text-gray-300 leading-relaxed mb-3">
                 We use Discord for authentication. When you log in via Discord, we receive your Discord username, ID, and avatar. We do not have access to your Discord password.
               </p>
-              <a 
+              <a
                 href="https://discord.com/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -142,6 +142,42 @@ export default function PrivacyPage() {
               >
                 Discord Privacy Policy <ExternalLink className="w-4 h-4" />
               </a>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-white mb-3">Advertising</h3>
+              <p className="text-gray-300 leading-relaxed mb-3">
+                We may display advertisements served by third-party advertising
+                partners. These partners may use cookies, device identifiers, and
+                similar technologies to collect information about your visits to
+                this and other websites in order to show ads relevant to you and
+                to measure ad performance. We do not sell your personal
+                information.
+              </p>
+              <p className="text-gray-300 leading-relaxed mb-3">
+                For visitors in the EEA, UK, and other applicable regions, ads are
+                served only after you consent via our cookie banner, and you can
+                change your choice at any time. You can also opt out of
+                personalized advertising through the industry tools below.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <a
+                  href="https://optout.aboutads.info/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#54FFA4] hover:text-[#45e894] inline-flex items-center gap-2"
+                >
+                  DAA Opt-Out <ExternalLink className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://www.youronlinechoices.eu/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#54FFA4] hover:text-[#45e894] inline-flex items-center gap-2"
+                >
+                  Your Online Choices (EU) <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
             </div>
           </div>
         </div>
