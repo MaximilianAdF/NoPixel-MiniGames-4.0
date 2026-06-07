@@ -4,12 +4,23 @@ import type { GameType } from '@/interfaces/user';
 // components (the lobby picker, the match client) without pulling server-only
 // Node modules into the bundle.
 //
-// Games whose replay is verified deterministic for ghost racing. Launch is
-// Chopping-only (fast/continuous → best ghost feel, determinism-checked via
-// scripts/ghost-replay-harness.ts). Add a game here only after its harness
-// case passes. Gates both harvesting and racing so an unverified game can
-// never produce or surface a raceable ghost.
-export const GHOST_ENABLED_GAMES: GameType[] = ['chopping'];
+// Games whose replay is verified deterministic for ghost racing. All seven
+// 1v1 games are enabled: each engine is bit-reproducible from (seed, inputs)
+// — confirmed by scripts/determinism-spike.ts (7/7 deterministic) — and each
+// game's match-mode config matches the config its Spectator rebuilds for
+// replay, so a recorded run reproduces faithfully. repair-kit is excluded
+// from 1v1 entirely (real-time mechanic), so it isn't here.
+// Gates both harvesting and racing; never add a game without verifying both
+// determinism AND match/spectator config parity.
+export const GHOST_ENABLED_GAMES: GameType[] = [
+  'chopping',
+  'thermite',
+  'lockpick',
+  'laundromat',
+  'pincracker',
+  'roof-running',
+  'word-memory',
+];
 
 export function isGhostEnabled(game: GameType): boolean {
   return GHOST_ENABLED_GAMES.includes(game);

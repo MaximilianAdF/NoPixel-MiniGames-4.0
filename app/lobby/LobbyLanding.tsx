@@ -11,7 +11,7 @@ import { generateLobbyCode, isValidLobbyCode } from '@/lib/lobby/code';
 import { trackLobbyCreated, trackLobbyJoined } from '@/app/utils/gtm';
 import PlayerAvatar from '@/app/components/PlayerAvatar';
 import { getRacedGhostIds } from '@/app/lobby/ghostHistory';
-import { isGhostEnabled } from '@/lib/lobby/ghostGames';
+import { GHOST_ENABLED_GAMES, isGhostEnabled } from '@/lib/lobby/ghostGames';
 import type { GameType } from '@/interfaces/user';
 
 interface PublicLobby {
@@ -282,12 +282,6 @@ interface GhostSummary {
 // always replay. Launch game is Chopping (most-played, best ghost feel).
 function GhostRaceSection({ initialGame }: { initialGame?: string | null }) {
   const router = useRouter();
-  // Only ghost-enabled games are raceable; fall back to Chopping for anything
-  // else (incl. a stale/unsupported ?ghost= param).
-  const game: GameType =
-    initialGame && isGhostEnabled(initialGame as GameType)
-      ? (initialGame as GameType)
-      : 'chopping';
   const [ghosts, setGhosts] = useState<GhostSummary[] | null>(null);
   const [racedIds, setRacedIds] = useState<Set<string>>(new Set());
 
@@ -296,29 +290,44 @@ function GhostRaceSection({ initialGame }: { initialGame?: string | null }) {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`/api/lobby/ghosts?game=${game}&sort=fast&limit=12`, { cache: 'no-store' });
-        if (!res.ok) { if (!cancelled) setGhosts([]); return; }
-        const data = (await res.json()) as { ghosts: GhostSummary[] };
-        if (!cancelled) setGhosts(data.ghosts);
+        // Pull the fastest few ghosts from every ghost-enabled game and merge,
+        // so the pool surfaces across games (not just one). If a specific game
+        // was requested (?ghost=), bias toward it by fetching it first.
+        const games = [...GHOST_ENABLED_GAMES];
+        if (initialGame && isGhostEnabled(initialGame as GameType)) {
+          const g = initialGame as GameType;
+          games.sort((a, b) => (a === g ? -1 : b === g ? 1 : 0));
+        }
+        const results = await Promise.all(
+          games.map((g) =>
+            fetch(`/api/lobby/ghosts?game=${g}&sort=fast&limit=4`, { cache: 'no-store' })
+              .then((r) => (r.ok ? r.json() : { ghosts: [] }))
+              .then((d) => d.ghosts as GhostSummary[])
+              .catch(() => [] as GhostSummary[]),
+          ),
+        );
+        if (!cancelled) setGhosts(results.flat());
       } catch {
         if (!cancelled) setGhosts([]);
       }
     })();
     return () => { cancelled = true; };
-  }, [game]);
+  }, [initialGame]);
 
   // Don't render the section at all until we know there's something to show —
   // avoids a flash of an empty "Race a ghost" header.
   if (ghosts === null || ghosts.length === 0) return null;
 
-  // Unraced first (novelty), then already-raced (still replayable), each group
-  // kept in fastest-first order from the API.
-  const ordered = [...ghosts].sort((a, b) => {
-    const ar = racedIds.has(a.id) ? 1 : 0;
-    const br = racedIds.has(b.id) ? 1 : 0;
-    return ar - br;
-  });
-  const label = GAME_META[game]?.label ?? game;
+  // Unraced first (novelty), then already-raced (still replayable); within each
+  // group, fastest first across all games. Cap the list so it stays scannable.
+  const ordered = [...ghosts]
+    .sort((a, b) => {
+      const ar = racedIds.has(a.id) ? 1 : 0;
+      const br = racedIds.has(b.id) ? 1 : 0;
+      if (ar !== br) return ar - br;
+      return a.result.elapsedMs - b.result.elapsedMs;
+    })
+    .slice(0, 12);
 
   return (
     <section className="max-w-3xl mx-auto mb-16">
@@ -331,13 +340,14 @@ function GhostRaceSection({ initialGame }: { initialGame?: string | null }) {
         <span className="text-gray-500 text-xs">no opponent needed</span>
       </div>
       <p className="text-gray-500 text-xs mb-5">
-        Beat a recorded run from a past {label} match — same board, racing their ghost in real time.
+        Beat a recorded run from a past match — same board, racing their ghost in real time.
       </p>
 
       <ul className="space-y-2">
         {ordered.map((ghost) => {
           const raced = racedIds.has(ghost.id);
           const time = (ghost.result.elapsedMs / 1000).toFixed(1);
+          const label = GAME_META[ghost.game]?.label ?? ghost.game;
           return (
             <li key={ghost.id}>
               <button
