@@ -249,18 +249,16 @@ export default function LobbyLanding() {
 
             {/* Race a ghost — recorded runs you can challenge solo, so there's
                 always something to play even with nobody else online. */}
-            <GhostRaceCallout initialGame={searchParams?.get('ghost')} />
+            <GhostRaceSection initialGame={searchParams?.get('ghost')} />
 
             {/* Live feed */}
             <PublicLobbyList lobbies={publicLobbies} onJoin={handleJoinPublic} />
+
+            {/* Recent finished matches — readable list (not a ticker). */}
+            <RecentMatchesSection matches={recentMatches} />
           </>
         )}
       </div>
-
-      {/* Ambient activity ticker — pinned to the bottom, cycles through the
-          most recent finished matches. Hidden entirely when there's nothing
-          to show (no fake filler). */}
-      <RecentMatchesTicker matches={recentMatches} />
     </main>
   );
 }
@@ -277,49 +275,50 @@ interface GhostSummary {
   timesBeaten: number;
 }
 
-// "Race a ghost" — surfaces recorded runs you can challenge solo. Launch game
-// is Chopping (most-played, best ghost feel); a future version can let you
-// pick the game. Hides ghosts you've already raced (Option B); falls back to
-// re-showing them rather than dead-ending.
-function GhostRaceCallout({ initialGame }: { initialGame?: string | null }) {
+// "Race a ghost" — a browsable list of recorded runs you can challenge solo,
+// fastest first. Ghosts you've already raced are de-emphasised (greyed +
+// "raced" tag) rather than hidden, so the list never looks empty and you can
+// always replay. Launch game is Chopping (most-played, best ghost feel).
+function GhostRaceSection({ initialGame }: { initialGame?: string | null }) {
   const router = useRouter();
   const game: GameType = (initialGame && initialGame in GAME_META
     ? (initialGame as GameType)
     : 'chopping');
-  const [ghost, setGhost] = useState<GhostSummary | null>(null);
-  const [loaded, setLoaded] = useState(false);
+  const [ghosts, setGhosts] = useState<GhostSummary[] | null>(null);
+  const [racedIds, setRacedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    setRacedIds(new Set(getRacedGhostIds()));
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`/api/lobby/ghosts?game=${game}&sort=fast&limit=20`, { cache: 'no-store' });
-        if (!res.ok) { if (!cancelled) setLoaded(true); return; }
+        const res = await fetch(`/api/lobby/ghosts?game=${game}&sort=fast&limit=12`, { cache: 'no-store' });
+        if (!res.ok) { if (!cancelled) setGhosts([]); return; }
         const data = (await res.json()) as { ghosts: GhostSummary[] };
-        if (cancelled) return;
-        const raced = new Set(getRacedGhostIds());
-        // Prefer an unraced ghost (novelty); fall back to the fastest overall
-        // so a player who's raced them all still gets a challenge.
-        const unraced = data.ghosts.filter((g) => !raced.has(g.id));
-        const pick = (unraced[0] ?? data.ghosts[0]) || null;
-        setGhost(pick);
-        setLoaded(true);
+        if (!cancelled) setGhosts(data.ghosts);
       } catch {
-        if (!cancelled) setLoaded(true);
+        if (!cancelled) setGhosts([]);
       }
     })();
     return () => { cancelled = true; };
   }, [game]);
 
-  // Nothing to offer yet — render nothing (no empty filler).
-  if (!loaded || !ghost) return null;
+  // Don't render the section at all until we know there's something to show —
+  // avoids a flash of an empty "Race a ghost" header.
+  if (ghosts === null || ghosts.length === 0) return null;
 
-  const label = GAME_META[ghost.game]?.label ?? ghost.game;
-  const time = (ghost.result.elapsedMs / 1000).toFixed(1);
+  // Unraced first (novelty), then already-raced (still replayable), each group
+  // kept in fastest-first order from the API.
+  const ordered = [...ghosts].sort((a, b) => {
+    const ar = racedIds.has(a.id) ? 1 : 0;
+    const br = racedIds.has(b.id) ? 1 : 0;
+    return ar - br;
+  });
+  const label = GAME_META[game]?.label ?? game;
 
   return (
     <section className="max-w-3xl mx-auto mb-16">
-      <div className="flex items-center gap-3 mb-5">
+      <div className="flex items-center gap-3 mb-2">
         <h2 className="text-lg font-semibold text-white inline-flex items-center gap-2">
           <Ghost className="w-4 h-4 text-spring-green-400" />
           Race a ghost
@@ -327,36 +326,58 @@ function GhostRaceCallout({ initialGame }: { initialGame?: string | null }) {
         <span className="flex-1 h-px bg-white/10" />
         <span className="text-gray-500 text-xs">no opponent needed</span>
       </div>
+      <p className="text-gray-500 text-xs mb-5">
+        Beat a recorded run from a past {label} match — same board, racing their ghost in real time.
+      </p>
 
-      <button
-        type="button"
-        onClick={() => router.push(`/lobby/ghost/${ghost.id}`)}
-        className="group relative w-full overflow-hidden rounded-lg bg-gradient-to-br from-mirage-900/60 via-mirage-900/40 to-mirage-800/60 border border-spring-green-500/25 hover:border-spring-green-400/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-spring-green-500/10 hover:-translate-y-0.5 flex items-center gap-4 p-4 text-left"
-      >
-        <PlayerAvatar
-          userId={ghost.recorderClientId}
-          displayName={ghost.recorderName}
-          discordId={ghost.recorderDiscordId}
-          avatarHash={ghost.recorderAvatarHash}
-          size={44}
-          linkable={false}
-        />
-        <div className="flex-1 min-w-0">
-          <div className="text-white text-sm font-semibold truncate">
-            Beat {ghost.recorderName}&apos;s run
-          </div>
-          <div className="text-gray-500 text-[11px] font-mono uppercase tracking-wider mt-0.5">
-            {label} · {time}s
-            {ghost.timesRaced > 0 && (
-              <span className="text-gray-600"> · beaten {ghost.timesBeaten}/{ghost.timesRaced}</span>
-            )}
-          </div>
-        </div>
-        <span className="inline-flex items-center text-spring-green-400 text-xs font-mono font-semibold tracking-wider group-hover:text-spring-green-300 shrink-0">
-          RACE
-          <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
-        </span>
-      </button>
+      <ul className="space-y-2">
+        {ordered.map((ghost) => {
+          const raced = racedIds.has(ghost.id);
+          const time = (ghost.result.elapsedMs / 1000).toFixed(1);
+          return (
+            <li key={ghost.id}>
+              <button
+                type="button"
+                onClick={() => router.push(`/lobby/ghost/${ghost.id}`)}
+                className={`group relative w-full overflow-hidden rounded-lg border transition-all duration-200 flex items-center gap-3 p-3 text-left ${
+                  raced
+                    ? 'bg-mirage-900/30 border-white/[0.06] hover:border-spring-green-500/30 opacity-70 hover:opacity-100'
+                    : 'bg-gradient-to-br from-mirage-900/60 via-mirage-900/40 to-mirage-800/60 border-spring-green-500/25 hover:border-spring-green-400/60 shadow-lg hover:shadow-spring-green-500/10 hover:-translate-y-0.5'
+                }`}
+              >
+                <PlayerAvatar
+                  userId={ghost.recorderClientId}
+                  displayName={ghost.recorderName}
+                  discordId={ghost.recorderDiscordId}
+                  avatarHash={ghost.recorderAvatarHash}
+                  size={36}
+                  linkable={false}
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="text-white text-sm font-semibold truncate flex items-center gap-2">
+                    {ghost.recorderName}
+                    {raced && (
+                      <span className="text-[9px] font-mono uppercase tracking-wider text-gray-500 border border-white/10 rounded px-1 py-0.5">
+                        raced
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-gray-500 text-[11px] font-mono uppercase tracking-wider mt-0.5">
+                    {label} · {time}s
+                    {ghost.timesRaced > 0 && (
+                      <span className="text-gray-600"> · beaten {ghost.timesBeaten}/{ghost.timesRaced}</span>
+                    )}
+                  </div>
+                </div>
+                <span className="inline-flex items-center text-spring-green-400 text-xs font-mono font-semibold tracking-wider group-hover:text-spring-green-300 shrink-0">
+                  RACE
+                  <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }
@@ -378,70 +399,61 @@ function timeAgo(iso: string, now: number): string {
   return new Date(then).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
-function RecentMatchesTicker({ matches }: { matches: RecentMatch[] }) {
-  const [idx, setIdx] = useState(0);
-  // Re-render once a minute so the "Xm ago" label stays current without a fetch.
+// Recent finished matches as a readable list (newest first). Replaces the old
+// one-line cycling ticker, which was cramped and hard to follow.
+function RecentMatchesSection({ matches }: { matches: RecentMatch[] }) {
+  // Re-render once a minute so the "Xm ago" labels stay current without refetch.
   const [now, setNow] = useState(() => Date.now());
-
-  useEffect(() => {
-    if (matches.length <= 1) return;
-    const t = setInterval(() => setIdx((i) => (i + 1) % matches.length), 3500);
-    return () => clearInterval(t);
-  }, [matches.length]);
-
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 60000);
     return () => clearInterval(t);
   }, []);
 
-  // Keep the index valid as the feed shrinks/grows.
-  useEffect(() => {
-    if (idx >= matches.length) setIdx(0);
-  }, [matches.length, idx]);
-
   if (matches.length === 0) return null;
-  const m = matches[Math.min(idx, matches.length - 1)];
-  const label = GAME_META[m.game]?.label ?? m.game;
-  const seconds = (m.durationMs / 1000).toFixed(1);
-  const when = timeAgo(m.endedAt, now);
+  const shown = matches.slice(0, 6);
 
   return (
-    <div className="sticky bottom-0 z-20 w-full border-t border-white/[0.06] bg-mirage-950/80 backdrop-blur-sm">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-3 text-sm">
-        <span className="inline-flex items-center gap-1.5 text-spring-green-400 shrink-0">
-          <Swords className="w-3.5 h-3.5" />
-          <span className="text-xs font-mono uppercase tracking-wider hidden sm:inline">
-            Latest
-          </span>
-        </span>
-        {/* key on endedAt+idx so each change re-triggers the fade-in */}
-        <p
-          key={`${m.endedAt}-${idx}`}
-          className="min-w-0 flex-1 truncate text-gray-300 animate-fade-in"
-        >
-          {m.winnerName ? (
-            <>
-              <span className="text-white font-semibold">{m.winnerName}</span>
-              <span className="text-gray-500"> beat </span>
-              <span className="text-gray-300">{m.opponentName ?? 'their opponent'}</span>
-            </>
-          ) : (
-            <span className="text-gray-300">A match ended in a draw</span>
-          )}
-          <span className="text-gray-600"> · </span>
-          <span className="text-gray-400">{label}</span>
-          <span className="text-gray-600"> · </span>
-          <span className="text-gray-500 font-mono tabular-nums">{seconds}s</span>
-          {when && (
-            <>
-              <span className="text-gray-600"> · </span>
-              <span className="text-gray-500">{when}</span>
-            </>
-          )}
-        </p>
-        <Trophy className="w-3.5 h-3.5 text-amber-400/70 shrink-0" />
+    <section className="max-w-3xl mx-auto pb-20">
+      <div className="flex items-center gap-3 mb-5">
+        <h2 className="text-lg font-semibold text-white inline-flex items-center gap-2">
+          <Swords className="w-4 h-4 text-spring-green-400" />
+          Recent matches
+        </h2>
+        <span className="flex-1 h-px bg-white/10" />
       </div>
-    </div>
+
+      <ul className="space-y-1.5">
+        {shown.map((m, i) => {
+          const label = GAME_META[m.game]?.label ?? m.game;
+          const seconds = (m.durationMs / 1000).toFixed(1);
+          const when = timeAgo(m.endedAt, now);
+          return (
+            <li
+              key={`${m.endedAt}-${i}`}
+              className="flex items-center gap-3 rounded-lg bg-mirage-900/30 border border-white/[0.06] px-3 py-2.5"
+            >
+              <Trophy className="w-3.5 h-3.5 text-amber-400/70 shrink-0" />
+              <div className="flex-1 min-w-0 text-sm truncate">
+                {m.winnerName ? (
+                  <>
+                    <span className="text-white font-semibold">{m.winnerName}</span>
+                    <span className="text-gray-500"> beat </span>
+                    <span className="text-gray-300">{m.opponentName ?? 'their opponent'}</span>
+                  </>
+                ) : (
+                  <span className="text-gray-300">Match ended in a draw</span>
+                )}
+              </div>
+              <span className="text-gray-400 text-xs hidden sm:inline shrink-0">{label}</span>
+              <span className="text-gray-500 text-xs font-mono tabular-nums shrink-0 w-12 text-right">{seconds}s</span>
+              {when && (
+                <span className="text-gray-600 text-xs shrink-0 w-16 text-right">{when}</span>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 
