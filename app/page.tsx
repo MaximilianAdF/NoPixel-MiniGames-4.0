@@ -209,10 +209,10 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
               {/* Puzzle Cards - render immediately without skeleton */}
               {puzzles.map((puzzle, index) => (
-                  <Link href={puzzle.href} key={puzzle.href} className="group">
+                  <Link href={puzzle.href} key={puzzle.href} className="group flex h-full">
                     <div
-                      className="relative overflow-hidden rounded-lg bg-gradient-to-br from-mirage-900/50 via-mirage-900/40 to-mirage-800/50 border border-spring-green-500/20 hover:border-spring-green-400/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-spring-green-500/10 hover:-translate-y-1"
-                      style={{ 
+                      className="relative overflow-hidden rounded-lg bg-gradient-to-br from-mirage-900/50 via-mirage-900/40 to-mirage-800/50 border border-spring-green-500/20 hover:border-spring-green-400/60 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-spring-green-500/10 hover:-translate-y-1 w-full"
+                      style={{
                         minHeight: '320px',
                         display: 'flex',
                         flexDirection: 'column',

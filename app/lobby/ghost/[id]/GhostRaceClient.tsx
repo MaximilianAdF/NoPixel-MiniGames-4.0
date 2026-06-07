@@ -256,14 +256,20 @@ function GhostOutcome({
   onRaceAnother: () => void;
 }) {
   const ghostMs = ghost.result.elapsedMs;
-  const beat = myResult.won && myResult.elapsedMs < ghostMs;
-  const title = !myResult.won ? 'You didn\'t finish' : beat ? 'You won!' : 'Ghost wins';
-  const delta = myResult.won ? Math.abs(myResult.elapsedMs - ghostMs) / 1000 : 0;
-  const subtitle = !myResult.won
-    ? `${ghost.recorderName}'s run finished in ${(ghostMs / 1000).toFixed(1)}s`
-    : beat
-      ? `You beat ${ghost.recorderName} by ${delta.toFixed(1)}s`
-      : `${ghost.recorderName} was ${delta.toFixed(1)}s faster`;
+  const name = ghost.recorderName;
+  const ghostSec = (ghostMs / 1000).toFixed(1);
+  const delta = (Math.abs(myResult.elapsedMs - ghostMs) / 1000).toFixed(1);
+
+  // Two outcomes in practice: you finish faster than the ghost (win), or the
+  // ghost completes its run first and the race ends before you do (loss).
+  // A "finished but slower" case can't occur — the race ends the moment the
+  // ghost wins — so it isn't handled.
+  const won = myResult.won && myResult.elapsedMs < ghostMs;
+  const title = won ? 'You win!' : 'You lost';
+  const subtitle = won
+    ? `You beat ${name} by ${delta}s`
+    : `${name}'s run finished in ${ghostSec}s`;
+  const beat = won;
   const glow = beat ? 'rgba(84,255,164,0.12)' : 'rgba(248,113,113,0.05)';
 
   return (
