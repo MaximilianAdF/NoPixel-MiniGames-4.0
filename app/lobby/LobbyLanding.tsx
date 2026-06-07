@@ -11,6 +11,7 @@ import { generateLobbyCode, isValidLobbyCode } from '@/lib/lobby/code';
 import { trackLobbyCreated, trackLobbyJoined } from '@/app/utils/gtm';
 import PlayerAvatar from '@/app/components/PlayerAvatar';
 import { getRacedGhostIds } from '@/app/lobby/ghostHistory';
+import { isGhostEnabled } from '@/lib/lobby/ghostGames';
 import type { GameType } from '@/interfaces/user';
 
 interface PublicLobby {
@@ -281,9 +282,12 @@ interface GhostSummary {
 // always replay. Launch game is Chopping (most-played, best ghost feel).
 function GhostRaceSection({ initialGame }: { initialGame?: string | null }) {
   const router = useRouter();
-  const game: GameType = (initialGame && initialGame in GAME_META
-    ? (initialGame as GameType)
-    : 'chopping');
+  // Only ghost-enabled games are raceable; fall back to Chopping for anything
+  // else (incl. a stale/unsupported ?ghost= param).
+  const game: GameType =
+    initialGame && isGhostEnabled(initialGame as GameType)
+      ? (initialGame as GameType)
+      : 'chopping';
   const [ghosts, setGhosts] = useState<GhostSummary[] | null>(null);
   const [racedIds, setRacedIds] = useState<Set<string>>(new Set());
 

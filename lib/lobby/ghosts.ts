@@ -12,6 +12,10 @@ import type { GameType } from '@/interfaces/user';
 
 export const GHOST_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
+// Re-exported from the client-safe module (this file imports mongodb, so client
+// components must import the gate from ghostGames.ts, not here).
+export { GHOST_ENABLED_GAMES, isGhostEnabled } from './ghostGames';
+
 // Bounds on a recorded run's input count. Floor rejects degenerate/instant
 // "wins"; ceiling caps payload size. Per-game tuning is a later refinement.
 export const MIN_GHOST_INPUTS = 2;

@@ -45,6 +45,7 @@ import { playEmoteSound } from '@/app/lobby/emoteSounds';
 import EmoteImage from '@/app/lobby/EmoteImage';
 import { generateMatchSeed } from '@/lib/lobby/seededRandom';
 import { determineHost } from '@/lib/lobby/host';
+import { isGhostEnabled } from '@/lib/lobby/ghostGames';
 import type { LobbyMessage } from '@/lib/lobby/messages';
 import type { GameType } from '@/interfaces/user';
 import type { GameResult } from '@/app/game/types';
@@ -471,6 +472,8 @@ export default function LobbyClient({ code }: LobbyClientProps) {
   const ghostRecordedSeedsRef = useRef<Set<number>>(new Set());
   useEffect(() => {
     if (!outcome || !match || !effectiveClientId) return;
+    // Only harvest from games whose replay is verified for ghost racing.
+    if (!isGhostEnabled(match.game)) return;
     if (ghostRecordedSeedsRef.current.has(match.seed)) return;
     const iWon = outcome.winnerClientId === effectiveClientId;
     if (!iWon || outcome.reason !== 'finished') return;
