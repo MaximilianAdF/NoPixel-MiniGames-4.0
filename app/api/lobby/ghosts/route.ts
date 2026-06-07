@@ -34,8 +34,11 @@ export async function GET(req: NextRequest) {
     }
     const sortParam = req.nextUrl.searchParams.get('sort');
     const sort = sortParam === 'new' ? 'new' : 'fast';
-    const limitRaw = Number(req.nextUrl.searchParams.get('limit'));
-    const limit = Number.isFinite(limitRaw) ? limitRaw : 10;
+    // Note: Number(null) === 0, so guard on the raw param being present —
+    // otherwise a missing ?limit silently becomes 0 (→ clamped to 1).
+    const limitParam = req.nextUrl.searchParams.get('limit');
+    const limitRaw = limitParam !== null ? Number(limitParam) : NaN;
+    const limit = Number.isFinite(limitRaw) && limitRaw > 0 ? limitRaw : 10;
     const excludeClientId = req.nextUrl.searchParams.get('exclude') || undefined;
 
     const ghosts = await listGhosts(game, { sort, limit, excludeClientId });
