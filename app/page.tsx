@@ -227,7 +227,14 @@ export default function Home() {
                       {/* Top Data Bar */}
                       <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-spring-green-500/20 to-transparent group-hover:via-spring-green-400/40 transition-colors duration-300" />
                       
-                      <div className="aspect-video relative flex-shrink-0 p-4 pb-2">
+                      {/* Fixed height (not aspect-ratio): the thumbnails have
+                          different natural aspect ratios, and Chrome vs Firefox
+                          size an aspect-ratio flex box differently when the
+                          child image's intrinsic ratio differs — which threw
+                          the cards out of alignment on Chrome. A fixed-height
+                          box + object-contain makes every image area identical
+                          across browsers. */}
+                      <div className="h-44 relative flex-shrink-0 p-4 pb-2">
                         {/* Soft radial spotlight behind the thumbnail —
                             intensifies on hover to give the game a "lit-from-
                             behind" feel. */}
