@@ -9,6 +9,7 @@ import { orbitron } from '@/app/fonts';
 import PlayerAvatar from '@/app/components/PlayerAvatar';
 import { useGhostPlayback } from '@/app/utils/useGhostPlayback';
 import { markGhostRaced } from '@/app/lobby/ghostHistory';
+import { trackGhostRaceStarted, trackGhostRaceCompleted } from '@/app/utils/gtm';
 import type { PresenceMember } from '@/app/utils/useAblyChannel';
 import type { GameResult } from '@/app/game/types';
 import type { GameType } from '@/interfaces/user';
@@ -97,7 +98,12 @@ export default function GhostRaceClient({ ghostId }: { ghostId: string }) {
     // Per-player "already raced" tracking (Option B) + telemetry fire on start
     // so quitting mid-race doesn't resurface the same ghost immediately.
     markGhostRaced(ghost.id);
-    recordRaceStat('ghost_race_started', ghost.game);
+    recordRaceStat('ghost_race_started', ghost.game); // durable Mongo counter
+    trackGhostRaceStarted({                            // GA4 / GTM
+      game_type: ghost.game,
+      ghost_id: ghost.id,
+      ghost_time_ms: ghost.result.elapsedMs,
+    });
   }, [ghost, goAt]);
 
   // Drive the countdown clock at second boundaries.
@@ -119,17 +125,25 @@ export default function GhostRaceClient({ ghostId }: { ghostId: string }) {
 
   const handleMatchEnd = useCallback((result: GameResult) => {
     setMyResult(result);
-    if (ghost && result.won) {
-      // Win = I finished, faster than the ghost's recorded time (or the ghost
-      // didn't finish). Since I only race a completed ghost, compare times.
-      const beatGhost = result.elapsedMs < ghost.result.elapsedMs;
-      if (beatGhost) recordRaceStat('ghost_race_won', ghost.game);
-      void fetch(`/api/lobby/ghosts/${ghost.id}/raced`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ beaten: beatGhost }),
-      }).catch(() => {});
-    }
+    if (!ghost) return;
+    // Win = I finished faster than the ghost's recorded time. (A finished-but-
+    // slower run can't occur — the race ends the moment the ghost completes.)
+    const beatGhost = result.won && result.elapsedMs < ghost.result.elapsedMs;
+    if (beatGhost) recordRaceStat('ghost_race_won', ghost.game); // durable counter
+    // Bump the ghost's raced/beaten tallies for social proof.
+    void fetch(`/api/lobby/ghosts/${ghost.id}/raced`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ beaten: beatGhost }),
+    }).catch(() => {});
+    // GA4 / GTM — every completion, with its result.
+    trackGhostRaceCompleted({
+      game_type: ghost.game,
+      ghost_id: ghost.id,
+      result: beatGhost ? 'won' : 'lost',
+      player_time_ms: result.won ? result.elapsedMs : 0,
+      ghost_time_ms: ghost.result.elapsedMs,
+    });
   }, [ghost]);
 
   // Tick `now` during the race so the countdown→race transition is crisp.

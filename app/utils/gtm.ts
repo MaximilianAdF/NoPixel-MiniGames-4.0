@@ -99,6 +99,32 @@ export interface MatchTimedOutEvent {
   game_type: string;
 }
 
+// Async ghost-race events (solo player racing a recorded run).
+export interface GhostRecordedEvent {
+  game_type: string;
+  // The recorded run's completion time, ms.
+  duration_ms: number;
+  // Where the run came from ('match' winner harvest, or 'solo' later).
+  source: string;
+}
+
+export interface GhostRaceStartedEvent {
+  game_type: string;
+  ghost_id: string;
+  // The ghost's time the player is chasing, ms.
+  ghost_time_ms: number;
+}
+
+export interface GhostRaceCompletedEvent {
+  game_type: string;
+  ghost_id: string;
+  // 'won' = beat the ghost's time; 'lost' = ghost finished first / DNF.
+  result: 'won' | 'lost';
+  // The player's own time when they finished, ms (0 if they didn't finish).
+  player_time_ms: number;
+  ghost_time_ms: number;
+}
+
 // Main GTM push function
 function pushToDataLayer(data: Record<string, any>) {
   if (typeof window !== 'undefined' && window.dataLayer) {
@@ -246,6 +272,27 @@ export function trackMatchForfeited(data: MatchForfeitedEvent) {
  */
 export function trackMatchTimedOut(data: MatchTimedOutEvent) {
   pushToDataLayer({ event: 'match_timed_out', ...data });
+}
+
+/**
+ * Track when a winning 1v1 run is harvested as a raceable ghost.
+ */
+export function trackGhostRecorded(data: GhostRecordedEvent) {
+  pushToDataLayer({ event: 'ghost_recorded', ...data });
+}
+
+/**
+ * Track when a player starts a solo ghost race.
+ */
+export function trackGhostRaceStarted(data: GhostRaceStartedEvent) {
+  pushToDataLayer({ event: 'ghost_race_started', ...data });
+}
+
+/**
+ * Track when a ghost race finishes (player beat the ghost or not).
+ */
+export function trackGhostRaceCompleted(data: GhostRaceCompletedEvent) {
+  pushToDataLayer({ event: 'ghost_race_completed', ...data });
 }
 
 /**

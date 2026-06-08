@@ -55,6 +55,7 @@ import {
   trackMatchCompleted,
   trackMatchForfeited,
   trackMatchTimedOut,
+  trackGhostRecorded,
 } from '@/app/utils/gtm';
 import MatchView from './MatchView';
 
@@ -497,6 +498,12 @@ export default function LobbyClient({ code }: LobbyClientProps) {
         recorderClientId: effectiveClientId,
       }),
     }).catch(() => {});
+    // GA4 / GTM (the durable Mongo counter is bumped server-side by the route).
+    trackGhostRecorded({
+      game_type: match.game,
+      duration_ms: myResult.elapsedMs,
+      source: 'match',
+    });
   }, [outcome, match, effectiveClientId, myResult, presence, effectiveDisplayName]);
 
   // Non-host fallback: if the host's match:outcome doesn't arrive within a
