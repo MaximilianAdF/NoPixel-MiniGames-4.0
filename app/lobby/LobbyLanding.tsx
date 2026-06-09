@@ -280,10 +280,13 @@ interface GhostSummary {
 // fastest first. Ghosts you've already raced are de-emphasised (greyed +
 // "raced" tag) rather than hidden, so the list never looks empty and you can
 // always replay. Launch game is Chopping (most-played, best ghost feel).
+const GHOST_LIST_COLLAPSED = 5; // rows shown before "Show all"
+
 function GhostRaceSection({ initialGame }: { initialGame?: string | null }) {
   const router = useRouter();
   const [ghosts, setGhosts] = useState<GhostSummary[] | null>(null);
   const [racedIds, setRacedIds] = useState<Set<string>>(new Set());
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     setRacedIds(new Set(getRacedGhostIds()));
@@ -319,15 +322,18 @@ function GhostRaceSection({ initialGame }: { initialGame?: string | null }) {
   if (ghosts === null || ghosts.length === 0) return null;
 
   // Unraced first (novelty), then already-raced (still replayable); within each
-  // group, fastest first across all games. Cap the list so it stays scannable.
-  const ordered = [...ghosts]
+  // group, fastest first across all games. Hard cap at 20 so the page can't
+  // grow unbounded, with a collapsed default of 5 + "Show all".
+  const ranked = [...ghosts]
     .sort((a, b) => {
       const ar = racedIds.has(a.id) ? 1 : 0;
       const br = racedIds.has(b.id) ? 1 : 0;
       if (ar !== br) return ar - br;
       return a.result.elapsedMs - b.result.elapsedMs;
     })
-    .slice(0, 12);
+    .slice(0, 20);
+  const ordered = showAll ? ranked : ranked.slice(0, GHOST_LIST_COLLAPSED);
+  const hiddenCount = ranked.length - ordered.length;
 
   return (
     <section className="max-w-3xl mx-auto mb-16">
@@ -395,6 +401,16 @@ function GhostRaceSection({ initialGame }: { initialGame?: string | null }) {
           );
         })}
       </ul>
+
+      {(hiddenCount > 0 || showAll) && ranked.length > GHOST_LIST_COLLAPSED && (
+        <button
+          type="button"
+          onClick={() => setShowAll((v) => !v)}
+          className="mt-3 w-full text-center text-xs font-medium text-gray-400 hover:text-spring-green-300 transition-colors py-1.5"
+        >
+          {showAll ? 'Show less' : `Show all ${ranked.length} ghosts`}
+        </button>
+      )}
     </section>
   );
 }
