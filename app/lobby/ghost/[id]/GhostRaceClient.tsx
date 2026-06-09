@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Loader2, RotateCcw, Trophy } from 'lucide-react';
@@ -28,6 +28,9 @@ interface FullGhost {
   recorderDiscordId?: string;
   recorderAvatarHash?: string;
   recorderClientId: string;
+  // How many people have raced this ghost, and how many beat it.
+  timesRaced: number;
+  timesBeaten: number;
 }
 
 const COUNTDOWN_MS = 3000;
@@ -216,20 +219,17 @@ export default function GhostRaceClient({ ghostId }: { ghostId: string }) {
   };
 
   return (
-    <>
-      <GhostRaceHeader ghost={ghost} />
-      <MatchView
-        game={ghost.game}
-        seed={ghost.seed}
-        onMatchEnd={handleMatchEnd}
-        onInput={() => {}}
-        opponentInputs={ghostInputs}
-        focusMode={false}
-        me={me}
-        opponent={ghostMember}
-        emotes={{}}
-      />
-    </>
+    <MatchView
+      game={ghost.game}
+      seed={ghost.seed}
+      onMatchEnd={handleMatchEnd}
+      onInput={() => {}}
+      opponentInputs={ghostInputs}
+      focusMode={false}
+      me={me}
+      opponent={ghostMember}
+      emotes={{}}
+    />
   );
 }
 
@@ -241,24 +241,6 @@ function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Thin top banner during the race — names the ghost so it's always clear you're
-// racing a recording, never a live person.
-const GhostRaceHeader = memo(function GhostRaceHeader({ ghost }: { ghost: FullGhost }) {
-  return (
-    <div className="fixed top-0 left-1/2 -translate-x-1/2 z-50 pt-3 pointer-events-none">
-      <div className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-black/80 backdrop-blur-sm px-4 py-2 border border-white/10 shadow-xl">
-        <span className="text-[10px] uppercase tracking-[0.25em] font-bold text-spring-green-300">
-          Ghost race
-        </span>
-        <span className="w-px h-4 bg-white/20" />
-        <span className="text-xs text-white/70">
-          vs <span className="text-white font-semibold">{ghost.recorderName}</span>&apos;s run
-          <span className="text-white/40 font-mono ml-2">{(ghost.result.elapsedMs / 1000).toFixed(1)}s</span>
-        </span>
-      </div>
-    </div>
-  );
-});
 
 function GhostOutcome({
   myResult,
@@ -340,6 +322,16 @@ function GhostOutcome({
             </div>
           </div>
         </div>
+
+        {/* How this ghost has done overall — includes the race that just
+            finished (the /raced bump happened on match end). */}
+        <p className="text-gray-500 text-xs mb-6 tabular-nums">
+          {(() => {
+            const races = ghost.timesRaced + 1;
+            const wins = ghost.timesBeaten + (beat ? 1 : 0);
+            return `Raced ${races} ${races === 1 ? 'time' : 'times'} · beaten ${wins} ${wins === 1 ? 'time' : 'times'}`;
+          })()}
+        </p>
 
         <div className="flex flex-col gap-2">
           <button

@@ -379,7 +379,10 @@ function GhostRaceSection({ initialGame }: { initialGame?: string | null }) {
                   <div className="text-gray-500 text-[11px] font-mono uppercase tracking-wider mt-0.5">
                     {label} · {time}s
                     {ghost.timesRaced > 0 && (
-                      <span className="text-gray-600"> · beaten {ghost.timesBeaten}/{ghost.timesRaced}</span>
+                      <span className="text-gray-600">
+                        {' · '}{ghost.timesRaced} {ghost.timesRaced === 1 ? 'race' : 'races'}
+                        {ghost.timesBeaten > 0 && `, ${ghost.timesBeaten} beat it`}
+                      </span>
                     )}
                   </div>
                 </div>
