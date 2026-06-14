@@ -1,0 +1,8 @@
+# Netlify build config. The Next.js runtime is auto-detected and maps the App
+# Router + route handlers to Netlify Functions (Node) — Mongo/Ably/Discord auth
+# run unchanged. Do not set `publish`; the Next runtime manages it.
+[build]
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"

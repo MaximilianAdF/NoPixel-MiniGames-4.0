@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { listRecentMatches, recordRecentMatch } from '@/lib/lobby/recentMatches';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { edgeCache } from '@/lib/cacheHeaders';
 import type { GameType } from '@/interfaces/user';
 
 export const dynamic = 'force-dynamic';
@@ -22,7 +23,7 @@ const MAX_DURATION_MS = 10 * 60 * 1000; // sanity clamp — matches cap at 3min
 export async function GET() {
   try {
     const matches = await listRecentMatches();
-    return NextResponse.json({ matches });
+    return NextResponse.json({ matches }, { headers: edgeCache(20) });
   } catch (error) {
     console.error('Failed to list recent matches:', error);
     return NextResponse.json({ error: 'Failed to list matches' }, { status: 500 });

@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { isValidLobbyCode } from '@/lib/lobby/code';
 import { listJoinablePublicLobbies, upsertPublicLobby } from '@/lib/lobby/publicLobbies';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { edgeCache } from '@/lib/cacheHeaders';
 import type { GameType } from '@/interfaces/user';
 
 export const dynamic = 'force-dynamic';
@@ -22,7 +23,9 @@ const ALLOWED_GAMES: GameType[] = [
 export async function GET() {
   try {
     const lobbies = await listJoinablePublicLobbies();
-    return NextResponse.json({ lobbies });
+    // Edge-cached ~10s: the landing page polls this, so collapse all callers
+    // into one Mongo read per window instead of one per poll per visitor.
+    return NextResponse.json({ lobbies }, { headers: edgeCache(10) });
   } catch (error) {
     console.error('Failed to list public lobbies:', error);
     return NextResponse.json({ error: 'Failed to list lobbies' }, { status: 500 });

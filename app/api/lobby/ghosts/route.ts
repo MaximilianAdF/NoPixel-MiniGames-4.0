@@ -7,6 +7,7 @@ import {
   type RecordedInput,
 } from '@/lib/lobby/ghosts';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { edgeCache } from '@/lib/cacheHeaders';
 import { incrementLobbyStat } from '@/lib/lobby/stats';
 import type { GameType } from '@/interfaces/user';
 
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
     const excludeClientId = req.nextUrl.searchParams.get('exclude') || undefined;
 
     const ghosts = await listGhosts(game, { sort, limit, excludeClientId });
-    return NextResponse.json({ ghosts });
+    return NextResponse.json({ ghosts }, { headers: edgeCache(30) });
   } catch (error) {
     console.error('Failed to list ghosts:', error);
     return NextResponse.json({ error: 'Failed to list ghosts' }, { status: 500 });

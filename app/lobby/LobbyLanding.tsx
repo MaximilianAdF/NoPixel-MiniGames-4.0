@@ -58,9 +58,10 @@ export default function LobbyLanding() {
 
   useEffect(() => {
     let cancelled = false;
+    let interval: ReturnType<typeof setInterval> | undefined;
     const load = async () => {
       try {
-        const res = await fetch('/api/lobby/public', { cache: 'no-store' });
+        const res = await fetch('/api/lobby/public');
         if (!res.ok) return;
         const data = (await res.json()) as { lobbies: PublicLobby[] };
         if (!cancelled) setPublicLobbies(data.lobbies);
@@ -68,19 +69,26 @@ export default function LobbyLanding() {
         // Listing is best-effort.
       }
     };
-    void load();
-    // Poll every 4s so filled / abandoned / privated lobbies drop off the
-    // list quickly, and refetch immediately whenever the tab regains focus
-    // (covers the gap between polls when someone tabs back in).
-    const interval = setInterval(load, 4000);
-    const onVisible = () => {
-      if (document.visibilityState === 'visible') void load();
+    // Poll only while the tab is visible. The response is edge-cached ~10s, so
+    // a faster cadence would just refetch the same payload, and a hidden tab
+    // needs no updates at all — refetch immediately when the tab regains focus.
+    const startPolling = () => {
+      if (!interval) interval = setInterval(load, 10000);
     };
+    const stopPolling = () => {
+      if (interval) { clearInterval(interval); interval = undefined; }
+    };
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') { void load(); startPolling(); }
+      else stopPolling();
+    };
+    void load();
+    startPolling();
     document.addEventListener('visibilitychange', onVisible);
     window.addEventListener('focus', onVisible);
     return () => {
       cancelled = true;
-      clearInterval(interval);
+      stopPolling();
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('focus', onVisible);
     };
@@ -90,9 +98,10 @@ export default function LobbyLanding() {
   // list since the feed is ambient flavour, not something you act on.
   useEffect(() => {
     let cancelled = false;
+    let interval: ReturnType<typeof setInterval> | undefined;
     const load = async () => {
       try {
-        const res = await fetch('/api/lobby/recent-matches', { cache: 'no-store' });
+        const res = await fetch('/api/lobby/recent-matches');
         if (!res.ok) return;
         const data = (await res.json()) as { matches: RecentMatch[] };
         if (!cancelled) setRecentMatches(data.matches);
@@ -100,11 +109,27 @@ export default function LobbyLanding() {
         // Cosmetic — ignore.
       }
     };
+    // Pause while hidden; the feed is edge-cached ~20s so polling faster buys
+    // nothing.
+    const startPolling = () => {
+      if (!interval) interval = setInterval(load, 20000);
+    };
+    const stopPolling = () => {
+      if (interval) { clearInterval(interval); interval = undefined; }
+    };
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') { void load(); startPolling(); }
+      else stopPolling();
+    };
     void load();
-    const interval = setInterval(load, 20000);
+    startPolling();
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
     return () => {
       cancelled = true;
-      clearInterval(interval);
+      stopPolling();
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
     };
   }, []);
 
@@ -303,7 +328,7 @@ function GhostRaceSection({ initialGame }: { initialGame?: string | null }) {
         }
         const results = await Promise.all(
           games.map((g) =>
-            fetch(`/api/lobby/ghosts?game=${g}&sort=fast&limit=4`, { cache: 'no-store' })
+            fetch(`/api/lobby/ghosts?game=${g}&sort=fast&limit=4`)
               .then((r) => (r.ok ? r.json() : { ghosts: [] }))
               .then((d) => d.ghosts as GhostSummary[])
               .catch(() => [] as GhostSummary[]),

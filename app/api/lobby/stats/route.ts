@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { getLobbyStats, incrementLobbyStat, type LobbyStatEvent } from '@/lib/lobby/stats';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { edgeCache } from '@/lib/cacheHeaders';
 import type { GameType } from '@/interfaces/user';
 
 export const dynamic = 'force-dynamic';
@@ -24,7 +25,7 @@ const ALLOWED_EVENTS: LobbyStatEvent[] = [
 export async function GET() {
   try {
     const stats = await getLobbyStats();
-    return NextResponse.json({ stats: stats ?? null });
+    return NextResponse.json({ stats: stats ?? null }, { headers: edgeCache(30) });
   } catch (error) {
     console.error('Failed to read lobby stats:', error);
     return NextResponse.json({ error: 'Failed to read stats' }, { status: 500 });
