@@ -17,6 +17,7 @@ import { LoadingProvider } from './contexts/LoadingContext';
 import { KeyboardShortcutsProvider } from './contexts/KeyboardShortcutsContext';
 import { GuideProvider } from './contexts/GuideContext';
 import GoogleTagManager, { GoogleTagManagerNoScript } from './components/GoogleTagManager';
+import GoogleAnalytics from './components/GoogleAnalytics';
 import Footer from './components/Footer';
 
 function Background() {
@@ -178,6 +179,9 @@ export default function RootLayout({
 
         {/* Google Tag Manager - Replace GTM-XXXXXXX with your actual GTM ID */}
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
+
+        {/* GA4 direct (gtag) — receives the custom game events GTM doesn't forward */}
+        <GoogleAnalytics />
 
         {/* Session Tracking - Load after page is interactive */}
         <Script id="session-tracker" strategy="lazyOnload">

@@ -127,8 +127,15 @@ export interface GhostRaceCompletedEvent {
 
 // Main GTM push function
 function pushToDataLayer(data: Record<string, any>) {
-  if (typeof window !== 'undefined' && window.dataLayer) {
-    window.dataLayer.push(data);
+  if (typeof window === 'undefined') return;
+  window.dataLayer?.push(data);
+  // GTM isn't forwarding these custom events to GA4, so also send them straight
+  // to GA4 via gtag (loaded by GoogleAnalytics). page_view stays GTM-owned to
+  // avoid double-counting.
+  const { event, ...params } = data;
+  const w = window as any;
+  if (event && event !== 'page_view' && typeof w.gtag === 'function') {
+    w.gtag('event', event, params);
   }
 }
 
