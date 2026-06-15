@@ -19,6 +19,21 @@ export function breadcrumbList(crumbs: Crumb[]) {
   };
 }
 
+// Builds a FAQPage from visible Q&A pairs. Note: Google restricted FAQ rich
+// results to gov/health sites in 2023, so this is for content/AI comprehension
+// (AI Overviews, answer engines), not a Google rich snippet.
+export function faqPage(faqs: { q: string; a: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: { "@type": "Answer", text: faq.a },
+    })),
+  };
+}
+
 // Builds an Article node for a guide page, linked to the site Organization.
 export function guideArticle(params: { headline: string; description: string; path: string }) {
   return {

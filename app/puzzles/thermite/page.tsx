@@ -4,6 +4,7 @@ import PuzzleBackButton from "@/app/components/PuzzleBackButton";
 import PuzzlePageWrapper from "@/app/puzzles/PuzzlePageWrapper";
 import JsonLd from "@/app/components/JsonLd";
 import { breadcrumbList } from "@/lib/structuredData";
+import PuzzleInfo from "@/app/puzzles/PuzzleInfo";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -14,8 +15,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Thermite Minigame",
-  description: "Practice the Thermite minigame from NoPixel 4.0 GTA RP. Memorize and recreate the highlighted tile pattern under a timer. Free browser trainer, no download required.",
+  title: { absolute: "Thermite Minigame – NoPixel 4.0 & FiveM Hack Practice" },
+  description: "Practice the NoPixel 4.0 & FiveM thermite hack free in your browser — memorize and recreate the highlighted tile pattern under a timer. No download required.",
   keywords: ["thermite hack", "NoPixel thermite", "maze bank hack", "GTA RP thermite", "thermite practice", "NoPixel 4.0 thermite", "laser disable minigame", "how to do thermite", "thermite tutorial"],
   openGraph: {
     title: "Thermite Minigame - NoPixel 4.0 Practice",
@@ -40,6 +41,7 @@ export default function Page() {
         <PuzzleBackButton />
         <Thermite />
       </PuzzlePageWrapper>
+      <PuzzleInfo game="thermite" />
     </>
   );
 }

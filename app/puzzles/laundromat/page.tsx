@@ -4,6 +4,7 @@ import PuzzleBackButton from "@/app/components/PuzzleBackButton";
 import PuzzlePageWrapper from "@/app/puzzles/PuzzlePageWrapper";
 import JsonLd from "@/app/components/JsonLd";
 import { breadcrumbList } from "@/lib/structuredData";
+import PuzzleInfo from "@/app/puzzles/PuzzleInfo";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -14,8 +15,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Laundromat Minigame",
-  description: "Practice the Laundromat minigame from NoPixel 4.0 GTA RP. Crack all five rotating locks against a tight timer. Free browser trainer, no download required.",
+  title: { absolute: "Laundromat Minigame – NoPixel 4.0 & FiveM Practice" },
+  description: "Practice the NoPixel 4.0 & FiveM laundromat safe minigame free in your browser — crack the rotating locks against a tight timer. No download required.",
   keywords: ["laundromat hack", "NoPixel laundromat", "GTA RP laundromat", "safe hack practice", "NoPixel 4.0 laundromat", "laundromat puzzle"],
   openGraph: {
     title: "Laundromat Minigame - NoPixel 4.0 Practice",
@@ -40,6 +41,7 @@ export default function Page() {
         <PuzzleBackButton />
         <Laundromat />
       </PuzzlePageWrapper>
+      <PuzzleInfo game="laundromat" />
     </>
   );
 }

@@ -4,6 +4,7 @@ import PuzzleBackButton from "@/app/components/PuzzleBackButton";
 import PuzzlePageWrapper from "@/app/puzzles/PuzzlePageWrapper";
 import JsonLd from "@/app/components/JsonLd";
 import { breadcrumbList } from "@/lib/structuredData";
+import PuzzleInfo from "@/app/puzzles/PuzzleInfo";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -14,8 +15,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Word Memory Minigame",
-  description: "Practice the Word Memory minigame from NoPixel 4.0 GTA RP. Recall which words you've already seen as the sequence grows. Free browser trainer, no download required.",
+  title: { absolute: "Word Memory Minigame – NoPixel 4.0 & FiveM Practice" },
+  description: "Practice the NoPixel 4.0 & FiveM word memory minigame free in your browser — recall which words you've already seen as the sequence grows. No download required.",
   keywords: ["word memory", "NoPixel word memory", "maze bank word memory", "GTA RP memory game", "NoPixel 4.0 word memory", "memory hack practice"],
   openGraph: {
     title: "Word Memory Minigame - NoPixel 4.0 Practice",
@@ -40,6 +41,7 @@ export default function Page() {
         <PuzzleBackButton />
         <WordMemory />
       </PuzzlePageWrapper>
+      <PuzzleInfo game="word-memory" />
     </>
   );
 }

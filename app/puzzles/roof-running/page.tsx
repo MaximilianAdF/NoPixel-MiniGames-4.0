@@ -4,6 +4,7 @@ import PuzzleBackButton from "@/app/components/PuzzleBackButton";
 import PuzzlePageWrapper from "@/app/puzzles/PuzzlePageWrapper";
 import JsonLd from "@/app/components/JsonLd";
 import { breadcrumbList } from "@/lib/structuredData";
+import PuzzleInfo from "@/app/puzzles/PuzzleInfo";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -14,8 +15,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Roof Running Minigame",
-  description: "Practice the Roof Running minigame from NoPixel 4.0 GTA RP. Clear the board by removing groups of matching coloured blocks. Free browser trainer, no download required.",
+  title: { absolute: "Roof Running Minigame – NoPixel 4.0 & FiveM Practice" },
+  description: "Practice the NoPixel 4.0 & FiveM roof running minigame free in your browser — clear the board by removing groups of matching coloured blocks. No download required.",
   keywords: ["roof running", "NoPixel roof running", "GTA RP roof running", "AC unit hack", "NoPixel 4.0 roof running", "parkour minigame", "house robbery", "roof running timing"],
   openGraph: {
     title: "Roof Running Minigame - NoPixel 4.0 Practice",
@@ -40,6 +41,7 @@ export default function Page() {
         <PuzzleBackButton />
         <RoofRunning />
       </PuzzlePageWrapper>
+      <PuzzleInfo game="roof-running" />
     </>
   );
 }

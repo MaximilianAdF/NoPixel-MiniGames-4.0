@@ -4,6 +4,7 @@ import PuzzleBackButton from "@/app/components/PuzzleBackButton";
 import PuzzlePageWrapper from "@/app/puzzles/PuzzlePageWrapper";
 import JsonLd from "@/app/components/JsonLd";
 import { breadcrumbList } from "@/lib/structuredData";
+import PuzzleInfo from "@/app/puzzles/PuzzleInfo";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -14,8 +15,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Chopping Minigame",
-  description: "Practice the Chopping minigame from NoPixel 4.0 GTA RP. Type the on-screen letter sequence quickly and accurately. Free browser trainer, no download required.",
+  title: { absolute: "Chopping Minigame – NoPixel 4.0 & FiveM Practice" },
+  description: "Practice the NoPixel 4.0 & FiveM chopping minigame free in your browser — type the on-screen letter sequence quickly and accurately. No download required.",
   keywords: ["chopping minigame", "NoPixel chopping", "GTA RP chopping", "vehicle chopping practice", "NoPixel 4.0 chopping", "chopping trainer"],
   openGraph: {
     title: "Chopping Minigame - NoPixel 4.0 Practice",
@@ -40,6 +41,7 @@ export default function Page() {
         <PuzzleBackButton />
         <Chopping />
       </PuzzlePageWrapper>
+      <PuzzleInfo game="chopping" />
     </>
   );
 }
