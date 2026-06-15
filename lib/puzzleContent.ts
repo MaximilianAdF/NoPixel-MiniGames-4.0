@@ -48,29 +48,29 @@ export const PUZZLE_CONTENT: Record<string, PuzzleContent> = {
   thermite: {
     name: 'Thermite',
     intro:
-      "Thermite is NoPixel 4.0's memory hack — the grid puzzle that runs when you breach high-security targets such as the lasers inside the Maze Bank in GTA RP. This free FiveM thermite practice tool reproduces the pattern-memory mechanic so you can drill it on demand.",
+      "Thermite is NoPixel 4.0's chain-reaction hack — the 6×6 grid puzzle you crack to breach high-security targets like the Maze Bank sewers and vault in GTA RP. This free FiveM thermite trainer reproduces the 4.0 mechanic exactly, so you can drill your board reads with no download.",
     howItWorks:
-      'A group of tiles on the grid lights up for a moment. Memorise the highlighted pattern, then recreate it by selecting the same tiles before the timer expires. Clear a round and the next pattern grows.',
+      'Click a highlighted square to decrypt it — its piece drops a step (full → half → empty) and highlights a fresh set of squares within its range (short, medium, or long) as your only legal next moves. Keep the chain alive and hit the target score before time runs out; if a click leaves zero highlighted squares, you stall and the hack fails.',
     tips: [
-      "Chunk the pattern into rows and shapes — 'top row plus an L' is far easier to recall than eight separate tiles.",
-      "Anchor the pattern to the grid's corners so you can rebuild it even after it disappears.",
-      'Move deliberately; one wrong tile usually costs more than the half-second spent picturing the layout.',
+      'Plan two or three moves ahead — the aim is to always leave yourself highlighted squares to click, not just to clear the nearest one.',
+      'Learn the ranges: short highlights immediate neighbours, medium reaches two cells out on a checkerboard, long reaches three. Each leaves a very different set of follow-ups.',
+      'Favour the centre and avoid dead-end clicks near the edges and corners — they highlight fewer follow-ups and are where most runs stall.',
     ],
     faq: [
       {
-        q: 'Is this the NoPixel 4.0 thermite hack?',
-        a: 'Yes — it recreates the tile-pattern memory minigame used to crack high-security targets such as the Maze Bank in NoPixel 4.0 GTA RP.',
+        q: 'Is this the NoPixel 4.0 thermite hack, or the old 3.0 one?',
+        a: "This is the 4.0 version — a chain-reaction puzzle on a 6×6 grid where every click propagates new highlighted squares by range. It is not the older 3.0 'memorise and recreate the pattern' minigame.",
       },
       {
         q: 'Is the thermite trainer free to use?',
         a: 'Yes, it is free and runs in your browser with no FiveM server or download required.',
       },
       {
-        q: 'How do I memorise the thermite pattern faster?',
-        a: 'Group tiles into shapes and rows instead of memorising each one, and anchor them to the grid corners. Reps turn those chunks into instant recall.',
+        q: 'How do I get better at thermite?',
+        a: 'Think a few moves ahead to keep highlighted squares available, learn what each piece range highlights, and steer toward the centre — most failures come from clicking into a dead end with no new highlights.',
       },
     ],
-    related: ['word-memory', 'roof-running'],
+    related: ['roof-running', 'pincracker'],
   },
 
   laundromat: {
