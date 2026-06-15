@@ -23,6 +23,8 @@ export default function CookieConsent() {
   const handleAccept = () => {
     localStorage.setItem('cookieConsent', 'accepted');
     localStorage.setItem('cookieConsentDate', new Date().toISOString());
+    // Grant GA4 analytics (Consent Mode) now that the user has opted in.
+    (window as any).gtag?.('consent', 'update', { analytics_storage: 'granted' });
     setIsVisible(false);
     setTimeout(() => setShowBanner(false), 300); // Wait for fade out
   };
@@ -33,12 +35,8 @@ export default function CookieConsent() {
     setIsVisible(false);
     setTimeout(() => setShowBanner(false), 300); // Wait for fade out
     
-    // Optionally: disable analytics if rejected
-    // You can add logic here to disable Google Analytics
-    if (typeof window !== 'undefined') {
-      // Disable Google Analytics
-      (window as any)['ga-disable-GA_MEASUREMENT_ID'] = true;
-    }
+    // Keep GA4 analytics off via Consent Mode.
+    (window as any).gtag?.('consent', 'update', { analytics_storage: 'denied' });
   };
 
   const handleClose = () => {
