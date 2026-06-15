@@ -5,15 +5,15 @@ import JsonLd from '@/app/components/JsonLd';
 import { breadcrumbList, guideArticle } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
-    title: 'Mastering Thermite Hacks in NoPixel 4.0 - Complete Strategy Guide',
-    description: 'Learn how to master the Thermite hacking minigame in NoPixel 4.0. Expert memory techniques, pattern recognition strategies, and pro tips for conquering bank heist laser systems.',
-    keywords: ['thermite hack guide', 'NoPixel thermite tutorial', 'thermite strategy', 'NoPixel bank heist', 'thermite tips', 'GTA RP thermite hack'],
+    title: 'Mastering Thermite in NoPixel 4.0 - Complete Chain-Reaction Strategy Guide',
+    description: 'Master the NoPixel 4.0 Thermite hack — the 6x6 chain-reaction grid. Board-reading techniques, piece ranges, combos, the Sewer and Vault presets, and a step-by-step improvement plan.',
+    keywords: ['thermite hack guide', 'NoPixel thermite tutorial', 'thermite strategy', 'thermite chain reaction', 'thermite combos', 'GTA RP thermite hack', 'maze bank vault'],
     alternates: {
         canonical: 'https://nphacks.net/guides/mastering-thermite',
     },
     openGraph: {
-        title: 'Mastering Thermite Hacks in NoPixel 4.0 - Complete Strategy Guide',
-        description: 'Expert strategies and memory techniques to conquer the hardest hacking minigame in NoPixel 4.0.',
+        title: 'Mastering Thermite in NoPixel 4.0 - Complete Chain-Reaction Strategy Guide',
+        description: 'Board-reading techniques, piece ranges and combos to conquer the chain-reaction Thermite hack in NoPixel 4.0.',
         url: 'https://nphacks.net/guides/mastering-thermite',
     },
 };
@@ -30,8 +30,8 @@ export default function MasteringThermitePage() {
             />
             <JsonLd
                 data={guideArticle({
-                    headline: 'Mastering Thermite Hacks in NoPixel 4.0 - Complete Strategy Guide',
-                    description: 'Learn how to master the Thermite hacking minigame in NoPixel 4.0. Expert memory techniques, pattern recognition strategies, and pro tips for conquering bank heist laser systems.',
+                    headline: 'Mastering Thermite in NoPixel 4.0 - Complete Chain-Reaction Strategy Guide',
+                    description: 'Master the NoPixel 4.0 Thermite hack — the 6x6 chain-reaction grid. Board-reading techniques, piece ranges, combos, the Sewer and Vault presets, and a step-by-step improvement plan.',
                     path: '/guides/mastering-thermite',
                 })}
             />
@@ -54,9 +54,9 @@ export default function MasteringThermitePage() {
                         Mastering Thermite Hacks in NoPixel 4.0
                     </h1>
                     <p className="text-gray-400 text-lg leading-relaxed">
-                        The Thermite hack is widely considered the most challenging minigame in NoPixel 4.0.
-                        This guide covers everything from fundamental techniques to advanced strategies used by
-                        the server&apos;s most successful heist crews.
+                        The Thermite hack is widely considered the most challenging minigame in NoPixel 4.0. This guide
+                        covers the chain-reaction mechanic end to end — from reading the board to chaining combos under the
+                        clock like the server&apos;s best heist crews.
                     </p>
                 </header>
 
@@ -71,21 +71,23 @@ export default function MasteringThermitePage() {
                         </div>
                         <div className="space-y-4 text-gray-300 leading-relaxed">
                             <p>
-                                The Thermite minigame is a memory-based pattern recognition challenge that appears during some of the most
-                                lucrative criminal activities in NoPixel 4.0. When triggered, players are presented with a grid of tiles,
-                                and a sequence of tiles will illuminate one by one. The player must then recreate that exact sequence from
-                                memory by clicking the tiles in the correct order.
+                                The NoPixel 4.0 Thermite minigame is a <strong className="text-white">chain-reaction puzzle</strong> played on
+                                a 6&times;6 grid — not a memory test. When it triggers, one or more squares start highlighted. You click a
+                                highlighted square to &quot;decrypt&quot; it; that drops the piece&apos;s status a step (full &rarr; half &rarr; empty)
+                                and lights up a new set of squares within the piece&apos;s range. Those new highlights are your only legal next
+                                moves, and the chain continues from there.
                             </p>
                             <p>
-                                What makes Thermite particularly challenging is the combination of factors working against you: the patterns
-                                become longer and more complex as difficulty increases, the display speed gets faster, and the pressure of
-                                knowing that failure means losing expensive supplies and alerting law enforcement creates intense cognitive load.
+                                Your job is to reach a <strong className="text-white">target score</strong> — the number of squares you decrypt — before
+                                the timer runs out. What makes Thermite hard is that the board is constantly changing: every click reshapes your
+                                available moves, and one careless click can leave you with nowhere to go. There&apos;s no &quot;wrong tile&quot; to
+                                misclick; you fail by <strong className="text-white">stalling</strong> (a click that highlights nothing) or by running
+                                out of time.
                             </p>
                             <p>
-                                In the NoPixel roleplay world, Thermite charges are consumed on use regardless of success or failure.
-                                This means every failed attempt costs real in-game currency, and failed hacks during heists can trigger
-                                security systems that bring police response. The economic and strategic consequences make mastering this
-                                minigame essential for any serious criminal enterprise.
+                                This is why Thermite rewards <strong className="text-white">spatial planning and reading the board</strong> rather than
+                                memorisation or twitch reflexes. It shows up on the highest-security systems in the NoPixel world — most famously the
+                                Maze Bank sewer generators and the vault — so reliable Thermite skill is a gateway to the most lucrative heists on the server.
                             </p>
                         </div>
                     </section>
@@ -94,47 +96,51 @@ export default function MasteringThermitePage() {
                     <section className="bg-[#1a2930] border-2 border-[#54FFA4]/30 rounded-xl p-6 md:p-8">
                         <div className="flex items-center gap-3 mb-4">
                             <Brain className="w-6 h-6 text-[#54FFA4]" />
-                            <h2 className="text-2xl font-bold text-white">Memory Techniques That Actually Work</h2>
+                            <h2 className="text-2xl font-bold text-white">Board-Reading Techniques That Actually Work</h2>
                         </div>
                         <div className="space-y-4 text-gray-300 leading-relaxed">
                             <p>
-                                The key to mastering Thermite lies in how you encode the visual information. Raw memorization of individual
-                                tile positions becomes increasingly difficult as sequences grow longer. Instead, successful players employ
-                                structured memory techniques that group and contextualize the information.
+                                Strong Thermite players don&apos;t out-memorise the board — they out-read it. These are the habits that turn a
+                                ~40% pass rate into consistent wins.
                             </p>
 
-                            <h3 className="text-xl font-semibold text-white pt-2">The Chunking Method</h3>
+                            <h3 className="text-xl font-semibold text-white pt-2">Learn the Three Ranges</h3>
                             <p>
-                                Rather than trying to remember each tile individually (position 1, position 5, position 3, position 8, position 2, position 7),
-                                group them into chunks of two or three. Think of it as &quot;15, 38, 27&quot; — three chunks instead of six individual items.
-                                Research shows that most people can hold 5-9 chunks in working memory, so this method effectively doubles or triples
-                                the length of sequences you can handle.
+                                Every piece highlights a fixed shape based on its range: <strong className="text-white">short</strong> lights up the
+                                immediate neighbours, <strong className="text-white">medium</strong> reaches two cells out on a checkerboard, and
+                                <strong className="text-white"> long</strong> reaches three cells out. Once you can recognise these at a glance, you can
+                                predict exactly what a click will open up before you make it — the foundation of everything else.
                             </p>
 
-                            <h3 className="text-xl font-semibold text-white pt-2">Spatial Path Visualization</h3>
+                            <h3 className="text-xl font-semibold text-white pt-2">Always Have Your Next Move</h3>
                             <p>
-                                Instead of memorizing positions numerically, visualize the sequence as a path drawn across the grid.
-                                Your brain is naturally excellent at remembering spatial paths — think about how easily you can retrace
-                                a route you&apos;ve walked. Treat the tile sequence as a journey across the grid, noting the direction
-                                and shape of the path. &quot;Start top-left, go down, sweep right, jump to bottom-left&quot; is much easier
-                                to remember than a list of coordinates.
+                                Never click a square until you can already see the click after it. The aim isn&apos;t to clear the nearest tile — it&apos;s
+                                to keep highlighted squares available so the chain never dies. Thinking just one move ahead is the single biggest jump
+                                in reliability you can make.
                             </p>
 
-                            <h3 className="text-xl font-semibold text-white pt-2">Verbal Encoding with Grid Landmarks</h3>
+                            <h3 className="text-xl font-semibold text-white pt-2">Control the Centre</h3>
                             <p>
-                                Assign memorable labels to grid positions and quietly verbalize the sequence. Instead of abstract positions,
-                                use descriptive terms: &quot;corner, edge, center, top, corner.&quot; Creating a verbal narrative engages
-                                a different memory system than pure visual memory, effectively giving you two independent encodings of the
-                                same information. If one system fails, the other can compensate.
+                                Central pieces highlight more follow-up squares than edges and corners. Keep the chain working through the middle of the
+                                board, where your options stay wide open, and treat the edges as a last resort. Getting cornered against a wall is how
+                                most runs stall.
                             </p>
 
-                            <h3 className="text-xl font-semibold text-white pt-2">Mouse-Tracking Rehearsal</h3>
+                            <h3 className="text-xl font-semibold text-white pt-2">Set Up Combos</h3>
                             <p>
-                                During the display phase, physically move your mouse or finger along the path of the illuminating tiles.
-                                This engages motor memory (procedural memory), which is one of the most robust and reliable memory systems
-                                in the brain. Even if you can&apos;t consciously recall the exact sequence, your hand may &quot;remember&quot;
-                                the path. This technique becomes more effective with practice as your motor cortex develops stronger associations.
+                                Decrypting several squares in quick succession triggers a combo (&quot;CRC Bypassed!&quot;) and banks bonus score. Rather
+                                than reacting click-by-click, plan a short two- or three-move chain in your head and then execute it fast. Combos are how
+                                you beat the Vault&apos;s higher target before the timer expires.
                             </p>
+
+                            <div className="bg-[#0F1B21]/50 border border-[#54FFA4]/20 rounded-lg p-4 flex items-start gap-3">
+                                <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                                <p className="text-sm">
+                                    <strong className="text-white">Pro tip:</strong> read the board in &quot;branches&quot;, not single tiles. Before
+                                    committing, glance at which highlighted square keeps the most future options alive — that&apos;s almost always the
+                                    right click.
+                                </p>
+                            </div>
                         </div>
                     </section>
 
@@ -142,28 +148,24 @@ export default function MasteringThermitePage() {
                     <section className="bg-[#1a2930] border-2 border-[#54FFA4]/30 rounded-xl p-6 md:p-8">
                         <div className="flex items-center gap-3 mb-4">
                             <Target className="w-6 h-6 text-[#54FFA4]" />
-                            <h2 className="text-2xl font-bold text-white">Difficulty Levels and What to Expect</h2>
+                            <h2 className="text-2xl font-bold text-white">The Presets and What to Expect</h2>
                         </div>
                         <div className="space-y-4 text-gray-300 leading-relaxed">
                             <p>
-                                Understanding the progression of difficulty helps you set realistic training goals and know what to practice for specific heist types.
+                                Our trainer ships with the in-game presets plus a custom mode. Knowing what each demands helps you set realistic goals.
                             </p>
                             <div className="grid gap-4 mt-4">
                                 <div className="bg-[#0F1B21]/50 rounded-lg p-4 border border-green-500/20">
-                                    <h4 className="font-semibold text-green-400 mb-1">Beginner (3-4 tiles)</h4>
-                                    <p className="text-sm">Slow display speed with generous timing windows. Used in low-level criminal activities like basic store robberies. Most players can pass these within a few practice attempts.</p>
-                                </div>
-                                <div className="bg-[#0F1B21]/50 rounded-lg p-4 border border-yellow-500/20">
-                                    <h4 className="font-semibold text-yellow-400 mb-1">Intermediate (5-6 tiles)</h4>
-                                    <p className="text-sm">Moderate display speed requiring focused concentration. Required for Fleeca Bank robberies and mid-tier heists. This is where most players start to struggle and where practice becomes essential.</p>
+                                    <h4 className="font-semibold text-green-400 mb-1">Sewer Generators — 6&times;6, target 24, ~60s</h4>
+                                    <p className="text-sm">The standard Maze Bank sewer breach and the one to learn first. The target is reachable by clean, single clears if you keep your options open. Master this before anything else.</p>
                                 </div>
                                 <div className="bg-[#0F1B21]/50 rounded-lg p-4 border border-orange-500/20">
-                                    <h4 className="font-semibold text-orange-400 mb-1">Advanced (7-8 tiles)</h4>
-                                    <p className="text-sm">Fast display with minimal margin for error. Required for Paleto Bay Bank and higher-value targets. Only consistent practice and strong memory techniques will get you through these levels.</p>
+                                    <h4 className="font-semibold text-orange-400 mb-1">Vault — 6&times;6, target 28, ~60s</h4>
+                                    <p className="text-sm">Same board size, higher target. Four extra decrypts in the same time means single-clearing won&apos;t cut it — you have to chain combos. This is the real test of planning under pressure.</p>
                                 </div>
-                                <div className="bg-[#0F1B21]/50 rounded-lg p-4 border border-red-500/20">
-                                    <h4 className="font-semibold text-red-400 mb-1">Expert (9+ tiles)</h4>
-                                    <p className="text-sm">Extremely rapid sequences that test the limits of human working memory. Required for Pacific Standard Bank vault and the most dangerous heists on the server. Only elite hackers consistently pass at this level.</p>
+                                <div className="bg-[#0F1B21]/50 rounded-lg p-4 border border-[#54FFA4]/20">
+                                    <h4 className="font-semibold text-[#54FFA4] mb-1">Custom — your settings</h4>
+                                    <p className="text-sm">Open settings to change grid dimensions, target score and timer. Use it to drill specific skills — smaller boards for combo timing, larger boards to stress-test your reads.</p>
                                 </div>
                             </div>
                         </div>
@@ -177,37 +179,37 @@ export default function MasteringThermitePage() {
                         </div>
                         <div className="space-y-4 text-gray-300 leading-relaxed">
                             <p>
-                                Even experienced players fall into these traps. Being aware of common failure patterns is the first step to eliminating them.
+                                Even experienced players fall into these traps. Spotting them is the first step to eliminating them.
                             </p>
                             <ul className="space-y-3">
                                 <li className="flex items-start gap-3">
                                     <span className="text-red-400 font-bold mt-0.5">✗</span>
                                     <div>
-                                        <strong className="text-white">Missing the first tile:</strong> The most common cause of failure. Players often focus on getting ready rather than watching. Solution: be locked in before the sequence begins. Your eyes should already be on the grid.
+                                        <strong className="text-white">Grabbing the nearest highlight:</strong> clicking the closest square on reflex, without checking what it leaves you, is the #1 cause of stalls. Confirm you&apos;ll still have a move first.
                                     </div>
                                 </li>
                                 <li className="flex items-start gap-3">
                                     <span className="text-red-400 font-bold mt-0.5">✗</span>
                                     <div>
-                                        <strong className="text-white">Rushing after the display ends:</strong> Many players click immediately when the display phase ends. This leaves no time for mental rehearsal. Take 1-2 seconds to mentally replay the sequence before clicking.
+                                        <strong className="text-white">Drifting into edges and corners:</strong> those pieces highlight fewer cells, so your options dry up fast. Steer the chain back toward the centre whenever you can.
                                     </div>
                                 </li>
                                 <li className="flex items-start gap-3">
                                     <span className="text-red-400 font-bold mt-0.5">✗</span>
                                     <div>
-                                        <strong className="text-white">Confusing adjacent tiles:</strong> On larger grids, tiles that are close together can be confused. Solution: use grid landmarks — if a tile is in the exact corner vs one position away from the corner, note that distinction explicitly.
+                                        <strong className="text-white">Single-clearing on the Vault:</strong> clearing one square at a time can&apos;t reach target 28 in time. If you&apos;re not chaining combos, you won&apos;t beat the clock.
                                     </div>
                                 </li>
                                 <li className="flex items-start gap-3">
                                     <span className="text-red-400 font-bold mt-0.5">✗</span>
                                     <div>
-                                        <strong className="text-white">Panic clicking after an error:</strong> Once you know you&apos;ve made a mistake, some players randomly click hoping to get lucky. This never works and wastes time. Accept the failure, learn from it, and reset.
+                                        <strong className="text-white">Not learning the ranges:</strong> if you can&apos;t predict what short/medium/long light up, you&apos;re guessing every move. Drill the three shapes until they&apos;re instant.
                                     </div>
                                 </li>
                                 <li className="flex items-start gap-3">
                                     <span className="text-red-400 font-bold mt-0.5">✗</span>
                                     <div>
-                                        <strong className="text-white">Only practicing easy levels:</strong> If you only practice 3-4 tile patterns, you&apos;ll never build the cognitive capacity for harder ones. Regularly push yourself one level beyond your comfort zone.
+                                        <strong className="text-white">Only practising one board:</strong> beating Sewer once isn&apos;t mastery. Rotate through Vault and custom layouts so you can read anything the chain throws at you.
                                     </div>
                                 </li>
                             </ul>
@@ -218,29 +220,29 @@ export default function MasteringThermitePage() {
                     <section className="bg-[#1a2930] border-2 border-[#54FFA4]/30 rounded-xl p-6 md:p-8">
                         <div className="flex items-center gap-3 mb-4">
                             <GraduationCap className="w-6 h-6 text-[#54FFA4]" />
-                            <h2 className="text-2xl font-bold text-white">The 30-Day Thermite Mastery Plan</h2>
+                            <h2 className="text-2xl font-bold text-white">A Four-Week Thermite Improvement Plan</h2>
                         </div>
                         <div className="space-y-4 text-gray-300 leading-relaxed">
                             <p>
-                                Follow this structured training plan to go from beginner to expert-level Thermite skills in 30 days.
-                                Consistency is more important than duration — 15 focused minutes daily beats 2 hours once a week.
+                                Follow this structured plan to go from cornered-and-confused to clearing the Vault on demand. Consistency beats
+                                marathons — 15 focused minutes a day outperforms two hours once a week.
                             </p>
                             <div className="space-y-3 mt-4">
                                 <div className="bg-[#0F1B21]/50 rounded-lg p-4 border border-[#54FFA4]/20">
-                                    <h4 className="font-semibold text-[#54FFA4] mb-1">Week 1: Foundation (Days 1-7)</h4>
-                                    <p className="text-sm">Practice 3-4 tile patterns for 15 minutes daily. Focus on building your chosen memory technique (chunking, spatial paths, or verbal encoding). Don&apos;t worry about speed — accuracy is everything at this stage. Aim for 90%+ success rate on beginner difficulty.</p>
+                                    <h4 className="font-semibold text-[#54FFA4] mb-1">Week 1: Learn the Ranges (Days 1-7)</h4>
+                                    <p className="text-sm">Play Sewer slowly and study what each piece highlights — short, medium, long. Don&apos;t chase score; just train yourself to always leave a next move. Goal: never stall on Sewer.</p>
                                 </div>
                                 <div className="bg-[#0F1B21]/50 rounded-lg p-4 border border-[#54FFA4]/20">
-                                    <h4 className="font-semibold text-[#54FFA4] mb-1">Week 2: Building Capacity (Days 8-14)</h4>
-                                    <p className="text-sm">Move to 5-6 tile patterns. Start incorporating mouse-tracking rehearsal alongside your primary technique. Practice for 20 minutes daily. You should start seeing your response time decrease as the mechanics become automatic.</p>
+                                    <h4 className="font-semibold text-[#54FFA4] mb-1">Week 2: Think One Move Ahead (Days 8-14)</h4>
+                                    <p className="text-sm">Pick up the pace on Sewer at the real target (24). Before each click, identify your next click too. Keep the chain in the centre of the board. Goal: consistent Sewer clears.</p>
                                 </div>
                                 <div className="bg-[#0F1B21]/50 rounded-lg p-4 border border-[#54FFA4]/20">
-                                    <h4 className="font-semibold text-[#54FFA4] mb-1">Week 3: Pressure Training (Days 15-21)</h4>
-                                    <p className="text-sm">Tackle 7-8 tile patterns. Set personal time limits to simulate heist pressure. Practice under mild distractions (music playing, etc.) to build focus resilience. If you&apos;re stuck, revisit your memory technique and potentially try combining two methods.</p>
+                                    <h4 className="font-semibold text-[#54FFA4] mb-1">Week 3: Combos &amp; the Vault (Days 15-21)</h4>
+                                    <p className="text-sm">Move to the Vault (target 28). Practice staging two- and three-click chains and firing them fast for combos. Expect to fail at first — the planning gets faster with reps.</p>
                                 </div>
                                 <div className="bg-[#0F1B21]/50 rounded-lg p-4 border border-[#54FFA4]/20">
-                                    <h4 className="font-semibold text-[#54FFA4] mb-1">Week 4: Mastery (Days 22-30)</h4>
-                                    <p className="text-sm">Push into 9+ tile territory. If you can consistently pass 8-tile patterns, you&apos;re ready for virtually any heist in NoPixel 4.0. Keep practicing to maintain your edge.</p>
+                                    <h4 className="font-semibold text-[#54FFA4] mb-1">Week 4: Pressure &amp; Variety (Days 22-30)</h4>
+                                    <p className="text-sm">Mix Sewer, Vault and custom boards back to back so no layout surprises you. Tighten your decision speed. If you can clear the Vault consistently, you&apos;re ready for any heist in NoPixel 4.0.</p>
                                 </div>
                             </div>
                         </div>
@@ -254,20 +256,19 @@ export default function MasteringThermitePage() {
                         </div>
                         <div className="space-y-4 text-gray-300 leading-relaxed">
                             <p>
-                                In the NoPixel roleplay ecosystem, your ability to hack determines what criminal activities you can participate in.
-                                Thermite proficiency is not just about completing a puzzle — it&apos;s a gateway to the most exciting and profitable
-                                content the server has to offer.
+                                In the NoPixel roleplay ecosystem, your ability to hack determines what criminal activities you can take part in.
+                                Thermite proficiency isn&apos;t just about clearing a puzzle — it&apos;s a gateway to the most exciting and profitable
+                                content on the server.
                             </p>
                             <p>
-                                Players who can consistently pass advanced Thermite patterns are in high demand. Heist crews actively recruit
-                                skilled hackers, and being the person who can reliably disable security systems earns significant respect and
-                                financial rewards within the roleplay community.
+                                Players who can reliably clear the Vault under pressure are in genuine demand. Heist crews actively recruit hackers they
+                                can trust, and being the person who calmly decrypts the board while the clock runs earns real respect and rewards within
+                                the community.
                             </p>
                             <p>
-                                Conversely, failing a Thermite hack during a live heist can have devastating consequences: burned Thermite charges
-                                (which are expensive to acquire), triggered alarms that bring police response, and the potential loss of the entire
-                                crew&apos;s investment in planning, equipment, and setup. The social pressure of letting down your crew makes
-                                practice even more critical.
+                                The flip side is steep: a blown Thermite during a live heist can trip security, waste the crew&apos;s planning and setup,
+                                and end a run before it starts. That pressure is exactly why drilling the board-reading and combo skills here — where
+                                mistakes are free — pays off when it counts.
                             </p>
                         </div>
                     </section>
