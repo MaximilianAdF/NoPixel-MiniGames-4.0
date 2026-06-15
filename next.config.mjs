@@ -30,6 +30,14 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@fortawesome/react-fontawesome', '@fortawesome/free-solid-svg-icons'],
   },
+  // Collapse legacy / mistyped URLs onto the canonical routes so they stop
+  // showing up as duplicate / not-found entries in Search Console.
+  async redirects() {
+    return [
+      { source: '/puzzle/:slug', destination: '/puzzles/:slug', permanent: true },
+      { source: '/NoPixel-MiniGames-4.0/:path*', destination: '/', permanent: true },
+    ];
+  },
   // Headers for better caching
   async headers() {
     return [
