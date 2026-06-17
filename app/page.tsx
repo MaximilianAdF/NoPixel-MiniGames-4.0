@@ -359,14 +359,18 @@ export default function Home() {
           {/* About Section - removed backdrop-blur and simplified animation */}
           <Reveal as="div" className="bg-gradient-to-br from-mirage-900/80 to-mirage-950/80 rounded-2xl shadow-xl p-8 sm:p-10 border-2 border-spring-green-500/30 hover:border-spring-green-400/60 transition-colors duration-300">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6 bg-gradient-to-r from-spring-green-400 to-aquamarine-400 bg-clip-text text-transparent">
-              About NoPixel Hacking Simulator
+              Every NoPixel 4.0 Hack, Free to Practice
             </h2>
             <div className="space-y-4 text-gray-300 leading-relaxed text-lg">
               <p className="hover:text-gray-200 transition-colors duration-300">
-                Welcome to the most comprehensive NoPixel 4.0 hacking simulator available online. 
-                This platform provides authentic replicas of the challenging minigames featured in the popular Grand Theft Auto V roleplay 
-                server, NoPixel. Whether you&apos;re a seasoned criminal looking to hone your skills or a curious newcomer wanting to experience 
+                Welcome to the most comprehensive collection of NoPixel 4.0 hacks you can practice online — completely free.
+                This platform provides authentic replicas of every hacking minigame featured in the popular Grand Theft Auto V roleplay
+                server, NoPixel. Whether you&apos;re a seasoned criminal looking to hone your skills or a curious newcomer wanting to experience
                 the thrill of virtual heists, this simulator offers the perfect training ground.
+              </p>
+              <p className="hover:text-gray-200 transition-colors duration-300">
+                The NoPixel hacks covered here include the Thermite chain-reaction grid, the Lockpick and Laundromat timing locks, Roof Running,
+                Word Memory, PinCracker, Chopping and the Repair Kit — every minigame you&apos;ll run into across heists, robberies and vehicle crime in GTA RP.
               </p>
               <p className="hover:text-gray-200 transition-colors duration-300">
                 NoPixel is renowned for its intricate and demanding hacking mechanics that add an exciting layer of challenge to various 
@@ -434,6 +438,14 @@ export default function Home() {
                   "mainEntity": [
                     {
                       "@type": "Question",
+                      "name": "What are the NoPixel 4.0 hacks?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "The NoPixel 4.0 hacks are the hacking minigames you play across heists and crime in the GTA RP server: Thermite, Lockpick, Laundromat, Roof Running, Word Memory, PinCracker, Chopping and Repair Kit. You can practice all of them free on this site."
+                      }
+                    },
+                    {
+                      "@type": "Question",
                       "name": "What is NoPixel 4.0?",
                       "acceptedAnswer": {
                         "@type": "Answer",
@@ -488,6 +500,13 @@ export default function Home() {
               Frequently Asked Questions
             </h2>
             <div className="space-y-6 text-gray-300">
+              <div className="border-l-4 border-spring-green-500/30 pl-6 hover:border-spring-green-500 transition-colors duration-300">
+                <h3 className="text-xl font-bold text-white mb-2">What are the NoPixel 4.0 hacks?</h3>
+                <p className="leading-relaxed">
+                  The NoPixel 4.0 hacks are the hacking minigames you play across heists and crime in the GTA RP server — Thermite, Lockpick, Laundromat, Roof Running, Word Memory, PinCracker, Chopping and Repair Kit. You can practice all of them free on this site.
+                </p>
+              </div>
+
               <div className="border-l-4 border-spring-green-500/30 pl-6 hover:border-spring-green-500 transition-colors duration-300">
                 <h3 className="text-xl font-bold text-white mb-2">What is NoPixel 4.0?</h3>
                 <p className="leading-relaxed">

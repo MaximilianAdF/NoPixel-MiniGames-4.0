@@ -41,6 +41,10 @@ export const PUZZLE_CONTENT: Record<string, PuzzleContent> = {
         q: 'How do I get better at the lockpick minigame?',
         a: "Practise reading the marker's speed and stopping it just inside the target zone. Short, repeated sessions build the muscle memory that makes it automatic in-game.",
       },
+      {
+        q: 'Is this the Prodigy RP lockpick?',
+        a: 'Yes — Prodigy RP and other FiveM / NoPixel-based servers use the same rotating-lock timing minigame, so the timing you build here carries straight over.',
+      },
     ],
     related: ['laundromat', 'repair-kit'],
   },
