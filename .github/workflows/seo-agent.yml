@@ -81,6 +81,26 @@ jobs:
       - name: Clean up scratch files
         run: rm -f reports/_draft*.md reports/_critique*.md
 
+      # Safety net: if the agent edited code, verify it still builds; auto-revert
+      # breaking edits (keep the report) so a bad fix never reaches a PR.
+      - name: Verify agent edits build
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+        run: |
+          if git status --porcelain app lib | grep -q .; then
+            echo "Agent edited code — verifying build..."
+            npm ci --no-audit --no-fund
+            if ! npm run build; then
+              echo "::warning::Agent edits broke the build — reverting code edits, keeping the report."
+              git checkout -- app lib
+              printf '\n---\n> WARNING: proposed code edits were auto-reverted (they broke the build). The report and suggestions are retained — apply manually after review.\n' >> reports/seo-report.md
+            else
+              echo "Build OK."
+            fi
+          else
+            echo "No code edits — skipping build verification."
+          fi
+
       - name: Open pull request
         uses: peter-evans/create-pull-request@v6
         with:
@@ -92,12 +112,7 @@ jobs:
             reports/**
             app/**
             lib/**
-          title: "SEO weekly report + suggestions"
-          commit-message: "seo: weekly agent report + suggested edits"
-          body: |
-            Automated weekly SEO analysis — 3-pass debate (propose -> red-team -> judge),
-            opus at max effort, with live GSC/GA4 drill-down.
-
-            - Read the report under `reports/` for the strategy, the debate outcomes, and the rejected ideas.
-            - Review any suggested metadata edits in the diff before merging.
-            - `seo-data.json` and `_draft`/`_critique` scratch files are gitignored / cleaned.
+          title: "Weekly site audit + fixes"
+          commit-message: "seo: weekly agent report + fixes"
+          # The agent's full report (written by the judge) becomes the PR description.
+          body-path: reports/seo-report.md
