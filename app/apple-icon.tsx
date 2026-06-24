@@ -1,14 +1,14 @@
 import { ImageResponse } from 'next/og'
 
-// Google ignores favicons smaller than 48x48 (must be a multiple of 48) and
-// falls back to a generic globe. 192 = 4x48 keeps the "NP" crisp at any size.
+// iOS home-screen icon (180x180). Mirrors app/icon.tsx so the brand mark is
+// consistent across Google favicons, browser tabs, and saved-to-homescreen.
 export const size = {
-  width: 192,
-  height: 192,
+  width: 180,
+  height: 180,
 }
 export const contentType = 'image/png'
 
-export default function Icon() {
+export default function AppleIcon() {
   return new ImageResponse(
     (
       <div
@@ -19,17 +19,17 @@ export default function Icon() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: '48px',
+          borderRadius: '40px',
           boxShadow: '0 12px 48px rgba(84, 255, 164, 0.5)',
         }}
       >
         <div
           style={{
-            fontSize: '120px',
+            fontSize: '112px',
             fontFamily: 'system-ui, -apple-system, sans-serif',
             fontWeight: '900',
             color: '#0F1B21',
-            letterSpacing: '-12px',
+            letterSpacing: '-11px',
             textShadow: '0 6px 12px rgba(0,0,0,0.2)',
           }}
         >

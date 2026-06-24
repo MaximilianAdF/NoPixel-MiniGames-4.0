@@ -79,14 +79,17 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://nphacks.net'),
   applicationName: 'NoPixel 4.0 Minigames',
   title: {
-    default: "NoPixel 4.0 Minigames - Free Practice Trainer for GTA RP Hacking",
+    default: "NoPixel 4.0 Minigames & Hacks - Free Practice Trainer",
     template: "%s | NoPixel 4.0 Practice"
   },
-  description: "Free practice trainers for the NoPixel 4.0 GTA RP hacking minigames - Thermite, Lockpick, Laundromat, Roof Running and more. Authentic mechanics, no download required.",
+  description: "Practice every NoPixel 4.0 hack and minigame free in your browser - Thermite, Lockpick, Laundromat, Roof Running, PinCracker and more. No download required.",
+  alternates: {
+    canonical: 'https://nphacks.net',
+  },
   icons: {
     icon: '/icon',
     shortcut: '/icon',
-    apple: '/icon',
+    apple: '/apple-icon',
   },
   manifest: '/manifest.json',
   keywords: [
@@ -117,14 +120,14 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://nphacks.net',
-    title: 'NoPixel 4.0 Minigames - Free GTA RP Hacking Practice',
+    title: 'NoPixel 4.0 Minigames & Hacks - Free GTA RP Hacking Practice',
     description: 'Free practice trainers for NoPixel 4.0 GTA RP hacking minigames. Authentic mechanics, daily challenges, and in-depth guides.',
     siteName: 'NoPixel 4.0 Minigames',
     // Next.js will automatically use /app/opengraph-image.tsx
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NoPixel 4.0 Minigames - Free GTA RP Hacking Practice',
+    title: 'NoPixel 4.0 Minigames & Hacks - Free GTA RP Hacking Practice',
     description: 'Free practice trainers for NoPixel 4.0 GTA RP hacking minigames. Authentic mechanics, daily challenges, and in-depth guides.',
     // Next.js will automatically use /app/opengraph-image.tsx
   },

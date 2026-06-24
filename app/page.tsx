@@ -178,7 +178,7 @@ export default function Home() {
             <div className="relative flex flex-col sm:flex-row items-center sm:items-start justify-center gap-2 sm:gap-4">
               {/* NoPixel - Large on the left */}
               <h1 className="relative group cursor-pointer text-center sm:text-left">
-                <span className="sr-only">NoPixel 4.0 Minigames — Hacking Simulator</span>
+                <span className="sr-only">NoPixel 4.0 Minigames & Hacks — Free Practice Trainer</span>
                 <span
                   aria-hidden="true"
                   className="inline-block text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black bg-clip-text text-transparent transition-transform duration-500 group-hover:translate-x-2 animate-gradient-flow"
