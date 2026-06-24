@@ -5,8 +5,8 @@ name: Weekly SEO agent
 # the weekly schedule is added afterwards.
 on:
   workflow_dispatch: {}
-  # schedule:
-  #   - cron: "0 7 * * 1"   # Mondays 07:00 UTC (enable after a successful test run)
+  schedule:
+    - cron: "0 7 * * 1"   # Mondays 07:00 UTC
 
 permissions:
   contents: write
