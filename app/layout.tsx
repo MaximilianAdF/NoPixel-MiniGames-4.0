@@ -87,9 +87,13 @@ export const metadata: Metadata = {
     canonical: 'https://nphacks.net',
   },
   icons: {
-    icon: '/icon',
-    shortcut: '/icon',
-    apple: '/apple-icon',
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   manifest: '/manifest.json',
   keywords: [
@@ -208,7 +212,7 @@ export default function RootLayout({
                   "@id": "https://nphacks.net/#organization",
                   "name": "NoPixel Minigames",
                   "url": "https://nphacks.net",
-                  "logo": "https://nphacks.net/icon",
+                  "logo": "https://nphacks.net/icon-512.png",
                   "sameAs": [
                     "https://github.com/MaximilianAdF/NoPixel-MiniGames-4.0"
                   ]

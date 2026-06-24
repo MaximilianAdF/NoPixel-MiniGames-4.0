@@ -9,22 +9,22 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icon",
-      "sizes": "32x32",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icon",
+      "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon",
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "categories": ["games", "education", "entertainment"],
@@ -35,14 +35,14 @@
       "short_name": "Daily",
       "description": "Complete today's daily challenge",
       "url": "/daily-challenge",
-      "icons": [{ "src": "/icon", "sizes": "96x96" }]
+      "icons": [{ "src": "/icon-96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Leaderboards",
       "short_name": "Leaderboards",
       "description": "View global leaderboards",
       "url": "/leaderboards",
-      "icons": [{ "src": "/icon", "sizes": "96x96" }]
+      "icons": [{ "src": "/icon-96.png", "sizes": "96x96", "type": "image/png" }]
     }
   ]
 }

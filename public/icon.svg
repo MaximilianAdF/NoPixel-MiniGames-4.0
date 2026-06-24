@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="nphacks hack terminal mark">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#13262c"/>
+      <stop offset="1" stop-color="#0c171b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.42" cy="0.5" r="0.62">
+      <stop offset="0" stop-color="#54FFA4" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#54FFA4" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="stroke" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7dffc0"/>
+      <stop offset="1" stop-color="#00e07a"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="44" fill="url(#bg)"/>
+  <rect width="192" height="192" rx="44" fill="url(#glow)"/>
+  <rect x="5.5" y="5.5" width="181" height="181" rx="39" fill="none" stroke="#54FFA4" stroke-opacity="0.2" stroke-width="3"/>
+  <!-- neon command-prompt chevron -->
+  <path d="M58 54 L102 96 L58 138" fill="none" stroke="url(#stroke)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- blinking-cursor underscore -->
+  <rect x="110" y="120" width="44" height="16" rx="5" fill="url(#stroke)"/>
+</svg>
