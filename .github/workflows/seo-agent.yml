@@ -1,0 +1,73 @@
+name: Weekly SEO agent
+
+# Reads GSC + GA4, has Claude analyze it, and opens a PR with a report + any
+# high-confidence metadata edits. Manual-only until the first test run is green;
+# the weekly schedule is added afterwards.
+on:
+  workflow_dispatch: {}
+  # schedule:
+  #   - cron: "0 7 * * 1"   # Mondays 07:00 UTC (enable after a successful test run)
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: seo-agent
+  cancel-in-progress: false
+
+jobs:
+  seo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python deps
+        run: pip install -r scripts/seo-agent/requirements.txt
+
+      - name: Fetch GSC + GA4 data
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          GA4_PROPERTY_ID: ${{ vars.GA4_PROPERTY_ID }}
+          GSC_SITE: ${{ vars.GSC_SITE }}
+          SEO_DATA_OUT: seo-data.json
+        run: python scripts/seo-agent/fetch.py
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Claude Code
+        run: npm i -g @anthropic-ai/claude-code
+
+      - name: Run SEO agent
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          PROMPT="$(cat scripts/seo-agent/prompt.md)
+
+          The analytics bundle is at: ./seo-data.json
+          Today's date is: $(date +%F)"
+          claude -p "$PROMPT" \
+            --model sonnet \
+            --permission-mode acceptEdits \
+            --allowedTools "Read,Edit,Write,Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
+
+      - name: Open pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: seo-agent/weekly-report
+          delete-branch: true
+          title: "SEO weekly report + suggestions"
+          commit-message: "seo: weekly agent report + suggested edits"
+          body: |
+            Automated weekly SEO analysis from the content agent.
+
+            - Read the report under `reports/` for the strategy + prioritized opportunities.
+            - Review any suggested metadata edits in the diff before merging.
+            - `seo-data.json` is gitignored and not included.

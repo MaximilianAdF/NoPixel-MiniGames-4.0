@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Shared project, keep config private
 .idea/
+
+# SEO agent data bundle (generated, not committed)
+seo-data.json
