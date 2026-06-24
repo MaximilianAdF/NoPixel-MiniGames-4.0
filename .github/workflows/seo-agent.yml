@@ -1,8 +1,8 @@
 name: Weekly SEO agent
 
-# Reads GSC + GA4, has Claude analyze it, and opens a PR with a report + any
-# high-confidence metadata edits. Manual-only until the first test run is green;
-# the weekly schedule is added afterwards.
+# Reads GSC + GA4 (broad static bundle + on-demand drill-down), runs a 3-pass
+# debate (propose -> red-team attack -> impartial judge), and opens a PR with a
+# report + any high-confidence metadata edits the debate produced.
 on:
   workflow_dispatch: {}
   schedule:
@@ -16,66 +16,68 @@ concurrency:
   group: seo-agent
   cancel-in-progress: false
 
+env:
+  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+  GA4_PROPERTY_ID: ${{ vars.GA4_PROPERTY_ID }}
+  GSC_SITE: ${{ vars.GSC_SITE }}
+  CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
 jobs:
   seo:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
       - name: Install Python deps
         run: pip install -r scripts/seo-agent/requirements.txt
-
       - name: Fetch GSC + GA4 data
         env:
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
-          GA4_PROPERTY_ID: ${{ vars.GA4_PROPERTY_ID }}
-          GSC_SITE: ${{ vars.GSC_SITE }}
           SEO_DATA_OUT: seo-data.json
         run: python scripts/seo-agent/fetch.py
-
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-
       - name: Install Claude Code
         run: npm i -g @anthropic-ai/claude-code
 
-      # Pass 1 — analyst drafts candidate ideas (no code edits)
-      - name: Analyze (draft)
-        env:
-          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      # Pass 1 — propose candidates (no edits)
+      - name: Propose (analyst)
         run: |
           PROMPT="$(cat scripts/seo-agent/prompt.md)
 
           The analytics bundle is at: ./seo-data.json
           Today's date is: $(date +%F)"
-          claude -p "$PROMPT" \
-            --model opus --effort max \
-            --permission-mode acceptEdits \
-            --allowedTools "Read,Write,Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
+          claude -p "$PROMPT" --model opus --effort max --permission-mode acceptEdits \
+            --allowedTools "Read,Write,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
 
-      # Pass 2 — skeptic debates/verifies each idea, writes final report + makes <=2 edits
-      - name: Verify & finalize (adversarial debate)
-        env:
-          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      # Pass 2 — red-team attacks every candidate (no edits)
+      - name: Red-team (attack)
         run: |
-          PROMPT="$(cat scripts/seo-agent/prompt-verify.md)
+          PROMPT="$(cat scripts/seo-agent/prompt-adversary.md)
 
           The analyst draft is at: ./reports/_draft.md
           The analytics bundle is at: ./seo-data.json
           Today's date is: $(date +%F)"
-          claude -p "$PROMPT" \
-            --model opus --effort max \
-            --permission-mode acceptEdits \
-            --allowedTools "Read,Edit,Write,Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
+          claude -p "$PROMPT" --model opus --effort max --permission-mode acceptEdits \
+            --allowedTools "Read,Write,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
 
-      - name: Clean up draft
-        run: rm -f reports/_draft*.md
+      # Pass 3 — impartial judge decides, finalizes, makes <=2 edits
+      - name: Judge & finalize
+        run: |
+          PROMPT="$(cat scripts/seo-agent/prompt-judge.md)
+
+          The analyst draft is at: ./reports/_draft.md
+          The red-team critique is at: ./reports/_critique.md
+          The analytics bundle is at: ./seo-data.json
+          Today's date is: $(date +%F)"
+          claude -p "$PROMPT" --model opus --effort max --permission-mode acceptEdits \
+            --allowedTools "Read,Edit,Write,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
+
+      - name: Clean up scratch files
+        run: rm -f reports/_draft*.md reports/_critique*.md
 
       - name: Open pull request
         uses: peter-evans/create-pull-request@v6
@@ -85,8 +87,9 @@ jobs:
           title: "SEO weekly report + suggestions"
           commit-message: "seo: weekly agent report + suggested edits"
           body: |
-            Automated weekly SEO analysis from the content agent.
+            Automated weekly SEO analysis — 3-pass debate (propose -> red-team -> judge),
+            opus at max effort, with live GSC/GA4 drill-down.
 
-            - Read the report under `reports/` for the strategy + prioritized opportunities.
+            - Read the report under `reports/` for the strategy, the debate outcomes, and the rejected ideas.
             - Review any suggested metadata edits in the diff before merging.
-            - `seo-data.json` is gitignored and not included.
+            - `seo-data.json` and `_draft`/`_critique` scratch files are gitignored / cleaned.
