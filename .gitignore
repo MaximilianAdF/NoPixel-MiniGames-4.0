@@ -45,3 +45,4 @@ next-env.d.ts
 
 # SEO agent data bundle (generated, not committed)
 seo-data.json
+reports/_draft*.md

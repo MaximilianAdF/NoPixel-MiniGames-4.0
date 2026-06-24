@@ -19,7 +19,7 @@ concurrency:
 jobs:
   seo:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
@@ -45,7 +45,8 @@ jobs:
       - name: Install Claude Code
         run: npm i -g @anthropic-ai/claude-code
 
-      - name: Run SEO agent
+      # Pass 1 — analyst drafts candidate ideas (no code edits)
+      - name: Analyze (draft)
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
@@ -54,9 +55,27 @@ jobs:
           The analytics bundle is at: ./seo-data.json
           Today's date is: $(date +%F)"
           claude -p "$PROMPT" \
-            --model sonnet \
+            --model opus --effort max \
+            --permission-mode acceptEdits \
+            --allowedTools "Read,Write,Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
+
+      # Pass 2 — skeptic debates/verifies each idea, writes final report + makes <=2 edits
+      - name: Verify & finalize (adversarial debate)
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          PROMPT="$(cat scripts/seo-agent/prompt-verify.md)
+
+          The analyst draft is at: ./reports/_draft.md
+          The analytics bundle is at: ./seo-data.json
+          Today's date is: $(date +%F)"
+          claude -p "$PROMPT" \
+            --model opus --effort max \
             --permission-mode acceptEdits \
             --allowedTools "Read,Edit,Write,Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
+
+      - name: Clean up draft
+        run: rm -f reports/_draft*.md
 
       - name: Open pull request
         uses: peter-evans/create-pull-request@v6
