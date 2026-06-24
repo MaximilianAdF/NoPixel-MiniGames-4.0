@@ -1,0 +1,25 @@
+# nphacks.net — NoPixel 4.0 Minigames & Hacks Trainer
+
+> Free, browser-based practice trainers for the NoPixel 4.0 (GTA RP / FiveM) hacking minigames. Each trainer recreates the real in-game mechanic so players can drill it with no download, no server, and no login. Community-built and open-source. Covers the NoPixel 4.0 versions (the soft reboot launched December 2023), not the older NoPixel 3.0 minigames.
+
+## Trainers (playable minigames)
+- [Lockpick](https://nphacks.net/puzzles/lockpick): rotating-lock timing minigame used for vehicle entry — stop the marker in the target zone.
+- [Thermite](https://nphacks.net/puzzles/thermite): 6x6 chain-reaction grid hack for high-security breaches (Maze Bank sewers and vault); click highlighted squares to keep the chain alive and hit the target before you stall.
+- [PinCracker](https://nphacks.net/puzzles/pincracker): Mastermind-style PIN deduction using colour feedback.
+- [Laundromat](https://nphacks.net/puzzles/laundromat): rotating-lock safe-cracking against a tight timer.
+- [Roof Running](https://nphacks.net/puzzles/roof-running): colour-matching board puzzle triggered by AC-Unit robberies.
+- [Word Memory](https://nphacks.net/puzzles/word-memory): "have I seen this word before?" recall hack.
+- [Chopping](https://nphacks.net/puzzles/chopping): type-the-letters reaction minigame for vehicle chopping.
+- [Repair Kit](https://nphacks.net/puzzles/repair-kit): stop-the-indicator timing minigame for vehicle repair.
+
+## Guides
+- [All guides](https://nphacks.net/guides): strategy guides for every minigame, plus heist preparation and reaction-time training.
+
+## FiveM servers
+- [Server trainers](https://nphacks.net/servers): practice the same minigames used by NoPixel-style FiveM servers such as Prodigy RP.
+
+## Key facts
+- 100% free, runs in any modern browser, no download or account required.
+- 1v1 mode: race a friend on the same puzzle at https://nphacks.net/lobby.
+- Daily challenge and global leaderboards at https://nphacks.net/daily-challenge and https://nphacks.net/leaderboards.
+- Recreates authentic NoPixel 4.0 mechanics; not affiliated with NoPixel.
