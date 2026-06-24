@@ -125,26 +125,18 @@ export interface GhostRaceCompletedEvent {
   ghost_time_ms: number;
 }
 
-// Main GTM push function
-// Analytics cookies are opt-in (see CookieConsent). Only GA4 events fire once
-// the visitor has explicitly accepted.
-function hasAnalyticsConsent(): boolean {
-  try {
-    return localStorage.getItem('cookieConsent') === 'accepted';
-  } catch {
-    return false;
-  }
-}
-
 function pushToDataLayer(data: Record<string, any>) {
   if (typeof window === 'undefined') return;
   window.dataLayer?.push(data);
   // GTM isn't forwarding these custom events to GA4, so also send them straight
-  // to GA4 via gtag (loaded by GoogleAnalytics) — but only after the visitor has
-  // accepted analytics cookies. page_view stays GTM-owned to avoid double-counting.
+  // to GA4 via gtag. We send for EVERY visitor: Consent Mode (set in the document
+  // <head> before GTM/gtag) makes these cookieless, anonymized pings when the
+  // visitor hasn't accepted, and full pings once they do — so GA4 gets coverage
+  // from all users without setting any cookie pre-consent. page_view stays
+  // GTM-owned to avoid double-counting.
   const { event, ...params } = data;
   const w = window as any;
-  if (event && event !== 'page_view' && hasAnalyticsConsent() && typeof w.gtag === 'function') {
+  if (event && event !== 'page_view' && typeof w.gtag === 'function') {
     w.gtag('event', event, params);
   }
 }

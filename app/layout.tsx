@@ -184,6 +184,15 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="color-scheme" content="dark" />
 
+        {/* Consent Mode v2 (Advanced) — MUST run before GTM/gtag. Defaults all
+            signals to denied, so GA4 (via GTM + gtag) sends COOKIELESS, anonymized
+            pings when the visitor hasn't accepted (no cookies stored without
+            consent) and upgrades to full, cookie-based pings once they accept.
+            This restores realistic GA4 coverage while staying GDPR-compliant. */}
+        <Script id="consent-default" strategy="beforeInteractive">
+          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=window.gtag||gtag;gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});gtag('set','url_passthrough',true);gtag('set','ads_data_redaction',true);try{if(localStorage.getItem('cookieConsent')==='accepted'){gtag('consent','update',{analytics_storage:'granted'});}}catch(e){}`}
+        </Script>
+
         {/* Google Tag Manager - Replace GTM-XXXXXXX with your actual GTM ID */}
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX'} />
 
