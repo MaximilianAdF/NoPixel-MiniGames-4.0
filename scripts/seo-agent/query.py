@@ -81,16 +81,46 @@ def run_ga4(a):
     return {"days": a.days, "rows": out}
 
 
-p = argparse.ArgumentParser(description="Ad-hoc GSC/GA4 query tool")
+def run_cf(a):
+    import urllib.request
+    token = os.environ["CF_ANALYTICS_TOKEN"]; zone = os.environ["CF_ZONE_ID"]
+    start = (datetime.date.today() - datetime.timedelta(days=a.days)).isoformat()
+    q = ('query{viewer{zones(filter:{zoneTag:"%s"}){'
+         'httpRequests1dGroups(limit:31,filter:{date_geq:"%s"},orderBy:[date_ASC]){'
+         'dimensions{date} sum{requests pageViews cachedRequests threats '
+         'countryMap{clientCountryName requests} responseStatusMap{edgeResponseStatus requests}} '
+         'uniq{uniques}}}}}' % (zone, start))
+    req = urllib.request.Request("https://api.cloudflare.com/client/v4/graphql",
+        data=json.dumps({"query": q}).encode(),
+        headers={"Authorization": "Bearer " + token, "Content-Type": "application/json"})
+    d = json.load(urllib.request.urlopen(req, timeout=40))
+    if d.get("errors"):
+        return {"error": str(d["errors"])[:300]}
+    groups = d["data"]["viewer"]["zones"][0]["httpRequests1dGroups"]
+    if a.view == "daily":
+        return {"rows": [{"date": g["dimensions"]["date"], "requests": g["sum"]["requests"],
+                          "pageViews": g["sum"]["pageViews"], "uniques": g["uniq"]["uniques"],
+                          "cached": g["sum"]["cachedRequests"], "threats": g["sum"].get("threats", 0)} for g in groups]}
+    latest = groups[-1]["sum"] if groups else {}
+    if a.view == "countries":
+        return {"rows": sorted([{"country": c["clientCountryName"], "requests": c["requests"]}
+                                for c in latest.get("countryMap", [])], key=lambda x: -x["requests"])}
+    return {"rows": sorted([{"status": s["edgeResponseStatus"], "requests": s["requests"]}
+                            for s in latest.get("responseStatusMap", [])], key=lambda x: -x["requests"])}
+
+
+p = argparse.ArgumentParser(description="Ad-hoc GSC/GA4/Cloudflare query tool")
 sub = p.add_subparsers(dest="source", required=True)
 g = sub.add_parser("gsc"); g.add_argument("--dims", default="query"); g.add_argument("--days", type=int, default=28)
 g.add_argument("--rows", type=int, default=50); g.add_argument("--filter", nargs=3, metavar=("DIM", "OP", "VAL"))
 a4 = sub.add_parser("ga4"); a4.add_argument("--dims", default=""); a4.add_argument("--mets", default="sessions")
 a4.add_argument("--days", type=int, default=28); a4.add_argument("--rows", type=int, default=25); a4.add_argument("--order", default=None)
+cf = sub.add_parser("cf"); cf.add_argument("--days", type=int, default=7)
+cf.add_argument("--view", choices=["daily", "countries", "status"], default="daily")
 
 args = p.parse_args()
 try:
-    result = run_gsc(args) if args.source == "gsc" else run_ga4(args)
+    result = run_gsc(args) if args.source == "gsc" else (run_ga4(args) if args.source == "ga4" else run_cf(args))
     print(json.dumps(result, indent=2))
 except Exception as ex:
     print(json.dumps({"error": repr(ex)[:400]}, indent=2)); sys.exit(1)

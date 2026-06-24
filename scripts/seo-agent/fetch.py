@@ -31,7 +31,7 @@ bundle = {
     "generated": today.isoformat(),
     "windows": {"gsc": {"start": gsc_start.isoformat(), "end": gsc_end.isoformat()},
                 "ga4": "current 28d vs prior 28d"},
-    "gsc": {}, "ga4": {}, "errors": [],
+    "gsc": {}, "ga4": {}, "cloudflare": {}, "errors": [],
 }
 
 # ---------------- Search Console ----------------
@@ -123,6 +123,47 @@ try:
     log("GA4 done")
 except Exception as ex:
     bundle["errors"].append("GA4: " + repr(ex)[:300]); log("GA4 ERROR " + repr(ex)[:160])
+
+# ---------------- Cloudflare edge analytics (consent-free, counts ALL visitors) ----------------
+CF_TOKEN = os.environ.get("CF_ANALYTICS_TOKEN")
+CF_ZONE = os.environ.get("CF_ZONE_ID")
+if CF_TOKEN and CF_ZONE:
+    try:
+        import urllib.request
+        cf_start = (today - datetime.timedelta(days=30)).isoformat()
+        q = ('query{viewer{zones(filter:{zoneTag:"%s"}){'
+             'httpRequests1dGroups(limit:31,filter:{date_geq:"%s"},orderBy:[date_ASC]){'
+             'dimensions{date} '
+             'sum{requests pageViews cachedRequests bytes threats '
+             'countryMap{clientCountryName requests} '
+             'responseStatusMap{edgeResponseStatus requests}} '
+             'uniq{uniques}}}}}' % (CF_ZONE, cf_start))
+        req = urllib.request.Request(
+            "https://api.cloudflare.com/client/v4/graphql",
+            data=json.dumps({"query": q}).encode(),
+            headers={"Authorization": "Bearer " + CF_TOKEN, "Content-Type": "application/json"})
+        resp = json.load(urllib.request.urlopen(req, timeout=40))
+        if resp.get("errors"):
+            raise RuntimeError(str(resp["errors"])[:200])
+        groups = resp["data"]["viewer"]["zones"][0]["httpRequests1dGroups"]
+        bundle["cloudflare"]["note"] = ("Edge analytics = consent-free, counts ALL visitors (incl. bots). "
+                                        "Use this + GSC as the trustworthy traffic source; GA4 is consent-gated and undercounts. "
+                                        "CF was set up recently so history is short and grows over time.")
+        bundle["cloudflare"]["daily"] = [
+            {"date": g["dimensions"]["date"], "requests": g["sum"]["requests"],
+             "pageViews": g["sum"]["pageViews"], "cachedRequests": g["sum"]["cachedRequests"],
+             "uniques": g["uniq"]["uniques"], "threats": g["sum"].get("threats", 0)} for g in groups]
+        if groups:
+            latest = groups[-1]["sum"]
+            bundle["cloudflare"]["latest_day_countries"] = [
+                {"country": c["clientCountryName"], "requests": c["requests"]}
+                for c in sorted(latest.get("countryMap", []), key=lambda x: -x["requests"])[:12]]
+            bundle["cloudflare"]["latest_day_status_codes"] = [
+                {"status": s["edgeResponseStatus"], "requests": s["requests"]}
+                for s in sorted(latest.get("responseStatusMap", []), key=lambda x: -x["requests"])[:10]]
+        log(f"CF {len(groups)} days")
+    except Exception as ex:
+        bundle["errors"].append("CF: " + repr(ex)[:300]); log("CF ERROR " + repr(ex)[:160])
 
 with open(OUT, "w") as f:
     json.dump(bundle, f, indent=2)

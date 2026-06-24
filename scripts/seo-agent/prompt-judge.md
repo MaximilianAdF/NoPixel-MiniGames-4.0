@@ -10,6 +10,9 @@ Write the **final report** to **`./reports/seo-<TODAY>.md`** (date below):
 - **Snapshot** (corrected for any data-quality caveats the debate surfaced).
 - **Surviving recommendations** — each with: the debate outcome, final confidence, exact file, and (for out-of-scope items) a clear "recommended follow-up" note.
 - **Rejected / needs-more-data** — what you cut and why (required; this transparency is the point of the debate).
+- **Site health & non-SEO issues** — surface anything notable beyond SEO from the Cloudflare/data signals (404 spikes, 5xx errors, threat/bot traffic, GA4 measurement gaps, broken pages). Report these for the owner to act on; do NOT auto-fix them.
+
+Traffic-source rule: treat **Cloudflare + GSC** as the true traffic numbers; **GA4 is consent-gated and undercounts** — never conclude "traffic dropped" from GA4 alone if CF/GSC disagree.
 
 Then make **at most 1–2** of the highest-confidence surviving edits directly:
 - Only page metadata (title/description) or `lib/puzzleContent.ts` copy. Titles ≈ 60 chars, descriptions ≈ 155.

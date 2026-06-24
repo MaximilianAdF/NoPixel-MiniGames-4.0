@@ -20,6 +20,8 @@ env:
   GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
   GA4_PROPERTY_ID: ${{ vars.GA4_PROPERTY_ID }}
   GSC_SITE: ${{ vars.GSC_SITE }}
+  CF_ANALYTICS_TOKEN: ${{ secrets.CF_ANALYTICS_TOKEN }}
+  CF_ZONE_ID: ${{ vars.CF_ZONE_ID }}
   CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
 jobs:
