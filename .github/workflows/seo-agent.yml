@@ -101,6 +101,16 @@ jobs:
             echo "No code edits — skipping build verification."
           fi
 
+      # Deliver the full report to the owner as a run artifact — NOT in the PR/repo.
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-report
+          path: reports/seo-report.md
+          retention-days: 90
+          if-no-files-found: warn
+
       - name: Open pull request
         uses: peter-evans/create-pull-request@v6
         with:
@@ -109,10 +119,13 @@ jobs:
           # Only commit the agent's legitimate outputs — never .github/ or scripts/
           # (the default GITHUB_TOKEN can't push workflow files, which would fail the run).
           add-paths: |
-            reports/**
             app/**
             lib/**
-          title: "Weekly site audit + fixes"
-          commit-message: "seo: weekly agent report + fixes"
-          # The agent's full report (written by the judge) becomes the PR description.
-          body-path: reports/seo-report.md
+          title: "Weekly site audit — fixes"
+          commit-message: "seo: weekly agent fixes"
+          body: |
+            Automated fixes from the weekly site audit (3-pass debate: propose → red-team → judge).
+
+            These are only the code changes the agent was confident were safe. **The full report
+            — analysis, proposed-but-not-applied issues, and site health — is the `seo-report`
+            artifact on this workflow run.** Download and read it before merging.

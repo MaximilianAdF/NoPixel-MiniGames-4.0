@@ -47,3 +47,6 @@ next-env.d.ts
 seo-data.json
 reports/_draft*.md
 reports/_critique*.md
+
+# Agent reports are delivered as run artifacts, never committed (kept out of the public repo)
+reports/
