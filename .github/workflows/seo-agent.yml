@@ -86,6 +86,12 @@ jobs:
         with:
           branch: seo-agent/weekly-report
           delete-branch: true
+          # Only commit the agent's legitimate outputs — never .github/ or scripts/
+          # (the default GITHUB_TOKEN can't push workflow files, which would fail the run).
+          add-paths: |
+            reports/**
+            app/**
+            lib/**
           title: "SEO weekly report + suggestions"
           commit-message: "seo: weekly agent report + suggested edits"
           body: |
