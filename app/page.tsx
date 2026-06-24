@@ -129,7 +129,7 @@ export default function Home() {
                 "price": "0",
                 "priceCurrency": "USD"
               },
-              "screenshot": "https://nphacks.net/images/og-image.png",
+              "screenshot": "https://nphacks.net/opengraph-image",
               "featureList": [
                 "Thermite Hacking Practice",
                 "Lockpick Training",
