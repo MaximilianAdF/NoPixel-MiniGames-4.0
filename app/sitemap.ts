@@ -32,6 +32,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.85,
   }));
 
+  // Server landing pages (NoPixel-style minigame practice per FiveM community)
+  const servers = ["prodigy-rp", "new-day-rp"];
+
+  const serverUrls = servers.map((server) => ({
+    url: `${baseUrl}/servers/${server}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.75,
+  }));
+
   // Other important pages
   const otherPages = [
     {
@@ -89,6 +99,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/servers`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    },
+    {
       url: `${baseUrl}/guides/mastering-thermite`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
@@ -123,6 +139,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     ...guideUrls,
     ...minigameUrls,
+    ...serverUrls,
     ...otherPages,
   ];
 }
