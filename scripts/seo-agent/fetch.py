@@ -217,6 +217,48 @@ try:
 except Exception as ex:
     bundle["errors"].append("PSI: " + repr(ex)[:200]); log("PSI ERROR " + repr(ex)[:160])
 
+# ---------------- Cloudflare RUM Web Vitals (real-user field CWV; CrUX lacks it at this traffic) ----------------
+CF_ACCT = os.environ.get("CF_ACCOUNT_ID")
+if CF_TOKEN and CF_ACCT:
+    try:
+        import urllib.request
+        rv_start = (today - datetime.timedelta(days=7)).isoformat()
+        rq = ('query{viewer{accounts(filter:{accountTag:"%s"}){'
+              'overall: rumWebVitalsEventsAdaptiveGroups(limit:1,filter:{date_geq:"%s"}){'
+              'count quantiles{largestContentfulPaintP75 interactionToNextPaintP75 cumulativeLayoutShiftP75} '
+              'sum{lcpGood lcpTotal inpGood inpTotal clsGood clsTotal}} '
+              'byPage: rumWebVitalsEventsAdaptiveGroups(limit:12,filter:{date_geq:"%s"},orderBy:[count_DESC]){'
+              'dimensions{requestPath} count '
+              'quantiles{largestContentfulPaintP75 interactionToNextPaintP75 cumulativeLayoutShiftP75}}'
+              '}}}' % (CF_ACCT, rv_start, rv_start))
+        rreq = urllib.request.Request("https://api.cloudflare.com/client/v4/graphql",
+            data=json.dumps({"query": rq}).encode(),
+            headers={"Authorization": "Bearer " + CF_TOKEN, "Content-Type": "application/json"})
+        rd = json.load(urllib.request.urlopen(rreq, timeout=40))
+        if rd.get("errors"):
+            raise RuntimeError(str(rd["errors"])[:200])
+        acc = rd["data"]["viewer"]["accounts"][0]
+        ms = lambda v: round(v / 1000) if v is not None else None  # CF returns µs
+        pct = lambda g, t: round(g / t * 100) if t else None
+        cf_rum = {"note": ("Cloudflare RUM = REAL-USER (browser beacon) Core Web Vitals, last 7d. "
+                           "LCP/INP in ms; CLS unitless. *_good_pct = share meeting the 'good' threshold. "
+                           "This is real-user field CWV that Google CrUX lacks until traffic grows.")}
+        if acc.get("overall"):
+            o = acc["overall"][0]; q = o["quantiles"]; s = o["sum"]
+            cf_rum["site_wide"] = {
+                "events": o["count"],
+                "LCP_p75_ms": ms(q["largestContentfulPaintP75"]), "LCP_good_pct": pct(s["lcpGood"], s["lcpTotal"]),
+                "INP_p75_ms": ms(q["interactionToNextPaintP75"]), "INP_good_pct": pct(s["inpGood"], s["inpTotal"]),
+                "CLS_p75": q["cumulativeLayoutShiftP75"], "CLS_good_pct": pct(s["clsGood"], s["clsTotal"])}
+        cf_rum["by_page"] = [{"path": p["dimensions"]["requestPath"], "events": p["count"],
+                              "LCP_p75_ms": ms(p["quantiles"]["largestContentfulPaintP75"]),
+                              "INP_p75_ms": ms(p["quantiles"]["interactionToNextPaintP75"]),
+                              "CLS_p75": p["quantiles"]["cumulativeLayoutShiftP75"]} for p in acc.get("byPage", [])]
+        bundle["web_vitals"]["cloudflare_rum"] = cf_rum
+        log("CF RUM web vitals ok")
+    except Exception as ex:
+        bundle["errors"].append("CF RUM: " + repr(ex)[:200]); log("CF RUM ERROR " + repr(ex)[:160])
+
 with open(OUT, "w") as f:
     json.dump(bundle, f, indent=2)
 print("wrote", OUT, "(", len(json.dumps(bundle)), "bytes )")
