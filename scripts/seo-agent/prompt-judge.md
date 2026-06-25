@@ -6,7 +6,7 @@ Read: the analyst draft **`./reports/_draft.md`**, the red-team critique **`./re
 
 For EACH candidate: weigh proposal vs attack → decide **KEEP / REVISE / DISCARD**, with the deciding reason and a final confidence.
 
-Write the **final report** to **`./reports/seo-report.md`** (delivered privately to the owner as a workflow artifact — it is NOT committed and NOT shown in the PR — so make it self-contained and skimmable; put the date at the top):
+Write the **final report** to **`./reports/seo-report.md`** (emailed privately to the owner — it is NOT committed and NOT shown in the PR — so make it self-contained and skimmable; put the date at the top):
 - **Snapshot** (corrected for any data-quality caveats the debate surfaced).
 - **✅ Fixed in this PR** — every edit you made, with file + before/after + why it's safe.
 - **📋 Proposed (needs your call)** — issues you did NOT auto-fix (gameplay/config/deps/risky), each with a concrete recommended fix + file path, for the owner to action.

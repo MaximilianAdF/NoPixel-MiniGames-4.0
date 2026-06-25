@@ -23,6 +23,8 @@ env:
   CF_ANALYTICS_TOKEN: ${{ secrets.CF_ANALYTICS_TOKEN }}
   CF_ZONE_ID: ${{ vars.CF_ZONE_ID }}
   CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+  # "true" only once the mail secrets are set, so the email step skips cleanly until then
+  MAIL_CONFIGURED: ${{ secrets.MAIL_SERVER != '' }}
 
 jobs:
   seo:
@@ -101,15 +103,22 @@ jobs:
             echo "No code edits — skipping build verification."
           fi
 
-      # Deliver the full report to the owner as a run artifact — NOT in the PR/repo.
-      - name: Upload report artifact
-        if: always()
-        uses: actions/upload-artifact@v4
+      # Deliver the full report PRIVATELY by email — never in the PR / repo / public artifacts.
+      # Skips cleanly until the MAIL_* secrets are configured.
+      - name: Email the report (private)
+        if: ${{ env.MAIL_CONFIGURED == 'true' }}
+        uses: dawidd6/action-send-mail@v3
         with:
-          name: seo-report
-          path: reports/seo-report.md
-          retention-days: 90
-          if-no-files-found: warn
+          server_address: ${{ secrets.MAIL_SERVER }}
+          server_port: ${{ secrets.MAIL_PORT }}
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          from: nphacks site audit <${{ secrets.MAIL_USERNAME }}>
+          to: ${{ secrets.MAIL_TO }}
+          subject: "nphacks — weekly site audit report"
+          body: file://reports/seo-report.md
+          convert_markdown: true
 
       - name: Open pull request
         uses: peter-evans/create-pull-request@v6
