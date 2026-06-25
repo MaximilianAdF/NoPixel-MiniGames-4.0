@@ -103,7 +103,23 @@ jobs:
             echo "No code edits — skipping build verification."
           fi
 
-      # Deliver the full report PRIVATELY by email — never in the PR / repo / public artifacts.
+      # Best-effort PDF of the report to attach to the email (never blocks the email).
+      - name: Render report to PDF
+        id: pdf
+        if: ${{ env.MAIL_CONFIGURED == 'true' }}
+        continue-on-error: true
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq pandoc wkhtmltopdf xvfb
+          if xvfb-run -a pandoc reports/seo-report.md -o reports/seo-report.pdf \
+               --metadata title="nphacks weekly site audit" \
+               -V margin-top=16mm -V margin-bottom=16mm -V margin-left=16mm -V margin-right=16mm; then
+            echo "path=reports/seo-report.pdf" >> "$GITHUB_OUTPUT"
+          else
+            echo "path=" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Deliver the report PRIVATELY by email — never in the PR / repo / public artifacts.
+      # Body = readable HTML (rendered from the digest); PDF attached when available.
       # Skips cleanly until the MAIL_* secrets are configured.
       - name: Email the report (private)
         if: ${{ env.MAIL_CONFIGURED == 'true' }}
@@ -119,6 +135,7 @@ jobs:
           subject: "nphacks — weekly site audit report"
           body: file://reports/seo-report.md
           convert_markdown: true
+          attachments: ${{ steps.pdf.outputs.path }}
 
       - name: Open pull request
         uses: peter-evans/create-pull-request@v6
