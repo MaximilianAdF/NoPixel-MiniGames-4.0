@@ -31,7 +31,7 @@ bundle = {
     "generated": today.isoformat(),
     "windows": {"gsc": {"start": gsc_start.isoformat(), "end": gsc_end.isoformat()},
                 "ga4": "current 28d vs prior 28d"},
-    "gsc": {}, "ga4": {}, "cloudflare": {}, "errors": [],
+    "gsc": {}, "ga4": {}, "cloudflare": {}, "web_vitals": {}, "errors": [],
 }
 
 # ---------------- Search Console ----------------
@@ -164,6 +164,58 @@ if CF_TOKEN and CF_ZONE:
         log(f"CF {len(groups)} days")
     except Exception as ex:
         bundle["errors"].append("CF: " + repr(ex)[:300]); log("CF ERROR " + repr(ex)[:160])
+
+# ---------------- Core Web Vitals via PageSpeed Insights (Google's ranking signal) ----------------
+try:
+    import urllib.request, urllib.parse
+    PSI_KEY = os.environ.get("PSI_API_KEY", "")
+
+    def psi(url, strategy="mobile"):
+        params = {"url": url, "strategy": strategy, "category": "performance"}
+        if PSI_KEY:
+            params["key"] = PSI_KEY
+        api = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed?" + urllib.parse.urlencode(params)
+        d = json.load(urllib.request.urlopen(api, timeout=80))
+        lr = d.get("lighthouseResult", {})
+        au = lr.get("audits", {})
+        def labn(k):
+            v = au.get(k, {}).get("numericValue")
+            return round(v, 1) if v is not None else None
+        def field(le):
+            if not le:
+                return None
+            m = le.get("metrics", {})
+            def g(k):
+                x = m.get(k)
+                return {"p75": x.get("percentile"), "rating": x.get("category")} if x else None
+            return {"overall": le.get("overall_category"),
+                    "LCP": g("LARGEST_CONTENTFUL_PAINT_MS"),
+                    "INP": g("INTERACTION_TO_NEXT_PAINT"),
+                    "CLS": g("CUMULATIVE_LAYOUT_SHIFT_SCORE")}
+        return {"url": url, "strategy": strategy,
+                "lab_perf_score": round((lr.get("categories", {}).get("performance", {}).get("score") or 0) * 100),
+                "lab_LCP_ms": labn("largest-contentful-paint"),
+                "lab_CLS": labn("cumulative-layout-shift"),
+                "lab_TBT_ms": labn("total-blocking-time"),
+                "field_url": field(d.get("loadingExperience")),
+                "field_origin": field(d.get("originLoadingExperience"))}
+
+    bundle["web_vitals"] = {
+        "note": ("Core Web Vitals. field = real Chrome users (CrUX) = the Google ranking signal; "
+                 "lab = Lighthouse diagnostic. Mobile strategy (Google's primary signal). "
+                 "field_url may be null on low-traffic pages — use field_origin then.")}
+    if PSI_KEY:
+        bundle["web_vitals"]["pages"] = []
+        for p in ["https://nphacks.net/", "https://nphacks.net/puzzles/lockpick", "https://nphacks.net/puzzles/thermite"]:
+            try:
+                bundle["web_vitals"]["pages"].append(psi(p)); log("PSI " + p)
+            except Exception as ex:
+                log("PSI fail " + p + ": " + repr(ex)[:80])
+    else:
+        bundle["web_vitals"]["note"] += " (SKIPPED — set the PSI_API_KEY secret to enable.)"
+        log("PSI skipped — no key")
+except Exception as ex:
+    bundle["errors"].append("PSI: " + repr(ex)[:200]); log("PSI ERROR " + repr(ex)[:160])
 
 with open(OUT, "w") as f:
     json.dump(bundle, f, indent=2)
