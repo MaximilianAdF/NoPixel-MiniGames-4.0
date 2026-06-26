@@ -49,11 +49,22 @@ jobs:
       - name: Install Claude Code
         run: npm i -g @anthropic-ai/claude-code
 
+      # Pass 0 — map the current codebase so every later pass reasons about the
+      # real tree, not a stale assumption. Writes ./reports/_repomap.md.
+      - name: Orient (codebase map)
+        run: |
+          PROMPT="$(cat scripts/seo-agent/prompt-orient.md)
+
+          Today's date is: $(date +%F)"
+          claude -p "$PROMPT" --model opus --effort high --permission-mode acceptEdits \
+            --allowedTools "Read,Write,Bash(find:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*),Bash(wc:*),Bash(head:*)"
+
       # Pass 1 — propose candidates (no edits)
       - name: Propose (analyst)
         run: |
           PROMPT="$(cat scripts/seo-agent/prompt.md)
 
+          The codebase map is at: ./reports/_repomap.md
           The analytics bundle is at: ./seo-data.json
           Today's date is: $(date +%F)"
           claude -p "$PROMPT" --model opus --effort xhigh --permission-mode acceptEdits \
@@ -65,6 +76,7 @@ jobs:
           PROMPT="$(cat scripts/seo-agent/prompt-adversary.md)
 
           The analyst draft is at: ./reports/_draft.md
+          The codebase map is at: ./reports/_repomap.md
           The analytics bundle is at: ./seo-data.json
           Today's date is: $(date +%F)"
           claude -p "$PROMPT" --model opus --effort xhigh --permission-mode acceptEdits \
@@ -78,6 +90,7 @@ jobs:
 
           The analyst draft is at: ./reports/_draft.md
           The red-team critique is at: ./reports/_critique.md
+          The codebase map is at: ./reports/_repomap.md
           The analytics bundle is at: ./seo-data.json
           Today's date is: $(date +%F)"
           claude -p "$PROMPT" --model opus --effort xhigh --permission-mode acceptEdits \
@@ -90,6 +103,7 @@ jobs:
           PROMPT="$(cat scripts/seo-agent/prompt-implementer.md)
 
           The approved build-list is at: ./reports/_approved.md
+          The codebase map is at: ./reports/_repomap.md
           The final report is at: ./reports/seo-report.md
           The analytics bundle is at: ./seo-data.json
           Today's date is: $(date +%F)"
@@ -97,7 +111,7 @@ jobs:
             --allowedTools "Read,Edit,Write,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
 
       - name: Clean up scratch files
-        run: rm -f reports/_draft*.md reports/_critique*.md reports/_approved*.md
+        run: rm -f reports/_draft*.md reports/_critique*.md reports/_approved*.md reports/_repomap*.md
 
       # Safety net: if the agent edited code, verify it still builds; auto-revert
       # breaking edits (keep the report) so a bad fix never reaches a PR.
