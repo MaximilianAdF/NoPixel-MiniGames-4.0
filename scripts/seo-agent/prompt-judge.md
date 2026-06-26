@@ -18,9 +18,11 @@ Keep it brief and high-signal — the deep 3-pass debate already happened intern
 
 Traffic-source rule: treat **Cloudflare + GSC** as the true traffic numbers; **GA4 is consent-gated and undercounts** — never conclude "traffic dropped" from GA4 alone if CF/GSC disagree.
 
-Then **fix the high-confidence, safe problems** that survived the debate (a build step verifies your edits and auto-reverts anything that breaks — so be correct):
-- **Allowed:** page metadata; `lib/puzzleContent.ts` and page/guide **content copy** (including fixing factual or 3.0-vs-4.0 errors); **broken internal links**; **alt text / simple accessibility**; and small, obvious **SEO/markup** fixes — anywhere under `app/` or `lib/`. Keep each edit small, surgical, and justified in the report.
-- **Never:** gameplay/game logic, React state/hooks, `next.config.mjs` or other config, CI / `.github`, dependencies / `package.json`, redirects, file deletions, or large refactors. Those go in **Proposed**, not auto-fixed.
-- Make only edits that clearly beat the current code AND survived the debate. No fixed cap, but stay conservative — quality over quantity. If nothing qualifies, change no code (the report alone is a valid outcome).
+Then **hand the approved fixes to the implementer — do NOT edit code yourself.** Write the approved build-list to **`./reports/_approved.md`**: for each change that survived the debate at high confidence on the SAFE surface, give a precise, self-contained spec the implementer can build without re-deciding:
+- **File** (exact path) · **what to change** (the specific element / copy / metadata) · **the exact new content or clear direction** · **why** (the deciding reason) · the **current value** so the implementer can locate it.
+- **Allowed surface:** page metadata; `lib/puzzleContent.ts` and page/guide **content copy** (incl. fixing factual or 3.0-vs-4.0 errors); **broken internal links**; **alt text / simple accessibility**; small SEO/markup fixes; and new **content / landing pages or guide copy** — anywhere under `app/` or `lib/`.
+- **Never approve:** gameplay/game logic, React state/hooks, `next.config.mjs` or other config, CI / `.github`, dependencies / `package.json`, redirects, file deletions, or large refactors. Those stay in the report's **Your actions** as proposals.
+- Only list changes that clearly beat the current code AND survived the debate. Quality over quantity; if nothing qualifies, write `_approved.md` containing just `NONE` (the report alone is a valid outcome).
+- Keep the report's **✅ Fixed this week** in sync with this list (the implementer builds it; a build gate verifies and auto-reverts anything that breaks).
 
 Everything is PR-reviewed. Be precise and conservative; show the reasoning that decided each call.
