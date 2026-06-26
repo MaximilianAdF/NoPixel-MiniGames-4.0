@@ -32,6 +32,7 @@ import {
   BookOpen,
   Github,
   ExternalLink,
+  Rocket,
 } from 'lucide-react';
 
 export default function NavigationMenu() {
@@ -422,6 +423,25 @@ export default function NavigationMenu() {
             >
               <Swords className="w-5 h-5" />
               <span className="font-medium">Play 1v1</span>
+            </Link>
+
+            {/* NoPixel 5.0 hub */}
+            <Link
+              href="/nopixel-5"
+              onClick={handleLinkClick}
+              className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 ${
+                pathname === '/nopixel-5'
+                  ? 'bg-[#54FFA4]/20 text-[#54FFA4] border border-[#54FFA4]/50'
+                  : 'text-gray-300 hover:bg-[#1a2930] hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Rocket className="w-5 h-5" />
+                <span className="font-medium">NoPixel 5.0</span>
+              </div>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#54FFA4] bg-[#54FFA4]/10 border border-[#54FFA4]/30 rounded px-1.5 py-0.5">
+                Soon
+              </span>
             </Link>
           </div>
 
