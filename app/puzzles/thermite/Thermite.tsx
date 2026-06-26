@@ -112,7 +112,7 @@ const ThermiteView: FC<ThermiteViewProps> = ({
             CRC Bypassed!
           </span>
         </div>
-        <Image src={backgroundImg} alt="" fill />
+        <Image src={backgroundImg} alt="" fill priority />
       </div>
     </GameShell>
   );

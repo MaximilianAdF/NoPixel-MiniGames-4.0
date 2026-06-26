@@ -34,7 +34,7 @@ function Background() {
         alt=""
         src={background}
         placeholder="blur"
-        quality={100}
+        quality={45}
         fill
         sizes="100vw"
         className="opacity-10 object-cover"
