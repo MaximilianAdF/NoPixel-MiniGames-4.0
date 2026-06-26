@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
-import { Heart, Target, Trophy, Zap } from 'lucide-react';
+import { Target, Trophy, Zap } from 'lucide-react';
 
 import { useEffect, useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -551,39 +551,6 @@ export default function Home() {
             </div>
           </Reveal>
         </div>
-
-        {/* Footer */}
-        <footer className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center text-gray-500 border-t-2 border-spring-green-500/30 mt-12">
-          <p className="text-sm hover:text-gray-400 transition-colors duration-300">
-            This is a fan-made simulator and is not affiliated with NoPixel or Rockstar Games. All trademarks belong to their respective owners.
-          </p>
-          <p className="text-sm mt-2 hover:text-gray-400 transition-colors duration-300 flex items-center justify-center gap-2">
-            Built with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> for the NoPixel community
-          </p>
-          
-          {/* Footer Links */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm">
-            <Link href="/about" className="hover:text-spring-green-400 transition-colors duration-300">
-              About
-            </Link>
-            <span className="text-gray-700">•</span>
-            <Link href="/privacy" className="hover:text-spring-green-400 transition-colors duration-300">
-              Privacy Policy
-            </Link>
-            <span className="text-gray-700">•</span>
-            <Link href="/terms" className="hover:text-spring-green-400 transition-colors duration-300">
-              Terms of Service
-            </Link>
-            <span className="text-gray-700">•</span>
-            <Link href="/contact" className="hover:text-spring-green-400 transition-colors duration-300">
-              Contact
-            </Link>
-            <span className="text-gray-700">•</span>
-            <Link href="/faq" className="hover:text-spring-green-400 transition-colors duration-300">
-              FAQ
-            </Link>
-          </div>
-        </footer>
 
       </main>
   );

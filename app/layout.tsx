@@ -262,9 +262,11 @@ export default function RootLayout({
                 <NavigationMenu />
                 <LoginButton />
                 <ContextualHint />
-                {children}
+                <div className="flex min-h-[100dvh] flex-col">
+                  <div className="flex-1">{children}</div>
+                  <Footer />
+                </div>
                 <CookieConsent />
-                <Footer />
               </GuideProvider>
             </KeyboardShortcutsProvider>
           </UserProvider>
