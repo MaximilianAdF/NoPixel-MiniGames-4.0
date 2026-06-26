@@ -10,6 +10,7 @@ For **every** candidate in the draft, write the strongest possible attack:
 - **Cannibalization / collateral** — cross-check the `query_page_map` (and drill down if needed): would this help one query but hurt another page/query?
 - **Factual correctness** — is it accurate to NoPixel **4.0** (not 3.0)? Check `lib/puzzleContent.ts`.
 - **Scope** — is the proposed edit even within the allowed surface (page metadata or `puzzleContent.ts` copy)? Flag ops/redirect/body-JSX items as out-of-scope.
+- **Growth / RPM realism** — for any PV or revenue lever: is it real demand or noise? Would a "PV win" actually rank (or just be a vanity keyword), and would an "RPM win" move revenue given the low-RPM geo mix? Is an "audience expansion" idea genuinely reachable, or a competitive long shot dressed up as a quick win?
 - **Hidden downside / opportunity cost.**
 
 Write a thorough critique to **`./reports/_critique.md`**: for each candidate, the attack + any contradicting data you pulled + a recommended verdict (keep / revise / kill) with reasoning. Do NOT finalize the report and do NOT edit any code — attack only.
