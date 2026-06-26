@@ -175,6 +175,17 @@ export default function NoPixel5Page() {
           ))}
         </div>
 
+        {/*
+          CTA — REDESIGN TODO: add a contact-capture so we can blast users the
+          moment 5.0 trainers land (this is the whole first-mover payoff).
+          Plan (see project_monetization-growth memory):
+            1. Discord invite ("Join for 5.0 updates") — primary; best fit for
+               this Discord-native FiveM/NoPixel audience, drives repeat visits.
+            2. Lightweight email capture ("Notify me when 5.0 drops") — a form
+               posting to an API route / free ESP; REQUIRES a consent checkbox +
+               privacy link (GDPR). Feeds the launch-day email blast.
+          Keep it low-friction; fold both into the full page redesign.
+        */}
         {/* CTA */}
         <div className="bg-gradient-to-r from-[#54FFA4]/10 to-[#45e894]/10 border-2 border-[#54FFA4]/30 rounded-xl p-8 text-center mb-12">
           <h2 className="text-2xl font-bold text-white mb-4">Get ready for NoPixel 5.0</h2>
