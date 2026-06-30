@@ -3,7 +3,7 @@
 import Script from 'next/script';
 
 // GA4 measurement ID. Overridable via env; falls back to the property's ID so
-// it works without extra Netlify config.
+// it works without extra build-time config.
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-FLSWTL4FJJ';
 
 // Loads GA4 (gtag) directly so the custom game events pushed in utils/gtm.ts

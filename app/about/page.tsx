@@ -206,7 +206,7 @@ export default function AboutPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-[#54FFA4]">▸</span>
-                  <strong className="text-white">Vercel</strong> — Global CDN deployment for minimal latency worldwide
+                  <strong className="text-white">DigitalOcean + Cloudflare</strong> — Self-hosted, fronted by a global CDN for low-latency access worldwide
                 </li>
               </ul>
             </div>
@@ -226,7 +226,7 @@ export default function AboutPage() {
               </p>
               <p className="text-gray-300 leading-relaxed">
                 Whether you&apos;re in North America, Europe, Asia, or anywhere else, our platform is optimized to deliver
-                low-latency gameplay through Vercel&apos;s worldwide edge network. Practice sessions feel smooth and responsive
+                low-latency gameplay through Cloudflare&apos;s worldwide CDN. Practice sessions feel smooth and responsive
                 regardless of your location.
               </p>
             </div>

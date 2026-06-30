@@ -1,8 +1,8 @@
 // Shared-cache headers for public, read-only GETs that return the same payload
 // to everyone. Collapses repeated client polls into one origin hit per `s`
-// seconds at the CDN edge (function never runs on a cache hit), slashing
-// Function Invocations + Duration. `CDN-Cache-Control` drives the Vercel and
-// Cloudflare edge caches and survives Next's force-dynamic `no-store` default;
+// seconds at the CDN edge (the origin is skipped entirely on a cache hit),
+// cutting origin load. `CDN-Cache-Control` drives the Cloudflare edge cache
+// and survives Next's force-dynamic `no-store` default;
 // the plain `Cache-Control` mirror covers any other intermediary.
 //
 // NEVER use on responses that vary per user (cookie/session) — a shared cache

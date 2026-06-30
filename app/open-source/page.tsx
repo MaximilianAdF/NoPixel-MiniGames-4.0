@@ -79,7 +79,7 @@ export default function OpenSourcePage() {
             </div>
             <div className="bg-[#0F1B21] rounded-lg p-4">
               <div className="text-[#54FFA4] font-semibold mb-2">Hosting</div>
-              <div className="text-white">Vercel</div>
+              <div className="text-white">DigitalOcean</div>
             </div>
             <div className="bg-[#0F1B21] rounded-lg p-4">
               <div className="text-[#54FFA4] font-semibold mb-2">Icons</div>

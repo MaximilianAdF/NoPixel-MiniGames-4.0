@@ -4,7 +4,6 @@ import { gilroy, gilroyNpTitle } from './fonts';
 import "./globals.css";
 import Image from 'next/image'
 import background from '../public/images/bg.png'
-import dynamic from 'next/dynamic';
 import Script from 'next/script';
 import { Orbitron, Rajdhani, Caveat } from 'next/font/google';
 import NavigationMenu from './components/NavigationMenu';
@@ -160,7 +159,6 @@ export const viewport: Viewport = {
 };
 
 // exported fonts moved to app/fonts.ts to avoid importing layout into client bundles
-const AppAnalytics = dynamic(() => import('./components/AppAnalytics'), { ssr: false });
 
 export default function RootLayout({
   children,
@@ -271,7 +269,6 @@ export default function RootLayout({
             </KeyboardShortcutsProvider>
           </UserProvider>
         </LoadingProvider>
-        <AppAnalytics />
       </body>
     </html>
   );

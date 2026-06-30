@@ -15,9 +15,8 @@ const PLAYED_THRESHOLD_DAYS = 90;
  *   - never played a game: removed after 30 days of inactivity
  *   - has played at least 1 game: removed after 90 days of inactivity
  *
- * Auth: Vercel Cron sets `Authorization: Bearer ${CRON_SECRET}` automatically
- * when the CRON_SECRET env var is configured. Manual admin runs use the same
- * header.
+ * Auth: the host cron job sends `Authorization: Bearer ${CRON_SECRET}` (set
+ * via the CRON_SECRET env var). Manual admin runs use the same header.
  *
  * Query params:
  *   ?dry_run=1  → return counts of what would be deleted without deleting

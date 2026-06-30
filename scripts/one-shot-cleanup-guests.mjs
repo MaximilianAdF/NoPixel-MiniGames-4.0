@@ -1,5 +1,5 @@
 // One-shot guest cleanup. Mirrors /api/admin/cleanup-guests filter logic exactly.
-// Use this for the initial backlog purge; the Vercel Cron handles ongoing daily runs.
+// Use this for the initial backlog purge; the host cron job handles ongoing daily runs.
 //
 // Usage:
 //   node scripts/one-shot-cleanup-guests.mjs           # live delete
