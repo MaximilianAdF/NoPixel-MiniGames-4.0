@@ -225,11 +225,11 @@ if CF_TOKEN and CF_ACCT:
         rv_start = (today - datetime.timedelta(days=7)).isoformat()
         rq = ('query{viewer{accounts(filter:{accountTag:"%s"}){'
               'overall: rumWebVitalsEventsAdaptiveGroups(limit:1,filter:{date_geq:"%s"}){'
-              'count quantiles{largestContentfulPaintP75 interactionToNextPaintP75 cumulativeLayoutShiftP75} '
+              'count quantiles{largestContentfulPaintP75 interactionToNextPaintP75 cumulativeLayoutShiftP75 firstContentfulPaintP75 timeToFirstByteP75} '
               'sum{lcpGood lcpTotal inpGood inpTotal clsGood clsTotal}} '
               'byPage: rumWebVitalsEventsAdaptiveGroups(limit:12,filter:{date_geq:"%s"},orderBy:[count_DESC]){'
               'dimensions{requestPath} count '
-              'quantiles{largestContentfulPaintP75 interactionToNextPaintP75 cumulativeLayoutShiftP75}}'
+              'quantiles{largestContentfulPaintP75 interactionToNextPaintP75 cumulativeLayoutShiftP75 firstContentfulPaintP75 timeToFirstByteP75}}'
               '}}}' % (CF_ACCT, rv_start, rv_start))
         rreq = urllib.request.Request("https://api.cloudflare.com/client/v4/graphql",
             data=json.dumps({"query": rq}).encode(),
@@ -241,19 +241,23 @@ if CF_TOKEN and CF_ACCT:
         ms = lambda v: round(v / 1000) if v is not None else None  # CF returns µs
         pct = lambda g, t: round(g / t * 100) if t else None
         cf_rum = {"note": ("Cloudflare RUM = REAL-USER (browser beacon) Core Web Vitals, last 7d. "
-                           "LCP/INP in ms; CLS unitless. *_good_pct = share meeting the 'good' threshold. "
-                           "This is real-user field CWV that Google CrUX lacks until traffic grows.")}
+                           "LCP/INP/FCP/TTFB in ms; CLS unitless. *_good_pct = share meeting the 'good' threshold "
+                           "(Google CWV thresholds: LCP<=2500, INP<=200, CLS<=0.1; FCP good<=1800, TTFB good<=800). "
+                           "Real-user field CWV that Google CrUX lacks until traffic grows.")}
         if acc.get("overall"):
             o = acc["overall"][0]; q = o["quantiles"]; s = o["sum"]
             cf_rum["site_wide"] = {
                 "events": o["count"],
                 "LCP_p75_ms": ms(q["largestContentfulPaintP75"]), "LCP_good_pct": pct(s["lcpGood"], s["lcpTotal"]),
                 "INP_p75_ms": ms(q["interactionToNextPaintP75"]), "INP_good_pct": pct(s["inpGood"], s["inpTotal"]),
-                "CLS_p75": q["cumulativeLayoutShiftP75"], "CLS_good_pct": pct(s["clsGood"], s["clsTotal"])}
+                "CLS_p75": q["cumulativeLayoutShiftP75"], "CLS_good_pct": pct(s["clsGood"], s["clsTotal"]),
+                "FCP_p75_ms": ms(q["firstContentfulPaintP75"]), "TTFB_p75_ms": ms(q["timeToFirstByteP75"])}
         cf_rum["by_page"] = [{"path": p["dimensions"]["requestPath"], "events": p["count"],
                               "LCP_p75_ms": ms(p["quantiles"]["largestContentfulPaintP75"]),
                               "INP_p75_ms": ms(p["quantiles"]["interactionToNextPaintP75"]),
-                              "CLS_p75": p["quantiles"]["cumulativeLayoutShiftP75"]} for p in acc.get("byPage", [])]
+                              "CLS_p75": p["quantiles"]["cumulativeLayoutShiftP75"],
+                              "FCP_p75_ms": ms(p["quantiles"]["firstContentfulPaintP75"]),
+                              "TTFB_p75_ms": ms(p["quantiles"]["timeToFirstByteP75"])} for p in acc.get("byPage", [])]
         bundle["web_vitals"]["cloudflare_rum"] = cf_rum
         log("CF RUM web vitals ok")
     except Exception as ex:
@@ -266,9 +270,9 @@ if CF_TOKEN and CF_ACCT:
         ps_start = (today - datetime.timedelta(days=7)).isoformat()
         pq = ('query{viewer{accounts(filter:{accountTag:"%s"}){'
               'overall: rumPerformanceEventsAdaptiveGroups(limit:1,filter:{date_geq:"%s"}){'
-              'count quantiles{pageLoadTimeP50 pageLoadTimeP75 pageLoadTimeP90}} '
+              'count quantiles{pageLoadTimeP50 pageLoadTimeP75 pageLoadTimeP90 pageRenderTimeP75}} '
               'byPage: rumPerformanceEventsAdaptiveGroups(limit:12,filter:{date_geq:"%s"},orderBy:[count_DESC]){'
-              'dimensions{requestPath} count quantiles{pageLoadTimeP50 pageLoadTimeP75 pageLoadTimeP90}}'
+              'dimensions{requestPath} count quantiles{pageLoadTimeP50 pageLoadTimeP75 pageLoadTimeP90 pageRenderTimeP75}}'
               '}}}' % (CF_ACCT, ps_start, ps_start))
         preq = urllib.request.Request("https://api.cloudflare.com/client/v4/graphql",
             data=json.dumps({"query": pq}).encode(),
@@ -278,14 +282,15 @@ if CF_TOKEN and CF_ACCT:
             raise RuntimeError(str(pdat["errors"])[:200])
         pacc = pdat["data"]["viewer"]["accounts"][0]
         ms = lambda v: round(v / 1000) if v is not None else None  # CF returns µs
-        perf = {"note": "Cloudflare RUM real-user PAGE-LOAD time (full window load, complements CWV), last 7d, in ms."}
+        perf = {"note": "Cloudflare RUM real-user PAGE-LOAD time (full window load) + render_p75 (DOM render phase = client-side cost; the minigames are JS-heavy), last 7d, in ms."}
         if pacc.get("overall"):
             oq = pacc["overall"][0]["quantiles"]
             perf["site_wide_ms"] = {"events": pacc["overall"][0]["count"],
-                "p50": ms(oq["pageLoadTimeP50"]), "p75": ms(oq["pageLoadTimeP75"]), "p90": ms(oq["pageLoadTimeP90"])}
+                "p50": ms(oq["pageLoadTimeP50"]), "p75": ms(oq["pageLoadTimeP75"]), "p90": ms(oq["pageLoadTimeP90"]),
+                "render_p75": ms(oq["pageRenderTimeP75"])}
         perf["by_page_ms"] = [{"path": p["dimensions"]["requestPath"], "events": p["count"],
                                "p50": ms(p["quantiles"]["pageLoadTimeP50"]), "p75": ms(p["quantiles"]["pageLoadTimeP75"]),
-                               "p90": ms(p["quantiles"]["pageLoadTimeP90"])} for p in pacc.get("byPage", [])]
+                               "p90": ms(p["quantiles"]["pageLoadTimeP90"]), "render_p75": ms(p["quantiles"]["pageRenderTimeP75"])} for p in pacc.get("byPage", [])]
         bundle["web_vitals"]["cloudflare_rum_pageload"] = perf
         log("CF RUM page-load speed ok")
     except Exception as ex:
@@ -298,11 +303,12 @@ if CF_TOKEN and CF_ACCT:
         au_start = (today - datetime.timedelta(days=7)).isoformat()
         def _grp(alias, dim, lim):
             return ('%s: rumPageloadEventsAdaptiveGroups(limit:%d,filter:{date_geq:"%s"},'
-                    'orderBy:[count_DESC]){count dimensions{%s}}' % (alias, lim, au_start, dim))
+                    'orderBy:[count_DESC]){count sum{visits} dimensions{%s}}' % (alias, lim, au_start, dim))
         aq = ('query{viewer{accounts(filter:{accountTag:"%s"}){' % CF_ACCT
-              + ('total: rumPageloadEventsAdaptiveGroups(limit:1,filter:{date_geq:"%s"}){count} ' % au_start)
+              + ('total: rumPageloadEventsAdaptiveGroups(limit:1,filter:{date_geq:"%s"}){count sum{visits}} ' % au_start)
               + _grp("byCountry", "countryName", 15) + ' ' + _grp("byDevice", "deviceType", 5) + ' '
               + _grp("byBrowser", "userAgentBrowser", 8) + ' ' + _grp("byReferer", "refererHost", 12) + ' '
+              + _grp("byOS", "userAgentOS", 6) + ' '
               + _grp("byPath", "requestPath", 15) + '}}}')
         areq = urllib.request.Request("https://api.cloudflare.com/client/v4/graphql",
             data=json.dumps({"query": aq}).encode(),
@@ -311,21 +317,60 @@ if CF_TOKEN and CF_ACCT:
         if adat.get("errors"):
             raise RuntimeError(str(adat["errors"])[:200])
         aacc = adat["data"]["viewer"]["accounts"][0]
-        rows = lambda alias, key: [{"name": r["dimensions"][key], "page_views": r["count"]} for r in aacc.get(alias, [])]
+        rows = lambda alias, key: [{"name": r["dimensions"][key], "page_views": r["count"],
+                                    "visits": (r.get("sum") or {}).get("visits")} for r in aacc.get(alias, [])]
+        _tot = (aacc.get("total") or [{}])[0]
         bundle["cloudflare"]["rum_audience"] = {
             "note": ("Cloudflare RUM = REAL-USER (browser beacon, CONSENT-FREE, excludes bots/non-JS), last 7d. "
-                     "page_views = real human page loads. Use this to validate/correct GA4's consent-gated "
+                     "page_views = real human page loads; visits = entry sessions (de-dupes internal nav — the "
+                     "right RPM/engagement denominator). Use this to validate/correct GA4's consent-gated "
                      "geo/device/referrer numbers; treat it (with GSC) as a truthful audience source."),
-            "total_page_views": (aacc.get("total") or [{}])[0].get("count"),
+            "total_page_views": _tot.get("count"),
+            "total_visits": (_tot.get("sum") or {}).get("visits"),
             "by_country": rows("byCountry", "countryName"),
             "by_device": rows("byDevice", "deviceType"),
             "by_browser": rows("byBrowser", "userAgentBrowser"),
+            "by_os": rows("byOS", "userAgentOS"),
             "by_referer": rows("byReferer", "refererHost"),
             "by_page": rows("byPath", "requestPath"),
         }
         log("CF RUM audience ok")
     except Exception as ex:
         bundle["errors"].append("CF RUM audience: " + repr(ex)[:200]); log("CF RUM audience ERROR " + repr(ex)[:160])
+
+# ---------------- Cloudflare HTTP health (zone, last ~24h): status-by-path + cache mix ----------------
+CF_ZONE = os.environ.get("CF_ZONE_ID")
+if CF_TOKEN and CF_ZONE:
+    try:
+        import urllib.request
+        h_now = datetime.datetime.now(datetime.timezone.utc)
+        h_start = (h_now - datetime.timedelta(hours=23)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        hq = ('query{viewer{zones(filter:{zoneTag:"%s"}){'
+              'errorPaths: httpRequestsAdaptiveGroups(limit:20,'
+              'filter:{datetime_geq:"%s",edgeResponseStatus_geq:400},orderBy:[count_DESC]){'
+              'count dimensions{edgeResponseStatus clientRequestPath}} '
+              'cache: httpRequestsAdaptiveGroups(limit:8,filter:{datetime_geq:"%s"},orderBy:[count_DESC]){'
+              'count dimensions{cacheStatus}}'
+              '}}}' % (CF_ZONE, h_start, h_start))
+        hreq = urllib.request.Request("https://api.cloudflare.com/client/v4/graphql",
+            data=json.dumps({"query": hq}).encode(),
+            headers={"Authorization": "Bearer " + CF_TOKEN, "Content-Type": "application/json"})
+        hdat = json.load(urllib.request.urlopen(hreq, timeout=40))
+        if hdat.get("errors"):
+            raise RuntimeError(str(hdat["errors"])[:200])
+        zd = hdat["data"]["viewer"]["zones"][0]
+        bundle["cloudflare"]["http_health_24h"] = {
+            "note": ("Cloudflare edge HTTP, last ~24h. error_paths = non-2xx (status >=400) responses by path — "
+                     "the broken-page / 5xx finder. cache_status = edge cache-hit mix (more 'hit' = cheaper + faster)."),
+            "error_paths": [{"status": r["dimensions"]["edgeResponseStatus"],
+                             "path": r["dimensions"]["clientRequestPath"], "requests": r["count"]}
+                            for r in zd.get("errorPaths", [])],
+            "cache_status": [{"status": r["dimensions"]["cacheStatus"], "requests": r["count"]}
+                             for r in zd.get("cache", [])],
+        }
+        log("CF HTTP health ok")
+    except Exception as ex:
+        bundle["errors"].append("CF HTTP health: " + repr(ex)[:200]); log("CF HTTP health ERROR " + repr(ex)[:160])
 
 with open(OUT, "w") as f:
     json.dump(bundle, f, indent=2)
