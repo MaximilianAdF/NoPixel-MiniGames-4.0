@@ -259,6 +259,74 @@ if CF_TOKEN and CF_ACCT:
     except Exception as ex:
         bundle["errors"].append("CF RUM: " + repr(ex)[:200]); log("CF RUM ERROR " + repr(ex)[:160])
 
+# ---------------- Cloudflare RUM page-load speed (real-user full load time, beyond CWV) ----------------
+if CF_TOKEN and CF_ACCT:
+    try:
+        import urllib.request
+        ps_start = (today - datetime.timedelta(days=7)).isoformat()
+        pq = ('query{viewer{accounts(filter:{accountTag:"%s"}){'
+              'overall: rumPerformanceEventsAdaptiveGroups(limit:1,filter:{date_geq:"%s"}){'
+              'count quantiles{pageLoadTimeP50 pageLoadTimeP75 pageLoadTimeP90}} '
+              'byPage: rumPerformanceEventsAdaptiveGroups(limit:12,filter:{date_geq:"%s"},orderBy:[count_DESC]){'
+              'dimensions{requestPath} count quantiles{pageLoadTimeP50 pageLoadTimeP75 pageLoadTimeP90}}'
+              '}}}' % (CF_ACCT, ps_start, ps_start))
+        preq = urllib.request.Request("https://api.cloudflare.com/client/v4/graphql",
+            data=json.dumps({"query": pq}).encode(),
+            headers={"Authorization": "Bearer " + CF_TOKEN, "Content-Type": "application/json"})
+        pdat = json.load(urllib.request.urlopen(preq, timeout=40))
+        if pdat.get("errors"):
+            raise RuntimeError(str(pdat["errors"])[:200])
+        pacc = pdat["data"]["viewer"]["accounts"][0]
+        ms = lambda v: round(v / 1000) if v is not None else None  # CF returns µs
+        perf = {"note": "Cloudflare RUM real-user PAGE-LOAD time (full window load, complements CWV), last 7d, in ms."}
+        if pacc.get("overall"):
+            oq = pacc["overall"][0]["quantiles"]
+            perf["site_wide_ms"] = {"events": pacc["overall"][0]["count"],
+                "p50": ms(oq["pageLoadTimeP50"]), "p75": ms(oq["pageLoadTimeP75"]), "p90": ms(oq["pageLoadTimeP90"])}
+        perf["by_page_ms"] = [{"path": p["dimensions"]["requestPath"], "events": p["count"],
+                               "p50": ms(p["quantiles"]["pageLoadTimeP50"]), "p75": ms(p["quantiles"]["pageLoadTimeP75"]),
+                               "p90": ms(p["quantiles"]["pageLoadTimeP90"])} for p in pacc.get("byPage", [])]
+        bundle["web_vitals"]["cloudflare_rum_pageload"] = perf
+        log("CF RUM page-load speed ok")
+    except Exception as ex:
+        bundle["errors"].append("CF RUM perf: " + repr(ex)[:200]); log("CF RUM perf ERROR " + repr(ex)[:160])
+
+# ---------------- Cloudflare RUM audience (consent-free, real-user traffic breakdown) ----------------
+if CF_TOKEN and CF_ACCT:
+    try:
+        import urllib.request
+        au_start = (today - datetime.timedelta(days=7)).isoformat()
+        def _grp(alias, dim, lim):
+            return ('%s: rumPageloadEventsAdaptiveGroups(limit:%d,filter:{date_geq:"%s"},'
+                    'orderBy:[count_DESC]){count dimensions{%s}}' % (alias, lim, au_start, dim))
+        aq = ('query{viewer{accounts(filter:{accountTag:"%s"}){' % CF_ACCT
+              + ('total: rumPageloadEventsAdaptiveGroups(limit:1,filter:{date_geq:"%s"}){count} ' % au_start)
+              + _grp("byCountry", "countryName", 15) + ' ' + _grp("byDevice", "deviceType", 5) + ' '
+              + _grp("byBrowser", "userAgentBrowser", 8) + ' ' + _grp("byReferer", "refererHost", 12) + ' '
+              + _grp("byPath", "requestPath", 15) + '}}}')
+        areq = urllib.request.Request("https://api.cloudflare.com/client/v4/graphql",
+            data=json.dumps({"query": aq}).encode(),
+            headers={"Authorization": "Bearer " + CF_TOKEN, "Content-Type": "application/json"})
+        adat = json.load(urllib.request.urlopen(areq, timeout=40))
+        if adat.get("errors"):
+            raise RuntimeError(str(adat["errors"])[:200])
+        aacc = adat["data"]["viewer"]["accounts"][0]
+        rows = lambda alias, key: [{"name": r["dimensions"][key], "page_views": r["count"]} for r in aacc.get(alias, [])]
+        bundle["cloudflare"]["rum_audience"] = {
+            "note": ("Cloudflare RUM = REAL-USER (browser beacon, CONSENT-FREE, excludes bots/non-JS), last 7d. "
+                     "page_views = real human page loads. Use this to validate/correct GA4's consent-gated "
+                     "geo/device/referrer numbers; treat it (with GSC) as a truthful audience source."),
+            "total_page_views": (aacc.get("total") or [{}])[0].get("count"),
+            "by_country": rows("byCountry", "countryName"),
+            "by_device": rows("byDevice", "deviceType"),
+            "by_browser": rows("byBrowser", "userAgentBrowser"),
+            "by_referer": rows("byReferer", "refererHost"),
+            "by_page": rows("byPath", "requestPath"),
+        }
+        log("CF RUM audience ok")
+    except Exception as ex:
+        bundle["errors"].append("CF RUM audience: " + repr(ex)[:200]); log("CF RUM audience ERROR " + repr(ex)[:160])
+
 with open(OUT, "w") as f:
     json.dump(bundle, f, indent=2)
 print("wrote", OUT, "(", len(json.dumps(bundle)), "bytes )")
