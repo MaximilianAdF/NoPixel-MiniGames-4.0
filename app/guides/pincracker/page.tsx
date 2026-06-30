@@ -1,4 +1,4 @@
-import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Zap, Brain, Trophy, Eye, Calculator, Fingerprint } from 'lucide-react';
+import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Brain, Trophy, Zap, Fingerprint } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import JsonLd from '@/app/components/JsonLd';
@@ -37,8 +37,8 @@ export default function PincrackerGuidePage() {
       />
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
-        <Link 
-          href="/guides" 
+        <Link
+          href="/guides"
           className="inline-flex items-center gap-2 text-gray-400 hover:text-[#54FFA4] transition-colors mb-8 pt-16"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -68,7 +68,7 @@ export default function PincrackerGuidePage() {
             </span>
             <span className="flex items-center gap-1">
               <Target className="w-4 h-4" />
-              Success Rate: ~50% (untrained) → 95%+ (trained)
+              Pure deduction — beat the clock, not your memory
             </span>
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function PincrackerGuidePage() {
           <nav className="space-y-2">
             <a href="#overview" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">1. Overview</a>
             <a href="#how-it-works" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">2. How PIN Cracker Works</a>
-            <a href="#memory-techniques" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">3. Memory Techniques</a>
+            <a href="#feedback" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">3. Reading the Color Feedback</a>
             <a href="#strategies" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">4. Winning Strategies</a>
             <a href="#common-mistakes" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">5. Common Mistakes</a>
             <a href="#advanced-tips" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">6. Advanced Pro Tips</a>
@@ -94,20 +94,16 @@ export default function PincrackerGuidePage() {
           </h2>
           <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
             <p className="text-gray-300 leading-relaxed mb-4">
-              The PIN Cracker minigame tests your short-term memory and quick number recall. You&apos;ll see a sequence of numbers flash on screen, then need to enter them back in the correct order. It&apos;s commonly used for bypassing electronic security systems, ATMs, and secure door panels in NoPixel 4.0.
+              PIN Cracker is a logic-deduction puzzle in the style of the classic board game Mastermind. A secret PIN is hidden behind a row of slots, and your job is to figure it out by guessing and reading the color-coded feedback each guess returns. This is <strong className="text-white">not</strong> a memory test — nothing flashes and disappears. Every guess and every clue stays on screen for you to reason about.
             </p>
             <p className="text-gray-300 leading-relaxed mb-4">
-              While the concept is simple, the execution under pressure is challenging. Numbers are displayed briefly, and you need to recall anywhere from 4 to 8+ digits depending on the difficulty level. The good news? Memory is a trainable skill, and with proper techniques, anyone can significantly improve their success rate.
+              The catch is the clock. Each round runs against a countdown (20 seconds by default), so you are racing to deduce the full code before time expires. There is no limit on the number of guesses you can make — your only enemy is the timer. Crack the whole PIN before it hits zero and the round is a win; let it run out and you fail.
             </p>
             <div className="bg-[#0F1B21] rounded-lg p-4 mt-4">
-              <h4 className="text-white font-semibold mb-2">When You&apos;ll Encounter PIN Cracker:</h4>
-              <ul className="text-gray-400 space-y-1 text-sm">
-                <li>• ATM hacking</li>
-                <li>• Security panel bypasses</li>
-                <li>• Safe cracking sequences</li>
-                <li>• Electronic door locks</li>
-                <li>• Some heist secondary objectives</li>
-              </ul>
+              <h4 className="text-white font-semibold mb-2">The single most important fact:</h4>
+              <p className="text-gray-400 text-sm">
+                The hidden PIN is built from <strong className="text-[#54FFA4]">distinct, non-repeating digits</strong> — the game draws them from a shuffled 0–9 deck, so no digit ever appears twice. That one rule turns the puzzle from guesswork into clean elimination.
+              </p>
             </div>
           </div>
         </section>
@@ -123,38 +119,45 @@ export default function PincrackerGuidePage() {
               <div>
                 <h3 className="text-xl font-semibold text-white mb-3">The Mechanics</h3>
                 <p className="text-gray-300 leading-relaxed mb-4">
-                  The game displays a sequence of numbers for a limited time (usually 2-5 seconds depending on length). After the numbers disappear, a number pad appears and you must enter the exact sequence you saw. Some versions require entering numbers in order, while others accept any order.
+                  You see one row of empty slots — four by default. Type digits to fill the slots left to right, then submit the row as a complete guess. The game instantly scores it, lighting up a colored marker under each slot to tell you how close that digit was. Read the colors, refine your guess, and submit again. Repeat until every slot is green.
                 </p>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="bg-[#0F1B21] rounded-lg p-4">
-                  <h4 className="text-[#54FFA4] font-semibold mb-2">Display Phase</h4>
+                  <h4 className="text-[#54FFA4] font-semibold mb-2">Controls</h4>
                   <ul className="text-gray-400 text-sm space-y-1">
-                    <li>• Numbers shown sequentially or all at once</li>
-                    <li>• Display time varies by difficulty</li>
-                    <li>• 4-8+ digits to remember</li>
-                    <li>• May include repeating numbers</li>
+                    <li>• Type digits <strong className="text-white">0–9</strong> on your keyboard to fill slots</li>
+                    <li>• <strong className="text-white">Backspace</strong> deletes the last digit</li>
+                    <li>• <strong className="text-white">Enter</strong> or the green <strong className="text-white">Crack</strong> button submits a full row</li>
+                    <li>• On mobile, tap the puzzle and use your phone&apos;s number keys</li>
                   </ul>
                 </div>
                 <div className="bg-[#0F1B21] rounded-lg p-4">
-                  <h4 className="text-[#54FFA4] font-semibold mb-2">Input Phase</h4>
+                  <h4 className="text-[#54FFA4] font-semibold mb-2">Win &amp; Lose</h4>
                   <ul className="text-gray-400 text-sm space-y-1">
-                    <li>• Number pad for entry</li>
-                    <li>• Timer countdown active</li>
-                    <li>• Can use keyboard or click</li>
-                    <li>• Wrong entry usually means failure</li>
+                    <li>• <strong className="text-green-400">Win:</strong> all slots turn green at once</li>
+                    <li>• <strong className="text-red-400">Lose:</strong> the countdown timer hits zero</li>
+                    <li>• Unlimited guesses — a wrong guess never ends the round</li>
+                    <li>• You must fill every slot before you can submit</li>
                   </ul>
                 </div>
               </div>
 
-              <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-3">Settings You Can Tune</h3>
+                <p className="text-gray-300 leading-relaxed mb-4">
+                  In practice mode the gear menu lets you shape the difficulty. <strong className="text-white">PIN Length</strong> ranges from 2 to 6 digits (default 4), and the <strong className="text-white">Timer</strong> ranges from 5 to 30 seconds (default 20). There is also an <strong className="text-white">Auto Clear</strong> toggle (on by default): when on, a non-winning guess wipes the row so you start the next guess fresh; turn it off to keep your previous digits on screen and edit them with Backspace.
+                </p>
+              </div>
+
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
                 <div className="flex items-start gap-3">
-                  <Fingerprint className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+                  <Zap className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="text-purple-400 font-semibold mb-1">Key Challenge</h4>
+                    <h4 className="text-blue-400 font-semibold mb-1">Why the Timer Changes Everything</h4>
                     <p className="text-gray-300 text-sm">
-                      The human brain can typically hold 7±2 items in short-term memory. PIN sequences at higher difficulties push beyond this limit, requiring memory techniques rather than raw memorization.
+                      With only 20 seconds on the default clock, you do not have time for lazy guessing. Each submission also plays a short staggered reveal as the markers light up one slot at a time, so efficient, information-dense guesses are what win rounds — not raw speed-typing.
                     </p>
                   </div>
                 </div>
@@ -163,85 +166,45 @@ export default function PincrackerGuidePage() {
           </div>
         </section>
 
-        {/* Memory Techniques Section */}
-        <section id="memory-techniques" className="mb-12">
+        {/* Feedback Section */}
+        <section id="feedback" className="mb-12">
           <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
             <span className="w-8 h-8 bg-[#54FFA4] text-[#0F1B21] rounded-lg flex items-center justify-center font-bold">3</span>
-            Memory Techniques
+            Reading the Color Feedback
           </h2>
-          <div className="space-y-6">
-            <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <Brain className="w-5 h-5 text-[#54FFA4]" />
-                Chunking Method
-              </h3>
-              <p className="text-gray-300 leading-relaxed mb-4">
-                The most effective technique for remembering numbers. Instead of memorizing 8 individual digits (7-3-9-1-4-8-2-6), group them into chunks of 2-3 digits each (73-91-48-26 or 739-148-26).
-              </p>
-              <div className="bg-[#0F1B21] rounded-lg p-4">
-                <div className="flex items-center gap-4 justify-center mb-4">
-                  <div className="text-center">
-                    <p className="text-gray-400 text-xs mb-1">Raw</p>
-                    <p className="text-xl font-mono text-white">7 3 9 1 4 8 2 6</p>
-                    <p className="text-red-400 text-xs mt-1">8 items to remember</p>
-                  </div>
-                  <span className="text-gray-500">→</span>
-                  <div className="text-center">
-                    <p className="text-gray-400 text-xs mb-1">Chunked</p>
-                    <p className="text-xl font-mono text-[#54FFA4]">73 - 91 - 48 - 26</p>
-                    <p className="text-green-400 text-xs mt-1">4 items to remember</p>
-                  </div>
+          <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
+            <p className="text-gray-300 leading-relaxed mb-6">
+              Every slot gets its own marker after you submit — the feedback is <strong className="text-white">per position</strong>, not a single combined score. Each color maps to one of three states:
+            </p>
+            <div className="space-y-3 mb-6">
+              <div className="flex items-start gap-4 p-4 bg-[#0F1B21] rounded-lg">
+                <span className="w-6 h-6 rounded bg-green-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-green-400 font-semibold mb-1">Green — Right digit, right place</h4>
+                  <p className="text-gray-400 text-sm">This digit is in the code and sitting in exactly the correct slot. Lock it in and never move it.</p>
                 </div>
-                <p className="text-gray-400 text-sm text-center">
-                  Your brain treats each chunk as a single unit, effectively halving the memory load.
+              </div>
+              <div className="flex items-start gap-4 p-4 bg-[#0F1B21] rounded-lg">
+                <span className="w-6 h-6 rounded bg-yellow-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-yellow-400 font-semibold mb-1">Yellow — Right digit, wrong place</h4>
+                  <p className="text-gray-400 text-sm">This digit belongs in the PIN but not in the slot you put it. Keep it in play and try it elsewhere.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4 p-4 bg-[#0F1B21] rounded-lg">
+                <span className="w-6 h-6 rounded bg-red-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-red-400 font-semibold mb-1">Red — Not in the code</h4>
+                  <p className="text-gray-400 text-sm">This digit is absent from the PIN entirely. Cross it off and never guess it again.</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <Brain className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+                <p className="text-gray-300 text-sm">
+                  <strong className="text-purple-400">Remember the no-repeat rule:</strong> because every digit in the PIN is unique, a single green or yellow tells you that digit is used exactly once. A red eliminates that digit from <em>all</em> remaining slots at once.
                 </p>
-              </div>
-            </div>
-
-            <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <Eye className="w-5 h-5 text-[#54FFA4]" />
-                Visual Patterns
-              </h3>
-              <p className="text-gray-300 leading-relaxed mb-4">
-                Convert numbers into visual patterns on the keypad. Trace the path your finger would take from number to number. A sequence like 1-5-9-7 forms a specific shape on the numpad.
-              </p>
-              <div className="grid grid-cols-3 gap-2 max-w-[150px] mx-auto mb-4">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                  <div 
-                    key={num}
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold ${
-                      [1, 5, 9, 7].includes(num) 
-                        ? 'bg-[#54FFA4] text-[#0F1B21]' 
-                        : 'bg-[#0F1B21] text-gray-500'
-                    }`}
-                  >
-                    {num}
-                  </div>
-                ))}
-              </div>
-              <p className="text-gray-400 text-sm text-center">
-                &quot;1-5-9-7&quot; forms a diagonal line then jumps left. Remember the shape, not the numbers.
-              </p>
-            </div>
-
-            <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <Calculator className="w-5 h-5 text-[#54FFA4]" />
-                Association Method
-              </h3>
-              <p className="text-gray-300 leading-relaxed mb-4">
-                Associate number sequences with things you already know. &quot;2547&quot; could become &quot;25 (quarter) and 47 (AK-47)&quot;. Your brain remembers stories and associations far better than abstract numbers.
-              </p>
-              <div className="bg-[#0F1B21] rounded-lg p-4">
-                <h4 className="text-white font-semibold mb-2">Common Associations:</h4>
-                <ul className="text-gray-400 text-sm space-y-1">
-                  <li>• 24 = Hours in a day</li>
-                  <li>• 365 = Days in a year</li>
-                  <li>• 747 = Boeing airplane</li>
-                  <li>• 911 = Emergency number</li>
-                  <li>• 420 = Popular culture reference</li>
-                </ul>
               </div>
             </div>
           </div>
@@ -256,9 +219,9 @@ export default function PincrackerGuidePage() {
           <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-white mb-3">The Combined Approach</h3>
+                <h3 className="text-lg font-semibold text-white mb-3">A Reliable Four-Guess Plan (4-digit code)</h3>
                 <p className="text-gray-300 leading-relaxed mb-4">
-                  The best players combine multiple techniques. Here&apos;s a step-by-step approach for maximum success:
+                  The fastest crackers treat every guess as an experiment that buys information. Here is a clean order of operations:
                 </p>
               </div>
 
@@ -266,41 +229,51 @@ export default function PincrackerGuidePage() {
                 <div className="flex items-start gap-4 p-4 bg-[#0F1B21] rounded-lg">
                   <span className="w-8 h-8 bg-[#54FFA4] text-[#0F1B21] rounded-lg flex items-center justify-center font-bold flex-shrink-0">1</span>
                   <div>
-                    <h4 className="text-white font-semibold mb-1">Chunk Immediately</h4>
-                    <p className="text-gray-400 text-sm">As numbers appear, mentally group them into pairs or triplets. Don&apos;t wait until you see all numbers.</p>
+                    <h4 className="text-white font-semibold mb-1">Open with distinct digits</h4>
+                    <p className="text-gray-400 text-sm">Lead with something like <span className="font-mono text-[#54FFA4]">0123</span>, then <span className="font-mono text-[#54FFA4]">4567</span>. Across two guesses you can test eight different digits and immediately learn which ones live in the code.</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4 p-4 bg-[#0F1B21] rounded-lg">
                   <span className="w-8 h-8 bg-[#54FFA4] text-[#0F1B21] rounded-lg flex items-center justify-center font-bold flex-shrink-0">2</span>
                   <div>
-                    <h4 className="text-white font-semibold mb-1">Verbalize the Chunks</h4>
-                    <p className="text-gray-400 text-sm">Quietly repeat the chunks to yourself: &quot;seventy-three, ninety-one, forty-eight&quot;. Audio reinforces visual memory.</p>
+                    <h4 className="text-white font-semibold mb-1">Eliminate every red</h4>
+                    <p className="text-gray-400 text-sm">Any digit that comes back red is gone for good. With unique digits, ruling out four reds can collapse the search space dramatically in a single guess.</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4 p-4 bg-[#0F1B21] rounded-lg">
                   <span className="w-8 h-8 bg-[#54FFA4] text-[#0F1B21] rounded-lg flex items-center justify-center font-bold flex-shrink-0">3</span>
                   <div>
-                    <h4 className="text-white font-semibold mb-1">Trace the Path</h4>
-                    <p className="text-gray-400 text-sm">Mentally trace where your finger will go on the keypad. This creates spatial memory as backup.</p>
+                    <h4 className="text-white font-semibold mb-1">Lock greens, shuffle yellows</h4>
+                    <p className="text-gray-400 text-sm">Keep green digits frozen in their slots. For yellows you already know the digit is correct — you just need to find its real position, so rotate it into untested slots.</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4 p-4 bg-[#0F1B21] rounded-lg">
                   <span className="w-8 h-8 bg-[#54FFA4] text-[#0F1B21] rounded-lg flex items-center justify-center font-bold flex-shrink-0">4</span>
                   <div>
-                    <h4 className="text-white font-semibold mb-1">Enter Confidently</h4>
-                    <p className="text-gray-400 text-sm">Type at a steady pace. Don&apos;t rush, don&apos;t hesitate. Confidence prevents second-guessing errors.</p>
+                    <h4 className="text-white font-semibold mb-1">Close it out</h4>
+                    <p className="text-gray-400 text-sm">Once you know which digits are in the code and have placed the greens, only a small number of orderings remain. Submit the arrangement the clues point to and watch the whole row go green.</p>
                   </div>
                 </div>
+              </div>
+
+              <div className="bg-[#0F1B21] rounded-lg p-4">
+                <h4 className="text-white font-semibold mb-2">Worked example (secret code 4 7 1 9):</h4>
+                <ul className="text-gray-400 text-sm space-y-1 font-mono">
+                  <li>Guess <span className="text-white">0 1 2 3</span> → 1 yellow, rest red <span className="font-sans text-gray-500">(1 is in; 0, 2, 3 are out)</span></li>
+                  <li>Guess <span className="text-white">4 5 6 7</span> → 4 yellow, 7 yellow, 5/6 red <span className="font-sans text-gray-500">(4 and 7 are in)</span></li>
+                  <li>Guess <span className="text-white">4 7 1 8</span> → 4, 7, 1 green, 8 red <span className="font-sans text-gray-500">(last slot must be 9)</span></li>
+                  <li>Guess <span className="text-white">4 7 1 9</span> → all green. Cracked.</li>
+                </ul>
               </div>
 
               <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <p className="text-gray-300 text-sm">
-                    <strong className="text-green-400">Pro Tip:</strong> Use the numeric keypad on your keyboard if available. It&apos;s faster than clicking and the layout matches what you&apos;re visualizing.
+                    <strong className="text-green-400">Pro Tip:</strong> Turn Auto Clear off when you want to nudge a single digit. Keeping the previous row on screen lets you Backspace one slot and re-submit instead of retyping the whole code — a real time-saver against the clock.
                   </p>
                 </div>
               </div>
@@ -319,9 +292,9 @@ export default function PincrackerGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Trying to Remember Individual Digits</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">Re-using red digits</h4>
                   <p className="text-gray-300 text-sm">
-                    Your brain isn&apos;t designed to hold 8 separate items. Always chunk numbers into groups—it&apos;s significantly more reliable.
+                    A red marker is a hard elimination. Putting that digit back into a later guess wastes a slot that could be gathering new information.
                   </p>
                 </div>
               </div>
@@ -329,9 +302,9 @@ export default function PincrackerGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Looking Away During Display</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">Ignoring yellow clues</h4>
                   <p className="text-gray-300 text-sm">
-                    Every millisecond of viewing time matters. Don&apos;t glance at the keypad, timer, or anything else while numbers are showing.
+                    A yellow digit is confirmed to be in the code — it just needs a different slot. Dropping it from your next guess throws away progress.
                   </p>
                 </div>
               </div>
@@ -339,9 +312,9 @@ export default function PincrackerGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Second-Guessing Yourself</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">Moving green digits</h4>
                   <p className="text-gray-300 text-sm">
-                    Once you start entering numbers, commit to your memory. Hesitating and changing answers usually leads to more errors, not fewer.
+                    Once a slot is green, that position is solved. Shuffling it around in the next guess only sets you backwards.
                   </p>
                 </div>
               </div>
@@ -349,9 +322,9 @@ export default function PincrackerGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Not Using Keyboard Numpad</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">Forgetting digits cannot repeat</h4>
                   <p className="text-gray-300 text-sm">
-                    Clicking numbers is slow and requires visual attention. The numeric keypad is faster and lets you stay focused on recall.
+                    The PIN never repeats a digit, so guesses like <span className="font-mono">1 1 2 2</span> waste slots. Always fill every position with a different number.
                   </p>
                 </div>
               </div>
@@ -370,48 +343,48 @@ export default function PincrackerGuidePage() {
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Practice Mental Math</h4>
-                  <p className="text-gray-400 text-sm">Daily number exercises strengthen your working memory overall, not just for this minigame.</p>
+                  <h4 className="text-white font-semibold mb-1">Type with the keyboard</h4>
+                  <p className="text-gray-400 text-sm">Number keys plus Enter are far faster than reaching for the Crack button. Every second saved is another guess you can afford.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Get Enough Sleep</h4>
-                  <p className="text-gray-400 text-sm">Sleep-deprived brains struggle with short-term memory. Rest before important heists.</p>
+                  <h4 className="text-white font-semibold mb-1">Cover all ten digits early</h4>
+                  <p className="text-gray-400 text-sm">Two opening guesses of eight distinct digits leave only two untested. You can often deduce the full membership of the code before guess three.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Minimize Distractions</h4>
-                  <p className="text-gray-400 text-sm">Close Discord, mute notifications. Any interruption during memorization can wipe your memory.</p>
+                  <h4 className="text-white font-semibold mb-1">Practice at shorter lengths first</h4>
+                  <p className="text-gray-400 text-sm">Drop PIN Length to 2 or 3 in settings to drill the green/yellow/red logic, then scale up to 5 and 6 once it&apos;s second nature.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Practice Beyond Your Level</h4>
-                  <p className="text-gray-400 text-sm">Train at 8+ digits so that 6-digit sequences feel easy by comparison.</p>
+                  <h4 className="text-white font-semibold mb-1">Loosen the timer to learn</h4>
+                  <p className="text-gray-400 text-sm">Push the Timer toward 30 seconds while training your deduction, then tighten it back down to sharpen your speed under pressure.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Build a Number Vocabulary</h4>
-                  <p className="text-gray-400 text-sm">The more associations you have for 2-digit numbers, the faster you can encode them.</p>
+                  <h4 className="text-white font-semibold mb-1">Count your information, not your luck</h4>
+                  <p className="text-gray-400 text-sm">A good guess that returns all reds is still a win — it eliminated four digits. Judge guesses by what they rule out, not whether they hit.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Train Your Peripheral Vision</h4>
-                  <p className="text-gray-400 text-sm">Learn to see all numbers at once rather than reading left-to-right sequentially.</p>
+                  <h4 className="text-white font-semibold mb-1">Practice mode loops for free</h4>
+                  <p className="text-gray-400 text-sm">Win or lose, practice rounds restart automatically after a few seconds — so you can grind back-to-back codes with no menus in the way.</p>
                 </div>
               </div>
             </div>
@@ -422,7 +395,7 @@ export default function PincrackerGuidePage() {
                 <div>
                   <h4 className="text-[#54FFA4] font-semibold mb-1">Mastery Benchmark</h4>
                   <p className="text-gray-300 text-sm">
-                    You&apos;ve mastered PIN cracking when you can consistently complete 8-digit sequences without chunking—your brain will automatically process numbers efficiently through sheer practice.
+                    You&apos;ve mastered PIN Cracker when you can reliably crack a 4-digit code in three or four guesses inside the 20-second clock — and step up to 6-digit codes without breaking your elimination routine.
                   </p>
                 </div>
               </div>
@@ -435,7 +408,7 @@ export default function PincrackerGuidePage() {
           <Fingerprint className="w-12 h-12 text-purple-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-4">Ready to Crack Some PINs?</h2>
           <p className="text-gray-300 mb-6 max-w-lg mx-auto">
-            Put these memory techniques into practice. Start with shorter sequences and work your way up to expert level.
+            Put the deduction loop into practice. Start with shorter codes and a relaxed timer, then tighten the clock as your elimination gets sharper.
           </p>
           <Link
             href="/puzzles/pincracker"

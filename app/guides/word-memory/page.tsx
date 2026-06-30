@@ -1,4 +1,4 @@
-import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Zap, Brain, Trophy, Eye, Layers } from 'lucide-react';
+import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Zap, Brain, Trophy, Eye, Layers, MousePointerClick } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import JsonLd from '@/app/components/JsonLd';
@@ -37,8 +37,8 @@ export default function WordMemoryGuidePage() {
       />
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
-        <Link 
-          href="/guides" 
+        <Link
+          href="/guides"
           className="inline-flex items-center gap-2 text-gray-400 hover:text-[#54FFA4] transition-colors mb-8 pt-16"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -63,12 +63,12 @@ export default function WordMemoryGuidePage() {
               <Clock className="w-4 h-4" />
               7 min read
             </span>
-            <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded-md border border-yellow-500/30">
-              Medium Difficulty
+            <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded-md border border-red-500/30">
+              Hard Difficulty
             </span>
             <span className="flex items-center gap-1">
               <Target className="w-4 h-4" />
-              Success Rate: ~45% (untrained) → 90%+ (trained)
+              Goal: clear the whole sequence with zero mistakes
             </span>
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function WordMemoryGuidePage() {
           <nav className="space-y-2">
             <a href="#overview" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">1. Overview</a>
             <a href="#how-it-works" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">2. How Word Memory Works</a>
-            <a href="#memory-science" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">3. The Science of Memory</a>
+            <a href="#memory-science" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">3. Recognition, Not Recall</a>
             <a href="#strategies" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">4. Winning Strategies</a>
             <a href="#common-mistakes" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">5. Common Mistakes</a>
             <a href="#advanced-tips" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">6. Advanced Pro Tips</a>
@@ -94,18 +94,18 @@ export default function WordMemoryGuidePage() {
           </h2>
           <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
             <p className="text-gray-300 leading-relaxed mb-4">
-              Word Memory is a sequence recall minigame that tests your ability to remember and identify words you&apos;ve seen before. Words are shown one at a time, and you must identify whether each new word is one you&apos;ve already seen (&quot;SEEN&quot;) or a new word (&quot;NEW&quot;).
+              Word Memory shows you one word at a time and asks a single question about each one: have you already seen this word earlier in the run? Press <span className="text-[#54FFA4] font-semibold">SEEN</span> if the word has appeared before, or <span className="text-[#54FFA4] font-semibold">NEW</span> if this is its first appearance. Get it right and the next word loads; get it wrong even once and the run ends instantly.
             </p>
             <p className="text-gray-300 leading-relaxed mb-4">
-              This minigame challenges your working memory and recognition speed. Unlike memorizing a sequence and entering it back, you&apos;re constantly evaluating new information against an ever-growing mental list. It&apos;s one of the more mentally demanding hacks, especially at higher difficulties with more words.
+              The catch is the pacing. A single countdown covers the entire sequence — by default you have about <strong className="text-white">25 seconds</strong> to clear <strong className="text-white">25 words</strong>, which works out to roughly one second per decision. There are no lives, no strikes, and no streak meter: it is a flawless-run-or-bust recognition test against the clock.
             </p>
             <div className="bg-[#0F1B21] rounded-lg p-4 mt-4">
-              <h4 className="text-white font-semibold mb-2">When You&apos;ll Encounter Word Memory:</h4>
+              <h4 className="text-white font-semibold mb-2">At a Glance (default settings):</h4>
               <ul className="text-gray-400 space-y-1 text-sm">
-                <li>• Advanced security system bypasses</li>
-                <li>• Intelligence-based missions</li>
-                <li>• Certain heist puzzle sequences</li>
-                <li>• Memory-check security protocols</li>
+                <li>• Sequence length: <strong className="text-gray-200">25 words</strong> (adjustable 20&ndash;100 in settings)</li>
+                <li>• Timer: <strong className="text-gray-200">25 seconds</strong> for the whole run (adjustable 20&ndash;50s)</li>
+                <li>• Fail conditions: one wrong answer, or the clock hitting zero</li>
+                <li>• Score: the number of words you clear before the run ends</li>
               </ul>
             </div>
           </div>
@@ -122,27 +122,34 @@ export default function WordMemoryGuidePage() {
               <div>
                 <h3 className="text-xl font-semibold text-white mb-3">The Mechanics</h3>
                 <p className="text-gray-300 leading-relaxed mb-4">
-                  Words appear on screen one at a time. For each word, you must decide whether you&apos;ve seen it before in this session or if it&apos;s appearing for the first time. The twist: some words will definitely appear twice, so you need to track which words you&apos;ve encountered.
+                  The whole sequence is drawn from a small pool of distinct words — only about half as many unique words as the sequence is long (roughly <strong className="text-white">12 unique words</strong> for a 25-word run). Because that pool is so small, the same handful of words cycle back again and again, so most words after the opening few are repeats. The very first word is always NEW, since nothing has been shown yet. Your job is to keep track of which words from that small set have already turned up.
+                </p>
+                <p className="text-gray-300 leading-relaxed">
+                  A counter at the top shows your progress (for example <span className="text-[#54FFA4] font-semibold">0/25</span> climbing toward <span className="text-[#54FFA4] font-semibold">25/25</span>), and an orange bar along the bottom drains down as your shared timer runs out.
                 </p>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="bg-[#0F1B21] rounded-lg p-4">
-                  <h4 className="text-[#54FFA4] font-semibold mb-2">Game Elements</h4>
+                  <h4 className="text-[#54FFA4] font-semibold mb-2 flex items-center gap-2">
+                    <MousePointerClick className="w-4 h-4" /> Game Elements
+                  </h4>
                   <ul className="text-gray-400 text-sm space-y-1">
-                    <li>• Words shown sequentially</li>
-                    <li>• &quot;NEW&quot; and &quot;SEEN&quot; buttons</li>
-                    <li>• Time limit per response</li>
-                    <li>• 10-30+ words per round</li>
+                    <li>• One word shown at a time, centred</li>
+                    <li>• Purple <strong className="text-gray-200">Seen</strong> and green <strong className="text-gray-200">New</strong> buttons (click or tap)</li>
+                    <li>• A progress counter (cleared / total)</li>
+                    <li>• A single draining timer bar for the run</li>
                   </ul>
                 </div>
                 <div className="bg-[#0F1B21] rounded-lg p-4">
-                  <h4 className="text-[#54FFA4] font-semibold mb-2">Success Conditions</h4>
+                  <h4 className="text-[#54FFA4] font-semibold mb-2 flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" /> Win &amp; Lose
+                  </h4>
                   <ul className="text-gray-400 text-sm space-y-1">
-                    <li>• Correctly identify NEW words</li>
-                    <li>• Correctly identify SEEN words</li>
-                    <li>• Respond before time runs out</li>
-                    <li>• Maintain high accuracy overall</li>
+                    <li>• <span className="text-emerald-400">Win:</span> classify every word correctly to the end</li>
+                    <li>• <span className="text-red-400">Lose:</span> a single wrong SEEN/NEW call</li>
+                    <li>• <span className="text-red-400">Lose:</span> the countdown reaching zero</li>
+                    <li>• No strikes or second chances</li>
                   </ul>
                 </div>
               </div>
@@ -153,7 +160,7 @@ export default function WordMemoryGuidePage() {
                   <div>
                     <h4 className="text-indigo-400 font-semibold mb-1">Key Challenge</h4>
                     <p className="text-gray-300 text-sm">
-                      Your mental word list grows with each NEW word. By the end of a long sequence, you might be tracking 15+ words simultaneously. This is where memory techniques become essential.
+                      You are not memorising a long, ever-growing list — the unique pool is small. The real difficulty is doing it at speed and without a single slip, because one wrong call ends the entire run no matter how far you have come.
                     </p>
                   </div>
                 </div>
@@ -162,56 +169,36 @@ export default function WordMemoryGuidePage() {
           </div>
         </section>
 
-        {/* Memory Science Section */}
+        {/* Recognition vs Recall Section */}
         <section id="memory-science" className="mb-12">
           <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
             <span className="w-8 h-8 bg-[#54FFA4] text-[#0F1B21] rounded-lg flex items-center justify-center font-bold">3</span>
-            The Science of Memory
+            Recognition, Not Recall
           </h2>
           <div className="space-y-6">
             <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <Brain className="w-5 h-5 text-[#54FFA4]" />
-                How Your Brain Remembers Words
+                <Layers className="w-5 h-5 text-[#54FFA4]" />
+                Why This Helps You
               </h3>
               <p className="text-gray-300 leading-relaxed mb-4">
-                Your brain doesn&apos;t remember words like a computer stores data. Instead, it creates associations and emotional connections. Words that trigger imagery, emotions, or connections to existing knowledge are remembered better than abstract words.
+                Word Memory uses <strong>recognition</strong> (easier) rather than <strong>recall</strong> (harder). You never have to produce a word from a blank mind — you only have to react to the word in front of you and answer &quot;have I seen this one yet?&quot;. That is far more forgiving than reciting a sequence from scratch, which is exactly why focused practice raises your success rate so quickly.
               </p>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="bg-[#0F1B21] rounded-lg p-4">
-                  <h4 className="text-green-400 font-semibold mb-2">Easy to Remember</h4>
-                  <ul className="text-gray-400 text-sm space-y-1">
-                    <li>• Concrete nouns (dog, house, car)</li>
-                    <li>• Emotionally charged words</li>
-                    <li>• Unusual or funny words</li>
-                    <li>• Words you use frequently</li>
-                  </ul>
-                </div>
-                <div className="bg-[#0F1B21] rounded-lg p-4">
-                  <h4 className="text-red-400 font-semibold mb-2">Hard to Remember</h4>
-                  <ul className="text-gray-400 text-sm space-y-1">
-                    <li>• Abstract concepts (freedom, theory)</li>
-                    <li>• Similar-sounding words</li>
-                    <li>• Words with no mental image</li>
-                    <li>• Rarely used vocabulary</li>
-                  </ul>
-                </div>
+              <div className="bg-[#0F1B21] rounded-lg p-4">
+                <p className="text-gray-400 text-sm">
+                  <strong className="text-white">Think of it like this:</strong> recall is naming everyone at a party from memory; recognition is glancing at a photo and saying &quot;yes, I met them.&quot; The second is much easier — and because the word pool here is small, the same faces keep coming back.
+                </p>
               </div>
             </div>
 
             <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <Layers className="w-5 h-5 text-[#54FFA4]" />
-                Recognition vs Recall
+                <Brain className="w-5 h-5 text-[#54FFA4]" />
+                The Words Are On Your Side
               </h3>
-              <p className="text-gray-300 leading-relaxed mb-4">
-                Good news: Word Memory uses <strong>recognition</strong> (easier) rather than <strong>recall</strong> (harder). You don&apos;t need to produce words from memory—you just need to recognize if you&apos;ve seen them before. This is why the minigame is more accessible than it first seems.
+              <p className="text-gray-300 leading-relaxed">
+                The pool is made up of concrete, everyday nouns — things like <em>apple</em>, <em>river</em>, <em>anchor</em>, <em>lantern</em> and <em>compass</em>. They are easy to picture and there are no near-duplicate spellings to trip over, so the challenge is purely about tracking which ones have already appeared, not about deciphering tricky vocabulary.
               </p>
-              <div className="bg-[#0F1B21] rounded-lg p-4">
-                <p className="text-gray-400 text-sm">
-                  <strong className="text-white">Think of it like this:</strong> Recall is naming every person at a party from memory. Recognition is looking at a photo and saying &quot;Yes, I met them.&quot; Recognition is significantly easier, which is why training can dramatically improve your success rate.
-                </p>
-              </div>
             </div>
           </div>
         </section>
@@ -226,17 +213,27 @@ export default function WordMemoryGuidePage() {
             <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <Eye className="w-5 h-5 text-[#54FFA4]" />
-                Strategy 1: Visual Imagery
+                Strategy 1: Trust Recognition
               </h3>
               <p className="text-gray-300 leading-relaxed mb-4">
-                When you see a NEW word, immediately create a mental image. &quot;ELEPHANT&quot; becomes a vivid elephant in your mind. &quot;COURAGE&quot; becomes a knight standing brave. The more vivid and absurd the image, the better you&apos;ll remember it.
+                Recognition often fires faster than conscious thought. If a word feels familiar, it almost certainly is — the pool is small and repeats are common. Answer on that first instinct rather than re-deriving the answer from a mental list; with a shared timer, hesitation is what kills runs.
+              </p>
+            </div>
+
+            <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
+              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <Brain className="w-5 h-5 text-[#54FFA4]" />
+                Strategy 2: Encode Each New Word
+              </h3>
+              <p className="text-gray-300 leading-relaxed mb-4">
+                When you press NEW, take a split second to actually register the word — say it to yourself or flash a quick mental image. Because the words are concrete nouns, vivid imagery sticks easily. Click NEW on autopilot and you will fail to recognise that word the next time it cycles back.
               </p>
               <div className="bg-[#0F1B21] rounded-lg p-4">
-                <h4 className="text-white font-semibold mb-2">Example Imagery:</h4>
+                <h4 className="text-white font-semibold mb-2">Quick imagery:</h4>
                 <ul className="text-gray-400 text-sm space-y-1">
-                  <li>• HAMMER → Imagine smashing something dramatically</li>
-                  <li>• WHISPER → Picture someone being secretive</li>
-                  <li>• VOLCANO → Visualize a dramatic eruption</li>
+                  <li>• ANCHOR &rarr; picture it splashing off a boat</li>
+                  <li>• LANTERN &rarr; picture it glowing in the dark</li>
+                  <li>• ROCKET &rarr; picture it blasting off</li>
                 </ul>
               </div>
             </div>
@@ -244,16 +241,16 @@ export default function WordMemoryGuidePage() {
             <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <Zap className="w-5 h-5 text-[#54FFA4]" />
-                Strategy 2: The Story Chain
+                Strategy 3: Keep a Steady Rhythm
               </h3>
               <p className="text-gray-300 leading-relaxed mb-4">
-                Link each new word to the previous one in a ridiculous story. If you see DOG, then UMBRELLA, then PIZZA, imagine: &quot;A DOG holding an UMBRELLA eating PIZZA.&quot; The absurdity makes it memorable.
+                The clock covers the whole run, not each word, so roughly 25 words must fit inside roughly 25 seconds. Settle into a one-decision-per-second rhythm and do not burn three or four seconds agonising over a single word — that stolen time leaves nothing for the words still to come.
               </p>
               <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <p className="text-gray-300 text-sm">
-                    <strong className="text-green-400">Pro Tip:</strong> The story doesn&apos;t need to make sense—in fact, weirder is better. Your brain remembers unusual things more easily than ordinary things.
+                    <strong className="text-green-400">Pro Tip:</strong> tune the run in settings. Bumping the timer up (to 50s) or the word count down (to 20) gives you breathing room while you learn the pool.
                   </p>
                 </div>
               </div>
@@ -261,21 +258,11 @@ export default function WordMemoryGuidePage() {
 
             <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <Brain className="w-5 h-5 text-[#54FFA4]" />
-                Strategy 3: First Letter Anchoring
-              </h3>
-              <p className="text-gray-300 leading-relaxed mb-4">
-                As a backup, track the first letter of each word. If you see BANANA, CASTLE, DRAGON, remember &quot;B-C-D.&quot; When a word appears, first check if its first letter is in your list. This gives you a quick filter before deeper recognition.
-              </p>
-            </div>
-
-            <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <Target className="w-5 h-5 text-[#54FFA4]" />
-                Strategy 4: Trust Your Gut
+                Strategy 4: Exploit the Shrinking Unknown
               </h3>
-              <p className="text-gray-300 leading-relaxed mb-4">
-                Recognition often happens faster than conscious thought. If a word &quot;feels&quot; familiar, it probably is. Don&apos;t overthink—your initial instinct is frequently correct. Studies show that gut reactions on recognition tasks are more accurate than deliberate analysis.
+              <p className="text-gray-300 leading-relaxed">
+                Early on, most words are NEW because you have not met the pool yet. Once you are deep into the run and have seen the dozen or so unique words at least once, the odds flip hard toward SEEN. Late in a sequence, a word you genuinely do not recognise should make you double-check rather than reflexively guess.
               </p>
             </div>
           </div>
@@ -292,9 +279,9 @@ export default function WordMemoryGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Overthinking Simple Words</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">Forgetting One Slip Ends Everything</h4>
                   <p className="text-gray-300 text-sm">
-                    Spending too long on each word eats up time and creates doubt. Make a decision within 2 seconds. If you&apos;re unsure after 2 seconds, go with your first instinct.
+                    There are no strikes. A single wrong SEEN or NEW call ends the run on the spot, whether it is word 2 or word 24. Stay deliberate the whole way through — a perfect run is the only kind that counts.
                   </p>
                 </div>
               </div>
@@ -302,9 +289,9 @@ export default function WordMemoryGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Not Processing New Words</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">Clicking NEW Without Encoding</h4>
                   <p className="text-gray-300 text-sm">
-                    Clicking &quot;NEW&quot; without actually encoding the word. You need to create a memory trace, or you&apos;ll miss it when it reappears. Take a split second to register it.
+                    Pressing NEW without registering the word leaves no memory trace, so you misfire when it loops back. Give every first-time word a beat of attention before moving on.
                   </p>
                 </div>
               </div>
@@ -312,9 +299,9 @@ export default function WordMemoryGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Confusing Similar Words</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">False Familiarity</h4>
                   <p className="text-gray-300 text-sm">
-                    RUNNING vs RUNNER, HAPPY vs HAPPINESS. These aren&apos;t the same word. Pay attention to exact spelling and word form.
+                    Deep into a run everything starts to feel familiar. Do not press SEEN on a word just because the screen is busy — make sure it is one you actually encoded, not just one that rhymes with the vibe of the round.
                   </p>
                 </div>
               </div>
@@ -322,9 +309,9 @@ export default function WordMemoryGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Mental Fatigue</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">Letting the Clock Bleed Out</h4>
                   <p className="text-gray-300 text-sm">
-                    Long sequences are mentally exhausting. Your accuracy drops significantly after 15-20 words. Practice building mental stamina.
+                    The timer covers the entire sequence. Spending too long on the easy opening words means the clock can expire before you reach the finish — running out of time is a loss just like a wrong answer.
                   </p>
                 </div>
               </div>
@@ -343,24 +330,24 @@ export default function WordMemoryGuidePage() {
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Play Memory Games Daily</h4>
-                  <p className="text-gray-400 text-sm">Apps like Lumosity or Peak train the exact working memory skills needed for this minigame.</p>
+                  <h4 className="text-white font-semibold mb-1">Dial In the Settings</h4>
+                  <p className="text-gray-400 text-sm">Use the gear icon to set word count (20&ndash;100) and timer (20&ndash;50s). Start gentle, then tighten the screws as you improve.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Read More</h4>
-                  <p className="text-gray-400 text-sm">People who read regularly have larger working vocabularies and better word recognition.</p>
+                  <h4 className="text-white font-semibold mb-1">Let It Loop</h4>
+                  <p className="text-gray-400 text-sm">In practice the round auto-restarts a few seconds after it ends, so you can grind back-to-back attempts without touching anything.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Stay Hydrated</h4>
-                  <p className="text-gray-400 text-sm">Dehydration significantly impairs cognitive function. Drink water before important hacks.</p>
+                  <h4 className="text-white font-semibold mb-1">Learn the Pool</h4>
+                  <p className="text-gray-400 text-sm">Only about a dozen unique words appear in a default run. The more familiar that small set feels, the faster every SEEN call becomes.</p>
                 </div>
               </div>
 
@@ -368,23 +355,23 @@ export default function WordMemoryGuidePage() {
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <h4 className="text-white font-semibold mb-1">Avoid Multitasking</h4>
-                  <p className="text-gray-400 text-sm">Close Discord, mute notifications. Working memory requires full attention.</p>
+                  <p className="text-gray-400 text-sm">Mute notifications and close distractions. With a one-second-per-word pace, a single glance away can cost you the run.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Use Keyboard Shortcuts</h4>
-                  <p className="text-gray-400 text-sm">Map NEW and SEEN to keys your fingers rest on. Reduces reaction time vs clicking.</p>
+                  <h4 className="text-white font-semibold mb-1">Rest Your Hand on the Buttons</h4>
+                  <p className="text-gray-400 text-sm">Keep your cursor (or thumb) hovering between Seen and New so each answer is a tiny flick, not a hunt across the screen.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Practice With Distractions</h4>
-                  <p className="text-gray-400 text-sm">Real heists have noise and stress. Practice with background noise to build resilience.</p>
+                  <h4 className="text-white font-semibold mb-1">Listen for the Beep</h4>
+                  <p className="text-gray-400 text-sm">A short tone confirms each correct answer and a tick marks every passing second — use the audio to keep your rhythm without staring at the bar.</p>
                 </div>
               </div>
             </div>
@@ -395,7 +382,7 @@ export default function WordMemoryGuidePage() {
                 <div>
                   <h4 className="text-[#54FFA4] font-semibold mb-1">Mastery Benchmark</h4>
                   <p className="text-gray-300 text-sm">
-                    You&apos;ve mastered Word Memory when you can maintain 90%+ accuracy through a 25+ word sequence. At this level, word recognition becomes almost automatic and you can handle even the longest sequences confidently.
+                    You have mastered Word Memory when you can clear a full default run — every word, zero mistakes — with seconds still left on the clock. At that point the recognition becomes automatic and you can crank the word count up toward 100.
                   </p>
                 </div>
               </div>
@@ -408,7 +395,7 @@ export default function WordMemoryGuidePage() {
           <Brain className="w-12 h-12 text-indigo-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-4">Ready to Master Word Memory?</h2>
           <p className="text-gray-300 mb-6 max-w-lg mx-auto">
-            Train your working memory with unlimited practice. Build the mental capacity to track dozens of words effortlessly.
+            Run unlimited free attempts in your browser. Learn the pool, lock in your rhythm, and chase a flawless clear before the timer runs dry.
           </p>
           <Link
             href="/puzzles/word-memory"

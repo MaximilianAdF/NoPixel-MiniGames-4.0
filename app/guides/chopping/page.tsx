@@ -1,4 +1,4 @@
-import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Keyboard, Zap, Brain, Trophy, Timer, MousePointer } from 'lucide-react';
+import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Keyboard, Zap, Brain, Trophy, Timer, Gauge } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import JsonLd from '@/app/components/JsonLd';
@@ -6,14 +6,14 @@ import { breadcrumbList, guideArticle } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
   title: 'Chopping Guide - Master NoPixel 4.0 Typing Challenge | Expert Tips',
-  description: 'Complete guide to mastering the Chopping minigame in NoPixel 4.0. Learn typing speed techniques, letter sequence strategies, and pro tips for VIN scratching.',
-  keywords: ['chopping guide', 'NoPixel VIN scratch', 'typing challenge tutorial', 'keyboard speed tips', 'GTA RP chopping minigame'],
+  description: 'Complete guide to the NoPixel 4.0 Chopping minigame. Type the Q/W/E/R/A/S/D letter sequence in order before the timer runs out — one wrong key ends the run. Learn the controls, settings, and pro tips.',
+  keywords: ['chopping guide', 'NoPixel chopping minigame', 'typing challenge tutorial', 'keyboard speed tips', 'GTA RP chopping minigame', 'FiveM chopping practice'],
   alternates: {
     canonical: 'https://nphacks.net/guides/chopping',
   },
   openGraph: {
     title: 'Chopping Guide - Master NoPixel 4.0 Typing Challenge | Expert Tips',
-    description: 'Complete guide to mastering the Chopping minigame in NoPixel 4.0. Learn typing speed techniques, letter sequence strategies, and pro tips for VIN scratching.',
+    description: 'Complete guide to the NoPixel 4.0 Chopping minigame. Type the letter sequence in order before the timer runs out — one wrong key ends the run.',
     url: 'https://nphacks.net/guides/chopping',
   },
 };
@@ -31,14 +31,14 @@ export default function ChoppingGuidePage() {
       <JsonLd
         data={guideArticle({
           headline: 'Chopping Guide - Master NoPixel 4.0 Typing Challenge | Expert Tips',
-          description: 'Complete guide to mastering the Chopping minigame in NoPixel 4.0. Learn typing speed techniques, letter sequence strategies, and pro tips for VIN scratching.',
+          description: 'Complete guide to the NoPixel 4.0 Chopping minigame. Type the Q/W/E/R/A/S/D letter sequence in order before the timer runs out — one wrong key ends the run.',
           path: '/guides/chopping',
         })}
       />
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
-        <Link 
-          href="/guides" 
+        <Link
+          href="/guides"
           className="inline-flex items-center gap-2 text-gray-400 hover:text-[#54FFA4] transition-colors mb-8 pt-16"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -61,14 +61,14 @@ export default function ChoppingGuidePage() {
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
-              6 min read
+              5 min read
             </span>
             <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-md border border-green-500/30">
               Easy Difficulty
             </span>
             <span className="flex items-center gap-1">
               <Target className="w-4 h-4" />
-              Success Rate: ~70% (untrained) → 99%+ (trained)
+              Success Rate: ~60% (untrained) → 99% (trained)
             </span>
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function ChoppingGuidePage() {
           <nav className="space-y-2">
             <a href="#overview" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">1. Overview</a>
             <a href="#how-it-works" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">2. How Chopping Works</a>
-            <a href="#timing" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">3. Perfecting Your Timing</a>
+            <a href="#settings" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">3. Letters, Timer &amp; Settings</a>
             <a href="#strategies" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">4. Winning Strategies</a>
             <a href="#common-mistakes" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">5. Common Mistakes</a>
             <a href="#advanced-tips" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">6. Advanced Pro Tips</a>
@@ -94,18 +94,17 @@ export default function ChoppingGuidePage() {
           </h2>
           <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
             <p className="text-gray-300 leading-relaxed mb-4">
-              The Chopping minigame (also known as VIN Scratch) is used for scratching vehicle identification numbers during car theft operations. It&apos;s a timing-based minigame where you need to stop a moving indicator within target zones to successfully remove VIN characters.
+              Chopping is NoPixel 4.0&apos;s quick-reaction typing minigame, triggered when you dismantle (&quot;chop&quot;) a stolen vehicle for parts in GTA RP. A row of letters lights up on screen and you have to press them in order, fast, before a short countdown expires.
             </p>
             <p className="text-gray-300 leading-relaxed mb-4">
-              This is generally considered one of the easiest minigames in NoPixel 4.0, making it perfect for players new to hacking. However, don&apos;t underestimate it—failed attempts mean wasted tools and time. Mastering the timing ensures you never fail a chop again.
+              It is one of the most approachable minigames in the city — there is no marker to track and no mouse aiming. It is pure keyboard reaction. The catch is that it is unforgiving: a single wrong key ends the run instantly, so accuracy matters just as much as speed.
             </p>
             <div className="bg-[#0F1B21] rounded-lg p-4 mt-4">
               <h4 className="text-white font-semibold mb-2">When You&apos;ll Encounter Chopping:</h4>
               <ul className="text-gray-400 space-y-1 text-sm">
-                <li>• Vehicle theft operations</li>
-                <li>• VIN scratching for chop shops</li>
-                <li>• Boosting missions</li>
-                <li>• Some racing-related activities</li>
+                <li>• Dismantling stolen vehicles at a chop shop</li>
+                <li>• Vehicle boosting and theft operations</li>
+                <li>• Stripping cars for parts to sell</li>
               </ul>
             </div>
           </div>
@@ -122,38 +121,50 @@ export default function ChoppingGuidePage() {
               <div>
                 <h3 className="text-xl font-semibold text-white mb-3">The Mechanics</h3>
                 <p className="text-gray-300 leading-relaxed mb-4">
-                  A progress bar appears with one or more target zones highlighted. A marker moves across the bar at a consistent speed. Your job is to click (or press the action key) when the marker is within a target zone. Each successful hit removes part of the VIN.
+                  A grid of randomly generated letters appears, every one drawn from just seven keys: <strong className="text-[#54FFA4]">Q, W, E, R, A, S and D</strong>. One cell is highlighted as the active letter. Press the matching key and that cell turns green, the highlight advances to the next letter, and you keep going left to right through the whole sequence. There is no mouse input and no moving bar — you simply type each highlighted letter as it lights up.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                  <Keyboard className="w-5 h-5 text-[#54FFA4]" />
+                  Visual Feedback
+                </h3>
+                <p className="text-gray-300 leading-relaxed">
+                  The current target is highlighted, a correct key flashes the cell <span className="text-green-400 font-semibold">green</span> (with a confirmation beep), and a wrong key flashes it <span className="text-red-400 font-semibold">red</span> and fails the round. The countdown ticks audibly every second so you always know how much time is left.
                 </p>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <div className="bg-[#0F1B21] rounded-lg p-4">
-                  <h4 className="text-[#54FFA4] font-semibold mb-2">Game Elements</h4>
+                <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                  <h4 className="text-green-400 font-semibold mb-2 flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5" />
+                    You Win When
+                  </h4>
                   <ul className="text-gray-400 text-sm space-y-1">
-                    <li>• Horizontal progress bar</li>
-                    <li>• Moving marker/cursor</li>
-                    <li>• Target zones to hit</li>
-                    <li>• Multiple rounds per VIN</li>
+                    <li>• Every letter in the sequence is typed correctly</li>
+                    <li>• The final cell turns green before time runs out</li>
                   </ul>
                 </div>
-                <div className="bg-[#0F1B21] rounded-lg p-4">
-                  <h4 className="text-[#54FFA4] font-semibold mb-2">Success Conditions</h4>
+                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+                  <h4 className="text-red-400 font-semibold mb-2 flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5" />
+                    You Lose When
+                  </h4>
                   <ul className="text-gray-400 text-sm space-y-1">
-                    <li>• Click when marker is in target zone</li>
-                    <li>• Complete all required hits</li>
-                    <li>• Don&apos;t miss too many attempts</li>
-                    <li>• Finish before any timer expires</li>
+                    <li>• You press the wrong key — instant fail, no second chances</li>
+                    <li>• The countdown timer reaches zero first</li>
                   </ul>
                 </div>
               </div>
 
               <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
                 <div className="flex items-start gap-3">
-                  <Keyboard className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                  <Zap className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="text-green-400 font-semibold mb-1">Why It&apos;s Easy</h4>
+                    <h4 className="text-green-400 font-semibold mb-1">It&apos;s One Continuous Round</h4>
                     <p className="text-gray-300 text-sm">
-                      Unlike other minigames, Chopping has generous target zones and consistent marker speed. The timing window is forgiving, and the marker moves predictably. This makes it ideal for learning timing fundamentals.
+                      There are no levels or escalating difficulty tiers — each attempt is a single fixed sequence against a single countdown. In practice mode the board simply re-rolls a fresh random sequence a few seconds after each result so you can keep drilling.
                     </p>
                   </div>
                 </div>
@@ -162,52 +173,51 @@ export default function ChoppingGuidePage() {
           </div>
         </section>
 
-        {/* Timing Section */}
-        <section id="timing" className="mb-12">
+        {/* Settings Section */}
+        <section id="settings" className="mb-12">
           <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
             <span className="w-8 h-8 bg-[#54FFA4] text-[#0F1B21] rounded-lg flex items-center justify-center font-bold">3</span>
-            Perfecting Your Timing
+            Letters, Timer &amp; Settings
           </h2>
           <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
                   <Timer className="w-5 h-5 text-[#54FFA4]" />
-                  Understanding the Timing Window
+                  The Default Setup
                 </h3>
                 <p className="text-gray-300 leading-relaxed mb-4">
-                  The target zone is usually quite wide, giving you a comfortable window to hit. However, aiming for the center of the zone ensures you have maximum margin for error. Think of the center as your bullseye.
+                  Out of the box the trainer gives you a <strong className="text-[#54FFA4]">15-letter</strong> sequence and a <strong className="text-[#54FFA4]">7-second</strong> countdown. That is roughly half a second per key — comfortable once your fingers know the seven keys, but tight if you have to hunt for them.
                 </p>
               </div>
 
-              <div className="flex items-center justify-center gap-4 py-4">
-                <div className="w-full max-w-md">
-                  <div className="h-8 bg-[#0F1B21] rounded-lg relative overflow-hidden">
-                    {/* Target zone */}
-                    <div className="absolute left-1/3 w-1/4 h-full bg-[#54FFA4]/30 border-l-2 border-r-2 border-[#54FFA4]" />
-                    {/* Marker */}
-                    <div className="absolute left-1/2 w-1 h-full bg-white" />
-                  </div>
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>Start</span>
-                    <span className="text-[#54FFA4]">Target Zone</span>
-                    <span>End</span>
-                  </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-[#0F1B21] rounded-lg p-4">
+                  <h4 className="text-[#54FFA4] font-semibold mb-2 flex items-center gap-2">
+                    <Keyboard className="w-4 h-4" />
+                    Number of Letters
+                  </h4>
+                  <p className="text-gray-400 text-sm">
+                    Adjustable from <strong className="text-white">13 to 18</strong> in practice mode (default 15). More letters means more chances to slip and a tighter time budget per key.
+                  </p>
+                </div>
+                <div className="bg-[#0F1B21] rounded-lg p-4">
+                  <h4 className="text-[#54FFA4] font-semibold mb-2 flex items-center gap-2">
+                    <Gauge className="w-4 h-4" />
+                    Timer
+                  </h4>
+                  <p className="text-gray-400 text-sm">
+                    Adjustable from <strong className="text-white">5 to 30 seconds</strong> (default 7). Crank it up while you learn the key positions, then dial it back down to match the in-game pressure.
+                  </p>
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-center">
-                  <p className="text-red-400 font-bold mb-1">Too Early</p>
-                  <p className="text-gray-400 text-sm">Miss - wasted attempt</p>
-                </div>
-                <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 text-center">
-                  <p className="text-green-400 font-bold mb-1">In Zone</p>
-                  <p className="text-gray-400 text-sm">Success!</p>
-                </div>
-                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-center">
-                  <p className="text-red-400 font-bold mb-1">Too Late</p>
-                  <p className="text-gray-400 text-sm">Miss - wasted attempt</p>
+              <div className="bg-[#54FFA4]/10 border border-[#54FFA4]/30 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Lightbulb className="w-5 h-5 text-[#54FFA4] flex-shrink-0 mt-0.5" />
+                  <p className="text-gray-300 text-sm">
+                    <strong className="text-[#54FFA4]">Training tip:</strong> Start at 18 letters with 30 seconds to build clean, error-free muscle memory, then gradually shorten the timer toward the default 7 seconds. Your score for a run is simply the number of letters you got right before failing.
+                  </p>
                 </div>
               </div>
             </div>
@@ -223,42 +233,42 @@ export default function ChoppingGuidePage() {
           <div className="space-y-6">
             <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <Brain className="w-5 h-5 text-[#54FFA4]" />
-                Strategy 1: The Rhythm Method
+                <Keyboard className="w-5 h-5 text-[#54FFA4]" />
+                Strategy 1: Anchor on the Seven Keys
               </h3>
               <p className="text-gray-300 leading-relaxed mb-4">
-                Watch the marker complete one full pass to learn its speed. Develop a mental rhythm—count &quot;one, two, three, click&quot; or whatever timing works for you. The marker speed is consistent, so once you find the rhythm, you can repeat it reliably.
+                Every letter is one of Q, W, E, R, A, S or D — a tight cluster on the left side of the keyboard. Rest your left hand over those keys (index on R/F area, fingers spanning the Q-W-E-R top row and A-S-D home row) so you never have to look down or reach. Owning these seven positions is 90% of the game.
               </p>
               <div className="bg-[#0F1B21] rounded-lg p-4">
                 <p className="text-gray-400 text-sm">
-                  <strong className="text-white">Pro Tip:</strong> The marker often bounces back after reaching the end. Use the first pass to calibrate, then hit on the second pass if needed.
+                  <strong className="text-white">Pro Tip:</strong> The keys are not the literal home row — Q, W, E and R sit on the row above A, S and D. Practise the two-row reach until your fingers find each letter without thought.
                 </p>
               </div>
             </div>
 
             <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <MousePointer className="w-5 h-5 text-[#54FFA4]" />
-                Strategy 2: Focus on the Zone Edge
+                <CheckCircle className="w-5 h-5 text-[#54FFA4]" />
+                Strategy 2: Accuracy Over Raw Speed
               </h3>
               <p className="text-gray-300 leading-relaxed mb-4">
-                Instead of watching the marker, watch the left edge of the target zone. When the marker crosses that edge, you know you&apos;re in the safe window. This reduces the mental load of tracking two things simultaneously.
+                Because a single wrong key ends the run, there is no value in mashing. A clean, slightly slower pass beats a frantic one that fails on letter nine. Match your speed to the level where you stop making mistakes, then let it creep up naturally.
               </p>
             </div>
 
             <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <Zap className="w-5 h-5 text-[#54FFA4]" />
-                Strategy 3: Aim for Center
+                <Brain className="w-5 h-5 text-[#54FFA4]" />
+                Strategy 3: Read Ahead
               </h3>
               <p className="text-gray-300 leading-relaxed mb-4">
-                Don&apos;t click as soon as you enter the zone—wait until the marker is roughly centered. This gives you maximum room for error and accounts for any input lag or reaction time variance.
+                Your eyes should be on the <em>next</em> letter, not the one your finger is currently pressing. Reading one or two cells ahead removes the stutter between keystrokes and lets you flow through the sequence at a steady rhythm instead of stop-start bursts.
               </p>
               <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <p className="text-gray-300 text-sm">
-                    <strong className="text-green-400">Pro Tip:</strong> If the zone is wide, you have time to be patient. Don&apos;t rush the click—a deliberate, centered hit is better than a panicked edge hit.
+                    <strong className="text-green-400">Pro Tip:</strong> A smooth, even cadence finishes faster than alternating sprints and pauses — and it makes mistakes far less likely.
                   </p>
                 </div>
               </div>
@@ -277,9 +287,9 @@ export default function ChoppingGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Clicking Too Early</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">Mashing for Speed</h4>
                   <p className="text-gray-300 text-sm">
-                    Anticipation leading to premature clicks. Wait until you can visually confirm the marker has entered the zone before pressing.
+                    One wrong key is an instant loss, so panic-mashing throws away the run. Type deliberately — speed without control fails every time.
                   </p>
                 </div>
               </div>
@@ -287,9 +297,9 @@ export default function ChoppingGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Not Accounting for Lag</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">Hitting Adjacent Keys</h4>
                   <p className="text-gray-300 text-sm">
-                    Network or input lag can delay your click by 50-100ms. If you&apos;re consistently missing late, click slightly earlier than feels natural.
+                    Q, W, E, R, A, S and D are packed close together, so a lazy finger easily lands on a neighbour. Keep your hand anchored so each key has a dedicated finger.
                   </p>
                 </div>
               </div>
@@ -297,9 +307,9 @@ export default function ChoppingGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Rushing Multiple Zones</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">Looking at the Keyboard</h4>
                   <p className="text-gray-300 text-sm">
-                    When there are multiple target zones, players sometimes rush to hit them all. Each zone is its own challenge—treat them independently.
+                    Glancing down to find a key costs time and breaks your read-ahead. Learn the seven positions by feel so your eyes stay on the screen.
                   </p>
                 </div>
               </div>
@@ -307,9 +317,9 @@ export default function ChoppingGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Underestimating the Minigame</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">Ignoring the Timer</h4>
                   <p className="text-gray-300 text-sm">
-                    Because it&apos;s &quot;easy,&quot; some players don&apos;t focus properly. Overconfidence leads to careless mistakes. Treat every attempt seriously.
+                    The default 7-second window is short. Staring at one letter too long lets the clock run out even if you never make a mistake — keep moving.
                   </p>
                 </div>
               </div>
@@ -328,40 +338,40 @@ export default function ChoppingGuidePage() {
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Stable Hand Position</h4>
-                  <p className="text-gray-400 text-sm">Rest your clicking hand comfortably. A stable hand reduces unintentional movement and accidental clicks.</p>
+                  <h4 className="text-white font-semibold mb-1">Fixed Left-Hand Claw</h4>
+                  <p className="text-gray-400 text-sm">Settle your left hand into one claw shape over Q-W-E-R-A-S-D and never move the whole hand — only flick individual fingers.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Use Keyboard if Possible</h4>
-                  <p className="text-gray-400 text-sm">If the minigame supports keyboard input, it&apos;s often more consistent than mouse clicking.</p>
+                  <h4 className="text-white font-semibold mb-1">Listen for the Beep</h4>
+                  <p className="text-gray-400 text-sm">Each correct key plays a confirmation beep. Use it as an audio metronome so you can keep your eyes reading ahead.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Full Screen Focus</h4>
-                  <p className="text-gray-400 text-sm">Play in fullscreen or windowed fullscreen. Borderless lets you see the minigame clearly without distractions.</p>
+                  <h4 className="text-white font-semibold mb-1">Drill With More Letters</h4>
+                  <p className="text-gray-400 text-sm">Set the count to 18 in settings. If you can clear 18 cleanly, the in-game 15 feels easy.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">60+ FPS</h4>
-                  <p className="text-gray-400 text-sm">Higher frame rates make the marker movement smoother and easier to track. Aim for at least 60 FPS.</p>
+                  <h4 className="text-white font-semibold mb-1">Then Tighten the Clock</h4>
+                  <p className="text-gray-400 text-sm">Once accuracy is solid, lower the timer step by step toward 7 seconds to build the pace real chops demand.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Build Consistency First</h4>
-                  <p className="text-gray-400 text-sm">Don&apos;t worry about speed—focus on never missing. Speed comes naturally with practice.</p>
+                  <h4 className="text-white font-semibold mb-1">Use a Responsive Keyboard</h4>
+                  <p className="text-gray-400 text-sm">A wired or low-latency keyboard registers fast finger flicks more reliably than a laggy wireless one.</p>
                 </div>
               </div>
 
@@ -369,7 +379,7 @@ export default function ChoppingGuidePage() {
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <h4 className="text-white font-semibold mb-1">Warm Up Before Jobs</h4>
-                  <p className="text-gray-400 text-sm">Do a few practice rounds before actual chop jobs to get in the zone.</p>
+                  <p className="text-gray-400 text-sm">Run a few practice sequences before a real chop so your fingers already know the seven keys.</p>
                 </div>
               </div>
             </div>
@@ -380,7 +390,7 @@ export default function ChoppingGuidePage() {
                 <div>
                   <h4 className="text-[#54FFA4] font-semibold mb-1">Mastery Benchmark</h4>
                   <p className="text-gray-300 text-sm">
-                    You&apos;ve mastered Chopping when you can complete 20+ consecutive attempts without a single miss. At this point, the minigame becomes almost automatic and you can focus on the actual job at hand.
+                    You&apos;ve mastered Chopping when you can clear the full 15-letter sequence at the default 7-second timer, repeatedly, without a single wrong key. At that point the seven keys are pure muscle memory and the minigame becomes automatic.
                   </p>
                 </div>
               </div>
@@ -393,7 +403,7 @@ export default function ChoppingGuidePage() {
           <Keyboard className="w-12 h-12 text-amber-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-4">Ready to Master Chopping?</h2>
           <p className="text-gray-300 mb-6 max-w-lg mx-auto">
-            Perfect your timing with unlimited practice. Never fail another VIN scratch and become the most reliable chopper in the city.
+            Drill the seven keys with unlimited practice runs. Build the speed and accuracy to clear every sequence without a single wrong key.
           </p>
           <Link
             href="/puzzles/chopping"

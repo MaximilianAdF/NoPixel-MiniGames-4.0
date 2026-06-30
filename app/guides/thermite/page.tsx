@@ -96,17 +96,17 @@ export default function ThermiteGuidePage() {
           </h2>
           <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
             <p className="text-gray-300 leading-relaxed mb-4">
-              Thermite is one of the most demanding hacks in NoPixel 4.0 — a fast, spatial <strong className="text-white">chain-reaction</strong> played on a 6&times;6 grid. You don&apos;t memorise a pattern. Instead you keep a chain of &quot;decryptions&quot; alive: every square you clear lights up your next legal moves, and you race to hit a target score before the timer runs out — or before you click yourself into a dead end. It simulates burning through high-security systems during Maze Bank heists.
+              Thermite is one of the most demanding hacks in NoPixel 4.0 — a fast, spatial <strong className="text-white">chain-reaction</strong> played on a 6&times;6 grid (the default; presets and custom settings range from 5&times;5 up to 9&times;9). Every cell holds a <strong className="text-white">range piece</strong> — short, medium, or long — and a decryption status that steps down <strong className="text-white">full &rarr; half &rarr; empty</strong>. You don&apos;t memorise a pattern. Instead you click squares to step them down, re-lighting the board each time, and race to decrypt a target number of <strong className="text-white">bytes</strong> before the timer runs out — or before you click yourself into a dead end.
             </p>
             <p className="text-gray-300 leading-relaxed mb-4">
-              Success comes from <strong className="text-white">reading the board and planning a couple of moves ahead</strong> — not from memory or twitch reflexes. Even strong players get cornered on the Vault preset, which is exactly why practice pays off before a real heist.
+              Success comes from <strong className="text-white">reading the board and planning a couple of moves ahead</strong> — not from memory or twitch reflexes. The whole skill is keeping a legal next move alive while still landing enough decrypts in time. Even strong players get cornered on the Vault preset, which is exactly why practice pays off before a real heist.
             </p>
             <div className="bg-[#0F1B21] rounded-lg p-4 mt-4">
               <h4 className="text-white font-semibold mb-2">When You&apos;ll Encounter Thermite:</h4>
               <ul className="text-gray-400 space-y-1 text-sm">
                 <li>• Maze Bank sewer generator breaches</li>
                 <li>• The Maze Bank vault</li>
-                <li>• Other high-security systems that need decrypting</li>
+                <li>• Art Asylum (water route) and other high-security systems that need decrypting</li>
               </ul>
             </div>
           </div>
@@ -123,7 +123,10 @@ export default function ThermiteGuidePage() {
               <div>
                 <h3 className="text-xl font-semibold text-white mb-3">The Mechanics</h3>
                 <p className="text-gray-300 leading-relaxed mb-4">
-                  The board is a 6&times;6 grid. Every cell holds a piece with one of three <strong className="text-white">ranges</strong> — short, medium, or long — and a <strong className="text-white">status that decays</strong> from full &rarr; half &rarr; empty each time you click it. One or more squares start highlighted as your opening move. Clicking a highlighted square decrypts it and lights up new squares within that piece&apos;s range — and those new highlights are your only legal next moves.
+                  The board is a 6&times;6 grid of teal pieces, and at the start <strong className="text-white">every square is highlighted</strong> — your first click can be anywhere. Each click does three things at once: it steps the clicked square down one status (full &rarr; half, or half &rarr; empty), it swaps a fresh random range piece onto that square, and it <strong className="text-white">re-lights the board</strong> based on the piece that was just clicked. Only squares sitting on that piece&apos;s range pattern stay lit — everything else goes dark, and those lit squares are your only legal next clicks.
+                </p>
+                <p className="text-gray-300 leading-relaxed mb-4">
+                  Crucially, <strong className="text-white">only the half &rarr; empty step scores</strong>. Taking a square to empty is a decrypt worth <strong className="text-white">+1 byte</strong>; the first click that drops a full square to half (it turns grey) is just a setup and scores nothing. And because clicking a square un-lights it, you have to come back and re-light it with a later click to finish it — so every byte is a <strong className="text-white">two-click play</strong>.
                 </p>
               </div>
 
@@ -133,17 +136,17 @@ export default function ThermiteGuidePage() {
                   <ul className="text-gray-400 text-sm space-y-1">
                     <li>• You can only click a highlighted square</li>
                     <li>• Its status drops one step (full &rarr; half &rarr; empty)</li>
-                    <li>• New squares within its range light up</li>
-                    <li>• Those highlights become your next moves</li>
+                    <li>• The square is reassigned a new random range piece</li>
+                    <li>• The board re-lights from that piece&apos;s range — your next moves</li>
                   </ul>
                 </div>
                 <div className="bg-[#0F1B21] rounded-lg p-4">
-                  <h4 className="text-[#54FFA4] font-semibold mb-2">Reaching the Target</h4>
+                  <h4 className="text-[#54FFA4] font-semibold mb-2">Scoring &amp; the Target</h4>
                   <ul className="text-gray-400 text-sm space-y-1">
-                    <li>• Score = squares decrypted (bytes)</li>
-                    <li>• Sewer target 24 &middot; Vault target 28</li>
-                    <li>• ~60-second timer</li>
-                    <li>• Fast back-to-back clears score combos</li>
+                    <li>• A byte scores only on a half &rarr; empty decrypt (+1)</li>
+                    <li>• Targets: Sewer 24 &middot; Vault 28 &middot; Art Asylum 30</li>
+                    <li>• Timer: 60s (Sewer/Vault), 25s (Art Asylum)</li>
+                    <li>• Three fast decrypts in a valid range pattern = combo bonus</li>
                   </ul>
                 </div>
               </div>
@@ -153,11 +156,11 @@ export default function ThermiteGuidePage() {
                 <div className="grid grid-cols-3 gap-3">
                   <div className="bg-[#0F1B21] rounded-lg p-3 text-center">
                     <span className="text-[#54FFA4] font-bold">Short</span>
-                    <p className="text-gray-400 text-xs mt-1">Immediate neighbours</p>
+                    <p className="text-gray-400 text-xs mt-1">Adjacent cells (one step out)</p>
                   </div>
                   <div className="bg-[#0F1B21] rounded-lg p-3 text-center">
                     <span className="text-[#54FFA4] font-bold">Medium</span>
-                    <p className="text-gray-400 text-xs mt-1">Two cells out (checkerboard)</p>
+                    <p className="text-gray-400 text-xs mt-1">Two cells out (skips the gap)</p>
                   </div>
                   <div className="bg-[#0F1B21] rounded-lg p-3 text-center">
                     <span className="text-[#54FFA4] font-bold">Long</span>
@@ -172,7 +175,7 @@ export default function ThermiteGuidePage() {
                   <div>
                     <h4 className="text-yellow-400 font-semibold mb-1">Critical Understanding</h4>
                     <p className="text-gray-300 text-sm">
-                      There&apos;s no &quot;wrong tile&quot; to misclick — you can only click highlighted squares. You fail when a click lights up <strong className="text-white">zero new squares</strong> (you stall) or the timer runs out. The whole skill is never getting cornered: always leave yourself a next move.
+                      There&apos;s no &quot;wrong tile&quot; to misclick — you can only click highlighted squares. You fail when a click lights up <strong className="text-white">zero squares</strong> (you stall and the board flashes red) or the timer runs out. Emptied squares vanish for good and can never be re-lit, so the board shrinks as you play. The whole skill is never getting cornered: always leave yourself a next move.
                     </p>
                   </div>
                 </div>
@@ -194,7 +197,7 @@ export default function ThermiteGuidePage() {
                 Strategy 1: Always Find Your Next Move First
               </h3>
               <p className="text-gray-300 leading-relaxed mb-4">
-                Before you click, look at where that click will leave you. The goal isn&apos;t to clear the nearest square — it&apos;s to keep highlighted squares available. If a move would leave you with nothing, pick a different one.
+                Before you click, look at where that click will leave you. The goal isn&apos;t to clear the nearest square — it&apos;s to keep highlighted squares available. If a move would light up nothing, it ends the run, so pick a different one.
               </p>
               <div className="bg-[#0F1B21] rounded-lg p-4">
                 <p className="text-gray-400 text-sm">
@@ -209,7 +212,7 @@ export default function ThermiteGuidePage() {
                 Strategy 2: Learn What Each Range Lights Up
               </h3>
               <p className="text-gray-300 leading-relaxed mb-4">
-                Every piece highlights a fixed shape based on its range. Once you can read those shapes at a glance, you can predict your options before you commit a single click.
+                The square you click re-lights the board using <strong className="text-white">its own</strong> range, so read that piece before committing. Each range paints a fixed shape, and once you can read those shapes at a glance you can predict your options before you click.
               </p>
               <div className="grid grid-cols-3 gap-2 mb-2">
                 <div className="bg-[#0F1B21] rounded p-3 text-center">
@@ -218,7 +221,7 @@ export default function ThermiteGuidePage() {
                 </div>
                 <div className="bg-[#0F1B21] rounded p-3 text-center">
                   <span className="text-[#54FFA4] font-bold">Medium</span>
-                  <p className="text-gray-400 text-xs">two out, diagonal</p>
+                  <p className="text-gray-400 text-xs">two out, skips the gap</p>
                 </div>
                 <div className="bg-[#0F1B21] rounded p-3 text-center">
                   <span className="text-[#54FFA4] font-bold">Long</span>
@@ -230,16 +233,19 @@ export default function ThermiteGuidePage() {
             <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <Zap className="w-5 h-5 text-[#54FFA4]" />
-                Strategy 3: Work the Centre &amp; Chain Combos
+                Strategy 3: Chain Combos for Bonus Bytes
               </h3>
               <p className="text-gray-300 leading-relaxed mb-4">
-                Central pieces highlight more follow-up squares than edges and corners, so keep the action in the middle of the board where your options stay open. When clears line up, fire them in quick succession — combos (&quot;CRC Bypassed!&quot;) bank extra score and are how you beat the Vault&apos;s higher target in time.
+                A combo (&quot;CRC Bypassed!&quot;) fires when you land <strong className="text-white">three decrypts in a row</strong> — three half &rarr; empty kills, each within about a second of the last — <strong className="text-white">and</strong> the ranges of those three pieces form a valid set: a matching trio (short-short-short, medium-medium-medium, or long-long-long) or a straight run up or down (short &rarr; medium &rarr; long, or long &rarr; medium &rarr; short).
+              </p>
+              <p className="text-gray-300 leading-relaxed mb-4">
+                The reward grows exponentially: your first combo is worth <strong className="text-white">+1</strong> bonus byte, the second <strong className="text-white">+2</strong>, the third <strong className="text-white">+4</strong>, the fourth <strong className="text-white">+8</strong>, and so on. A setup click (full &rarr; half) or any pause longer than a second breaks the streak — combos are pure decrypts, back to back.
               </p>
               <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <p className="text-gray-300 text-sm">
-                    <strong className="text-green-400">Pro Tip:</strong> plan a two- or three-click chain in your head, then execute it fast. Several decrypts within about a second triggers a combo and a score bonus.
+                    <strong className="text-green-400">Pro Tip:</strong> pre-stage three half (grey) squares, read their ranges, then kill them fast in an order that reads 1-2-3, 3-2-1, or a matching trio. That bonus is how you beat the Vault and Art Asylum targets in time.
                   </p>
                 </div>
               </div>
@@ -260,7 +266,17 @@ export default function ThermiteGuidePage() {
                 <div>
                   <h4 className="text-red-400 font-semibold mb-1">Grabbing the Nearest Highlight</h4>
                   <p className="text-gray-300 text-sm">
-                    Reflexively clicking the closest square without checking what it leaves you is the #1 way to stall. Always confirm you&apos;ll still have a move afterwards.
+                    Reflexively clicking the closest square without checking what it leaves you is the #1 way to stall. Always confirm you&apos;ll still have a lit square afterwards.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+                <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
+                <div>
+                  <h4 className="text-red-400 font-semibold mb-1">Forgetting a Byte Takes Two Clicks</h4>
+                  <p className="text-gray-300 text-sm">
+                    A full square only scores once it goes full &rarr; half &rarr; empty. The first click arms it (grey, no points); you have to re-light that half square and click it again to bank the byte. Plan to come back to it.
                   </p>
                 </div>
               </div>
@@ -270,7 +286,7 @@ export default function ThermiteGuidePage() {
                 <div>
                   <h4 className="text-red-400 font-semibold mb-1">Drifting Into Edges &amp; Corners</h4>
                   <p className="text-gray-300 text-sm">
-                    Edge and corner pieces highlight fewer cells, so your options dry up fast out there. Steer the chain back toward the centre whenever you can.
+                    Pieces near the edge light up fewer cells (half their range falls off the board), so your options dry up fast out there. Steer the chain back toward the centre whenever you can.
                   </p>
                 </div>
               </div>
@@ -280,17 +296,7 @@ export default function ThermiteGuidePage() {
                 <div>
                   <h4 className="text-red-400 font-semibold mb-1">Ignoring Combos on High Targets</h4>
                   <p className="text-gray-300 text-sm">
-                    On Vault (target 28) clearing one square at a time won&apos;t beat the clock. Set up quick chains so several clears land back-to-back.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-                <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
-                <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Only Practising One Board</h4>
-                  <p className="text-gray-300 text-sm">
-                    Beating Sewer once isn&apos;t mastery. Mix in Vault and custom boards so you can read any layout the chain throws at you.
+                    On Vault (28) and especially Art Asylum (30 in just 25 seconds), single decrypts won&apos;t beat the clock. Line up three kills whose ranges form a run or a matching trio to bank the bonus bytes.
                   </p>
                 </div>
               </div>
@@ -317,8 +323,8 @@ export default function ThermiteGuidePage() {
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Pre-Stage Two Clicks</h4>
-                  <p className="text-gray-400 text-sm">Decide your next two moves before you click the first — then they flow without hesitation.</p>
+                  <h4 className="text-white font-semibold mb-1">Plan the Kill, Not Just the Click</h4>
+                  <p className="text-gray-400 text-sm">Only half &rarr; empty scores, so arm squares you can realistically re-light and finish — don&apos;t leave grey squares stranded.</p>
                 </div>
               </div>
 
@@ -326,15 +332,15 @@ export default function ThermiteGuidePage() {
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <h4 className="text-white font-semibold mb-1">Treat the Centre as a Hub</h4>
-                  <p className="text-gray-400 text-sm">Central pieces keep the most options open — route the chain back through the middle.</p>
+                  <p className="text-gray-400 text-sm">Central pieces keep the most cells in range — route the chain back through the middle.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Hunt Combos Deliberately</h4>
-                  <p className="text-gray-400 text-sm">Line up clusters so three clears land within a second for the score bonus.</p>
+                  <h4 className="text-white font-semibold mb-1">Build Combos by Range</h4>
+                  <p className="text-gray-400 text-sm">Speed alone isn&apos;t enough — your three back-to-back kills must read 1-2-3, 3-2-1, or a matching trio to count.</p>
                 </div>
               </div>
 
@@ -371,7 +377,7 @@ export default function ThermiteGuidePage() {
                   <div className="flex items-center gap-4 p-3 bg-[#0F1B21] rounded-lg">
                     <span className="text-2xl font-bold text-[#54FFA4]">5</span>
                     <div>
-                      <p className="text-white font-medium">Sewer warm-ups (target 24)</p>
+                      <p className="text-white font-medium">Sewer warm-ups (target 24, 60s)</p>
                       <p className="text-gray-400 text-sm">Focus on always having a next move</p>
                     </div>
                   </div>
@@ -385,7 +391,7 @@ export default function ThermiteGuidePage() {
                   <div className="flex items-center gap-4 p-3 bg-[#0F1B21] rounded-lg">
                     <span className="text-2xl font-bold text-[#54FFA4]">5</span>
                     <div>
-                      <p className="text-white font-medium">Vault rounds (target 28)</p>
+                      <p className="text-white font-medium">Vault rounds (target 28, 60s)</p>
                       <p className="text-gray-400 text-sm">Forces combos and planning under pressure</p>
                     </div>
                   </div>
@@ -398,7 +404,7 @@ export default function ThermiteGuidePage() {
                   <div>
                     <h4 className="text-[#54FFA4] font-semibold mb-1">Success Benchmark</h4>
                     <p className="text-gray-300 text-sm">
-                      Aim for 8/10 clean Sewer completions before attempting real heists. Once you can clear the Vault consistently, your planning and combos are heist-ready.
+                      Aim for 8/10 clean Sewer completions before attempting real heists. Once you can clear the Vault consistently — and chain a combo or two — try the Art Asylum preset (target 30 in 25 seconds) to prove your planning and combos are heist-ready.
                     </p>
                   </div>
                 </div>

@@ -1,4 +1,4 @@
-import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Blocks, Zap, Brain, Trophy, Timer } from 'lucide-react';
+import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Blocks, Zap, Brain, Trophy, Timer, MousePointerClick } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import JsonLd from '@/app/components/JsonLd';
@@ -37,8 +37,8 @@ export default function RoofRunningGuidePage() {
       />
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
-        <Link 
-          href="/guides" 
+        <Link
+          href="/guides"
           className="inline-flex items-center gap-2 text-gray-400 hover:text-[#54FFA4] transition-colors mb-8 pt-16"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -55,7 +55,7 @@ export default function RoofRunningGuidePage() {
               <h1 className="text-4xl md:text-5xl font-bold text-white">
                 Roof Running Guide
               </h1>
-              <p className="text-[#54FFA4] text-lg">Tile Clearing Strategy Puzzle</p>
+              <p className="text-[#54FFA4] text-lg">Same Game Tile-Clearing Puzzle</p>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
@@ -68,7 +68,7 @@ export default function RoofRunningGuidePage() {
             </span>
             <span className="flex items-center gap-1">
               <Target className="w-4 h-4" />
-              Success Rate: ~65% (untrained) → 98%+ (trained)
+              Objective: Clear every block before time runs out
             </span>
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function RoofRunningGuidePage() {
           <nav className="space-y-2">
             <a href="#overview" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">1. Overview</a>
             <a href="#how-it-works" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">2. How Roof Running Works</a>
-            <a href="#controls" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">3. Mastering the Controls</a>
+            <a href="#controls" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">3. The Controls</a>
             <a href="#strategies" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">4. Winning Strategies</a>
             <a href="#common-mistakes" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">5. Common Mistakes</a>
             <a href="#advanced-tips" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">6. Advanced Pro Tips</a>
@@ -94,18 +94,18 @@ export default function RoofRunningGuidePage() {
           </h2>
           <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
             <p className="text-gray-300 leading-relaxed mb-4">
-              Roof Running is a reaction-based minigame that simulates navigating across rooftops during an escape. You&apos;ll be prompted with directional inputs (arrow keys or WASD) that you must press at the right time to successfully make each jump or turn.
+              Roof Running is NoPixel 4.0&apos;s rooftop minigame, triggered when you rob AC-units in GTA RP. Despite the name, it isn&apos;t a parkour or reaction challenge at all — it&apos;s a <strong className="text-white">&quot;Same Game&quot; tile-clearing puzzle</strong>. The board fills with colored blocks and you clear them by clicking connected groups, racing to empty the entire grid before the timer runs out.
             </p>
             <p className="text-gray-300 leading-relaxed mb-4">
-              Unlike memory games, Roof Running tests your reflexes and hand-eye coordination. The challenge comes from the speed of prompts and the need to react accurately under pressure. It&apos;s one of the more forgiving minigames since individual mistakes don&apos;t always mean instant failure—but consistent errors will cause you to fall.
+              This is a pure planning puzzle, not a test of reflexes. Every clear reshapes the board as blocks collapse downward and columns slide together, so a single careless move can strand a lone block and make the board impossible to finish. When that happens the game ends instantly — so it pays to think before you click.
             </p>
             <div className="bg-[#0F1B21] rounded-lg p-4 mt-4">
               <h4 className="text-white font-semibold mb-2">When You&apos;ll Encounter Roof Running:</h4>
               <ul className="text-gray-400 space-y-1 text-sm">
-                <li>• Escape sequences during chases</li>
-                <li>• Building infiltration routes</li>
-                <li>• Some heist entry/exit points</li>
-                <li>• Parkour-based challenges</li>
+                <li>• Robbing rooftop AC-units in NoPixel 4.0 GTA RP</li>
+                <li>• Practice mode here, on randomly generated boards</li>
+                <li>• The daily challenge, on a fixed board for everyone</li>
+                <li>• Head-to-head 1v1 matches against another player</li>
               </ul>
             </div>
           </div>
@@ -122,7 +122,10 @@ export default function RoofRunningGuidePage() {
               <div>
                 <h3 className="text-xl font-semibold text-white mb-3">The Mechanics</h3>
                 <p className="text-gray-300 leading-relaxed mb-4">
-                  The game shows a sequence of directional prompts that appear on screen. Each prompt requires you to press the corresponding key within a short time window. Success moves you forward; failure reduces your momentum or causes a stumble.
+                  You start with a grid of colored blocks in three colors — red, green and blue — placed at random. Click any block that belongs to a group of <strong className="text-white">two or more same-colored blocks connected horizontally or vertically</strong> (diagonals never count), and the entire connected group disappears at once. Clicking a block with no matching neighbour does nothing.
+                </p>
+                <p className="text-gray-300 leading-relaxed mb-4">
+                  After every clear two things happen automatically: <strong className="text-[#54FFA4]">gravity</strong> drops the blocks above straight down to fill the gaps, then any column that became completely empty is removed and the columns to its right <strong className="text-[#54FFA4]">slide left</strong> to close the space. These collapses constantly merge blocks into new, bigger groups, so the board you&apos;re looking at after a clear is rarely the one you started with.
                 </p>
               </div>
 
@@ -130,19 +133,19 @@ export default function RoofRunningGuidePage() {
                 <div className="bg-[#0F1B21] rounded-lg p-4">
                   <h4 className="text-[#54FFA4] font-semibold mb-2">Game Elements</h4>
                   <ul className="text-gray-400 text-sm space-y-1">
-                    <li>• Directional arrows (↑ ↓ ← →)</li>
-                    <li>• Timing window indicator</li>
-                    <li>• Multiple consecutive prompts</li>
-                    <li>• Speed increases as you progress</li>
+                    <li>• Three block colors: red, green, blue</li>
+                    <li>• Default board of 8 rows × 11 columns (88 blocks)</li>
+                    <li>• Gravity pulls blocks down after each clear</li>
+                    <li>• Empty columns collapse to the left</li>
                   </ul>
                 </div>
                 <div className="bg-[#0F1B21] rounded-lg p-4">
-                  <h4 className="text-[#54FFA4] font-semibold mb-2">Success Conditions</h4>
+                  <h4 className="text-[#54FFA4] font-semibold mb-2">Win &amp; Lose Conditions</h4>
                   <ul className="text-gray-400 text-sm space-y-1">
-                    <li>• Press correct key in time</li>
-                    <li>• Maintain enough momentum</li>
-                    <li>• Complete all prompts in sequence</li>
-                    <li>• Don&apos;t miss too many in a row</li>
+                    <li>• <span className="text-green-400">Win:</span> clear every block off the board</li>
+                    <li>• <span className="text-red-400">Lose:</span> the countdown timer hits zero</li>
+                    <li>• <span className="text-red-400">Lose:</span> any color is left as a single block</li>
+                    <li>• <span className="text-red-400">Lose:</span> no group of 2+ remains to clear</li>
                   </ul>
                 </div>
               </div>
@@ -151,9 +154,9 @@ export default function RoofRunningGuidePage() {
                 <div className="flex items-start gap-3">
                   <Timer className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="text-orange-400 font-semibold mb-1">Timing is Everything</h4>
+                    <h4 className="text-orange-400 font-semibold mb-1">Beat the Clock</h4>
                     <p className="text-gray-300 text-sm">
-                      Each prompt has a &quot;perfect&quot; zone and an &quot;acceptable&quot; zone. Hitting the perfect zone maintains max speed; hitting acceptable keeps you going but may slow you down. Missing entirely causes stumbles.
+                      Practice runs use a 25-second countdown by default, and the moment it expires the run is a loss. In practice mode you can retune the timer (5–100 seconds) and the board size (5–10 rows, 5–15 columns) from the settings. Note that 1v1 matches drop the clock entirely on a fixed 8×11 board — there, the round is decided by whoever clears first or makes the fatal mistake.
                     </p>
                   </div>
                 </div>
@@ -166,37 +169,20 @@ export default function RoofRunningGuidePage() {
         <section id="controls" className="mb-12">
           <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
             <span className="w-8 h-8 bg-[#54FFA4] text-[#0F1B21] rounded-lg flex items-center justify-center font-bold">3</span>
-            Mastering the Controls
+            The Controls
           </h2>
           <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-white mb-3">Control Options</h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="bg-[#0F1B21] rounded-lg p-4">
-                    <h4 className="text-[#54FFA4] font-semibold mb-3">Arrow Keys</h4>
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center text-white font-bold">↑</div>
-                      <div className="flex gap-2">
-                        <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center text-white font-bold">←</div>
-                        <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center text-white font-bold">↓</div>
-                        <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center text-white font-bold">→</div>
-                      </div>
-                    </div>
-                    <p className="text-gray-400 text-xs text-center mt-2">Natural for directional thinking</p>
-                  </div>
-                  <div className="bg-[#0F1B21] rounded-lg p-4">
-                    <h4 className="text-[#54FFA4] font-semibold mb-3">WASD Keys</h4>
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center text-white font-bold">W</div>
-                      <div className="flex gap-2">
-                        <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center text-white font-bold">A</div>
-                        <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center text-white font-bold">S</div>
-                        <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center text-white font-bold">D</div>
-                      </div>
-                    </div>
-                    <p className="text-gray-400 text-xs text-center mt-2">Better for gamer muscle memory</p>
-                  </div>
+                <h3 className="text-lg font-semibold text-white mb-3">It&apos;s All Mouse</h3>
+                <p className="text-gray-300 text-sm mb-4">
+                  There is no keyboard input — no arrow keys, no WASD, no timing bar. The whole game is played with a single action: click a block.
+                </p>
+                <div className="bg-[#0F1B21] rounded-lg p-4 flex flex-col items-center gap-3">
+                  <MousePointerClick className="w-10 h-10 text-[#54FFA4]" />
+                  <p className="text-gray-300 text-sm text-center max-w-md">
+                    Left-click any block that is part of a group of two or more touching, same-colored blocks to clear the whole group. Clicking a block that has no matching neighbour simply does nothing — there is no penalty for a dead click.
+                  </p>
                 </div>
               </div>
 
@@ -204,15 +190,15 @@ export default function RoofRunningGuidePage() {
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <p className="text-gray-300 text-sm">
-                    <strong className="text-green-400">Recommendation:</strong> Use whichever control scheme feels more natural. Most gamers prefer WASD because of muscle memory from other games. If you primarily play games with arrow keys, stick with those.
+                    <strong className="text-green-400">Read before you click:</strong> because a dead click costs nothing, the real skill is in your eyes, not your hands. Scan the board for the largest connected groups and trace how the board will collapse before you commit to a move.
                   </p>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-white mb-3">Hand Positioning</h3>
+                <h3 className="text-lg font-semibold text-white mb-3">Adjusting the Challenge</h3>
                 <p className="text-gray-300 text-sm">
-                  Keep your fingers hovering over all four keys, ready to press any direction instantly. Don&apos;t rest on one key—neutral position means faster reaction to any prompt.
+                  In practice mode the settings panel lets you set the number of rows (5–10), columns (5–15) and the timer (5–100 seconds). A smaller board with a longer clock is the gentlest way to learn the collapse behaviour; the default 8×11 grid on a 25-second timer is the standard challenge.
                 </p>
               </div>
             </div>
@@ -228,42 +214,42 @@ export default function RoofRunningGuidePage() {
           <div className="space-y-6">
             <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <Brain className="w-5 h-5 text-[#54FFA4]" />
-                Strategy 1: Stay Relaxed
+                <Blocks className="w-5 h-5 text-[#54FFA4]" />
+                Strategy 1: Clear the Biggest Groups First
               </h3>
               <p className="text-gray-300 leading-relaxed mb-4">
-                Tension slows reaction time. Keep your hands loose, breathe normally, and don&apos;t grip the keyboard. Relaxed muscles respond faster than tense ones.
+                Large clears trigger the most movement, and that movement is your friend — when a big group vanishes, the blocks that fall and shift in behind it tend to stack same-colored blocks together into fresh groups. Hitting the biggest available group keeps the board churning and your options open.
               </p>
               <div className="bg-[#0F1B21] rounded-lg p-4">
                 <p className="text-gray-400 text-sm">
-                  <strong className="text-white">Mental trick:</strong> Think of it like a rhythm game, not a stress test. The prompts have a pattern—flow with it instead of fighting it.
+                  <strong className="text-white">Why it works:</strong> the goal is an empty board, and a single big clear removes more blocks <em>and</em> sets up the next clear at the same time.
                 </p>
               </div>
             </div>
 
             <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <Blocks className="w-5 h-5 text-[#54FFA4]" />
-                Strategy 2: Focus on the Timing Indicator
+                <Brain className="w-5 h-5 text-[#54FFA4]" />
+                Strategy 2: Simulate the Collapse
               </h3>
               <p className="text-gray-300 leading-relaxed mb-4">
-                Don&apos;t watch the arrow itself—watch the timing indicator. Press when the indicator hits the perfect zone. This separates &quot;seeing the direction&quot; from &quot;timing the press,&quot; making both tasks easier.
+                Before each click, picture what happens after it: blocks above the cleared group drop down, and if a whole column empties, everything to its right slides left. A clear that looks clean can drop two unrelated blocks next to each other and strand a color. Trace the collapse one move ahead and you&apos;ll avoid most dead ends.
               </p>
             </div>
 
             <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <Zap className="w-5 h-5 text-[#54FFA4]" />
-                Strategy 3: Anticipate, Don&apos;t React
+                Strategy 3: Protect Thinning Colors
               </h3>
               <p className="text-gray-300 leading-relaxed mb-4">
-                Pure reaction is slow. Instead, start moving your finger toward the key as soon as you see the direction, then press at the right time. This &quot;prepare and execute&quot; approach is faster than &quot;see and react.&quot;
+                The instant any one color is reduced to a single block, the board is declared unsolvable and you lose. Keep an eye on whichever color is running low and clear around it so its remaining blocks stay touching — never let a color get down to one stray tile with no partner.
               </p>
               <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <p className="text-gray-300 text-sm">
-                    <strong className="text-green-400">Pro Tip:</strong> Your brain needs about 150-200ms to process visual information. Account for this by pressing slightly before you &quot;feel&quot; like you should.
+                    <strong className="text-green-400">Pro Tip:</strong> finish a color in even numbers. If you can pair up the last blocks of a color and clear them together, you&apos;ll never leave the lone block that ends the run.
                   </p>
                 </div>
               </div>
@@ -282,9 +268,9 @@ export default function RoofRunningGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Pressing Too Early</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">Stranding a Single Block</h4>
                   <p className="text-gray-300 text-sm">
-                    Panicking and pressing before the timing window opens. Wait for the indicator to enter the acceptable zone before pressing.
+                    The most common loss. Leaving one block of a color with no same-colored neighbour makes the board unsolvable, and the game ends the run on the spot. Always plan how the last few blocks of each color will pair off.
                   </p>
                 </div>
               </div>
@@ -292,9 +278,9 @@ export default function RoofRunningGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Wrong Key Presses</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">Clicking Without Reading the Collapse</h4>
                   <p className="text-gray-300 text-sm">
-                    Confusing left/right or up/down under pressure. If this happens often, slow down mentally and verify the direction before pressing.
+                    Clearing the first group you see, without picturing how gravity and the left-shift will rearrange everything, is how solvable boards turn into dead ends. Slow down and look one move ahead.
                   </p>
                 </div>
               </div>
@@ -302,9 +288,9 @@ export default function RoofRunningGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Losing Focus Mid-Sequence</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">Ignoring the Timer</h4>
                   <p className="text-gray-300 text-sm">
-                    Looking away or losing concentration during long sequences. The minigame punishes lapses in attention—stay locked in until it&apos;s done.
+                    The default 25-second countdown is tight on a full 8×11 board. Spend a moment planning, but don&apos;t freeze — running the clock to zero is just as much a loss as stranding a block.
                   </p>
                 </div>
               </div>
@@ -312,9 +298,9 @@ export default function RoofRunningGuidePage() {
               <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-red-400 font-semibold mb-1">Tensing Up After Mistakes</h4>
+                  <h4 className="text-red-400 font-semibold mb-1">Breaking Up a Color You&apos;ll Need</h4>
                   <p className="text-gray-300 text-sm">
-                    One miss leads to panic, which leads to more misses. If you stumble, mentally reset and focus on the next prompt as if it&apos;s a fresh start.
+                    Clearing part of a color too early can split the rest into pieces that can never reconnect. If a color is already scarce, clear it last or keep its blocks bunched together.
                   </p>
                 </div>
               </div>
@@ -333,48 +319,48 @@ export default function RoofRunningGuidePage() {
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Play Rhythm Games</h4>
-                  <p className="text-gray-400 text-sm">Games like osu!, Guitar Hero, or Beat Saber train the exact same skills. Cross-training helps.</p>
+                  <h4 className="text-white font-semibold mb-1">Weaponise the Left-Shift</h4>
+                  <p className="text-gray-400 text-sm">Fully emptying a column slides everything to its right leftward. Use that to push a stray block up against a matching neighbour.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Use a Mechanical Keyboard</h4>
-                  <p className="text-gray-400 text-sm">Faster key actuation and tactile feedback improve reaction time and accuracy.</p>
+                  <h4 className="text-white font-semibold mb-1">Watch the Bottom Rows</h4>
+                  <p className="text-gray-400 text-sm">Clearing low groups drops the most blocks. Low clears reshape the board the hardest, so check them first when planning.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Warm Up Your Hands</h4>
-                  <p className="text-gray-400 text-sm">Cold fingers are slow fingers. Stretch and warm up before important heists.</p>
+                  <h4 className="text-white font-semibold mb-1">Train on an Easy Board</h4>
+                  <p className="text-gray-400 text-sm">Shrink the grid and stretch the timer in settings to learn how collapses behave, then ramp back up to the default 8×11.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Reduce Input Lag</h4>
-                  <p className="text-gray-400 text-sm">Enable game mode on your monitor, use wired peripherals, close background apps.</p>
+                  <h4 className="text-white font-semibold mb-1">Keep the Colors Balanced</h4>
+                  <p className="text-gray-400 text-sm">With only three colors, no color should ever fall far behind the others. Clear evenly so none gets isolated down to a single block.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Practice at Higher Speeds</h4>
-                  <p className="text-gray-400 text-sm">If available, train at faster settings. Normal speed will feel slow by comparison.</p>
+                  <h4 className="text-white font-semibold mb-1">Take Your Time in 1v1</h4>
+                  <p className="text-gray-400 text-sm">Matches have no clock, so there&apos;s no rush — but a stranded block still ends your board instantly. Prioritise a fully solvable path over raw speed.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-4 bg-[#0F1B21] rounded-lg">
                 <Lightbulb className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-white font-semibold mb-1">Focus on Consistency</h4>
-                  <p className="text-gray-400 text-sm">It&apos;s better to hit all &quot;good&quot; zones than to alternate between &quot;perfect&quot; and &quot;miss.&quot;</p>
+                  <h4 className="text-white font-semibold mb-1">Plan the Endgame Early</h4>
+                  <p className="text-gray-400 text-sm">Decide which color you&apos;ll clear last while the board is still full. The final moves are where most boards become unsolvable.</p>
                 </div>
               </div>
             </div>
@@ -385,7 +371,7 @@ export default function RoofRunningGuidePage() {
                 <div>
                   <h4 className="text-[#54FFA4] font-semibold mb-1">Mastery Benchmark</h4>
                   <p className="text-gray-300 text-sm">
-                    You&apos;ve mastered Roof Running when you can complete 20+ consecutive prompts without a miss on standard difficulty. At that point, the minigame becomes automatic and you can focus on the excitement of the chase.
+                    You&apos;ve mastered Roof Running when you can wipe a default 8×11 board down to zero blocks inside the 25-second timer, consistently, without ever stranding a lone color. At that point the AC-unit job is yours every time.
                   </p>
                 </div>
               </div>
@@ -398,7 +384,7 @@ export default function RoofRunningGuidePage() {
           <Blocks className="w-12 h-12 text-green-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-4">Ready to Master Roof Running?</h2>
           <p className="text-gray-300 mb-6 max-w-lg mx-auto">
-            Train your reflexes with unlimited practice. Perfect your timing until every escape is flawless.
+            Train on unlimited random boards. Plan your clears, chain the collapses, and empty the board before the clock runs out.
           </p>
           <Link
             href="/puzzles/roof-running"
