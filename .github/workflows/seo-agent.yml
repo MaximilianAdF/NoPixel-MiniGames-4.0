@@ -167,21 +167,22 @@ jobs:
           convert_markdown: true
           attachments: ${{ steps.pdf.outputs.path }}
 
-      - name: Open pull request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          branch: seo-agent/weekly-report
-          delete-branch: true
-          # Only commit the agent's legitimate outputs — never .github/ or scripts/
-          # (the default GITHUB_TOKEN can't push workflow files, which would fail the run).
-          add-paths: |
-            app/**
-            lib/**
-          title: "Weekly site audit — fixes"
-          commit-message: "seo: weekly agent fixes"
-          body: |
-            Automated fixes from the weekly site audit (3-pass debate: propose → red-team → judge).
-
-            These are only the code changes the agent was confident were safe. **The full report
-            — analysis, proposed-but-not-applied issues, and site health — is the `seo-report`
-            artifact on this workflow run.** Download and read it before merging.
+      # Auto-push the agent's verified fixes straight to main. By this point the
+      # changes have survived the full pipeline (orient → propose → red-team →
+      # judge → implement) AND the build-verify gate above (breaking edits were
+      # already reverted), so anything still staged in app/ or lib/ is good to
+      # ship — the droplet auto-deploys from main. Restricted to app/** and
+      # lib/**, so it can never touch .github/, scripts/ or config.
+      - name: Push verified fixes to main
+        run: |
+          if git status --porcelain app lib | grep -q .; then
+            git config user.name "nphacks-seo-agent[bot]"
+            git config user.email "seo-agent@users.noreply.github.com"
+            git add app lib
+            git commit -m "seo: weekly agent auto-fixes" \
+              -m "Verified fixes from the weekly site audit (orient -> propose -> red-team -> judge -> implement, then build-verified). Content/metadata only; full analysis emailed privately."
+            git push origin HEAD:main
+            echo "::notice::Pushed this week's verified fixes to main."
+          else
+            echo "No surviving code changes this week — nothing to push."
+          fi
