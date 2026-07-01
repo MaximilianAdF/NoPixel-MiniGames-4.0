@@ -16,6 +16,7 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@mdi/js": "^7.4.47",
     "@mdi/react": "^1.6.1",
+    "@sentry/nextjs": "^8.55.2",
     "@vercel/analytics": "^1.2.2",
     "@vercel/speed-insights": "^1.0.10",
     "ably": "^2.21.0",
