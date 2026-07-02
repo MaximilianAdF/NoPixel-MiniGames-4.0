@@ -10,4 +10,6 @@ For EACH approved change, implement it **properly**:
 
 **Stay strictly within the approved list and the allowed safe surface** (content / metadata / internal links / new content pages under `app/` and `lib/`). Do NOT invent changes beyond `_approved.md`, and never touch gameplay logic, React state/hooks, `next.config.mjs` or other config, CI / `.github`, dependencies / `package.json`, redirects, or delete files. If an approved item would require any of those, **skip that item** (leave the others) rather than improvising.
 
+**Verify your own work:** after making your edits, run `npx tsc --noEmit` (deps are installed). If it reports errors in files you touched, fix them and re-run until clean — the build gate will revert EVERYTHING if the build breaks, so a type error in one edit destroys all of your work.
+
 If an approved item can't be implemented cleanly and safely, skip it and move on — a partial, correct result beats a broken one. Do not edit the report or the build-list.

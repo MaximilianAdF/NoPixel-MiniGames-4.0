@@ -49,6 +49,10 @@ jobs:
           node-version: "20"
       - name: Install Claude Code
         run: npm i -g @anthropic-ai/claude-code
+      # Project deps up-front so the implementer can typecheck its own edits
+      # and the verify step below can build without a separate install.
+      - name: Install project deps
+        run: npm ci --no-audit --no-fund
 
       # Pass 0 — map the current codebase so every later pass reasons about the
       # real tree, not a stale assumption. Writes ./reports/_repomap.md.
@@ -109,7 +113,7 @@ jobs:
           The analytics bundle is at: ./seo-data.json
           Today's date is: $(date +%F)"
           claude -p "$PROMPT" --model opus --effort xhigh --permission-mode acceptEdits \
-            --allowedTools "Read,Edit,Write,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
+            --allowedTools "Read,Edit,Write,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*),Bash(npx tsc:*)"
 
       - name: Clean up scratch files
         run: rm -f reports/_draft*.md reports/_critique*.md reports/_approved*.md reports/_repomap*.md
@@ -122,7 +126,6 @@ jobs:
         run: |
           if git status --porcelain app lib | grep -q .; then
             echo "Agent edited code — verifying build..."
-            npm ci --no-audit --no-fund
             if ! npm run build; then
               echo "::warning::Agent edits broke the build — reverting code edits, keeping the report."
               git checkout -- app lib
@@ -142,6 +145,7 @@ jobs:
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq pandoc wkhtmltopdf xvfb
           if xvfb-run -a pandoc reports/seo-report.md -o reports/seo-report.pdf \
+               --pdf-engine=wkhtmltopdf \
                --metadata title="nphacks weekly site audit" \
                -V margin-top=16mm -V margin-bottom=16mm -V margin-left=16mm -V margin-right=16mm; then
             echo "path=reports/seo-report.pdf" >> "$GITHUB_OUTPUT"
@@ -164,7 +168,9 @@ jobs:
           from: nphacks site audit <${{ secrets.MAIL_USERNAME }}>
           to: ${{ secrets.MAIL_TO }}
           subject: "nphacks — weekly site audit report"
-          body: file://reports/seo-report.md
+          # html_body + convert_markdown renders the markdown properly; plain
+          # `body` would arrive as raw ##/** text.
+          html_body: file://reports/seo-report.md
           convert_markdown: true
           attachments: ${{ steps.pdf.outputs.path }}
 
