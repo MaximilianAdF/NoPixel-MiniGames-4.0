@@ -1,28 +1,30 @@
 import { MongoClient } from 'mongodb';
 
-const uri: string = process.env.MONGODB_URI!;
 const options: object = {};
 
-let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
-
 declare global {
-  var _mongoClientPromise: Promise<MongoClient>;
+  var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Please add your Mongo URI to .env.local');
-}
-
-if (process.env.NODE_ENV === 'development') {
-  if (!global._mongoClientPromise) {
-    client = new MongoClient(uri, options);
-    global._mongoClientPromise = client.connect();
+// Lazy connection: no env check or connect at import time, so builds without a
+// database (e.g. CI page-data collection) succeed; we only throw/connect when a
+// route actually awaits the client. The global cache reuses one connection per
+// process in both dev (hot reload) and prod.
+function getClientPromise(): Promise<MongoClient> {
+  if (!process.env.MONGODB_URI) {
+    throw new Error('Please add your Mongo URI to .env.local');
   }
-  clientPromise = global._mongoClientPromise;
-} else {
-  client = new MongoClient(uri, options);
-  clientPromise = client.connect();
+  if (!global._mongoClientPromise) {
+    global._mongoClientPromise = new MongoClient(process.env.MONGODB_URI, options).connect();
+  }
+  return global._mongoClientPromise;
 }
+
+// Thenable wrapper keeps the historical `await clientPromise` interface intact.
+const clientPromise = {
+  then: (onfulfilled?: any, onrejected?: any) => getClientPromise().then(onfulfilled, onrejected),
+  catch: (onrejected?: any) => getClientPromise().catch(onrejected),
+  finally: (onfinally?: any) => getClientPromise().finally(onfinally),
+} as Promise<MongoClient>;
 
 export default clientPromise;

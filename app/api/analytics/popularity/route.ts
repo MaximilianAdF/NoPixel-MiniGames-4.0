@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 
+// Pure GET with no request usage — force dynamic so Next never executes it at
+// build time (page-data collection would otherwise hit the database).
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/analytics/popularity
  * Get game popularity statistics
