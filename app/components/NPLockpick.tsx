@@ -128,8 +128,15 @@ const NPLockpickView: FC<NPLockpickViewProps> = ({
       >
         <div
           className="aspect-square flex items-center justify-center relative"
-          // Height budget includes ~100px clearance for the Journey adhesion ad.
-          style={{ width: '100%', maxWidth: `calc(100vh - 390px)` }}
+          // Solo: explicit width from the viewport-height budget (chrome +
+          // ~100px adhesion-ad clearance) so the rings scale with screen
+          // height — width:100% collapses to the panel's min floor inside the
+          // page's shrink-to-fit centering. Capped by viewport width on phones.
+          style={
+            !compact
+              ? { width: 'calc(100vh - 390px)', maxWidth: 'min(calc(100vw - 80px), 100%)' }
+              : { width: '100%', maxWidth: 'calc(100vh - 390px)' }
+          }
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

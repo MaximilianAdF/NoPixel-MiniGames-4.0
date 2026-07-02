@@ -84,12 +84,20 @@ const ThermiteView: FC<ThermiteViewProps> = ({
           !onSquareClick && 'pointer-events-none',
         )}
         style={{
-          // Height budget includes ~100px clearance for the Journey adhesion ad.
-          maxWidth: `calc(calc(calc(calc(calc(100vh - 340px) - ${4 * (state.rows - 1)}px) / ${state.rows}) * ${state.columns}) + ${2 * (state.columns - 1)}px)`,
-          // Height-aware floor: full width on phones, up to 600px on desktop,
-          // but never taller than the viewport allows on short screens.
-          ...(!compact && { minWidth: 'min(600px, calc(100vw - 60px), calc(100vh - 340px))' }),
-          width: '100%',
+          // Solo: explicit width from the viewport-height budget (chrome +
+          // ~100px adhesion-ad clearance) so the board scales with screen
+          // height — width:100% would collapse to the min floor inside the
+          // page's shrink-to-fit centering. Capped by viewport width on
+          // phones. 1v1 keeps flowing width inside the match layout.
+          ...(!compact
+            ? {
+                width: `calc(calc(calc(calc(calc(100vh - 325px) - ${4 * (state.rows - 1)}px) / ${state.rows}) * ${state.columns}) + ${2 * (state.columns - 1)}px)`,
+                maxWidth: 'min(calc(100vw - 60px), 100%)',
+              }
+            : {
+                width: '100%',
+                maxWidth: `calc(calc(calc(calc(calc(100vh - 325px) - ${4 * (state.rows - 1)}px) / ${state.rows}) * ${state.columns}) + ${2 * (state.columns - 1)}px)`,
+              }),
           gridTemplateRows: `repeat(${state.rows}, minmax(0, 1fr))`,
           gridTemplateColumns: `repeat(${state.columns}, minmax(0, 1fr))`,
         }}
