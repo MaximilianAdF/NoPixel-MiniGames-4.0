@@ -28,7 +28,7 @@ export default function PrivacyPage() {
             </h1>
           </div>
           <p className="text-gray-400 text-lg">
-            Last Updated: November 13, 2025
+            Last Updated: July 2, 2026
           </p>
         </div>
 
@@ -147,18 +147,30 @@ export default function PrivacyPage() {
             <div>
               <h3 className="text-xl font-bold text-white mb-3">Advertising</h3>
               <p className="text-gray-300 leading-relaxed mb-3">
-                We may display advertisements served by third-party advertising
-                partners. These partners may use cookies, device identifiers, and
+                We display advertisements through{' '}
+                <a
+                  href="https://www.mediavine.com/privacy-policy/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#54FFA4] hover:text-[#45e894]"
+                >
+                  Journey by Mediavine
+                </a>
+                , our advertising management partner. Mediavine and its
+                advertising partners may use cookies, device identifiers, and
                 similar technologies to collect information about your visits to
-                this and other websites in order to show ads relevant to you and
-                to measure ad performance. We do not sell your personal
-                information.
+                this and other websites in order to serve ads, personalise them
+                where permitted, and measure ad performance. We do not sell your
+                personal information.
               </p>
               <p className="text-gray-300 leading-relaxed mb-3">
-                For visitors in the EEA, UK, and other applicable regions, ads are
-                served only after you consent via our cookie banner, and you can
-                change your choice at any time. You can also opt out of
-                personalized advertising through the industry tools below.
+                For visitors in the EEA, UK, and other applicable regions, a
+                consent dialog (an IAB-certified Consent Management Platform
+                provided through Mediavine) lets you accept or refuse the use of
+                cookies and personal data for advertising before any such
+                processing occurs, and you can change your choice at any time.
+                You can also opt out of personalized advertising through the
+                industry tools below.
               </p>
               <div className="flex flex-wrap gap-4">
                 <a

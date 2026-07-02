@@ -235,6 +235,17 @@ export default function RootLayout({
             })
           }}
         />
+
+        {/* Journey by Mediavine (ads) — site-unique script wrapper, must live in
+            <head>. async so it never blocks paint; data-cfasync/data-noptimize
+            keep Cloudflare and optimizers from deferring or rewriting it. */}
+        <script
+          type="text/javascript"
+          async
+          data-noptimize="1"
+          data-cfasync="false"
+          src="//scripts.scriptwrapper.com/tags/09211bfe-a82d-4882-9012-edfd3fb877f2.js"
+        />
       </head>
       <body
         className={`${gilroy.className} overscroll-y-none`}
