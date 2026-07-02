@@ -6,53 +6,53 @@ export default function RoofRunningInstructions() {
         <>
             <InstructionSection id="overview" title="What is Roof Running?" icon={<Info className="w-5 h-5" />}>
                 <p>
-                    Roof Running is a strategic tile-matching puzzle game that challenges your planning, pattern recognition, 
-                    and forward-thinking abilities. Players must clear colored tiles from the board by matching groups of 
-                    three or more adjacent tiles of the same color. This minigame simulates the quick decision-making and 
-                    route planning required during parkour escapes across Los Santos rooftops in NoPixel 4.0.
+                    Roof Running is a &apos;Same Game&apos; style tile-clearing puzzle that challenges your planning, pattern
+                    recognition, and speed. The board fills with red, green, and blue blocks, and you must wipe every
+                    single one before the timer runs out. In NoPixel 4.0 this minigame triggers when you dismantle
+                    AC units during rooftop robberies across Los Santos.
                 </p>
                 <p>
-                    Unlike reflex-based minigames, Roof Running is a pure strategy challenge where every move matters. 
-                    One wrong clear can make the board unsolvable, leaving you with isolated tiles. Success requires 
-                    visualizing cascading effects, planning multiple moves ahead, and understanding tile physics as 
-                    groups collapse and shift after clearing.
+                    Roof Running blends strategy with time pressure: on the default board you have just 25 seconds to
+                    clear an 8x11 grid of 88 blocks. One careless clear can strand a lone block that nothing can ever
+                    remove, instantly failing the run. Success requires reading clusters at a glance, anticipating how
+                    the board collapses after each clear, and clicking fast.
                 </p>
             </InstructionSection>
 
             <InstructionSection id="howtoplay" title="How to Play - Complete Rules" icon={<Gamepad className="w-5 h-5" />}>
                 <ol className="list-decimal pl-5 space-y-2">
-                    <li><strong>Survey the board</strong> - Colored tiles are arranged in a grid pattern</li>
-                    <li><strong>Identify matching groups</strong> - Find clusters of 3+ adjacent tiles (horizontal or vertical)</li>
-                    <li><strong>Click to select and clear</strong> - Click any tile in a valid group to clear all connected same-color tiles</li>
-                    <li><strong>Tiles collapse</strong> - Remaining tiles fall downward to fill gaps (gravity effect)</li>
-                    <li><strong>Tiles shift left</strong> - Empty columns cause remaining columns to shift left</li>
-                    <li><strong>Chain reactions possible</strong> - New groups may form after tiles collapse</li>
-                    <li><strong>Clear the entire board</strong> - Remove all tiles to complete the level successfully</li>
-                    <li><strong>Avoid unsolvable states</strong> - If only singles/pairs remain, you&apos;ve failed</li>
+                    <li><strong>Survey the board</strong> - Red, green, and blue blocks fill a grid (8 rows x 11 columns by default)</li>
+                    <li><strong>Identify matching groups</strong> - Find clusters of 2+ same-colour blocks touching horizontally or vertically</li>
+                    <li><strong>Click to clear</strong> - Click any block in a valid group to clear every connected same-colour block at once</li>
+                    <li><strong>Blocks fall</strong> - Remaining blocks drop downward to fill the gaps (gravity effect)</li>
+                    <li><strong>Columns shift left</strong> - Fully emptied columns collapse, sliding the rest of the board left</li>
+                    <li><strong>New groups form</strong> - Falling and shifting blocks can merge into fresh clusters for you to clear</li>
+                    <li><strong>Clear the entire board</strong> - Remove every block before the timer expires to win</li>
+                    <li><strong>Avoid stranding blocks</strong> - A lone block with no way to pair up can never be cleared</li>
                 </ol>
                 <p className="mt-2">
-                    <strong>Critical rules:</strong> Only tiles touching horizontally or vertically count as adjacent 
-                    (diagonal doesn&apos;t count). Minimum group size is 3 tiles. The game automatically detects 
-                    unsolvable states and ends the attempt.
+                    <strong>Critical rules:</strong> Only blocks touching horizontally or vertically count as connected
+                    (diagonal doesn&apos;t count). The minimum clearable group is 2 blocks - clicking an isolated single
+                    does nothing. You fail instantly if only one block of any colour remains on the board, if no touching
+                    pair is left anywhere, or if the timer hits zero.
                 </p>
             </InstructionSection>
 
             <InstructionSection id="scoring" title="Scoring System and Optimization" icon={<Trophy className="w-5 h-5" />}>
                 <p>
-                    Roof Running scoring rewards strategic planning:
+                    Roof Running keeps scoring simple and honest:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Group size multiplier</strong> - 3 tiles = base points, 4 tiles = 1.5x, 5+ tiles = 2x or higher</li>
-                    <li><strong>Combo cascades</strong> - Chain reactions from falling tiles multiply score exponentially</li>
-                    <li><strong>Move efficiency bonus</strong> - Clearing board in fewer moves awards completion bonuses</li>
-                    <li><strong>Perfect clear reward</strong> - Removing every single tile gives massive bonus points</li>
-                    <li><strong>Large group priority</strong> - Clearing 6+ tile groups in single move gives special bonuses</li>
-                    <li><strong>Color diversity bonus</strong> - Balanced clearing across all colors prevents penalties</li>
-                    <li><strong>Time bonuses</strong> - Faster solves award speed multipliers on some difficulty levels</li>
+                    <li><strong>Score = blocks cleared</strong> - Every block you remove counts for one point, whether it fell in a huge clear or a pair</li>
+                    <li><strong>Full clear to win</strong> - The round only counts as a success when the entire board is empty (88 blocks on default settings)</li>
+                    <li><strong>No partial credit for winning</strong> - Clearing most of the board still ends in failure if anything is stranded or the clock runs out</li>
+                    <li><strong>Time is the real currency</strong> - There are no combo or speed multipliers; finishing at all within the timer is the challenge</li>
+                    <li><strong>Stats tracking</strong> - Your cleared-block count and completion time are recorded, so faster full clears are how you improve</li>
                 </ul>
                 <p className="mt-2">
-                    <strong>Optimal strategy:</strong> Maximum score comes from clearing largest possible groups first, 
-                    then engineering cascades through strategic tile positioning.
+                    <strong>Optimal strategy:</strong> Since every block is worth the same, optimise for board control and
+                    speed - clear big groups to keep the board collapsing, and never waste seconds on moves that risk
+                    stranding a colour.
                 </p>
             </InstructionSection>
 
@@ -61,90 +61,92 @@ export default function RoofRunningInstructions() {
                     Master-level players use these advanced strategies:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Initial scan priority</strong> - Identify all large groups (5+ tiles) before making first move</li>
-                    <li><strong>Cascade visualization</strong> - Mentally simulate how tiles will fall after each clear</li>
-                    <li><strong>Corner preservation</strong> - Keep corner tiles connected to maintain solving options</li>
-                    <li><strong>Column management</strong> - Track which columns have isolated colors that could become stuck</li>
-                    <li><strong>Bottom-up thinking</strong> - Consider bottom-row moves carefully as they affect entire columns</li>
-                    <li><strong>Isolation prevention</strong> - Never create single tiles or 2-tile pairs with no expansion possibility</li>
-                    <li><strong>Color balancing</strong> - Monitor color distribution to avoid trapping minority colors</li>
-                    <li><strong>Forced move recognition</strong> - Identify moves that MUST be made eventually and time them optimally</li>
-                    <li><strong>Dead-end detection</strong> - Recognize board states that will lead to unsolvability several moves ahead</li>
-                    <li><strong>Optimal path planning</strong> - For max scores, plan full solving sequence before first click</li>
+                    <li><strong>Initial scan priority</strong> - Spot the large groups (5+ blocks) in your first glance at the board</li>
+                    <li><strong>Cascade visualization</strong> - Mentally simulate how blocks will fall and shift after each clear</li>
+                    <li><strong>Big groups first</strong> - Large clears collapse the most board and create the most new matches</li>
+                    <li><strong>Column management</strong> - Track columns holding rare colours that could end up stranded</li>
+                    <li><strong>Bottom-up thinking</strong> - Clears near the bottom reshuffle entire columns, so weigh them carefully</li>
+                    <li><strong>Isolation prevention</strong> - Never make a clear that leaves a colour as one lone block; that fails instantly</li>
+                    <li><strong>Colour counting</strong> - Keep rough track of how many of each colour remain so no colour gets trapped</li>
+                    <li><strong>Use the collapse</strong> - Gravity and the left-shift can reunite separated blocks; engineer clears that bring them together</li>
+                    <li><strong>Click while you think</strong> - Clear obvious safe groups immediately and plan the tricky endgame as the board shrinks</li>
+                    <li><strong>Endgame awareness</strong> - The last few clears decide the run; make sure the final blocks of each colour end up touching</li>
                 </ul>
             </InstructionSection>
 
             <InstructionSection id="difficulty" title="Difficulty Levels and Complexity" icon={<TrendingUp className="w-5 h-5" />}>
                 <p>
-                    Roof Running difficulty scales across multiple factors:
+                    Roof Running always uses three colours - difficulty comes from the board size and the clock, both
+                    adjustable in the practice settings:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Beginner (3 colors, small grid)</strong> - Forgiving layouts with obvious large groups, easy to solve</li>
-                    <li><strong>Intermediate (4 colors, medium grid)</strong> - Requires basic planning, some tricky positions</li>
-                    <li><strong>Advanced (5 colors, large grid)</strong> - Multiple solution paths, need to think ahead 3-4 moves</li>
-                    <li><strong>Expert (6+ colors, large grid)</strong> - Narrow solution paths, one wrong move can fail attempt</li>
-                    <li><strong>Master (6+ colors, complex layouts)</strong> - Intentionally difficult starting positions requiring perfect play</li>
+                    <li><strong>Rows (5-10)</strong> - Taller boards mean longer columns and deeper cascades to predict</li>
+                    <li><strong>Columns (5-15)</strong> - Wider boards add more blocks and more left-shifts to track</li>
+                    <li><strong>Timer (5-100 seconds)</strong> - The clock is the main difficulty dial; shorter timers demand instant reads</li>
+                    <li><strong>Default challenge (8x11, 25 seconds)</strong> - The standard setup: 88 blocks in 25 seconds, matching the on-server pressure</li>
+                    <li><strong>Fixed modes</strong> - Daily challenges and 1v1 matches lock the settings, so practise at the defaults to prepare</li>
                 </ul>
                 <p className="mt-2">
-                    <strong>Complexity factors:</strong> More colors = harder to match. Scattered distribution = more planning needed. 
-                    Unbalanced color ratios = higher risk of isolation. Larger boards = more moves to track mentally.
+                    <strong>Complexity factors:</strong> Bigger boards = more blocks per second required. Shorter timers =
+                    less room to plan. Scattered colour distribution = higher risk of stranding a block. Start roomy, then
+                    tighten the timer as you improve.
                 </p>
             </InstructionSection>
 
             <InstructionSection id="mistakes" title="Critical Mistakes That Cause Failure" icon={<AlertTriangle className="w-5 h-5" />}>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Clearing 3-tile groups prematurely</strong> - Save small groups for later, prioritize large groups</li>
-                    <li><strong>Not simulating tile collapse</strong> - Failing to visualize how tiles shift ruins planning</li>
-                    <li><strong>Creating isolated singles</strong> - A single tile with no same-color neighbors is unremovable</li>
-                    <li><strong>Ignoring bottom tiles</strong> - Bottom-row clears have massive cascading effects</li>
-                    <li><strong>Reactive instead of proactive</strong> - Making moves without considering next 2-3 steps</li>
-                    <li><strong>Color tunnel vision</strong> - Focusing on one color while neglecting others leads to isolation</li>
-                    <li><strong>Rushing without planning</strong> - First instinct is often wrong, take time to analyze</li>
-                    <li><strong>Missing cascade opportunities</strong> - Not recognizing potential chain reactions wastes points</li>
+                    <li><strong>Stranding a single block</strong> - Reducing any colour to one lone block anywhere on the board is an instant fail</li>
+                    <li><strong>Not simulating the collapse</strong> - Failing to visualize how blocks fall and shift ruins your plan</li>
+                    <li><strong>Overplanning</strong> - Freezing to analyse burns the 25-second clock; obvious clears should be instant</li>
+                    <li><strong>Ignoring bottom blocks</strong> - Bottom-row clears have massive cascading effects on the columns above</li>
+                    <li><strong>Colour tunnel vision</strong> - Grinding one colour while neglecting others is how the last blocks end up separated</li>
+                    <li><strong>Breaking up rare colours</strong> - If a colour is down to a few blocks, keep them connected until you clear them together</li>
+                    <li><strong>Clicking dead singles</strong> - Clicking a block with no same-colour neighbour does nothing and wastes time</li>
+                    <li><strong>Forgetting the left-shift</strong> - Emptied columns slide the board left, which can split groups you were counting on</li>
                     <li><strong>Over-confidence on easy boards</strong> - Simple layouts can still become unsolvable with bad sequencing</li>
-                    <li><strong>Not counting remaining tiles</strong> - Losing track of color distribution causes dead ends</li>
+                    <li><strong>Not counting remaining blocks</strong> - Losing track of colour distribution causes dead ends in the endgame</li>
                 </ul>
             </InstructionSection>
 
             <InstructionSection id="nopixel" title="NoPixel Roleplay Context" icon={<Briefcase className="w-5 h-5" />}>
                 <p>
-                    In NoPixel 4.0, Roof Running represents parkour escapes and rooftop navigation:
+                    In NoPixel 4.0, Roof Running is the rooftop AC unit robbery activity:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Police chase escapes</strong> - Navigate rooftops during high-speed pursuits</li>
-                    <li><strong>Heist getaway routes</strong> - Plan optimal escape paths after bank robberies</li>
-                    <li><strong>Tactical positioning</strong> - Access advantageous rooftop positions for shootouts</li>
-                    <li><strong>Stealth infiltration</strong> - Enter secure areas via rooftop access points</li>
-                    <li><strong>Criminal hideouts</strong> - Reach hidden rooftop meeting spots</li>
-                    <li><strong>Urban exploration</strong> - Discover shortcuts and secret routes across the city</li>
+                    <li><strong>AC unit theft</strong> - Crews climb onto rooftops and dismantle air-conditioning units for parts</li>
+                    <li><strong>The hack trigger</strong> - This tile-clearing puzzle pops when you start stripping a unit</li>
+                    <li><strong>Time pressure</strong> - Fumbling the puzzle wastes precious minutes while police response builds</li>
+                    <li><strong>Parkour routes</strong> - Reaching the units means climbing and jumping between rooftops, giving the activity its name</li>
+                    <li><strong>Fence the loot</strong> - Stolen AC parts are sold on for a payout, making clean fast clears profitable</li>
+                    <li><strong>Escape planning</strong> - Crews plan rooftop exit routes before starting, since cops check known roof-running spots</li>
                 </ul>
                 <p className="mt-2">
-                    In roleplay scenarios, criminals who master roof running have a significant advantage in foot chases. 
-                    The ability to plan optimal parkour routes under pressure separates professional criminals from amateurs. 
-                    Police officers also use roof running skills to cut off escape routes and maintain pursuit from elevated positions.
+                    In roleplay scenarios, criminals who can clear this puzzle quickly and consistently strip more units per
+                    run and spend less time exposed on rooftops. A failed puzzle is wasted loot and wasted time while the
+                    heat builds.
                 </p>
                 <p className="mt-2">
-                    The minigame&apos;s strategic planning mirrors real parkour: one bad jump (move) can end your escape route 
-                    (make board unsolvable), while perfect route planning allows for smooth, efficient escapes with room for 
-                    improvisation.
+                    The minigame&apos;s pressure mirrors the activity itself: one bad decision (a clear that strands a block)
+                    ends the attempt, while a clean, planned sequence gets you off the roof with the loot before anyone
+                    notices.
                 </p>
             </InstructionSection>
 
             <InstructionSection id="solving" title="Mathematical Solving Strategy" icon={<Brain className="w-5 h-5" />} defaultOpen={false}>
                 <p>
-                    Approach Roof Running puzzles systematically:
+                    Approach Roof Running boards systematically:
                 </p>
                 <ol className="list-decimal pl-5 space-y-2">
-                    <li><strong>Step 1: Initial analysis</strong> - Count total tiles per color, identify largest groups</li>
-                    <li><strong>Step 2: Identify forced moves</strong> - Find groups that MUST be cleared to avoid isolation</li>
-                    <li><strong>Step 3: Map cascades</strong> - Visualize which clears will create new groups via tile collapse</li>
-                    <li><strong>Step 4: Build move tree</strong> - Plan sequence of 3-5 moves that maintain solvability</li>
-                    <li><strong>Step 5: Execute with checkpoints</strong> - After each move, verify board remains solvable</li>
+                    <li><strong>Step 1: Initial analysis</strong> - Spot the largest groups and any colour that looks scarce or scattered</li>
+                    <li><strong>Step 2: Clear the safe groups</strong> - Big clusters far from scarce colours are almost always safe to clear immediately</li>
+                    <li><strong>Step 3: Map cascades</strong> - Visualize which clears will drop or shift separated blocks into new groups</li>
+                    <li><strong>Step 4: Protect the endgame</strong> - Plan the final clears so the last blocks of each colour finish touching</li>
+                    <li><strong>Step 5: Verify as you go</strong> - Before each risky clear, check that no colour will be left as a lone block</li>
                 </ol>
                 <p className="mt-2">
-                    <strong>Solvability test:</strong> A board is solvable if and only if you can find a sequence where no 
-                    color becomes completely isolated (all instances are singles or pairs with no expansion options). Work 
-                    backwards from the goal state (empty board) to verify your move sequence.
+                    <strong>Solvability test:</strong> The board is lost the moment any colour is down to a single block, or
+                    when no touching pair remains anywhere. Separated blocks of the same colour are not dead yet - gravity
+                    and the left-shift can reunite them - but every clear you make must keep a path to bringing them together.
                 </p>
             </InstructionSection>
 
@@ -153,34 +155,34 @@ export default function RoofRunningInstructions() {
                     Build Roof Running expertise through progressive training:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Beginner phase</strong> - Focus on completing boards, don&apos;t worry about move efficiency</li>
-                    <li><strong>Pattern recognition</strong> - Learn common group formations and how they collapse</li>
-                    <li><strong>Cascade training</strong> - Practice predicting exactly how tiles will fall and shift</li>
-                    <li><strong>Isolation drills</strong> - Intentionally create near-failures to learn what NOT to do</li>
-                    <li><strong>Speed solving</strong> - Once mechanics are mastered, add time pressure</li>
-                    <li><strong>Move optimization</strong> - Challenge yourself to solve in minimum possible moves</li>
-                    <li><strong>Mental simulation</strong> - Practice solving boards completely in your head before clicking</li>
+                    <li><strong>Beginner phase</strong> - Raise the timer in settings and focus on full clears without time pressure</li>
+                    <li><strong>Pattern recognition</strong> - Learn common cluster shapes and how they collapse after a clear</li>
+                    <li><strong>Cascade training</strong> - Practice predicting exactly how blocks will fall and columns will shift</li>
+                    <li><strong>Isolation drills</strong> - Study your failures: identify the exact clear that stranded the losing block</li>
+                    <li><strong>Speed solving</strong> - Step the timer down toward the 25-second default as your reads get faster</li>
+                    <li><strong>Board scaling</strong> - Grow the grid toward the full 8x11 once smaller boards feel automatic</li>
+                    <li><strong>Instant openings</strong> - Train yourself to make the first two or three clears within seconds of the board appearing</li>
                 </ul>
             </InstructionSection>
 
             <InstructionSection id="detection" title="Understanding Unsolvable Detection" icon={<Zap className="w-5 h-5" />} defaultOpen={false}>
                 <p>
-                    The game automatically detects impossible situations:
+                    The game automatically detects impossible situations and ends the run immediately:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>No valid groups remain</strong> - All remaining tiles are singles or pairs</li>
-                    <li><strong>Isolated colors</strong> - A color exists only as disconnected singles</li>
-                    <li><strong>Unmatchable pairs</strong> - Two tiles of same color exist but cannot be connected</li>
+                    <li><strong>Lone colour</strong> - Exactly one block of any colour remains anywhere on the board; it can never be cleared</li>
+                    <li><strong>No valid groups remain</strong> - No two same-colour blocks are touching anywhere, so no clear is possible</li>
+                    <li><strong>Timer expiry</strong> - The countdown reaching zero fails the attempt regardless of board state</li>
                 </ul>
                 <p className="mt-2">
-                    When detected, the game immediately ends to save time. This is helpful for learning - if you hit 
-                    unsolvable states frequently, it means you&apos;re not planning far enough ahead. Top players rarely 
-                    see unsolvable states because they verify each move maintains solvability.
+                    When detected, the game ends instantly rather than letting you click in vain. This is helpful for
+                    learning - if you hit unsolvable states frequently, you&apos;re not tracking colour counts far enough
+                    ahead. Top players rarely see them because they check every risky clear against the lone-block rule.
                 </p>
                 <p className="mt-2">
-                    <strong>Recovery technique:</strong> If you realize you&apos;re one move away from unsolvable, some 
-                    boards allow escape by clearing specific groups that reunite isolated colors through tile collapse. 
-                    This requires advanced cascade prediction.
+                    <strong>Recovery technique:</strong> Separated blocks of the same colour are not an automatic loss. As
+                    long as two or more of that colour exist, clears that trigger the right gravity drops and column shifts
+                    can bring them back together - this rescue play requires accurate cascade prediction.
                 </p>
             </InstructionSection>
         </>

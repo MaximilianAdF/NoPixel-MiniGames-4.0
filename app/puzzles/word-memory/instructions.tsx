@@ -6,104 +6,96 @@ export default function WordMemoryInstructions() {
         <>
             <InstructionSection id="overview" title="What is Word Memory?" icon={<Info className="w-5 h-5" />}>
                 <p>
-                    Word Memory is a cognitive challenge that tests your short-term memory retention, recall accuracy, 
-                    and decision-making speed under pressure. Players are presented with individual words one at a time 
-                    and must correctly identify whether each word is appearing for the first time (NEW) or has been shown 
-                    previously in the current round (SEEN). This minigame simulates the mental acuity and information 
-                    retention crucial for intelligence gathering, witness interrogation, and evidence tracking in NoPixel 4.0.
+                    Word Memory is a cognitive challenge that tests your short-term memory retention, recall accuracy,
+                    and decision-making speed under pressure. Words are presented one at a time and for each one you must
+                    correctly identify whether it is appearing for the first time (NEW) or has been shown
+                    previously in the current run (SEEN). This minigame simulates the recall hack used on targets
+                    like the Maze Bank in NoPixel 4.0.
                 </p>
                 <p>
-                    Unlike reflex-based minigames or pattern puzzles, Word Memory is a pure test of cognitive function. 
-                    As the word list grows longer, your working memory becomes increasingly taxed, forcing you to develop 
-                    sophisticated mental organization strategies to maintain accuracy while racing against time pressure 
-                    and the limited mistake allowance.
+                    Unlike reflex-based minigames or pattern puzzles, Word Memory is a pure test of cognitive function —
+                    and it is sudden death. There are no strikes and no second chances: a single wrong call ends the run
+                    instantly, and the entire word list shares one countdown. By default you must clear 25 words in
+                    25 seconds, which leaves roughly one second per decision.
                 </p>
             </InstructionSection>
 
             <InstructionSection id="howtoplay" title="How to Play - Complete Rules" icon={<Gamepad className="w-5 h-5" />}>
                 <ol className="list-decimal pl-5 space-y-2">
-                    <li><strong>Round begins</strong> - A word appears on screen</li>
-                    <li><strong>Make your judgment</strong> - Determine if this word is NEW or has been SEEN before</li>
-                    <li><strong>Click your answer</strong> - Press the NEW button (first appearance) or SEEN button (repeat)</li>
-                    <li><strong>Receive feedback</strong> - Correct answer awards points, wrong answer counts as strike</li>
-                    <li><strong>Next word appears</strong> - Continue identifying words as they appear sequentially</li>
-                    <li><strong>Track your strikes</strong> - You have limited mistakes (usually 3) before game over</li>
-                    <li><strong>Build your streak</strong> - Consecutive correct answers multiply score</li>
-                    <li><strong>Survive as long as possible</strong> - The round continues until you run out of allowed mistakes</li>
-                    <li><strong>Final score calculated</strong> - Based on correct identifications, streak multipliers, and survival time</li>
+                    <li><strong>Run begins</strong> - The first word appears, the progress counter starts at 0, and the countdown bar begins draining</li>
+                    <li><strong>Make your judgment</strong> - Decide whether this exact word has already appeared earlier in this run</li>
+                    <li><strong>Click your answer</strong> - Press the green NEW button (first appearance) or the purple SEEN button (repeat); on mobile, just tap</li>
+                    <li><strong>Correct answer</strong> - A short beep confirms it, the counter ticks up, and the next word appears immediately</li>
+                    <li><strong>Wrong answer</strong> - The run ends instantly with a fail; there are no strikes and no mistake allowance</li>
+                    <li><strong>Beat the clock</strong> - One timer covers the whole run; if it empties before you finish, the run fails</li>
+                    <li><strong>Win the run</strong> - Answer every word in the sequence correctly before time runs out</li>
                 </ol>
                 <p className="mt-2">
-                    <strong>Key challenge:</strong> As you see more words, your mental list grows. Early rounds may have 20-30 
-                    unique words, while advanced players track 100+ words simultaneously in their memory.
+                    <strong>Key challenge:</strong> Each run draws from a pool of only half as many unique words as its length —
+                    a default 25-word run uses roughly a dozen unique words — so repeats come fast and often. Expect around
+                    half of everything you see to be a word you have already answered.
                 </p>
             </InstructionSection>
 
             <InstructionSection id="scoring" title="Scoring System and Performance Metrics" icon={<Trophy className="w-5 h-5" />}>
                 <p>
-                    Word Memory scoring rewards accuracy and endurance:
+                    Word Memory scoring is simple and unforgiving:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Correct identification</strong> - Each right answer awards base points (10-20 pts)</li>
-                    <li><strong>Streak multipliers</strong> - Consecutive correct answers build 2x, 3x, 4x+ multipliers</li>
-                    <li><strong>Survival time bonus</strong> - Longer rounds award completion bonuses per word survived</li>
-                    <li><strong>Perfect rounds</strong> - Zero mistakes grants 3-5x final score multiplier</li>
-                    <li><strong>High word count achievements</strong> - Tracking 50+, 75+, 100+ unique words gives bonus points</li>
-                    <li><strong>Speed bonuses</strong> - Quick correct answers (under 2 seconds) award reaction bonuses</li>
-                    <li><strong>Recovery bonus</strong> - Bouncing back with long streak after a mistake gives resilience points</li>
+                    <li><strong>Score = words cleared</strong> - Your score is the number of words you answered correctly before the run ended</li>
+                    <li><strong>Progress counter</strong> - The number above the word (e.g. 12/25) shows how far through the sequence you are</li>
+                    <li><strong>Win condition</strong> - Clear the entire sequence before the countdown empties</li>
+                    <li><strong>Loss conditions</strong> - One wrong SEEN/NEW call, or the timer running out — whichever comes first</li>
+                    <li><strong>No partial credit systems</strong> - There are no points-per-word values, streak multipliers, or speed bonuses; a run either succeeds or fails, and the counter is your score</li>
                 </ul>
                 <p className="mt-2">
-                    <strong>Penalty system:</strong> Each mistake breaks your streak multiplier and uses one strike. 
-                    Three strikes ends the round immediately.
+                    <strong>What this means in practice:</strong> accuracy is everything. A cautious run that ends on a timeout at
+                    20/25 still beats a reckless run that dies on word three — but only a full clear counts as a win.
                 </p>
             </InstructionSection>
 
             <InstructionSection id="tips" title="Advanced Memory and Recall Strategies" icon={<Lightbulb className="w-5 h-5" />}>
                 <p>
-                    Expert Word Memory players use sophisticated cognitive techniques:
+                    Strong Word Memory players lean on a few practical techniques:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Categorical chunking</strong> - Mentally group words by category (animals, foods, actions, objects)</li>
-                    <li><strong>Alphabetical organization</strong> - Sort words alphabetically in your mind for faster recall</li>
-                    <li><strong>Vivid visualization</strong> - Create mental images for each word to enhance encoding</li>
-                    <li><strong>Story method</strong> - Link words together in an absurd narrative for better retention</li>
-                    <li><strong>First-letter mnemonics</strong> - Remember word initial letters to trigger full recall</li>
-                    <li><strong>Rhyme association</strong> - Connect words through rhyming patterns</li>
-                    <li><strong>Spatial memory palace</strong> - Place words in imaginary room locations</li>
-                    <li><strong>Emotion tagging</strong> - Assign emotional associations to make words memorable</li>
-                    <li><strong>Repetition timing</strong> - Mentally rehearse recent words during brief pauses</li>
-                    <li><strong>Dual encoding</strong> - Use both verbal (word sound) and visual (word appearance) memory</li>
+                    <li><strong>Rehearse once, then move on</strong> - Say each NEW word to yourself a single time; light rehearsal sticks far better than passively reading</li>
+                    <li><strong>Trust your first instinct</strong> - Your initial familiar/unfamiliar feeling is usually right, and hesitation burns the shared timer</li>
+                    <li><strong>Answer at a steady tempo</strong> - The default pace is about one second per word, so build a click rhythm instead of stopping to deliberate</li>
+                    <li><strong>Chunk by theme</strong> - Group words you have seen by category (animals, foods, places) so they reinforce each other</li>
+                    <li><strong>Expect repeats early</strong> - The unique pool is small, so a word can legitimately repeat within a few rounds — do not dismiss the SEEN feeling just because it feels too soon</li>
+                    <li><strong>Vivid visualization</strong> - Attach a quick mental image to each new word to strengthen encoding</li>
+                    <li><strong>Read the whole word</strong> - The bank contains lookalike pairs such as &quot;fountain&quot;/&quot;mountain&quot; and &quot;sunrise&quot;/&quot;sunset&quot;; skimming the first letters gets runs killed</li>
                 </ul>
             </InstructionSection>
 
-            <InstructionSection id="difficulty" title="Difficulty Levels and Progression" icon={<TrendingUp className="w-5 h-5" />}>
+            <InstructionSection id="difficulty" title="Difficulty Settings and Game Modes" icon={<TrendingUp className="w-5 h-5" />}>
                 <p>
-                    Word Memory difficulty scales through multiple dimensions:
+                    Difficulty in Word Memory comes from the two sliders in the practice settings:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Beginner (common short words)</strong> - Cat, dog, run, tree - distinct, easy to remember</li>
-                    <li><strong>Intermediate (mixed vocabulary)</strong> - Combination of common and uncommon words, longer words</li>
-                    <li><strong>Advanced (similar word traps)</strong> - Cat/cap, run/ran, house/horse - easily confused pairs</li>
-                    <li><strong>Expert (complex vocabulary)</strong> - Abstract concepts, scientific terms, multi-syllable words</li>
-                    <li><strong>Master (hostile conditions)</strong> - Fast presentation, visual distractions, time pressure</li>
+                    <li><strong>Number of Words (20-100)</strong> - Longer runs mean more decisions and a larger unique pool to track (the pool is always half the word count, so a 100-word run juggles about 50 unique words)</li>
+                    <li><strong>Timer (20-50 seconds)</strong> - One countdown for the whole run; raising the word count without raising the timer squeezes your time per decision</li>
+                    <li><strong>Default</strong> - 25 words in 25 seconds</li>
                 </ul>
                 <p className="mt-2">
-                    <strong>Additional difficulty modifiers:</strong> Some modes reduce time per decision, add visual noise, 
-                    use homonyms (two/too/to), or intentionally repeat words quickly to catch hasty players.
+                    <strong>Other modes:</strong> the daily challenge and competitive runs use preset word counts and timers
+                    (settings are locked), and 1v1 matches pit both players against the same fixed 25-word sequence. All modes
+                    use the same fixed bank of common, distinct words — there are no separate vocabulary tiers or trap-word modes.
                 </p>
             </InstructionSection>
 
             <InstructionSection id="mistakes" title="Common Mistakes and Cognitive Traps" icon={<AlertTriangle className="w-5 h-5" />}>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Similar word confusion</strong> - Mistaking &quot;cat&quot; for &quot;cap&quot; or &quot;run&quot; for &quot;ran&quot;</li>
-                    <li><strong>False familiarity</strong> - Thinking a new word seems familiar due to similar words seen earlier</li>
-                    <li><strong>Speed-accuracy tradeoff</strong> - Clicking too fast without fully reading the word</li>
-                    <li><strong>Recency bias</strong> - Better remembering recent words while forgetting early ones</li>
-                    <li><strong>Memory overload</strong> - Not using chunking, trying to remember raw list of 50+ words</li>
-                    <li><strong>Second-guessing</strong> - Changing correct initial instinct leads to wrong answer</li>
-                    <li><strong>Fatigue accumulation</strong> - Mental exhaustion reduces accuracy as round progresses</li>
-                    <li><strong>Panic after mistakes</strong> - One error causes cascade of subsequent mistakes</li>
-                    <li><strong>Vowel confusion</strong> - Not carefully reading vowels (bet/bat/bit/but all look similar quickly)</li>
-                    <li><strong>Context interference</strong> - Outside thoughts pollute memory with words not in the game</li>
+                    <li><strong>Similar word confusion</strong> - Mistaking &quot;fountain&quot; for &quot;mountain&quot; or &quot;sunrise&quot; for &quot;sunset&quot; when skimming</li>
+                    <li><strong>False familiarity</strong> - Calling a new word SEEN because it resembles one you actually saw earlier</li>
+                    <li><strong>Doubting early repeats</strong> - Answering NEW on a genuine repeat because &quot;it can&apos;t come back that fast&quot; — with a small pool, it can</li>
+                    <li><strong>Deliberating too long</strong> - Every second you spend agonizing over one word is stolen from all the words after it</li>
+                    <li><strong>Second-guessing</strong> - Overriding a correct first instinct; in a sudden-death format one flipped answer ends everything</li>
+                    <li><strong>Recency bias</strong> - Remembering the last few words clearly while the opening words fade</li>
+                    <li><strong>Speed-accuracy tradeoff</strong> - Clicking before fully reading the word; a fast wrong answer fails harder than a slow right one</li>
+                    <li><strong>Memory overload on long runs</strong> - Trying to hold a raw 40-50 word pool without chunking on high word-count settings</li>
+                    <li><strong>Context interference</strong> - Outside thoughts polluting your mental list with words that were never shown</li>
                 </ul>
             </InstructionSection>
 
@@ -121,8 +113,8 @@ export default function WordMemoryInstructions() {
                     <li><strong>Evidence correlation</strong> - Linking clues from different crime scenes through memory</li>
                 </ul>
                 <p className="mt-2">
-                    In roleplay scenarios, characters with strong memory become invaluable intelligence assets. Criminal organizations 
-                    prize members who can remember complex heist plans without written notes (which could be evidence). Police detectives 
+                    In roleplay scenarios, characters with strong memory become invaluable intelligence assets. Criminal organizations
+                    prize members who can remember complex heist plans without written notes (which could be evidence). Police detectives
                     with exceptional memory can connect cases spanning months by recalling details other officers forget.
                 </p>
             </InstructionSection>
@@ -135,14 +127,14 @@ export default function WordMemoryInstructions() {
                     <li><strong>Spaced repetition</strong> - Mentally review word list at increasing intervals (10 words ago, 20 words ago)</li>
                     <li><strong>Active recall practice</strong> - Periodically quiz yourself on recent words without looking</li>
                     <li><strong>Method of Loci</strong> - Place each word in specific location of familiar mental environment</li>
-                    <li><strong>Peg system</strong> - Associate numbers 1-100 with objects, link words to numbered pegs</li>
+                    <li><strong>Peg system</strong> - Associate numbers with objects, link words to numbered pegs</li>
                     <li><strong>Dual encoding theory</strong> - Process words both verbally (sound) and visually (appearance)</li>
                     <li><strong>Elaborative rehearsal</strong> - Create meaningful connections between words and existing knowledge</li>
                     <li><strong>Phonological loop training</strong> - Strengthen verbal working memory through subvocalization practice</li>
                     <li><strong>Interference reduction</strong> - Clear mind of distractions, create mental &quot;clean slate&quot; before rounds</li>
                 </ul>
                 <p className="mt-2">
-                    <strong>Research insight:</strong> Studies show that combining visual and verbal encoding increases recall by 40-60% 
+                    <strong>Research insight:</strong> Studies show that combining visual and verbal encoding increases recall
                     compared to using only one encoding method.
                 </p>
             </InstructionSection>
@@ -152,15 +144,15 @@ export default function WordMemoryInstructions() {
                     Build elite Word Memory skills through structured practice:
                 </p>
                 <ol className="list-decimal pl-5 space-y-2">
-                    <li><strong>Week 1-2: Foundation building</strong> - Practice with 20-30 word rounds, focus on accuracy over speed</li>
-                    <li><strong>Week 3-4: Chunking mastery</strong> - Develop consistent categorization system for all word types</li>
-                    <li><strong>Week 5-6: Capacity expansion</strong> - Gradually increase to 50-70 word rounds</li>
-                    <li><strong>Week 7-8: Speed development</strong> - Reduce decision time while maintaining accuracy</li>
-                    <li><strong>Week 9-10: Distraction resistance</strong> - Practice with background noise, time pressure</li>
-                    <li><strong>Week 11-12: Advanced techniques</strong> - Master memory palace or peg systems for 100+ words</li>
+                    <li><strong>Week 1-2: Foundation building</strong> - Practice with 20-30 word runs and a generous timer, focus on accuracy over speed</li>
+                    <li><strong>Week 3-4: Chunking mastery</strong> - Develop consistent categorization system for the word bank&apos;s common themes</li>
+                    <li><strong>Week 5-6: Capacity expansion</strong> - Gradually increase to 50-70 word runs</li>
+                    <li><strong>Week 7-8: Speed development</strong> - Shorten the timer setting to force quicker decisions while maintaining accuracy</li>
+                    <li><strong>Week 9-10: Distraction resistance</strong> - Practice with background noise and tight time pressure</li>
+                    <li><strong>Week 11-12: Advanced techniques</strong> - Master memory palace or peg systems for 100-word runs (the maximum setting)</li>
                 </ol>
                 <p className="mt-2">
-                    <strong>Daily drill:</strong> 3 rounds of Word Memory upon waking (fresh mind) + 2 rounds before bed (consolidation during sleep).
+                    <strong>Daily drill:</strong> 3 runs of Word Memory upon waking (fresh mind) + 2 runs before bed (consolidation during sleep).
                 </p>
             </InstructionSection>
 
@@ -171,14 +163,14 @@ export default function WordMemoryInstructions() {
                 <ul className="list-disc pl-5 space-y-2">
                     <li><strong>Working memory capacity</strong> - Average person holds 7±2 items, chunking expands this to 20+</li>
                     <li><strong>Serial position effect</strong> - First words (primacy) and recent words (recency) are easiest to recall</li>
-                    <li><strong>Encoding specificity</strong> - Words encoded with context/emotion are recalled 3x better</li>
+                    <li><strong>Encoding specificity</strong> - Words encoded with context/emotion are recalled far better</li>
                     <li><strong>Proactive interference</strong> - Earlier words interfere with recalling later similar words</li>
                     <li><strong>Retroactive interference</strong> - New words can overwrite memory of earlier similar words</li>
                     <li><strong>Depth of processing</strong> - Semantic (meaning) processing beats shallow (appearance) processing</li>
-                    <li><strong>Cognitive load theory</strong> - Mental exhaustion accumulates, take micro-breaks between words</li>
+                    <li><strong>Cognitive load theory</strong> - Mental fatigue accumulates over long high word-count runs, so rest between attempts</li>
                 </ul>
                 <p className="mt-2">
-                    <strong>Application:</strong> By understanding these principles, you can strategically organize information to work with 
+                    <strong>Application:</strong> By understanding these principles, you can strategically organize information to work with
                     your brain&apos;s natural strengths rather than against its limitations.
                 </p>
             </InstructionSection>

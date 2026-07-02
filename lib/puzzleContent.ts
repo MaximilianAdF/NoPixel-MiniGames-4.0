@@ -130,7 +130,7 @@ export const PUZZLE_CONTENT: Record<string, PuzzleContent> = {
         a: 'Prioritise the biggest matching groups and keep the board collapsing so new matches form — leaving single, isolated blocks for last is what runs you out of time.',
       },
     ],
-    related: ['thermite', 'pincracker'],
+    related: ['thermite', 'chopping'],
   },
 
   pincracker: {
@@ -158,7 +158,7 @@ export const PUZZLE_CONTENT: Record<string, PuzzleContent> = {
         a: 'Treat it as logic, not luck: start with distinct digits, use the colour feedback to eliminate options, and keep confirmed digits fixed while you test the rest.',
       },
     ],
-    related: ['roof-running', 'word-memory'],
+    related: ['thermite', 'word-memory'],
   },
 
   'repair-kit': {
@@ -214,7 +214,7 @@ export const PUZZLE_CONTENT: Record<string, PuzzleContent> = {
         a: 'Rehearse each new word once and chunk similar words together. Trust your first instinct on each call rather than second-guessing.',
       },
     ],
-    related: ['thermite', 'pincracker'],
+    related: ['pincracker', 'chopping'],
   },
 
   chopping: {
@@ -242,6 +242,6 @@ export const PUZZLE_CONTENT: Record<string, PuzzleContent> = {
         a: 'Touch-type from the home row and watch the upcoming letters instead of the current one. Clean, steady runs beat fast but error-prone ones.',
       },
     ],
-    related: ['lockpick', 'thermite'],
+    related: ['word-memory', 'roof-running'],
   },
 };

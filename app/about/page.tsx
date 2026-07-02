@@ -88,11 +88,11 @@ export default function AboutPage() {
               <ul className="space-y-3 text-gray-300">
                 <li className="flex items-start gap-2">
                   <span className="text-[#54FFA4] font-bold mt-0.5">•</span>
-                  <span><strong className="text-white">Thermite Hack</strong> — The iconic memory-based tile pattern game used in bank heist laser security systems. One of the hardest minigames requiring exceptional pattern recognition.</span>
+                  <span><strong className="text-white">Thermite Hack</strong> — The chain-reaction grid puzzle used in bank heist laser security systems. Every click re-lights the board by the clicked piece&apos;s range, so it rewards planning several moves ahead.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#54FFA4] font-bold mt-0.5">•</span>
-                  <span><strong className="text-white">Lockpick</strong> — A timing-based challenge used for vehicle theft and door bypassing. Tests your rhythm and precision under pressure.</span>
+                  <span><strong className="text-white">Lockpick</strong> — The rotating-ring lock used for vehicle theft and door bypassing. Align every coloured pin with a matching slot on each ring before the timer runs out.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#54FFA4] font-bold mt-0.5">•</span>
@@ -100,11 +100,11 @@ export default function AboutPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#54FFA4] font-bold mt-0.5">•</span>
-                  <span><strong className="text-white">Laundromat</strong> — A pattern matching game triggered during south-side safe robberies. Requires quick visual processing.</span>
+                  <span><strong className="text-white">Laundromat</strong> — The rotating colour-match lock on the south-side Laundromat safe. Line every gate up with a matching pin across all rings inside a tight timer.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#54FFA4] font-bold mt-0.5">•</span>
-                  <span><strong className="text-white">Roof Running</strong> — An agility-based challenge encountered when robbing AC units. Tests hand-eye coordination.</span>
+                  <span><strong className="text-white">Roof Running</strong> — The tile-clearing board puzzle encountered when robbing AC units. Clear groups of matching colours as gravity collapses the grid — strategy beats speed.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#54FFA4] font-bold mt-0.5">•</span>
@@ -112,11 +112,11 @@ export default function AboutPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#54FFA4] font-bold mt-0.5">•</span>
-                  <span><strong className="text-white">Chopping</strong> — The vehicle disassembly minigame with rapid response requirements. Used in the chop shop criminal enterprise.</span>
+                  <span><strong className="text-white">Chopping</strong> — The vehicle disassembly typing test used in the chop shop criminal enterprise. Type the letter sequence perfectly — one wrong key ends the run.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#54FFA4] font-bold mt-0.5">•</span>
-                  <span><strong className="text-white">RepairKit</strong> — A mechanical puzzle for vehicle repairs. Tests your ability to complete complex sequences quickly.</span>
+                  <span><strong className="text-white">RepairKit</strong> — The stop-the-marker timing minigame for vehicle repairs. Halt the sweeping block inside the target slot, round after round, at increasing speeds.</span>
                 </li>
               </ul>
             </div>

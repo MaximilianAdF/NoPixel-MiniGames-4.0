@@ -16,11 +16,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: { absolute: "Lockpick Minigame – NoPixel 4.0 & FiveM Practice Trainer" },
-  description: "Practice the NoPixel 4.0 & FiveM lockpick minigame free in your browser — stop each rotating lock at its target marker before the timer ends. No download required.",
+  description: "Practice the NoPixel 4.0 & FiveM lockpick minigame free in your browser — rotate each ring to match coloured pins to slots before the timer ends. No download required.",
   keywords: ["lockpick minigame", "NoPixel lockpick", "GTA RP lockpick", "vehicle lockpick practice", "NoPixel 4.0 lockpick", "lockpicking trainer"],
   openGraph: {
     title: "Lockpick Minigame - NoPixel 4.0 Practice",
-    description: "Practice the Lockpick minigame from NoPixel 4.0 GTA RP. Stop each rotating lock at its target marker before the timer ends. Free browser trainer, no download required.",
+    description: "Practice the Lockpick minigame from NoPixel 4.0 GTA RP. Rotate each ring to line its coloured pins up with matching slots before the timer ends. Free browser trainer, no download required.",
     url: "https://nphacks.net/puzzles/lockpick",
   },
   alternates: {

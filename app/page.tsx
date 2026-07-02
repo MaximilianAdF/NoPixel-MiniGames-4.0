@@ -18,48 +18,56 @@ const puzzles = [
     href: "/puzzles/thermite",
     img: "/puzzles/thermite.png?v=3",
     title: "Thermite",
+    alt: "NoPixel 4.0 Thermite hack minigame — chain-reaction grid puzzle trainer",
     description: "Replica of the Thermite hack that is triggered when disabling lasers inside the Maze Bank on NoPixel 4.0",
   },
   {
     href: "/puzzles/roof-running",
     img: "/puzzles/roof-running.png?v=3",
     title: "Roof Running",
+    alt: "NoPixel 4.0 Roof Running minigame — colour tile-clearing board puzzle trainer",
     description: "Replica of the Roof Running hack that is triggered when robbing AC-Units on NoPixel 4.0"
   },
   {
     href: "/puzzles/laundromat",
     img: "/puzzles/laundromat.png?v=3",
     title: "Laundromat",
+    alt: "NoPixel 4.0 Laundromat safe hack — rotating colour-match lock trainer",
     description: "Replica of the Laundromat hack that is triggered when robbing the safe inside the south-side Laundromat on NoPixel 4.0"
   },
   {
     href: "/puzzles/lockpick",
     img: "/puzzles/lockpick.png?v=3",
     title: "LockPick",
+    alt: "NoPixel 4.0 / FiveM lockpick minigame — rotating-ring colour-match lock trainer",
     description: "Replica of the LockPick hack that is triggered when lockpicking vehicles, among other things, on NoPixel 4.0"
   },
   {
     href: "/puzzles/repair-kit",
     img: "/puzzles/repair-kit.png?v=3",
     title: "RepairKit",
+    alt: "NoPixel 4.0 Repair Kit minigame — stop-the-marker timing bar trainer",
     description: "Replica of the RepairKit hack that is triggered when repairing vehicles on NoPixel 4.0"
   },
   {
     href: "/puzzles/word-memory",
     img: "/puzzles/word-memory.png?v=3",
     title: "Word Memory",
+    alt: "NoPixel 4.0 Word Memory hack — seen-it-before word recognition trainer",
     description: "Replica of the Word Memory hack that is triggered when hacking the Maze Bank on NoPixel 4.0"
   },
   {
     href: "/puzzles/chopping",
     img: "/puzzles/chopping.png?v=3",
     title: "Chopping",
+    alt: "NoPixel 4.0 Chopping minigame — QWERASD letter-sequence typing trainer",
     description: "Replica of the Chopping hack that is triggered when chopping vehicles on NoPixel 4.0"
   },
   {
     href: "/puzzles/pincracker",
     img: "/puzzles/pincracker.png?v=3",
     title: "PinCracker",
+    alt: "NoPixel 4.0 PinCracker hack — Mastermind-style PIN deduction trainer",
     description: "Replica of the PinCracker hack that is triggered when hacking the Maze Bank on NoPixel 4.0"
   }
 ] as const;
@@ -273,7 +281,7 @@ export default function Home() {
                             tilts subtly for a 3D pop. */}
                         <Image
                           src={puzzle.img}
-                          alt={puzzle.title}
+                          alt={puzzle.alt}
                           width={400}
                           height={225}
                           priority={index < 4}
@@ -369,7 +377,7 @@ export default function Home() {
                 the thrill of virtual heists, this simulator offers the perfect training ground.
               </p>
               <p className="hover:text-gray-200 transition-colors duration-300">
-                The NoPixel hacks covered here include the Thermite chain-reaction grid, the Lockpick and Laundromat timing locks, Roof Running,
+                The NoPixel hacks covered here include the Thermite chain-reaction grid, the Lockpick and Laundromat colour-match rotating locks, Roof Running,
                 Word Memory, PinCracker, Chopping and the Repair Kit — every minigame you&apos;ll run into across heists, robberies and vehicle crime in GTA RP.
               </p>
               <p className="hover:text-gray-200 transition-colors duration-300">
