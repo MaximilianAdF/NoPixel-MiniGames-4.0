@@ -25,5 +25,16 @@ Sentry.init({
     /adtrafficquality\.google/,
     /amazon-adsystem\.com/,
     /consentmanager\.net/,
+    /uidapi\.com/,
+    /uid2-sdk/,
+    /optable/,
+    /prebid/,
+  ],
+  // Ad-stack + navigation noise seen in production (blocked SDK loads, fetches
+  // aborted by page navigation) — unactionable, filtered by message.
+  ignoreErrors: [
+    /UID2 SDK failed to load/,
+    /window\.optable/,
+    'AbortError: Fetch is aborted',
   ],
 });
