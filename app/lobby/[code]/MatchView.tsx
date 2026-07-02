@@ -219,7 +219,7 @@ function Half({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-center p-6 sm:p-10 lg:p-14 xl:p-20 min-h-screen xl:min-h-0">
+    <div className="flex items-center justify-center p-6 sm:p-10 lg:p-14 xl:p-20 pb-[104px] min-h-screen xl:min-h-0">
       <div className="w-full flex flex-col" style={{ maxWidth: GAME_MAX_W }}>
         {member ? (
           (() => {
@@ -315,7 +315,7 @@ function FocusLayout({
         )}
         {summary}
       </div>
-      <div className="min-h-screen flex items-center justify-center p-6 sm:p-10 lg:p-14 xl:p-20">
+      <div className="min-h-screen flex items-center justify-center p-6 sm:p-10 lg:p-14 xl:p-20 pb-[104px]">
         <div className="w-full" style={{ maxWidth: GAME_MAX_W }}>
           {interactive}
         </div>
