@@ -46,6 +46,14 @@ const nextConfig = {
     return [
       { source: '/puzzle/:slug', destination: '/puzzles/:slug', permanent: true },
       { source: '/NoPixel-MiniGames-4.0/:path*', destination: '/', permanent: true },
+      // Journey by Mediavine hosted ads.txt — a redirect (their recommended
+      // pattern, valid per the IAB spec) keeps the bidder list always current
+      // instead of a static copy that silently goes stale.
+      {
+        source: '/ads.txt',
+        destination: 'https://adstxt.journeymv.com/sites/09211bfe-a82d-4882-9012-edfd3fb877f2/ads.txt',
+        permanent: false,
+      },
     ];
   },
   // Headers for better caching
