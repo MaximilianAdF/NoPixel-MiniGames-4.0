@@ -12,11 +12,20 @@ jobs:
         env:
           TOKEN: ${{ secrets.SENTRY_API_TOKEN }}
         run: |
-          curl -s -H "Authorization: Bearer $TOKEN" \
-            "https://de.sentry.io/api/0/projects/maximilian-e3/javascript-nextjs/issues/?statsPeriod=7d&query=is:unresolved&sort=freq&limit=20" \
+          curl -s -w "\nHTTP_STATUS=%{http_code}\n" -H "Authorization: Bearer $TOKEN" \
+            "https://de.sentry.io/api/0/projects/maximilian-e3/javascript-nextjs/issues/?statsPeriod=7d&query=is%3Aunresolved&sort=freq&limit=20" \
           | python3 -c "
           import sys, json
-          for i in json.load(sys.stdin):
+          raw = sys.stdin.read()
+          body, _, status = raw.rpartition('HTTP_STATUS=')
+          print('status:', status.strip())
+          try:
+              data = json.loads(body)
+          except Exception as e:
+              print('unparseable:', body[:300]); raise SystemExit(0)
+          if isinstance(data, dict):
+              print('API error:', json.dumps(data)[:300]); raise SystemExit(0)
+          for i in data:
               print(f\"[{i.get('count')}ev/{i.get('userCount')}u] {i.get('title','')[:150]}\")
               print(f\"   culprit: {str(i.get('culprit'))[:120]}\")
               print(f\"   first: {i.get('firstSeen','')[:16]}  last: {i.get('lastSeen','')[:16]}  id: {i.get('shortId')}\")
