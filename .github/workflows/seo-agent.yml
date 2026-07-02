@@ -6,7 +6,7 @@ name: Weekly SEO agent
 on:
   workflow_dispatch: {}
   schedule:
-    - cron: "0 7 * * 1"   # Mondays 07:00 UTC
+    - cron: "0 7 * * 1,4"   # Mondays + Thursdays 07:00 UTC
 
 permissions:
   contents: write
@@ -24,6 +24,7 @@ env:
   CF_ZONE_ID: ${{ vars.CF_ZONE_ID }}
   CF_ACCOUNT_ID: ${{ vars.CF_ACCOUNT_ID }}
   PSI_API_KEY: ${{ secrets.PSI_API_KEY }}
+  SENTRY_API_TOKEN: ${{ secrets.SENTRY_API_TOKEN }}
   CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
   # "true" only once the mail secrets are set, so the email step skips cleanly until then
   MAIL_CONFIGURED: ${{ secrets.MAIL_SERVER != '' }}
@@ -68,7 +69,7 @@ jobs:
           The analytics bundle is at: ./seo-data.json
           Today's date is: $(date +%F)"
           claude -p "$PROMPT" --model opus --effort xhigh --permission-mode acceptEdits \
-            --allowedTools "Read,Write,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
+            --allowedTools "Read,Write,WebSearch,WebFetch,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
 
       # Pass 2 — red-team attacks every candidate (no edits)
       - name: Red-team (attack)
@@ -80,7 +81,7 @@ jobs:
           The analytics bundle is at: ./seo-data.json
           Today's date is: $(date +%F)"
           claude -p "$PROMPT" --model opus --effort xhigh --permission-mode acceptEdits \
-            --allowedTools "Read,Write,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
+            --allowedTools "Read,Write,WebSearch,WebFetch,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
 
       # Pass 3 — impartial judge decides + writes the report and the approved
       # build-list (./reports/_approved.md). The judge no longer edits code.
@@ -94,7 +95,7 @@ jobs:
           The analytics bundle is at: ./seo-data.json
           Today's date is: $(date +%F)"
           claude -p "$PROMPT" --model opus --effort xhigh --permission-mode acceptEdits \
-            --allowedTools "Read,Write,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
+            --allowedTools "Read,Write,WebSearch,WebFetch,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
 
       # Pass 4 — dedicated implementer builds the judge's approved changes well.
       # Separates "decide" from "build"; the build-verify step below is the gate.

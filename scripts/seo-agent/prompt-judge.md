@@ -11,7 +11,8 @@ Write the **final report** to **`./reports/seo-report.md`** — this is EMAILED 
 - **Snapshot** — at most 4-6 key numbers (traffic trend from Cloudflare/GSC — the trustworthy sources; top channel; one notable change). A small table or short list.
 - **✅ Fixed this week** — one line per edit (what + file).
 - **📋 Your actions** — the proposed (not-auto-fixed) items, **prioritized**, one line each: the action, why it matters, where. This is the most important section — make it genuinely actionable, not vague. When material, this MUST include the top **growth & revenue levers**: PV levers (striking-distance pushes, CTR snippet tuning, internal "try next" links, content/audience expansion) and RPM levers (geo-mix shifts, CWV-as-revenue regressions, ad-placement health once live, affiliate/featured-server opportunities) — each with its expected effect on PV or RPM.
-- **⚠️ Health flags** — only real issues (404 spikes, 5xx, bot/threat surges, broken pages, GA4 gaps).
+- **⚠️ Health flags** — only real issues (404 spikes, 5xx, **top Sentry errors**, bot/threat surges, broken pages, GA4 gaps).
+- **🔭 Trends & opportunities** — verified market/news intel that matters (NoPixel 5.0 signals, trending games/features worth building, competitor moves), each with its source and the concrete action. Omit when nothing verified.
 - **Also evaluated & dropped** — one short line naming what you considered but cut (no lengthy reasoning).
 
 Keep it brief and high-signal — the deep 3-pass debate already happened internally; this email is just the owner-facing digest of decisions + actions.

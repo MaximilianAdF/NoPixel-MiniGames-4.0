@@ -43,8 +43,10 @@ try:
     sc = build("searchconsole", "v1", credentials=creds, cache_discovery=False)
     s, e = gsc_start.isoformat(), gsc_end.isoformat()
 
-    def gscq(dims, limit):
+    def gscq(dims, limit, stype=None):
         body = {"startDate": s, "endDate": e, "dimensions": dims, "rowLimit": limit}
+        if stype:
+            body["type"] = stype
         last = None
         for attempt in range(4):
             try:
@@ -67,6 +69,24 @@ try:
     daily = [{"date": r["keys"][0], "clicks": r["clicks"], "impr": r["impressions"]} for r in gscq(["date"], 60)]
     log("GSC device+daily")
 
+    # Per-search-type slices (web is the default above). Image often has many
+    # impressions but few clicks; video/news show whether those surfaces exist.
+    search_types = {}
+    for stype in ("image", "video", "news"):
+        try:
+            tdaily = gscq(["date"], 60, stype=stype)  # full totals incl. long tail
+            trows = gscq(["query"], 15, stype=stype)
+            tpages = gscq(["page"], 10, stype=stype)
+            search_types[stype] = {
+                "totals": {"clicks": sum(r["clicks"] for r in tdaily), "impressions": sum(r["impressions"] for r in tdaily)},
+                "top_queries": [row1(r) for r in trows],
+                "top_pages": [{"page": r["keys"][0], "clicks": r["clicks"], "impr": r["impressions"],
+                               "ctr": round(r["ctr"], 4), "pos": round(r["position"], 1)} for r in tpages],
+            }
+        except Exception as tex:
+            search_types[stype] = {"error": repr(tex)[:120]}
+    log("GSC search types")
+
     bundle["gsc"] = {
         "top_by_clicks": sorted(queries, key=lambda x: x["clicks"], reverse=True)[:40],
         "top_by_impressions": sorted(queries, key=lambda x: x["impr"], reverse=True)[:40],
@@ -79,6 +99,10 @@ try:
         "query_page_map": qp,
         "devices": devices,
         "daily_trend": daily,
+        "search_types": {"note": ("Non-web search surfaces (the default sections above are type=web). "
+                                  "image with high impressions but ~0 clicks = image-SEO gap (alt text, "
+                                  "descriptive filenames, image sitemap); empty video/news = no presence there."),
+                         **search_types},
     }
 except Exception as ex:
     bundle["errors"].append("GSC: " + repr(ex)[:300]); log("GSC ERROR " + repr(ex)[:160])
@@ -371,6 +395,32 @@ if CF_TOKEN and CF_ZONE:
         log("CF HTTP health ok")
     except Exception as ex:
         bundle["errors"].append("CF HTTP health: " + repr(ex)[:200]); log("CF HTTP health ERROR " + repr(ex)[:160])
+
+# ---------------- Sentry (top unresolved errors, last 14d) ----------------
+SENTRY_TOKEN = os.environ.get("SENTRY_API_TOKEN")
+if SENTRY_TOKEN:
+    try:
+        import urllib.request, urllib.parse
+        base = os.environ.get("SENTRY_API_BASE", "https://de.sentry.io/api/0")  # EU-region org
+        org, proj = os.environ.get("SENTRY_ORG", "maximilian-e3"), os.environ.get("SENTRY_PROJECT", "javascript-nextjs")
+        qs = urllib.parse.urlencode({"statsPeriod": "14d", "query": "is:unresolved", "sort": "freq", "limit": 15})
+        sreq = urllib.request.Request(f"{base}/projects/{org}/{proj}/issues/?{qs}",
+                                      headers={"Authorization": "Bearer " + SENTRY_TOKEN})
+        issues = json.load(urllib.request.urlopen(sreq, timeout=30))
+        bundle["sentry"] = {
+            "note": ("Top unresolved production errors from Sentry, last 14d, sorted by event count. "
+                     "count = events, userCount = distinct users affected. Recurring errors on game or "
+                     "API routes are reliability flags — surface them, propose fixes for clear ones."),
+            "issues": [{"title": i.get("title"), "culprit": i.get("culprit"),
+                        "count": int(i.get("count", 0)), "users": i.get("userCount"),
+                        "first_seen": i.get("firstSeen"), "last_seen": i.get("lastSeen"),
+                        "link": i.get("permalink")} for i in issues],
+        }
+        log(f"Sentry ok ({len(issues)} issues)")
+    except Exception as ex:
+        bundle["errors"].append("Sentry: " + repr(ex)[:200]); log("Sentry ERROR " + repr(ex)[:160])
+else:
+    bundle["sentry"] = {"note": "SKIPPED — set the SENTRY_API_TOKEN secret to include top production errors."}
 
 with open(OUT, "w") as f:
     json.dump(bundle, f, indent=2)

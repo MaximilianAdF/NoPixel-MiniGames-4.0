@@ -11,6 +11,7 @@ For **every** candidate in the draft, write the strongest possible attack:
 - **Factual correctness** — is it accurate to NoPixel **4.0** (not 3.0)? Check `lib/puzzleContent.ts`.
 - **Scope** — is the proposed edit even within the allowed surface (page metadata or `puzzleContent.ts` copy)? Flag ops/redirect/body-JSX items as out-of-scope.
 - **Growth / RPM realism** — for any PV or revenue lever: is it real demand or noise? Would a "PV win" actually rank (or just be a vanity keyword), and would an "RPM win" move revenue given the low-RPM geo mix? Is an "audience expansion" idea genuinely reachable, or a competitive long shot dressed up as a quick win?
+- **Trend / news claims** — you also have WebSearch: verify any market/news/trend claim (NoPixel 5.0 intel, "trending" games, competitor moves). Is the source real and current, or rumour/stale? Is the proposed build genuinely demanded, or hype that won't convert to searches for OUR site? Kill trend proposals that lack verifiable demand evidence.
 - **Hidden downside / opportunity cost.**
 
 Write a thorough critique to **`./reports/_critique.md`**: for each candidate, the attack + any contradicting data you pulled + a recommended verdict (keep / revise / kill) with reasoning. Do NOT finalize the report and do NOT edit any code — attack only.

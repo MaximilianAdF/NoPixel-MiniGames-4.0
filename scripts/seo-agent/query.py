@@ -8,6 +8,7 @@ GSC examples:
   python scripts/seo-agent/query.py gsc --dims query --days 90 --rows 50 --filter page contains /puzzles/lockpick
   python scripts/seo-agent/query.py gsc --dims date --days 90            # daily trend
   python scripts/seo-agent/query.py gsc --dims query --filter query contains lockpick
+  python scripts/seo-agent/query.py gsc --dims page --type image --days 28   # image-search slice (also: video/news/discover)
 
 GA4 examples:
   python scripts/seo-agent/query.py ga4 --dims pagePath --mets screenPageViews,sessions,averageSessionDuration --days 28 --rows 25
@@ -37,6 +38,8 @@ def run_gsc(a):
     start = end - datetime.timedelta(days=a.days)
     body = {"startDate": start.isoformat(), "endDate": end.isoformat(),
             "dimensions": a.dims.split(","), "rowLimit": a.rows}
+    if getattr(a, "type", None):
+        body["type"] = a.type
     if a.filter:
         dim, op, val = a.filter
         body["dimensionFilterGroups"] = [{"filters": [{"dimension": dim, "operator": op, "expression": val}]}]
@@ -113,6 +116,7 @@ p = argparse.ArgumentParser(description="Ad-hoc GSC/GA4/Cloudflare query tool")
 sub = p.add_subparsers(dest="source", required=True)
 g = sub.add_parser("gsc"); g.add_argument("--dims", default="query"); g.add_argument("--days", type=int, default=28)
 g.add_argument("--rows", type=int, default=50); g.add_argument("--filter", nargs=3, metavar=("DIM", "OP", "VAL"))
+g.add_argument("--type", choices=["web", "image", "video", "news", "discover"], default=None)
 a4 = sub.add_parser("ga4"); a4.add_argument("--dims", default=""); a4.add_argument("--mets", default="sessions")
 a4.add_argument("--days", type=int, default=28); a4.add_argument("--rows", type=int, default=25); a4.add_argument("--order", default=None)
 cf = sub.add_parser("cf"); cf.add_argument("--days", type=int, default=7)
