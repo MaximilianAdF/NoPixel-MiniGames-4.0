@@ -2,6 +2,7 @@
 
 // import "./puzzle.css";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
+import MediavineGameSettings from "@/app/components/MediavineGameSettings";
 
 export default function PuzzleLayout({
   children,
@@ -42,6 +43,7 @@ export default function PuzzleLayout({
 
           {/* Main Content - Scrollable */}
           <main className="relative z-10">
+            <MediavineGameSettings />
             <ErrorBoundary>
               {children}
             </ErrorBoundary>

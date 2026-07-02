@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import MediavineGameSettings from '@/app/components/MediavineGameSettings';
 
 // /lobby is a client component (LobbyLanding) and can't export metadata itself,
 // so the 1v1 landing's SEO lives here. Child routes (/lobby/[code],
@@ -25,5 +26,10 @@ export const metadata: Metadata = {
 };
 
 export default function LobbyLayout({ children }: { children: ReactNode }) {
-  return children;
+  return (
+    <>
+      <MediavineGameSettings />
+      {children}
+    </>
+  );
 }
