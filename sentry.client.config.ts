@@ -14,4 +14,16 @@ Sentry.init({
   // covers real-user perf) and no Session Replay (Clarity owns replay). The
   // tracing code is tree-shaken out via __SENTRY_TRACING__:false (next.config).
   sendDefaultPii: false,
+  // Third-party ad/CMP scripts throw unactionable cross-origin errors — keep
+  // them out of the quota so real site errors stay visible.
+  denyUrls: [
+    /scriptwrapper\.com/,
+    /grow\.me/,
+    /journeymv\.com/,
+    /googlesyndication\.com/,
+    /doubleclick\.net/,
+    /adtrafficquality\.google/,
+    /amazon-adsystem\.com/,
+    /consentmanager\.net/,
+  ],
 });
