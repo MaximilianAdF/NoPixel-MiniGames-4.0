@@ -25,6 +25,7 @@ env:
   CF_ACCOUNT_ID: ${{ vars.CF_ACCOUNT_ID }}
   PSI_API_KEY: ${{ secrets.PSI_API_KEY }}
   SENTRY_API_TOKEN: ${{ secrets.SENTRY_API_TOKEN }}
+  JOURNEY_STATS: ${{ secrets.JOURNEY_STATS }}
   CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
   # "true" only once the mail secrets are set, so the email step skips cleanly until then
   MAIL_CONFIGURED: ${{ secrets.MAIL_SERVER != '' }}

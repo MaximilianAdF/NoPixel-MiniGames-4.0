@@ -396,6 +396,19 @@ if CF_TOKEN and CF_ZONE:
     except Exception as ex:
         bundle["errors"].append("CF HTTP health: " + repr(ex)[:200]); log("CF HTTP health ERROR " + repr(ex)[:160])
 
+# ---------------- Journey/Mediavine stats (manual — no public API exists) ----------------
+# Owner pastes dashboard numbers into the JOURNEY_STATS secret, e.g.:
+#   gh secret set JOURNEY_STATS -b '2026-07: earnings $123, RPM $4.20, sessions 41k (desktop RPM $5.1)'
+JOURNEY_STATS = os.environ.get("JOURNEY_STATS")
+if JOURNEY_STATS:
+    bundle["journey_ads"] = {
+        "note": ("Journey by Mediavine dashboard numbers, manually entered by the owner (Journey has no "
+                 "public API). Treat as the GROUND TRUTH for ad revenue/RPM when reasoning about RPM levers."),
+        "stats": JOURNEY_STATS,
+    }
+else:
+    bundle["journey_ads"] = {"note": "SKIPPED — owner can set the JOURNEY_STATS secret with dashboard numbers (earnings/RPM/sessions)."}
+
 # ---------------- Sentry (top unresolved errors, last 14d) ----------------
 SENTRY_TOKEN = os.environ.get("SENTRY_API_TOKEN")
 if SENTRY_TOKEN:
