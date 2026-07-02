@@ -128,7 +128,8 @@ const NPLockpickView: FC<NPLockpickViewProps> = ({
       >
         <div
           className="aspect-square flex items-center justify-center relative"
-          style={{ width: '100%', maxWidth: `calc(100vh - 298px)` }}
+          // Height budget includes ~100px clearance for the Journey adhesion ad.
+          style={{ width: '100%', maxWidth: `calc(100vh - 390px)` }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

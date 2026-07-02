@@ -80,12 +80,15 @@ const ThermiteView: FC<ThermiteViewProps> = ({
       <div
         className={classNames(
           'thermite',
-          !compact && 'min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px]',
           phase === 'idle' && 'blur',
           !onSquareClick && 'pointer-events-none',
         )}
         style={{
-          maxWidth: `calc(calc(calc(calc(calc(100vh - 236px) - ${4 * (state.rows - 1)}px) / ${state.rows}) * ${state.columns}) + ${2 * (state.columns - 1)}px)`,
+          // Height budget includes ~100px clearance for the Journey adhesion ad.
+          maxWidth: `calc(calc(calc(calc(calc(100vh - 340px) - ${4 * (state.rows - 1)}px) / ${state.rows}) * ${state.columns}) + ${2 * (state.columns - 1)}px)`,
+          // Height-aware floor: full width on phones, up to 600px on desktop,
+          // but never taller than the viewport allows on short screens.
+          ...(!compact && { minWidth: 'min(600px, calc(100vw - 60px), calc(100vh - 340px))' }),
           width: '100%',
           gridTemplateRows: `repeat(${state.rows}, minmax(0, 1fr))`,
           gridTemplateColumns: `repeat(${state.columns}, minmax(0, 1fr))`,
