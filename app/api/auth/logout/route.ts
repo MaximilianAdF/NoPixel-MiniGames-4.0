@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { clearSession, getSession } from '@/lib/auth/session';
 import { revokeDiscordToken } from '@/lib/auth/discord';
+import { SITE_URL } from '@/lib/siteConfig';
 
 export const dynamic = 'force-dynamic';
+
+// Redirect base — falls back to the canonical site URL so a missing
+// NEXTAUTH_URL env can never turn logout redirects into 500s.
+const BASE_URL = process.env.NEXTAUTH_URL || SITE_URL;
 
 /**
  * Logout Route
@@ -57,9 +62,9 @@ export async function GET(request: NextRequest) {
 
     await clearSession();
 
-    return NextResponse.redirect(`${process.env.NEXTAUTH_URL}${returnTo}`);
+    return NextResponse.redirect(`${BASE_URL}${returnTo}`);
   } catch (error) {
     console.error('Logout error:', error);
-    return NextResponse.redirect(`${process.env.NEXTAUTH_URL}${returnTo}?error=logout_failed`);
+    return NextResponse.redirect(`${BASE_URL}${returnTo}?error=logout_failed`);
   }
 }

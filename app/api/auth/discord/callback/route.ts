@@ -4,9 +4,14 @@ import { createSessionToken, setSessionCookie, getSession } from '@/lib/auth/ses
 import { UserSession } from '@/interfaces/user';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { SITE_URL } from '@/lib/siteConfig';
 
 // Force this route to be dynamic
 export const dynamic = 'force-dynamic';
+
+// Redirect base — falls back to the canonical site URL so a missing
+// NEXTAUTH_URL env can never turn auth redirects into 500s.
+const BASE_URL = process.env.NEXTAUTH_URL || SITE_URL;
 
 /**
  * Discord OAuth Callback Route
@@ -22,11 +27,11 @@ export async function GET(request: NextRequest) {
     // Check for OAuth errors
     if (error) {
       console.error('Discord OAuth error:', error);
-      return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/?error=auth_failed`);
+      return NextResponse.redirect(`${BASE_URL}/?error=auth_failed`);
     }
 
     if (!code) {
-      return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/?error=no_code`);
+      return NextResponse.redirect(`${BASE_URL}/?error=no_code`);
     }
 
     // Exchange code for access token
@@ -172,7 +177,7 @@ export async function GET(request: NextRequest) {
     // Get return URL from cookie
     const returnTo = request.cookies.get('auth_return_to')?.value || '/';
 
-    const response = NextResponse.redirect(`${process.env.NEXTAUTH_URL}${returnTo}`);
+    const response = NextResponse.redirect(`${BASE_URL}${returnTo}`);
     
     // Set session cookie manually (since we're in a route handler)
     response.cookies.set('nopixel_session', token, {
@@ -189,6 +194,6 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (error) {
     console.error('Discord callback error:', error);
-    return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/?error=callback_failed`);
+    return NextResponse.redirect(`${BASE_URL}/?error=callback_failed`);
   }
 }

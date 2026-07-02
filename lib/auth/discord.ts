@@ -1,4 +1,5 @@
 import { DiscordUser, DiscordTokenResponse } from '@/interfaces/user';
+import { SITE_URL } from '@/lib/siteConfig';
 
 // Discord OAuth endpoints
 const DISCORD_API_URL = 'https://discord.com/api/v10';
@@ -9,7 +10,7 @@ const DISCORD_OAUTH_URL = 'https://discord.com/api/oauth2';
  */
 export function getDiscordAuthUrl(): string {
   const clientId = process.env.DISCORD_CLIENT_ID;
-  const redirectUri = process.env.DISCORD_REDIRECT_URI || `${process.env.NEXTAUTH_URL}/api/auth/discord/callback`;
+  const redirectUri = process.env.DISCORD_REDIRECT_URI || `${process.env.NEXTAUTH_URL || SITE_URL}/api/auth/discord/callback`;
   const scope = 'identify email';
 
   const params = new URLSearchParams({
@@ -28,7 +29,7 @@ export function getDiscordAuthUrl(): string {
 export async function exchangeCodeForToken(code: string): Promise<DiscordTokenResponse> {
   const clientId = process.env.DISCORD_CLIENT_ID!;
   const clientSecret = process.env.DISCORD_CLIENT_SECRET!;
-  const redirectUri = process.env.DISCORD_REDIRECT_URI || `${process.env.NEXTAUTH_URL}/api/auth/discord/callback`;
+  const redirectUri = process.env.DISCORD_REDIRECT_URI || `${process.env.NEXTAUTH_URL || SITE_URL}/api/auth/discord/callback`;
 
   const params = new URLSearchParams({
     client_id: clientId,
