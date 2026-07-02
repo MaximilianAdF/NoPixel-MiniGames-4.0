@@ -13,7 +13,7 @@ jobs:
           TOKEN: ${{ secrets.SENTRY_API_TOKEN }}
         run: |
           curl -s -w "\nHTTP_STATUS=%{http_code}\n" -H "Authorization: Bearer $TOKEN" \
-            "https://de.sentry.io/api/0/projects/maximilian-e3/javascript-nextjs/issues/?statsPeriod=7d&query=is%3Aunresolved&sort=freq&limit=20" \
+            "https://de.sentry.io/api/0/projects/maximilian-e3/javascript-nextjs/issues/?statsPeriod=14d&query=is%3Aunresolved&sort=freq&limit=20" \
           | python3 -c "
           import sys, json
           raw = sys.stdin.read()
