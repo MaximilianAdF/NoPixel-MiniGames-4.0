@@ -1,0 +1,23 @@
+name: Sentry debug (temporary)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: List unresolved Sentry issues
+        env:
+          TOKEN: ${{ secrets.SENTRY_API_TOKEN }}
+        run: |
+          curl -s -H "Authorization: Bearer $TOKEN" \
+            "https://de.sentry.io/api/0/projects/maximilian-e3/javascript-nextjs/issues/?statsPeriod=7d&query=is:unresolved&sort=freq&limit=20" \
+          | python3 -c "
+          import sys, json
+          for i in json.load(sys.stdin):
+              print(f\"[{i.get('count')}ev/{i.get('userCount')}u] {i.get('title','')[:150]}\")
+              print(f\"   culprit: {str(i.get('culprit'))[:120]}\")
+              print(f\"   first: {i.get('firstSeen','')[:16]}  last: {i.get('lastSeen','')[:16]}  id: {i.get('shortId')}\")
+          "
