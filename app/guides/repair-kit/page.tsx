@@ -3,6 +3,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import JsonLd from '@/app/components/JsonLd';
 import { breadcrumbList, guideArticle } from '@/lib/structuredData';
+import SideAdRail from '@/app/components/SideAdRail';
 
 export const metadata: Metadata = {
   title: 'Repair Kit Guide - Master NoPixel 4.0 Precision Timing | Expert Tips',
@@ -35,6 +36,7 @@ export default function RepairKitGuidePage() {
           path: '/guides/repair-kit',
         })}
       />
+      <SideAdRail contentHalfWidth={448} />
       <div className="entry-content max-w-4xl mx-auto">
         {/* Back Button */}
         <Link

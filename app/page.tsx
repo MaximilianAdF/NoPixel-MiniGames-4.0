@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import { Target, Trophy, Zap } from 'lucide-react';
+import SideAdRail from '@/app/components/SideAdRail';
 
 import { useEffect, useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -119,6 +120,7 @@ export default function Home() {
 
   return (
       <main className="relative flex min-h-screen flex-col items-center bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950">
+        <SideAdRail contentHalfWidth={576} />
         {/* Structured Data for SEO */}
         <Script
           id="structured-data"

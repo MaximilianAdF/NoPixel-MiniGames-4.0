@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Zap, ArrowLeft, Brain, Timer, Eye, Heart, Dumbbell, Coffee } from 'lucide-react';
 import JsonLd from '@/app/components/JsonLd';
 import { breadcrumbList, guideArticle } from '@/lib/structuredData';
+import SideAdRail from '@/app/components/SideAdRail';
 
 export const metadata: Metadata = {
     title: 'How to Improve Reaction Time for GTA RP Minigames - Science-Backed Guide',
@@ -35,6 +36,7 @@ export default function ReactionTimeGuidePage() {
                     path: '/guides/improving-reaction-time',
                 })}
             />
+            <SideAdRail contentHalfWidth={384} />
             <div className="entry-content max-w-3xl mx-auto">
                 {/* Navigation */}
                 <div className="pt-16 mb-8">

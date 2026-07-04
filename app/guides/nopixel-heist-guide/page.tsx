@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Target, ArrowLeft, Shield, Gamepad2, AlertTriangle, Map, Users, DollarSign } from 'lucide-react';
 import JsonLd from '@/app/components/JsonLd';
 import { breadcrumbList, guideArticle } from '@/lib/structuredData';
+import SideAdRail from '@/app/components/SideAdRail';
 
 export const metadata: Metadata = {
     title: 'Complete Guide to NoPixel 4.0 Heists - Planning, Hacks & Execution',
@@ -35,6 +36,7 @@ export default function HeistGuidePage() {
                     path: '/guides/nopixel-heist-guide',
                 })}
             />
+            <SideAdRail contentHalfWidth={384} />
             <div className="entry-content max-w-3xl mx-auto">
                 {/* Navigation */}
                 <div className="pt-16 mb-8">

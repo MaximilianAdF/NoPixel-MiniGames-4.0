@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Flame, ArrowLeft, Lightbulb, AlertTriangle, Trophy, Brain, GraduationCap, Target } from 'lucide-react';
 import JsonLd from '@/app/components/JsonLd';
 import { breadcrumbList, guideArticle } from '@/lib/structuredData';
+import SideAdRail from '@/app/components/SideAdRail';
 
 export const metadata: Metadata = {
     title: 'Mastering Thermite in NoPixel 4.0 - Complete Chain-Reaction Strategy Guide',
@@ -35,6 +36,7 @@ export default function MasteringThermitePage() {
                     path: '/guides/mastering-thermite',
                 })}
             />
+            <SideAdRail contentHalfWidth={384} />
             <div className="entry-content max-w-3xl mx-auto">
                 {/* Navigation */}
                 <div className="pt-16 mb-8">
