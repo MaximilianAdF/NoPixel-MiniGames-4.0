@@ -35,7 +35,7 @@ export default function LockpickGuidePage() {
           path: '/guides/lockpick',
         })}
       />
-      <div className="max-w-4xl mx-auto">
+      <div className="entry-content max-w-4xl mx-auto">
         {/* Back Button */}
         <Link
           href="/guides"

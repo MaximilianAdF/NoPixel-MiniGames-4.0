@@ -369,7 +369,9 @@ export default function Home() {
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6 bg-gradient-to-r from-spring-green-400 to-aquamarine-400 bg-clip-text text-transparent">
               Every NoPixel 4.0 Hack, Free to Practice
             </h2>
-            <div className="space-y-4 text-gray-300 leading-relaxed text-lg">
+            {/* entry-content marks the prose body so Journey's in-content ad
+                targeting can find it (custom non-WP markup isn't auto-detected). */}
+            <div className="entry-content space-y-4 text-gray-300 leading-relaxed text-lg">
               <p className="hover:text-gray-200 transition-colors duration-300">
                 Welcome to the most comprehensive collection of NoPixel 4.0 hacks you can practice online — completely free.
                 This platform provides authentic replicas of every hacking minigame featured in the popular Grand Theft Auto V roleplay

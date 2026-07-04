@@ -35,7 +35,7 @@ export default function WordMemoryGuidePage() {
           path: '/guides/word-memory',
         })}
       />
-      <div className="max-w-4xl mx-auto">
+      <div className="entry-content max-w-4xl mx-auto">
         {/* Back Button */}
         <Link
           href="/guides"

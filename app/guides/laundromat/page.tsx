@@ -37,7 +37,7 @@ export default function LaundromatGuidePage() {
           path: '/guides/laundromat',
         })}
       />
-      <div className="max-w-4xl mx-auto">
+      <div className="entry-content max-w-4xl mx-auto">
         {/* Back Button */}
         <Link
           href="/guides"

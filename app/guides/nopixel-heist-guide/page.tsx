@@ -35,7 +35,7 @@ export default function HeistGuidePage() {
                     path: '/guides/nopixel-heist-guide',
                 })}
             />
-            <div className="max-w-3xl mx-auto">
+            <div className="entry-content max-w-3xl mx-auto">
                 {/* Navigation */}
                 <div className="pt-16 mb-8">
                     <Link href="/guides" className="inline-flex items-center gap-2 text-[#54FFA4] hover:text-[#45e894] transition-colors text-sm font-medium">

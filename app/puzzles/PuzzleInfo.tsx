@@ -27,7 +27,9 @@ export default function PuzzleInfo({ game }: { game: string }) {
   return (
     <section
       aria-labelledby={`about-${game}`}
-      className="relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 pb-20 text-gray-300"
+      // entry-content marks the prose body so Journey's in-content ad
+      // targeting can find it (custom non-WP markup isn't auto-detected).
+      className="entry-content relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 pb-20 text-gray-300"
     >
       <div className="border-t border-spring-green-500/15 pt-10">
         <h2 id={`about-${game}`} className="text-2xl font-bold text-white">
