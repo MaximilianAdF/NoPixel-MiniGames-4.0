@@ -381,8 +381,15 @@ export default function Home() {
                 the thrill of virtual heists, this simulator offers the perfect training ground.
               </p>
               <p className="hover:text-gray-200 transition-colors duration-300">
-                The NoPixel hacks covered here include the Thermite chain-reaction grid, the Lockpick and Laundromat colour-match rotating locks, Roof Running,
-                Word Memory, PinCracker, Chopping and the Repair Kit — every minigame you&apos;ll run into across heists, robberies and vehicle crime in GTA RP.
+                The NoPixel hacks covered here include the <Link href="/puzzles/thermite" className="text-spring-green-400 hover:text-spring-green-300 underline underline-offset-2">Thermite chain-reaction grid</Link>, the{' '}
+                <Link href="/puzzles/lockpick" className="text-spring-green-400 hover:text-spring-green-300 underline underline-offset-2">Lockpick</Link> and{' '}
+                <Link href="/puzzles/laundromat" className="text-spring-green-400 hover:text-spring-green-300 underline underline-offset-2">Laundromat</Link> colour-match rotating locks,{' '}
+                <Link href="/puzzles/roof-running" className="text-spring-green-400 hover:text-spring-green-300 underline underline-offset-2">Roof Running</Link>,{' '}
+                <Link href="/puzzles/word-memory" className="text-spring-green-400 hover:text-spring-green-300 underline underline-offset-2">Word Memory</Link>,{' '}
+                <Link href="/puzzles/pincracker" className="text-spring-green-400 hover:text-spring-green-300 underline underline-offset-2">PinCracker</Link>,{' '}
+                <Link href="/puzzles/chopping" className="text-spring-green-400 hover:text-spring-green-300 underline underline-offset-2">Chopping</Link> and the{' '}
+                <Link href="/puzzles/repair-kit" className="text-spring-green-400 hover:text-spring-green-300 underline underline-offset-2">Repair Kit</Link> — every minigame you&apos;ll run into across heists, robberies and vehicle crime in GTA RP.
+                With <Link href="/nopixel-5" className="text-spring-green-400 hover:text-spring-green-300 underline underline-offset-2">NoPixel 5.0</Link> on the horizon, the fundamentals you build here carry straight into the next version.
               </p>
               <p className="hover:text-gray-200 transition-colors duration-300">
                 NoPixel is renowned for its intricate and demanding hacking mechanics that add an exciting layer of challenge to various 
