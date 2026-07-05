@@ -54,6 +54,12 @@ jobs:
       # and the verify step below can build without a separate install.
       - name: Install project deps
         run: npm ci --no-audit --no-fund
+      # Chromium for scripts/seo-agent/inspect.js — lets the agents load live
+      # pages, catch console errors, and take screenshots they can then view.
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+      - name: Prepare screenshot dir
+        run: mkdir -p reports/_shots
 
       # Pass 0 — map the current codebase so every later pass reasons about the
       # real tree, not a stale assumption. Writes ./reports/_repomap.md.
@@ -74,7 +80,7 @@ jobs:
           The analytics bundle is at: ./seo-data.json
           Today's date is: $(date +%F)"
           claude -p "$PROMPT" --model opus --effort xhigh --permission-mode acceptEdits \
-            --allowedTools "Read,Write,WebSearch,WebFetch,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
+            --allowedTools "Read,Write,WebSearch,WebFetch,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(node scripts/seo-agent/inspect.js:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
 
       # Pass 2 — red-team attacks every candidate (no edits)
       - name: Red-team (attack)
@@ -86,7 +92,7 @@ jobs:
           The analytics bundle is at: ./seo-data.json
           Today's date is: $(date +%F)"
           claude -p "$PROMPT" --model opus --effort xhigh --permission-mode acceptEdits \
-            --allowedTools "Read,Write,WebSearch,WebFetch,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
+            --allowedTools "Read,Write,WebSearch,WebFetch,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(node scripts/seo-agent/inspect.js:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
 
       # Pass 3 — impartial judge decides + writes the report and the approved
       # build-list (./reports/_approved.md). The judge no longer edits code.
@@ -100,7 +106,7 @@ jobs:
           The analytics bundle is at: ./seo-data.json
           Today's date is: $(date +%F)"
           claude -p "$PROMPT" --model opus --effort xhigh --permission-mode acceptEdits \
-            --allowedTools "Read,Write,WebSearch,WebFetch,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
+            --allowedTools "Read,Write,WebSearch,WebFetch,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(node scripts/seo-agent/inspect.js:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*)"
 
       # Pass 4 — dedicated implementer builds the judge's approved changes well.
       # Separates "decide" from "build"; the build-verify step below is the gate.
@@ -114,10 +120,10 @@ jobs:
           The analytics bundle is at: ./seo-data.json
           Today's date is: $(date +%F)"
           claude -p "$PROMPT" --model opus --effort xhigh --permission-mode acceptEdits \
-            --allowedTools "Read,Edit,Write,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*),Bash(npx tsc:*)"
+            --allowedTools "Read,Edit,Write,Bash(python scripts/seo-agent/query.py:*),Bash(python3 scripts/seo-agent/query.py:*),Bash(node scripts/seo-agent/inspect.js:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(rg:*),Bash(npx tsc:*)"
 
       - name: Clean up scratch files
-        run: rm -f reports/_draft*.md reports/_critique*.md reports/_approved*.md reports/_repomap*.md
+        run: rm -rf reports/_draft*.md reports/_critique*.md reports/_approved*.md reports/_repomap*.md reports/_shots
 
       # Safety net: if the agent edited code, verify it still builds; auto-revert
       # breaking edits (keep the report) so a bad fix never reaches a PR.
