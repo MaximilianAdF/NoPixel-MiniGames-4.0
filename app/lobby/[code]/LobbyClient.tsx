@@ -64,7 +64,7 @@ const ONEV_ONE_GAMES: { id: GameType; label: string }[] = [
   { id: 'thermite', label: 'Thermite' },
   { id: 'lockpick', label: 'Lockpick' },
   { id: 'laundromat', label: 'Laundromat' },
-  { id: 'pincracker', label: 'Pin Cracker' },
+  { id: 'pincracker', label: 'PinCracker' },
   { id: 'roof-running', label: 'Roof Running' },
   { id: 'word-memory', label: 'Word Memory' },
   { id: 'chopping', label: 'Chopping' },

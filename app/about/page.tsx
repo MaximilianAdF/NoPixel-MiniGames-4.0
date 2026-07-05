@@ -59,7 +59,7 @@ export default function AboutPage() {
               <h2 className="text-2xl font-bold text-white mb-3">Why We Built This</h2>
               <p className="text-gray-300 leading-relaxed mb-4">
                 As passionate NoPixel viewers and players, we noticed many people struggled with the minigames, especially under pressure.
-                Some players felt excluded from heists because they couldn&apos;t master Thermite or Pin Cracker hacks quickly enough.
+                Some players felt excluded from heists because they couldn&apos;t master Thermite or PinCracker hacks quickly enough.
                 The in-game consequences of failure are severe — wasted supplies, police alerts, and potentially days of planning down the drain.
               </p>
               <p className="text-gray-300 leading-relaxed mb-4">

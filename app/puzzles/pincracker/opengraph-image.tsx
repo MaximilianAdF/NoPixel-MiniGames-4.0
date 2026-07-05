@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 
-export const alt = 'Pin Cracker Practice - NoPixel 4.0 Minigames'
+export const alt = 'PinCracker Practice - NoPixel 4.0 Minigames'
 export const size = {
   width: 1200,
   height: 630,
@@ -71,7 +71,7 @@ export default async function Image() {
             lineHeight: 1.1,
           }}
         >
-          Pin Cracker
+          PinCracker
         </div>
         <div
           style={{

@@ -130,15 +130,6 @@ const guides = [
 // aren't orphaned — they each carry Article + Breadcrumb JSON-LD and sit in the sitemap.
 const editorialGuides = [
   {
-    slug: 'mastering-thermite',
-    title: 'Mastering Thermite',
-    description: 'Go deeper on the 4.0 chain-reaction hack — piece ranges, reading the board, and stringing combos to clear the sewers and vault.',
-    timeToRead: '8 min',
-    icon: Zap,
-    color: 'text-orange-400',
-    bgColor: 'bg-orange-500/20',
-  },
-  {
     slug: 'nopixel-heist-guide',
     title: 'NoPixel Heist Guide',
     description: 'Which minigames each major heist throws at you, and how to prep — from Fleeca runs to the Maze Bank vault.',
@@ -186,7 +177,7 @@ export default function GuidesPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-4 text-center">
             <Gamepad2 className="w-8 h-8 text-[#54FFA4] mx-auto mb-2" />
-            <div className="text-2xl font-bold text-white">11</div>
+            <div className="text-2xl font-bold text-white">10</div>
             <div className="text-gray-400 text-sm">Complete Guides</div>
           </div>
           <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-4 text-center">

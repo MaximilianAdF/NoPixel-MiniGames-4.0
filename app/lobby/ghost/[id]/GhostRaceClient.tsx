@@ -39,7 +39,7 @@ const COUNTDOWN_MS = 3000;
 const RACE_MAX_MS = 3 * 60 * 1000;
 const GAME_LABEL: Record<GameType, string> = {
   thermite: 'Thermite', lockpick: 'Lockpick', laundromat: 'Laundromat',
-  pincracker: 'Pin Cracker', 'roof-running': 'Roof Running',
+  pincracker: 'PinCracker', 'roof-running': 'Roof Running',
   'word-memory': 'Word Memory', chopping: 'Chopping', 'repair-kit': 'Repair Kit',
 };
 

@@ -6,15 +6,15 @@ import { breadcrumbList, guideArticle } from '@/lib/structuredData';
 import SideAdRail from '@/app/components/SideAdRail';
 
 export const metadata: Metadata = {
-  title: 'PIN Cracker Guide - Master NoPixel 4.0 Logic Puzzle | Expert Tips',
-  description: 'Complete guide to mastering the PIN Cracker minigame in NoPixel 4.0. Learn Mastermind-style deduction, color feedback interpretation, and pro tips for cracking codes.',
+  title: 'PinCracker Guide - Master NoPixel 4.0 Logic Puzzle | Expert Tips',
+  description: 'Complete guide to mastering the PinCracker minigame in NoPixel 4.0. Learn Mastermind-style deduction, color feedback interpretation, and pro tips for cracking codes.',
   keywords: ['PIN cracker guide', 'NoPixel PIN hack', 'mastermind puzzle tutorial', 'PIN cracker tips', 'GTA RP logic puzzle'],
   alternates: {
     canonical: 'https://nphacks.net/guides/pincracker',
   },
   openGraph: {
-    title: 'PIN Cracker Guide - Master NoPixel 4.0 Logic Puzzle | Expert Tips',
-    description: 'Complete guide to mastering the PIN Cracker minigame in NoPixel 4.0. Learn Mastermind-style deduction, color feedback interpretation, and pro tips for cracking codes.',
+    title: 'PinCracker Guide - Master NoPixel 4.0 Logic Puzzle | Expert Tips',
+    description: 'Complete guide to mastering the PinCracker minigame in NoPixel 4.0. Learn Mastermind-style deduction, color feedback interpretation, and pro tips for cracking codes.',
     url: 'https://nphacks.net/guides/pincracker',
   },
 };
@@ -26,13 +26,13 @@ export default function PincrackerGuidePage() {
         data={breadcrumbList([
           { name: 'Home', path: '/' },
           { name: 'Guides', path: '/guides' },
-          { name: 'PIN Cracker Guide', path: '/guides/pincracker' },
+          { name: 'PinCracker Guide', path: '/guides/pincracker' },
         ])}
       />
       <JsonLd
         data={guideArticle({
-          headline: 'PIN Cracker Guide - Master NoPixel 4.0 Logic Puzzle | Expert Tips',
-          description: 'Complete guide to mastering the PIN Cracker minigame in NoPixel 4.0. Learn Mastermind-style deduction, color feedback interpretation, and pro tips for cracking codes.',
+          headline: 'PinCracker Guide - Master NoPixel 4.0 Logic Puzzle | Expert Tips',
+          description: 'Complete guide to mastering the PinCracker minigame in NoPixel 4.0. Learn Mastermind-style deduction, color feedback interpretation, and pro tips for cracking codes.',
           path: '/guides/pincracker',
         })}
       />
@@ -55,7 +55,7 @@ export default function PincrackerGuidePage() {
             </div>
             <div>
               <h1 className="text-4xl md:text-5xl font-bold text-white">
-                PIN Cracker Guide
+                PinCracker Guide
               </h1>
               <p className="text-[#54FFA4] text-lg">Mastermind-Style Logic Puzzle</p>
             </div>
@@ -80,7 +80,7 @@ export default function PincrackerGuidePage() {
           <h2 className="text-xl font-bold text-white mb-4">Table of Contents</h2>
           <nav className="space-y-2">
             <a href="#overview" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">1. Overview</a>
-            <a href="#how-it-works" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">2. How PIN Cracker Works</a>
+            <a href="#how-it-works" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">2. How PinCracker Works</a>
             <a href="#feedback" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">3. Reading the Color Feedback</a>
             <a href="#strategies" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">4. Winning Strategies</a>
             <a href="#common-mistakes" className="block text-gray-400 hover:text-[#54FFA4] transition-colors">5. Common Mistakes</a>
@@ -96,7 +96,7 @@ export default function PincrackerGuidePage() {
           </h2>
           <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
             <p className="text-gray-300 leading-relaxed mb-4">
-              PIN Cracker is a logic-deduction puzzle in the style of the classic board game Mastermind. A secret PIN is hidden behind a row of slots, and your job is to figure it out by guessing and reading the color-coded feedback each guess returns. This is <strong className="text-white">not</strong> a memory test — nothing flashes and disappears. Every guess and every clue stays on screen for you to reason about.
+              PinCracker is a logic-deduction puzzle in the style of the classic board game Mastermind. A secret PIN is hidden behind a row of slots, and your job is to figure it out by guessing and reading the color-coded feedback each guess returns. This is <strong className="text-white">not</strong> a memory test — nothing flashes and disappears. Every guess and every clue stays on screen for you to reason about.
             </p>
             <p className="text-gray-300 leading-relaxed mb-4">
               The catch is the clock. Each round runs against a countdown (20 seconds by default), so you are racing to deduce the full code before time expires. There is no limit on the number of guesses you can make — your only enemy is the timer. Crack the whole PIN before it hits zero and the round is a win; let it run out and you fail.
@@ -114,7 +114,7 @@ export default function PincrackerGuidePage() {
         <section id="how-it-works" className="mb-12">
           <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
             <span className="w-8 h-8 bg-[#54FFA4] text-[#0F1B21] rounded-lg flex items-center justify-center font-bold">2</span>
-            How PIN Cracker Works
+            How PinCracker Works
           </h2>
           <div className="bg-[#1a2930] border border-[#54FFA4]/20 rounded-xl p-6">
             <div className="space-y-6">
@@ -397,7 +397,7 @@ export default function PincrackerGuidePage() {
                 <div>
                   <h4 className="text-[#54FFA4] font-semibold mb-1">Mastery Benchmark</h4>
                   <p className="text-gray-300 text-sm">
-                    You&apos;ve mastered PIN Cracker when you can reliably crack a 4-digit code in three or four guesses inside the 20-second clock — and step up to 6-digit codes without breaking your elimination routine.
+                    You&apos;ve mastered PinCracker when you can reliably crack a 4-digit code in three or four guesses inside the 20-second clock — and step up to 6-digit codes without breaking your elimination routine.
                   </p>
                 </div>
               </div>
@@ -417,7 +417,7 @@ export default function PincrackerGuidePage() {
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-bold hover:from-purple-600 hover:to-pink-600 transition-all hover:scale-105"
           >
             <Fingerprint className="w-5 h-5" />
-            Practice PIN Cracker Now
+            Practice PinCracker Now
           </Link>
         </div>
       </div>

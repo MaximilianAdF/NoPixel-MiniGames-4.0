@@ -81,7 +81,7 @@ export const gameConfigs: Record<GameType, GameConfig> = {
     tailwindGradient: 'from-green-500 to-emerald-500',
   },
   pincracker: {
-    name: 'Pin Cracker',
+    name: 'PinCracker',
     iconType: 'lucide',
     IconComponent: Fingerprint,
     color: 'text-blue-400',

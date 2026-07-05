@@ -46,6 +46,9 @@ const nextConfig = {
     return [
       { source: '/puzzle/:slug', destination: '/puzzles/:slug', permanent: true },
       { source: '/NoPixel-MiniGames-4.0/:path*', destination: '/', permanent: true },
+      // Consolidate the two thermite guides: mastering-thermite split the
+      // keyword set with /guides/thermite (which every trainer links to).
+      { source: '/guides/mastering-thermite', destination: '/guides/thermite', permanent: true },
     ];
   },
   // Journey by Mediavine hosted ads.txt — proxied (not redirected) so any

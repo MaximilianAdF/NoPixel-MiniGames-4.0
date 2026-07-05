@@ -4,16 +4,16 @@ import { Info, Gamepad, Trophy, Lightbulb, TrendingUp, AlertTriangle, Briefcase,
 export default function PincrackerInstructions() {
     return (
         <>
-            <InstructionSection id="overview" title="What is PIN Cracker?" icon={<Info className="w-5 h-5" />}>
+            <InstructionSection id="overview" title="What is PinCracker?" icon={<Info className="w-5 h-5" />}>
                 <p>
-                    The PIN Cracker minigame is a logic-based puzzle that challenges your deductive reasoning and
+                    The PinCracker minigame is a logic-based puzzle that challenges your deductive reasoning and
                     pattern recognition skills. Similar to the classic game Mastermind, you must crack a secret PIN
                     code by analyzing color-coded feedback from your guesses. The hidden PIN is built from distinct
                     digits — no digit ever repeats — and in NoPixel 4.0 this hack appears on high-value targets like
                     the Maze Bank.
                 </p>
                 <p>
-                    Unlike minigames that lean purely on speed and reflexes, PIN Cracker rewards methodical thinking
+                    Unlike minigames that lean purely on speed and reflexes, PinCracker rewards methodical thinking
                     and logical deduction. You get unlimited guesses, but a countdown timer (20 seconds by default)
                     keeps the pressure on: read the color clues, eliminate possibilities, and lock in the full code
                     before the clock hits zero.
@@ -39,7 +39,7 @@ export default function PincrackerInstructions() {
 
             <InstructionSection id="scoring" title="Winning, Losing, and the Timer" icon={<Trophy className="w-5 h-5" />}>
                 <p>
-                    PIN Cracker has one simple win condition and one simple fail condition:
+                    PinCracker has one simple win condition and one simple fail condition:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
                     <li><strong>Win</strong> - Submit a guess where every slot lights up green before time expires</li>
@@ -99,7 +99,7 @@ export default function PincrackerInstructions() {
 
             <InstructionSection id="nopixel" title="NoPixel Roleplay Context" icon={<Briefcase className="w-5 h-5" />}>
                 <p>
-                    In NoPixel 4.0, PIN Cracker appears in critical moments during heists:
+                    In NoPixel 4.0, PinCracker appears in critical moments during heists:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
                     <li><strong>High-security banks</strong> - Bypass electronic locks on targets like the Maze Bank</li>
@@ -109,7 +109,7 @@ export default function PincrackerInstructions() {
                 <p className="mt-2">
                     Failing the hack mid-heist has serious consequences: wasted time while police respond, burned
                     equipment, or a blown job entirely. Many heist crews assign their best logical thinker to handle
-                    PIN Cracker sections because a calm, systematic solver cracks it well inside the timer.
+                    PinCracker sections because a calm, systematic solver cracks it well inside the timer.
                 </p>
             </InstructionSection>
 
@@ -146,7 +146,7 @@ export default function PincrackerInstructions() {
 
             <InstructionSection id="training" title="Practice Recommendations" icon={<GraduationCap className="w-5 h-5" />} defaultOpen={false}>
                 <p>
-                    Build PIN Cracker mastery with structured practice:
+                    Build PinCracker mastery with structured practice:
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
                     <li><strong>Start with the defaults</strong> - 4 digits and 20 seconds is the baseline; master it before changing anything</li>
