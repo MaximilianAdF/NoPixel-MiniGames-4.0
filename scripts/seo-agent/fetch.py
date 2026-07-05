@@ -333,7 +333,8 @@ if CF_TOKEN and CF_ACCT:
               + _grp("byCountry", "countryName", 15) + ' ' + _grp("byDevice", "deviceType", 5) + ' '
               + _grp("byBrowser", "userAgentBrowser", 8) + ' ' + _grp("byReferer", "refererHost", 12) + ' '
               + _grp("byOS", "userAgentOS", 6) + ' '
-              + _grp("byPath", "requestPath", 15) + '}}}')
+              + _grp("byPath", "requestPath", 15) + ' '
+              + _grp("byDay", "date", 10) + '}}}')
         areq = urllib.request.Request("https://api.cloudflare.com/client/v4/graphql",
             data=json.dumps({"query": aq}).encode(),
             headers={"Authorization": "Bearer " + CF_TOKEN, "Content-Type": "application/json"})
@@ -357,6 +358,7 @@ if CF_TOKEN and CF_ACCT:
             "by_os": rows("byOS", "userAgentOS"),
             "by_referer": rows("byReferer", "refererHost"),
             "by_page": rows("byPath", "requestPath"),
+            "by_day": sorted(rows("byDay", "date"), key=lambda r: r["name"]),
         }
         log("CF RUM audience ok")
     except Exception as ex:
@@ -403,7 +405,11 @@ JOURNEY_STATS = os.environ.get("JOURNEY_STATS")
 if JOURNEY_STATS:
     bundle["journey_ads"] = {
         "note": ("Journey by Mediavine dashboard numbers, manually entered by the owner (Journey has no "
-                 "public API). Treat as the GROUND TRUTH for ad revenue/RPM when reasoning about RPM levers."),
+                 "public API). Treat as the GROUND TRUTH for ad revenue/RPM when reasoning about RPM levers. "
+                 "FILL-RATE TRACKING: derive impressions/day from the cumulative stats deltas below, divide by "
+                 "the real-human pageviews in cloudflare.rum_audience.by_day for the same dates, and report the "
+                 "fill-rate trend. Ramp gates: fill visibly climbing by Jul 16 2026 (several hundred imp/day) "
+                 "else flag ESCALATE-TO-JOURNEY; Aug 2 = first fair RPM verdict."),
         "stats": JOURNEY_STATS,
     }
 else:
