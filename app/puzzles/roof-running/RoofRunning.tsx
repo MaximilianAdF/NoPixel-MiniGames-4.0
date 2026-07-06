@@ -310,7 +310,7 @@ const RoofRunning: FC<RoofRunningProps> = ({ seed, onMatchEnd, onInput }) => {
 
   if (isChallengeLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-[280px] md:min-h-[400px]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#54FFA4]"></div>
       </div>
     );

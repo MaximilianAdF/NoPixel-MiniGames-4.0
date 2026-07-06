@@ -61,7 +61,9 @@ export default function GameShell({
   targetScore,
   hideTimer,
   className,
-  minHeight = 'min-h-[400px]',
+  // Lower floor on phones: mobile boards are ~250-330px tall, so a 400px
+  // minimum left dead space and pushed the timer far below the game.
+  minHeight = 'min-h-[280px] md:min-h-[400px]',
   children,
 }: GameShellProps) {
   const [settingsVisible, setSettingsVisible] = useState(false);

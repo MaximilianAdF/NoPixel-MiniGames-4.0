@@ -67,7 +67,6 @@
 @media (max-width: 768px) {
     .thermite {
         @apply gap-1;
-        max-width: calc(100vw - 32px) !important;
     }
     
     .thermite .square {
