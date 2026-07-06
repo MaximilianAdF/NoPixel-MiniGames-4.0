@@ -17,8 +17,8 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="single-post min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
+      <div className="entry-content max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12 pt-16">
           <div className="flex items-center justify-center gap-4 mb-4">

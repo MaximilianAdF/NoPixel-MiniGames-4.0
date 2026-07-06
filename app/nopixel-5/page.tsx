@@ -70,7 +70,7 @@ const faqs = [
 
 export default function NoPixel5Page() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
+    <div className="single-post min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
       <JsonLd
         data={breadcrumbList([
           { name: 'Home', path: '/' },
@@ -79,7 +79,7 @@ export default function NoPixel5Page() {
       />
       <JsonLd data={faqPage(faqs)} />
 
-      <div className="max-w-5xl mx-auto">
+      <div className="entry-content max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12 pt-16">
           <span className="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full bg-[#54FFA4]/10 border border-[#54FFA4]/30 text-[#54FFA4] text-xs font-semibold uppercase tracking-wider">

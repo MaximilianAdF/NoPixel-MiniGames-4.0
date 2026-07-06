@@ -446,8 +446,9 @@ export default function Home() {
             </div>
           </Reveal>
 
-          {/* FAQ Section for SEO - removed backdrop-blur */}
-          <Reveal as="div" className="bg-gradient-to-br from-mirage-900/80 to-mirage-950/80 rounded-2xl shadow-xl p-8 sm:p-10 border-2 border-spring-green-500/30 hover:border-spring-green-400/60 transition-colors duration-300">
+          {/* FAQ Section for SEO — single-post > entry-content lets Journey
+              place in-content units between Q&As (their density caps apply) */}
+          <Reveal as="div" className="single-post bg-gradient-to-br from-mirage-900/80 to-mirage-950/80 rounded-2xl shadow-xl p-8 sm:p-10 border-2 border-spring-green-500/30 hover:border-spring-green-400/60 transition-colors duration-300">
             <Script
               id="faq-structured-data"
               type="application/ld+json"
@@ -519,7 +520,7 @@ export default function Home() {
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6 bg-gradient-to-r from-spring-green-400 to-aquamarine-400 bg-clip-text text-transparent">
               Frequently Asked Questions
             </h2>
-            <div className="space-y-6 text-gray-300">
+            <div className="entry-content space-y-6 text-gray-300">
               <div className="border-l-4 border-spring-green-500/30 pl-6 hover:border-spring-green-500 transition-colors duration-300">
                 <h3 className="text-xl font-bold text-white mb-2">What are the NoPixel 4.0 hacks?</h3>
                 <p className="leading-relaxed">
