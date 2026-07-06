@@ -10,7 +10,7 @@ import NavigationMenu from './components/NavigationMenu';
 import LoginButton from './components/LoginButton';
 import ContextualHint from './components/ContextualHint';
 import GlobalLoading from './components/GlobalLoading';
-import CookieConsent from './components/CookieConsent';
+import ConsentBridge from './components/ConsentBridge';
 import { UserProvider } from './contexts/UserContext';
 import { LoadingProvider } from './contexts/LoadingContext';
 import { KeyboardShortcutsProvider } from './contexts/KeyboardShortcutsContext';
@@ -275,7 +275,7 @@ export default function RootLayout({
                   <div className="flex-1">{children}</div>
                   <Footer />
                 </div>
-                <CookieConsent />
+                <ConsentBridge />
               </GuideProvider>
             </KeyboardShortcutsProvider>
           </UserProvider>
