@@ -1,6 +1,5 @@
 "use client";
 
-// import "./puzzle.css";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import MediavineGameSettings from "@/app/components/MediavineGameSettings";
 
