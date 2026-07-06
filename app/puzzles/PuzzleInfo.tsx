@@ -27,11 +27,11 @@ export default function PuzzleInfo({ game }: { game: string }) {
   return (
     <section
       aria-labelledby={`about-${game}`}
-      // entry-content marks the prose body so Journey's in-content ad
-      // targeting can find it (custom non-WP markup isn't auto-detected).
-      className="entry-content relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 pb-20 text-gray-300"
+      // single-post > entry-content mirrors the WordPress markup Journey's
+      // in-content ad targeting looks for (.single-post .entry-content).
+      className="single-post relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 pb-20 text-gray-300"
     >
-      <div className="border-t border-spring-green-500/15 pt-10">
+      <div className="entry-content border-t border-spring-green-500/15 pt-10">
         {/* Game pages render the title inside the interactive shell, so the
             page-level H1 lives here (visually hidden) for document structure. */}
         <h1 className="sr-only">{c.name} Minigame — NoPixel 4.0 Practice</h1>

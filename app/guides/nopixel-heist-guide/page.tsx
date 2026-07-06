@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 
 export default function HeistGuidePage() {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
+        <div className="single-post min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
             <JsonLd
                 data={breadcrumbList([
                     { name: 'Home', path: '/' },

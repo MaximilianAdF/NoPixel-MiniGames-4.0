@@ -366,8 +366,9 @@ export default function Home() {
             </div>
           </Reveal>
 
-          {/* About Section - removed backdrop-blur and simplified animation */}
-          <Reveal as="div" className="bg-gradient-to-br from-mirage-900/80 to-mirage-950/80 rounded-2xl shadow-xl p-8 sm:p-10 border-2 border-spring-green-500/30 hover:border-spring-green-400/60 transition-colors duration-300">
+          {/* About Section — single-post > entry-content mirrors the WordPress
+              markup Journey's in-content ad targeting looks for */}
+          <Reveal as="div" className="single-post bg-gradient-to-br from-mirage-900/80 to-mirage-950/80 rounded-2xl shadow-xl p-8 sm:p-10 border-2 border-spring-green-500/30 hover:border-spring-green-400/60 transition-colors duration-300">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6 bg-gradient-to-r from-spring-green-400 to-aquamarine-400 bg-clip-text text-transparent">
               Every NoPixel 4.0 Hack, Free to Practice
             </h2>
