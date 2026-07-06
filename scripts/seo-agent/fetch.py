@@ -415,6 +415,28 @@ if JOURNEY_STATS:
 else:
     bundle["journey_ads"] = {"note": "SKIPPED — owner can set the JOURNEY_STATS secret with dashboard numbers (earnings/RPM/sessions)."}
 
+# ---------------- Microsoft Clarity (behavior: rage clicks, dead clicks, ...) ----------------
+CLARITY_TOKEN = os.environ.get("CLARITY_API_TOKEN")
+if CLARITY_TOKEN:
+    try:
+        import urllib.request
+        creq = urllib.request.Request(
+            "https://www.clarity.ms/export-data/api/v1/project-live-insights?numOfDays=3&dimension1=URL",
+            headers={"Authorization": "Bearer " + CLARITY_TOKEN})
+        cdat = json.load(urllib.request.urlopen(creq, timeout=40))
+        bundle["clarity"] = {
+            "note": ("Microsoft Clarity behavior metrics, last 3 days, by page URL. Key signals: "
+                     "RageClickCount/DeadClickCount (UX friction — users clicking things that don't respond), "
+                     "QuickbackClick (immediate bounces back), ExcessiveScroll, ScriptErrorCount. "
+                     "High rage/dead clicks on a page = investigate that page's UX; recordings live in the Clarity dashboard."),
+            "metrics": cdat,
+        }
+        log("Clarity ok")
+    except Exception as ex:
+        bundle["errors"].append("Clarity: " + repr(ex)[:200]); log("Clarity ERROR " + repr(ex)[:160])
+else:
+    bundle["clarity"] = {"note": "SKIPPED — set the CLARITY_API_TOKEN secret (Clarity > Settings > Data Export) to include behavior metrics."}
+
 # ---------------- Sentry (top unresolved errors, last 14d) ----------------
 SENTRY_TOKEN = os.environ.get("SENTRY_API_TOKEN")
 if SENTRY_TOKEN:

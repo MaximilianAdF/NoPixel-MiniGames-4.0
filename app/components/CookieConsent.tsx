@@ -25,6 +25,8 @@ export default function CookieConsent() {
     localStorage.setItem('cookieConsentDate', new Date().toISOString());
     // Grant GA4 analytics (Consent Mode) now that the user has opted in.
     (window as any).gtag?.('consent', 'update', { analytics_storage: 'granted' });
+    // Tell Clarity consent was given (pairs with its cookie-consent setting).
+    (window as any).clarity?.('consent');
     setIsVisible(false);
     setTimeout(() => setShowBanner(false), 300); // Wait for fade out
   };
@@ -47,12 +49,15 @@ export default function CookieConsent() {
   if (!showBanner) return null;
 
   // Compact card (was a near-full-screen sheet on mobile): one line, two
-  // buttons, inline privacy link — no page-dimming backdrop.
+  // buttons, inline privacy link — no page-dimming backdrop. Floats above the
+  // bottom ad zone so the Mediavine adhesion (near-max z-index) can't cover
+  // the Accept button.
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-[9999] p-3 sm:p-4 transition-transform duration-300 ${
-        isVisible ? 'translate-y-0' : 'translate-y-full'
+      className={`fixed left-0 right-0 z-[9999] p-3 sm:p-4 transition-all duration-300 ${
+        isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0 pointer-events-none'
       }`}
+      style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)' }}
     >
       <div className="max-w-xl mx-auto bg-gradient-to-br from-[#1a2930] to-[#0F1B21] border border-[#54FFA4]/40 rounded-xl shadow-2xl p-4 relative">
         <button
