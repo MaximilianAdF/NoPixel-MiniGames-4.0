@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'About Us - NoPixel 4.0 Minigames Trainer',
-  description: 'Learn about NoPixel 4.0 Minigames Trainer - A free, open-source practice tool for GTA RP players to master Thermite, Lockpick, PinCracker and other heist minigames.',
+  title: 'About nphacks – Our Free NoPixel Minigames Trainer',
+  description: 'The story behind nphacks — a free, open-source project that helps GTA RP players practise the NoPixel minigames in the browser, built by the community.',
   openGraph: {
     title: 'About NoPixel 4.0 Minigames Trainer',
     description: 'Free practice tools for the GTA RP community. Learn about our mission to help players master NoPixel minigames.',
