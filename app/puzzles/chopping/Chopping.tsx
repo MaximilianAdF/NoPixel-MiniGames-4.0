@@ -372,7 +372,7 @@ const Chopping: FC<ChoppingProps> = ({ seed, onMatchEnd, onInput }) => {
                 onBlur={(e) => {
                   if (phase === 'playing') {
                     e.preventDefault();
-                    e.target.focus();
+                    e.target.focus({ preventScroll: true });
                   }
                 }}
                 aria-label="Type letters here"

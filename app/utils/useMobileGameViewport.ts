@@ -68,9 +68,11 @@ export function useMobileGameViewport({
         input.focus();
       }
       input.setSelectionRange?.(input.value.length, input.value.length);
-      scrollSoon();
+      // Deliberately NO re-centering here: games re-focus on every keystroke,
+      // and scrolling per keypress made the page fight the player. Centering
+      // happens once on interaction/round-start/keyboard-open instead.
     },
-    [isMobile, inputRef, scrollSoon],
+    [isMobile, inputRef],
   );
 
   const handleInteraction = useCallback(() => {
@@ -113,12 +115,18 @@ export function useMobileGameViewport({
     return () => clearTimeout(timer);
   }, [isMobile, isPlaying, ensureVisible, focusInput]);
 
-  // Reserve space for the on-screen keyboard and keep the puzzle visible when it opens.
+  // Reserve space for the on-screen keyboard and keep the puzzle visible when
+  // it opens. Only reacts to real keyboard open/close (resize with a CHANGED
+  // offset) — listening to viewport 'scroll' here fed back into our own
+  // re-centering scrolls and made the page drift while typing.
   useEffect(() => {
     if (!isMobile || typeof window === 'undefined' || !window.visualViewport) return;
     const viewport = window.visualViewport;
+    let lastOffset = -1;
     const handleResize = () => {
       const offset = Math.max(0, window.innerHeight - viewport.height);
+      if (Math.abs(offset - lastOffset) < 50) return; // ignore jitter/echoes
+      lastOffset = offset;
       document.body.style.paddingBottom = offset ? `${offset}px` : '';
       if (offset > 100) {
         requestAnimationFrame(() => ensureVisible('smooth'));
@@ -126,12 +134,10 @@ export function useMobileGameViewport({
       }
     };
     viewport.addEventListener('resize', handleResize);
-    viewport.addEventListener('scroll', handleResize);
     handleResize();
     return () => {
       document.body.style.paddingBottom = '';
       viewport.removeEventListener('resize', handleResize);
-      viewport.removeEventListener('scroll', handleResize);
     };
   }, [isMobile, ensureVisible]);
 
