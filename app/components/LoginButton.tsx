@@ -125,7 +125,7 @@ export default function LoginButton() {
   if (isLoading || !mounted) {
     return (
       <div
-        className="fixed top-4 z-50 transition-all duration-300 ease-in-out"
+        className="fixed top-[max(1rem,env(safe-area-inset-top))] z-50 transition-all duration-300 ease-in-out"
         style={{ right: '16px' }}
       >
         {/* Skeleton placeholder matching Discord login button dimensions */}
@@ -144,7 +144,7 @@ export default function LoginButton() {
   if (isLoggedIn && user) {
     return (
       <div
-        className="fixed top-4 z-50 user-menu transition-all duration-300 ease-in-out flex flex-col items-end gap-2"
+        className="fixed top-[max(1rem,env(safe-area-inset-top))] z-50 user-menu transition-all duration-300 ease-in-out flex flex-col items-end gap-2"
         style={{ right: rightPosition }}
       >
         <div className="relative">
@@ -309,7 +309,7 @@ export default function LoginButton() {
   return (
     <button
       onClick={handleLogin}
-      className="fixed top-4 z-50 flex items-center gap-2 px-4 py-2 rounded-lg bg-[#5865F2] hover:bg-[#4752C4] text-white font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+      className="fixed top-[max(1rem,env(safe-area-inset-top))] z-50 flex items-center gap-2 px-4 py-2 rounded-lg bg-[#5865F2] hover:bg-[#4752C4] text-white font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
       style={{ right: rightPosition }}
     >
       <DiscordIcon className="w-5 h-5" />

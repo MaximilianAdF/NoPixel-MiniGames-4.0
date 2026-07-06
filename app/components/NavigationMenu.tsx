@@ -271,7 +271,7 @@ export default function NavigationMenu() {
         !isOpen && (
           <button
             onClick={() => setIsOpen(true)}
-            className="fixed top-4 left-4 z-[60] p-2 rounded-lg bg-gradient-to-br from-[#0F1B21] to-[#1a2930] border-2 border-[#54FFA4]/30 hover:border-[#54FFA4] transition-all duration-300 shadow-lg"
+            className="fixed top-[max(1rem,env(safe-area-inset-top))] left-4 z-[60] p-2 rounded-lg bg-gradient-to-br from-[#0F1B21] to-[#1a2930] border-2 border-[#54FFA4]/30 hover:border-[#54FFA4] transition-all duration-300 shadow-lg"
             aria-label="Open navigation menu"
           >
             <Menu className="w-6 h-6 text-[#54FFA4]" />
