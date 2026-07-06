@@ -325,7 +325,7 @@ export default function GuidesPage() {
             <div className="bg-[#0F1B21]/50 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-[#54FFA4] mb-2">2</div>
               <p className="text-white font-semibold">Lockpick</p>
-              <p className="text-gray-400 text-sm">Master timing</p>
+              <p className="text-gray-400 text-sm">Match the rings</p>
             </div>
             <div className="bg-[#0F1B21]/50 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-[#54FFA4] mb-2">3</div>

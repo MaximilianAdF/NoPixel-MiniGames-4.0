@@ -16,7 +16,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: { absolute: "Lockpick Trainer – NoPixel 4.0 & FiveM Lockpick Minigame" },
-  description: "Practice the NoPixel 4.0 & FiveM lockpick minigame free in your browser — rotate each ring to match coloured pins to slots before the timer ends. No download required.",
+  description: "Free browser lockpick trainer for the NoPixel 4.0 & FiveM lockpick minigame — rotate each ring to match its coloured pins to the slots before the timer ends. No download required.",
   keywords: ["lockpick minigame", "NoPixel lockpick", "GTA RP lockpick", "vehicle lockpick practice", "NoPixel 4.0 lockpick", "lockpicking trainer"],
   openGraph: {
     title: "Lockpick Minigame - NoPixel 4.0 Practice",
