@@ -35,6 +35,7 @@ Sentry.init({
   ignoreErrors: [
     /UID2 SDK failed to load/,
     /window\.optable/,
+    /ym\.0/,
     'AbortError: Fetch is aborted',
   ],
 });
