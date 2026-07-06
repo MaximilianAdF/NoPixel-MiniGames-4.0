@@ -1,0 +1,61 @@
+name: Uptime monitor
+
+# Pings the live site + health endpoint every ~10 minutes; emails on failure
+# (after a 30s retry to skip transient blips). GitHub cron timing is
+# best-effort, so treat this as "alert within ~15 minutes", not instant.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check site + health endpoint
+        id: check
+        run: |
+          check() {
+            HOME_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "https://nphacks.net/" || echo 000)
+            HEALTH_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "https://nphacks.net/api/health" || echo 000)
+            echo "home=$HOME_CODE health=$HEALTH_CODE"
+            [ "$HOME_CODE" = "200" ] && [ "$HEALTH_CODE" = "200" ]
+          }
+          if check; then echo "status=up" >> "$GITHUB_OUTPUT"; exit 0; fi
+          echo "First check failed — retrying in 30s..."
+          sleep 30
+          if check; then echo "status=up" >> "$GITHUB_OUTPUT"; exit 0; fi
+          echo "status=down" >> "$GITHUB_OUTPUT"
+
+      - name: Alert by email
+        if: steps.check.outputs.status == 'down'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.MAIL_SERVER }}
+          server_port: ${{ secrets.MAIL_PORT }}
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          from: nphacks uptime <${{ secrets.MAIL_USERNAME }}>
+          to: ${{ secrets.MAIL_TO }}
+          subject: "🔴 nphacks.net appears DOWN"
+          body: |
+            Uptime check failed twice in a row (30s apart).
+
+            Checks: https://nphacks.net/ and https://nphacks.net/api/health
+            (health returns 503 when the app is up but the database is unreachable)
+
+            Quick triage:
+              ssh root@165.22.207.24
+              systemctl status nphacks.service
+              journalctl -u nphacks.service -n 50
+
+            Note: while down, this alert repeats every ~10 minutes.
+
+      - name: Fail run when down (visible in Actions history)
+        if: steps.check.outputs.status == 'down'
+        run: exit 1
