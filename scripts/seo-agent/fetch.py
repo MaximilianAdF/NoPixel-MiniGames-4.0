@@ -421,14 +421,18 @@ if CLARITY_TOKEN:
     try:
         import urllib.request
         creq = urllib.request.Request(
-            "https://www.clarity.ms/export-data/api/v1/project-live-insights?numOfDays=3&dimension1=URL",
+            "https://www.clarity.ms/export-data/api/v1/project-live-insights?numOfDays=3&dimension1=URL&dimension2=Device",
             headers={"Authorization": "Bearer " + CLARITY_TOKEN})
         cdat = json.load(urllib.request.urlopen(creq, timeout=40))
         bundle["clarity"] = {
-            "note": ("Microsoft Clarity behavior metrics, last 3 days, by page URL. Key signals: "
-                     "RageClickCount/DeadClickCount (UX friction — users clicking things that don't respond), "
-                     "QuickbackClick (immediate bounces back), ExcessiveScroll, ScriptErrorCount. "
-                     "High rage/dead clicks on a page = investigate that page's UX; recordings live in the Clarity dashboard."),
+            "note": ("Microsoft Clarity behavior metrics, last 3 days, by page URL x Device — the API's full "
+                     "metric set: Traffic (sessions/distinct users/bot sessions/pages-per-session), "
+                     "EngagementTime (total vs active), ScrollDepth, RageClickCount + DeadClickCount + "
+                     "ErrorClickCount (UX friction — clicks that don't respond / hit errors), QuickbackClick "
+                     "(instant bounce-backs), ExcessiveScroll, ScriptErrorCount. High friction on a page = "
+                     "investigate its UX (cross-reference traffic + CWV); recordings/heatmaps live in the "
+                     "Clarity dashboard only. Note: replay fidelity on game canvases is approximate — trust "
+                     "the aggregate counts over individual game recordings."),
             "metrics": cdat,
         }
         log("Clarity ok")
