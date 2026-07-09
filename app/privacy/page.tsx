@@ -57,6 +57,12 @@ export default function PrivacyPage() {
               <ul className="list-disc pl-6 space-y-2 text-gray-300">
                 <li>Discord username and ID (when you log in via Discord OAuth)</li>
                 <li>Email address (if provided through Discord)</li>
+                <li>
+                  Email address you voluntarily submit to our NoPixel 5.0 launch
+                  notification list, with your explicit consent, used solely to email you
+                  once when the new trainers go live. You can ask us to remove it at any
+                  time.
+                </li>
                 <li>Profile avatar/image</li>
                 <li>User preferences and settings</li>
               </ul>
