@@ -38,4 +38,24 @@ Sentry.init({
     /ym\.0/,
     'AbortError: Fetch is aborted',
   ],
+  // denyUrls only catches errors with a resolvable stack. Most ad noise is
+  // cross-origin "Script error." with no frames, which slips through. Drop:
+  //   (a) bare "Script error." with no stack, and
+  //   (b) errors whose every frame is an ad/CMP/analytics origin.
+  // Real app errors (incl. the chunk-load "Failed to fetch", which carries our
+  // own webpack frames) keep their nphacks frames and are preserved.
+  beforeSend(event) {
+    const values = event.exception?.values ?? [];
+    const frames = values.flatMap((v) => v.stacktrace?.frames ?? []);
+    const AD =
+      /(scriptwrapper|grow\.me|journeymv|googlesyndication|doubleclick|adtrafficquality|amazon-adsystem|consentmanager|prebid|uid2?|optable|clarity\.ms)/i;
+    if (frames.length > 0 && frames.every((f) => AD.test(f.filename || ""))) {
+      return null;
+    }
+    const msg = values.map((v) => v.value || "").join(" ");
+    if (frames.length === 0 && /^script error\.?$/i.test(msg.trim())) {
+      return null;
+    }
+    return event;
+  },
 });

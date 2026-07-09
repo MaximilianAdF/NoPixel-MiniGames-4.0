@@ -399,10 +399,19 @@ export default function Home() {
                 accuracy, allowing you to practice and improve your skills without the pressure of in-game consequences.
               </p>
               <p className="hover:text-gray-200 transition-colors duration-300">
-                Each minigame has been carefully crafted to match the look, feel, and mechanics of the original NoPixel 4.0 implementations. 
-                Test your reflexes with the Thermite hack, demonstrate your pattern recognition with the Word Memory 
+                Each minigame has been carefully crafted to match the look, feel, and mechanics of the original NoPixel 4.0 implementations.
+                Test your reflexes with the Thermite hack, demonstrate your pattern recognition with the Word Memory
                 challenge, or prove your coordination with the Roof Running game. Level up as you play and
                 compete with players around the world.
+              </p>
+              <p className="hover:text-gray-200 transition-colors duration-300">
+                Want the strategy behind each hack? Our in-depth{' '}
+                <Link href="/guides" className="text-spring-green-400 hover:text-spring-green-300 underline underline-offset-2">
+                  NoPixel 4.0 minigame guides
+                </Link>{' '}
+                break down every mechanic step by step — how the Thermite chain reaction spreads, the exact
+                order to rotate the Lockpick and Laundromat rings, and timing tips for Roof Running — so you
+                can go from practising to mastering each minigame.
               </p>
             </div>
           </Reveal>

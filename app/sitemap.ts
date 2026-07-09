@@ -4,6 +4,11 @@ import { SITE_URL } from "@/lib/siteConfig";
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = SITE_URL;
 
+  // Stable content date — bump when pages get a real content refresh. Previously
+  // every entry was stamped `new Date()` each deploy, so <lastmod> changed
+  // constantly and told crawlers nothing about actual freshness.
+  const UPDATED = new Date("2026-07-09");
+
   // Define all minigame routes
   const minigames = [
     "thermite",
@@ -19,7 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Generate sitemap entries for each minigame
   const minigameUrls = minigames.map((game) => ({
     url: `${baseUrl}/puzzles/${game}`,
-    lastModified: new Date(),
+    lastModified: UPDATED,
     changeFrequency: "monthly" as const,
     priority: 0.8,
   }));
@@ -27,7 +32,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Generate sitemap entries for each guide (high priority for SEO)
   const guideUrls = minigames.map((game) => ({
     url: `${baseUrl}/guides/${game}`,
-    lastModified: new Date(),
+    lastModified: UPDATED,
     changeFrequency: "weekly" as const,
     priority: 0.85,
   }));
@@ -37,7 +42,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const serverUrls = servers.map((server) => ({
     url: `${baseUrl}/servers/${server}`,
-    lastModified: new Date(),
+    lastModified: UPDATED,
     changeFrequency: "monthly" as const,
     priority: 0.75,
   }));
@@ -46,73 +51,73 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const otherPages = [
     {
       url: `${baseUrl}/leaderboards`,
-      lastModified: new Date(),
+      lastModified: UPDATED,
       changeFrequency: "daily" as const,
       priority: 0.9,
     },
     {
       url: `${baseUrl}/daily-challenge`,
-      lastModified: new Date(),
+      lastModified: UPDATED,
       changeFrequency: "daily" as const,
       priority: 0.9,
     },
     {
       url: `${baseUrl}/about`,
-      lastModified: new Date(),
+      lastModified: UPDATED,
       changeFrequency: "monthly" as const,
       priority: 0.6,
     },
     {
       url: `${baseUrl}/faq`,
-      lastModified: new Date(),
+      lastModified: UPDATED,
       changeFrequency: "monthly" as const,
       priority: 0.7,
     },
     {
       url: `${baseUrl}/open-source`,
-      lastModified: new Date(),
+      lastModified: UPDATED,
       changeFrequency: "monthly" as const,
       priority: 0.5,
     },
     {
       url: `${baseUrl}/privacy`,
-      lastModified: new Date(),
+      lastModified: UPDATED,
       changeFrequency: "monthly" as const,
       priority: 0.6,
     },
     {
       url: `${baseUrl}/terms`,
-      lastModified: new Date(),
+      lastModified: UPDATED,
       changeFrequency: "monthly" as const,
       priority: 0.6,
     },
     {
       url: `${baseUrl}/contact`,
-      lastModified: new Date(),
+      lastModified: UPDATED,
       changeFrequency: "monthly" as const,
       priority: 0.7,
     },
     {
       url: `${baseUrl}/lobby`,
-      lastModified: new Date(),
+      lastModified: UPDATED,
       changeFrequency: "weekly" as const,
       priority: 0.8,
     },
     {
       url: `${baseUrl}/servers`,
-      lastModified: new Date(),
+      lastModified: UPDATED,
       changeFrequency: "monthly" as const,
       priority: 0.7,
     },
     {
       url: `${baseUrl}/guides/nopixel-heist-guide`,
-      lastModified: new Date(),
+      lastModified: UPDATED,
       changeFrequency: "monthly" as const,
       priority: 0.8,
     },
     {
       url: `${baseUrl}/guides/improving-reaction-time`,
-      lastModified: new Date(),
+      lastModified: UPDATED,
       changeFrequency: "monthly" as const,
       priority: 0.8,
     },
@@ -121,19 +126,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified: UPDATED,
       changeFrequency: "weekly",
       priority: 1,
     },
     {
       url: `${baseUrl}/nopixel-5`,
-      lastModified: new Date(),
+      lastModified: UPDATED,
       changeFrequency: "weekly",
       priority: 0.9,
     },
     {
       url: `${baseUrl}/guides`,
-      lastModified: new Date(),
+      lastModified: UPDATED,
       changeFrequency: "weekly",
       priority: 0.9,
     },
