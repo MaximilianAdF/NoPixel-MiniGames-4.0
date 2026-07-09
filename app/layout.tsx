@@ -11,6 +11,7 @@ import LoginButton from './components/LoginButton';
 import ContextualHint from './components/ContextualHint';
 import GlobalLoading from './components/GlobalLoading';
 import ConsentBridge from './components/ConsentBridge';
+import ChunkReloader from './components/ChunkReloader';
 import { UserProvider } from './contexts/UserContext';
 import { LoadingProvider } from './contexts/LoadingContext';
 import { KeyboardShortcutsProvider } from './contexts/KeyboardShortcutsContext';
@@ -276,6 +277,7 @@ export default function RootLayout({
                   <Footer />
                 </div>
                 <ConsentBridge />
+                <ChunkReloader />
               </GuideProvider>
             </KeyboardShortcutsProvider>
           </UserProvider>
