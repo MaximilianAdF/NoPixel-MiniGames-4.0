@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     'nopixel 5.0 minigames',
     'nopixel 5.0 hacks',
     'nopixel 5.0 release date',
+    'nopixel v',
     'nopixel 5 lockpick',
     'nopixel 5.0 thermite',
     'nopixel update',
@@ -48,7 +49,7 @@ const currentTrainers = [
 const faqs = [
   {
     q: 'When is NoPixel 5.0 coming out?',
-    a: "There is no officially confirmed NoPixel 5.0 release date yet. NoPixel updates its core systems in major versions (3.0, then the current 4.0), and 5.0 is the anticipated next step. We'll update this page as concrete, confirmed details emerge - bookmark it and check back.",
+    a: "There is no officially confirmed NoPixel 5.0 release date yet. NoPixel updates its core systems in major versions (3.0, then the current 4.0), and 5.0 is the anticipated next step. In late June 2026, the NoPixel V build was spotted in the Rockstar Games Launcher backend - a sign it is moving toward an official PC release - though no release date has been confirmed. We'll update this page as concrete, confirmed details emerge - bookmark it and check back.",
   },
   {
     q: 'Will NoPixel 5.0 have new minigames and hacks?',
@@ -117,6 +118,14 @@ export default function NoPixel5Page() {
               date yet</span>, and the specific 5.0 minigame mechanics have not been revealed. Rather
               than guess at details, we keep this page honest and update it as concrete information is
               confirmed. What we can promise: the moment the new hacks are known, the trainers go live.
+            </p>
+            <p>
+              <span className="text-white font-semibold">Latest update (July 2026):</span> in late
+              June 2026, data miners spotted NoPixel V added to the backend of the Rockstar Games
+              Launcher - the first concrete sign the project (announced in September 2025 and built in
+              collaboration with Rockstar) is heading to an official PC platform. It is not playable
+              yet, and no release date, pricing or minigame changes have been confirmed. We&apos;ll add
+              the trainers the moment new hack mechanics are revealed.
             </p>
           </div>
         </div>
