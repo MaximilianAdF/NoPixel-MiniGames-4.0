@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, type RefObject } from 'react';
 import { useIsMobileOrTablet } from '@/app/utils/useMediaQuery';
 
 interface UseMobileGameViewportArgs {
@@ -10,15 +10,14 @@ interface UseMobileGameViewportArgs {
 
 export interface MobileGameViewport {
   isMobile: boolean;
-  showHint: boolean;
   ensureVisible: (behavior?: ScrollBehavior) => void;
   focusInput: (options?: { force?: boolean }) => void;
   handleInteraction: () => void;
-  dismissHint: () => void;
 }
 
-// Shared mobile keyboard handling: keeps the puzzle centered above the on-screen keyboard,
-// manages the hidden input's focus, and the one-time "tap to play" hint.
+// Shared mobile keyboard handling: keeps the puzzle centered above the on-screen
+// keyboard and manages the hidden input's focus. Reading the keystrokes out of
+// that input is useSoftKeyboardInput's job.
 export function useMobileGameViewport({
   isPlaying,
   outerRef,
@@ -26,8 +25,6 @@ export function useMobileGameViewport({
   inputRef,
 }: UseMobileGameViewportArgs): MobileGameViewport {
   const isMobile = useIsMobileOrTablet();
-  const [showHint, setShowHint] = useState(false);
-  const hintDismissedRef = useRef(false);
   const hasInteractedRef = useRef(false);
 
   const ensureVisible = useCallback(
@@ -50,12 +47,6 @@ export function useMobileGameViewport({
     setTimeout(() => ensureVisible('smooth'), 500);
   }, [ensureVisible]);
 
-  const dismissHint = useCallback(() => {
-    if (hintDismissedRef.current) return;
-    hintDismissedRef.current = true;
-    setShowHint(false);
-  }, []);
-
   const focusInput = useCallback(
     (options?: { force?: boolean }) => {
       if (!isMobile) return;
@@ -67,20 +58,16 @@ export function useMobileGameViewport({
       } catch {
         input.focus();
       }
-      input.setSelectionRange?.(input.value.length, input.value.length);
-      // Deliberately NO re-centering here: games re-focus on every keystroke,
-      // and scrolling per keypress made the page fight the player. Centering
-      // happens once on interaction/round-start/keyboard-open instead.
+      // Deliberately NO re-centering here: scrolling per focus made the page
+      // fight the player. Centering happens once on interaction/round-start/
+      // keyboard-open instead.
     },
     [isMobile, inputRef],
   );
 
   const handleInteraction = useCallback(() => {
     if (!isMobile) return;
-    if (!hasInteractedRef.current) {
-      hasInteractedRef.current = true;
-      dismissHint();
-    }
+    hasInteractedRef.current = true;
     const input = inputRef.current;
     if (!input) return;
     try {
@@ -96,7 +83,7 @@ export function useMobileGameViewport({
       }
     });
     scrollSoon();
-  }, [isMobile, inputRef, dismissHint, scrollSoon]);
+  }, [isMobile, inputRef, scrollSoon]);
 
   // Center the puzzle shortly after it mounts on mobile.
   useEffect(() => {
@@ -141,10 +128,5 @@ export function useMobileGameViewport({
     };
   }, [isMobile, ensureVisible]);
 
-  // Show the one-time hint while playing on mobile, until the player first interacts.
-  useEffect(() => {
-    setShowHint(isMobile && isPlaying && !hintDismissedRef.current);
-  }, [isMobile, isPlaying]);
-
-  return { isMobile, showHint, ensureVisible, focusInput, handleInteraction, dismissHint };
+  return { isMobile, ensureVisible, focusInput, handleInteraction };
 }
