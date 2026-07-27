@@ -7,6 +7,7 @@ import usePersistantState from '@/app/utils/usePersistentState';
 import { useKeyDown } from '@/app/utils/useKeyDown';
 import { useDailyChallenge } from '@/app/utils/useDailyChallenge';
 import { useMobileGameViewport } from '@/app/utils/useMobileGameViewport';
+import { useSoftKeyboardInput } from '@/app/utils/useSoftKeyboardInput';
 import { trackGameStart, trackGameRetry } from '@/app/utils/gtm';
 import { useUser } from '@/app/contexts/UserContext';
 import { NPSettingsRange } from '@/app/components/NPSettings';
@@ -17,6 +18,7 @@ import type { GameMode, GamePhase, GameResult } from '@/app/game/types';
 import { useReplayedState } from '@/app/utils/useReplayedState';
 import OpponentSummary from '@/app/lobby/OpponentSummary';
 import { choppingEngine, type ChoppingState } from './engine';
+import { Letters } from './utils';
 import { GridRow, defaultGridCols } from './ChoppingGrid';
 import '../../../public/Chopping/Chopping.css';
 
@@ -38,7 +40,8 @@ interface ChoppingViewProps {
   // activation. Spectator views omit these.
   wrapperRef?: React.Ref<HTMLDivElement>;
   onInteraction?: () => void;
-  // Interactive-only: hidden mobile input rendered inside the GameShell.
+  // Interactive-only: hidden mobile input, overlaid on the grid so tapping the
+  // puzzle focuses it directly and Android reliably raises the keyboard.
   mobileInput?: ReactNode;
   settings?: React.ComponentProps<typeof GameShell>['settings'];
 }
@@ -69,14 +72,14 @@ const ChoppingView: FC<ChoppingViewProps> = ({
     hideTimer={hideTimer}
     settings={settings}
   >
-    {mobileInput}
     <div
       ref={wrapperRef}
-      className={`${compact ? '' : 'min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px] '}w-full max-w-full flex-1 min-h-0 rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-center text-white p-1 sm:p-4 mx-auto`}
+      className={`relative ${compact ? '' : 'min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px] '}w-full max-w-full flex-1 min-h-0 rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-center text-white p-1 sm:p-4 mx-auto`}
       onTouchStartCapture={onInteraction}
       onPointerDownCapture={onInteraction}
       style={{ scrollMarginTop: '15vh', overflow: 'visible' }}
     >
+      {mobileInput}
       <div className="game-grid" style={{ height: '100%', width: '100%' }}>
         {Array.from({ length: Math.ceil(state.board.length / defaultGridCols) }).map(
           (_, rowIndex) => (
@@ -173,7 +176,6 @@ const Chopping: FC<ChoppingProps> = ({ seed, onMatchEnd, onInput }) => {
   const outerContainerRef = useRef<HTMLDivElement>(null);
   const gameWrapperRef = useRef<HTMLDivElement>(null);
   const mobileInputRef = useRef<HTMLInputElement>(null);
-  const skipNextInputRef = useRef(false);
   const prevActiveIndexRef = useRef(0);
 
   const mobile = useMobileGameViewport({
@@ -233,39 +235,28 @@ const Chopping: FC<ChoppingProps> = ({ seed, onMatchEnd, onInput }) => {
   );
   useKeyDown(handleKey, ALLOWED_KEYS, true);
 
-  const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (phase !== 'playing') return;
-    const { key } = e;
-    if (key.length === 1) {
-      skipNextInputRef.current = true;
-      e.preventDefault();
-      mobile.dismissHint();
-      submitInput(key.toUpperCase());
-      if (mobileInputRef.current) mobileInputRef.current.value = '';
-      return;
-    }
-    if (key === 'Backspace') {
-      skipNextInputRef.current = true;
-      e.preventDefault();
-      if (mobileInputRef.current) mobileInputRef.current.value = '';
-    }
-  };
+  const phaseRef = useRef(phase);
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
 
-  const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {
-    const input = e.currentTarget;
-    if (skipNextInputRef.current) {
-      skipNextInputRef.current = false;
-      input.value = '';
-      return;
-    }
-    const key = input.value.slice(-1);
-    if (key && phase === 'playing') {
-      mobile.dismissHint();
-      submitInput(key.toUpperCase());
-      input.value = '';
-      mobile.focusInput();
-    }
-  };
+  const handleSoftKey = useCallback(
+    (key: string) => {
+      if (phaseRef.current === 'playing' && key.length === 1) submitInput(key);
+    },
+    [submitInput],
+  );
+  const acceptLetter = useCallback((char: string) => {
+    const upper = char.toUpperCase();
+    return (Letters as string[]).includes(upper) ? upper : null;
+  }, []);
+
+  const keyboard = useSoftKeyboardInput({
+    enabled: mobile.isMobile,
+    inputRef: mobileInputRef,
+    onKey: handleSoftKey,
+    accept: acceptLetter,
+  });
 
   const [settingsNumLetters, setSettingsNumLetters] = useState(defaultNumLetters);
   const [settingsDuration, setSettingsDuration] = useState(defaultDuration);
@@ -332,10 +323,14 @@ const Chopping: FC<ChoppingProps> = ({ seed, onMatchEnd, onInput }) => {
         />
       )}
       <div ref={outerContainerRef} className="flex flex-col gap-4">
-        {mobile.isMobile && mobile.showHint && (
-          <div className="rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
-            Tap the puzzle, then type the letters to play.
-          </div>
+        {mobile.isMobile && phase === 'playing' && !keyboard.isFocused && (
+          <button
+            type="button"
+            onClick={keyboard.focus}
+            className="rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40"
+          >
+            Tap the puzzle to open your keyboard, then type the letters.
+          </button>
         )}
         <ChoppingView
           state={state}
@@ -348,33 +343,17 @@ const Chopping: FC<ChoppingProps> = ({ seed, onMatchEnd, onInput }) => {
           wrapperRef={gameWrapperRef}
           onInteraction={mobile.handleInteraction}
           settings={isMatch || isChallengeMode ? undefined : settings}
+          // Stays mounted across rounds: unmounting it drops focus, and Android
+          // will not reopen the keyboard without a fresh tap.
           mobileInput={
-            mobile.isMobile && phase === 'playing' ? (
+            mobile.isMobile ? (
               <input
+                {...keyboard.inputProps}
                 ref={mobileInputRef}
-                type="text"
                 inputMode="text"
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="characters"
-                className="opacity-0"
-                style={{
-                  position: 'fixed',
-                  top: 0,
-                  left: 0,
-                  width: '1px',
-                  height: '1px',
-                  background: 'transparent',
-                }}
-                onInput={handleMobileInput}
-                onKeyDown={handleMobileKeyDown}
-                onFocus={() => mobile.focusInput()}
-                onBlur={(e) => {
-                  if (phase === 'playing') {
-                    e.preventDefault();
-                    e.target.focus({ preventScroll: true });
-                  }
-                }}
+                className="absolute inset-0 z-10 h-full w-full bg-transparent opacity-0"
+                // 16px keeps iOS from zooming the page when the field takes focus.
+                style={{ fontSize: '16px' }}
                 aria-label="Type letters here"
               />
             ) : null

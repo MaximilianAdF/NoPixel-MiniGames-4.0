@@ -7,6 +7,7 @@ import usePersistantState from '@/app/utils/usePersistentState';
 import { useKeyDown } from '@/app/utils/useKeyDown';
 import { useDailyChallenge } from '@/app/utils/useDailyChallenge';
 import { useMobileGameViewport } from '@/app/utils/useMobileGameViewport';
+import { useSoftKeyboardInput } from '@/app/utils/useSoftKeyboardInput';
 import { trackGameStart, trackGameRetry } from '@/app/utils/gtm';
 import { useUser } from '@/app/contexts/UserContext';
 import { NPSettingsRange } from '@/app/components/NPSettings';
@@ -37,7 +38,8 @@ interface PincrackerViewProps {
   // Interactive-only. When omitted, no Crack button is rendered and the grid
   // is non-interactive.
   onCrack?: () => void;
-  // Interactive-only: optional hidden mobile input rendered inside the GameShell.
+  // Interactive-only: hidden mobile input, overlaid on the grid so tapping the
+  // puzzle focuses it directly and Android reliably raises the keyboard.
   mobileInput?: ReactNode;
   wrapperRef?: React.Ref<HTMLDivElement>;
   onInteraction?: () => void;
@@ -126,10 +128,9 @@ const PincrackerView: FC<PincrackerViewProps> = ({
       hideTimer={hideTimer}
       settings={settings}
     >
-      {mobileInput}
       <div
         ref={wrapperRef}
-        className={`h-56 sm:h-60 md:h-64 ${
+        className={`relative h-56 sm:h-60 md:h-64 ${
           compact ? '' : 'min-w-[calc(100vw-60px)] sm:min-w-[550px] md:min-w-[600px] '
         }w-full max-w-full rounded-lg bg-[rgba(0,28,49,0.3)] flex items-center justify-between text-white text-6xl sm:text-7xl md:text-8xl px-3 sm:px-5 md:px-6 mx-auto ${
           !onCrack ? 'pointer-events-none' : ''
@@ -138,6 +139,7 @@ const PincrackerView: FC<PincrackerViewProps> = ({
         onPointerDownCapture={onInteraction}
         style={{ scrollMarginTop: '15vh' }}
       >
+        {mobileInput}
         {state.guess.map((digit, index) => (
           <PinColumn
             key={index}
@@ -290,9 +292,8 @@ const Pincracker: FC<PincrackerProps> = ({ seed, onMatchEnd, onInput }) => {
       } else {
         submitInput({ type: 'digit', value: key as Digit });
       }
-      mobile.focusInput();
     },
-    [submitInput, mobile.focusInput],
+    [submitInput],
   );
 
   const handleKey = useCallback(
@@ -303,28 +304,28 @@ const Pincracker: FC<PincrackerProps> = ({ seed, onMatchEnd, onInput }) => {
   );
   useKeyDown(handleKey, ALLOWED_KEYS, true);
 
-  const handleMobileInput = (e: React.FormEvent<HTMLInputElement>) => {
-    const input = e.currentTarget;
-    const key = input.value.slice(-1);
-    if (!key || phase !== 'playing') {
-      if (!key) input.value = '';
-      return;
-    }
-    mobile.dismissHint();
-    submitKey(key);
-    input.value = '';
-  };
+  const phaseRef = useRef(phase);
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
 
-  const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (phase !== 'playing') return;
-    if (e.key === 'Backspace') {
-      mobile.dismissHint();
-      submitKey('Backspace');
-    } else if (e.key === 'Enter') {
-      mobile.dismissHint();
-      submitKey('Enter');
-    }
-  };
+  const handleSoftKey = useCallback(
+    (key: string) => {
+      if (phaseRef.current === 'playing') submitKey(key);
+    },
+    [submitKey],
+  );
+  const acceptDigit = useCallback(
+    (char: string) => (char >= '0' && char <= '9' ? char : null),
+    [],
+  );
+
+  const keyboard = useSoftKeyboardInput({
+    enabled: mobile.isMobile,
+    inputRef: mobileInputRef,
+    onKey: handleSoftKey,
+    accept: acceptDigit,
+  });
 
   const [settingsPinLength, setSettingsPinLength] = useState(defaultPinLength);
   const [settingsDuration, setSettingsDuration] = useState(defaultDuration);
@@ -403,10 +404,14 @@ const Pincracker: FC<PincrackerProps> = ({ seed, onMatchEnd, onInput }) => {
         />
       )}
       <div ref={outerContainerRef} className="flex flex-col gap-4">
-        {mobile.isMobile && mobile.showHint && (
-          <div className="rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40">
-            Tap the puzzle, then start typing to enter the code.
-          </div>
+        {mobile.isMobile && phase === 'playing' && !keyboard.isFocused && (
+          <button
+            type="button"
+            onClick={keyboard.focus}
+            className="rounded-xl border border-spring-green-500/40 bg-mirage-900/70 px-4 py-3 text-center text-xs font-medium text-spring-green-100 shadow-lg shadow-mirage-950/40"
+          >
+            Tap the puzzle to open your keyboard, then type the code.
+          </button>
         )}
         <PincrackerView
           state={state}
@@ -422,32 +427,18 @@ const Pincracker: FC<PincrackerProps> = ({ seed, onMatchEnd, onInput }) => {
           wrapperRef={gameWrapperRef}
           onInteraction={mobile.handleInteraction}
           settings={isMatch || isChallengeMode ? undefined : settings}
+          // Stays mounted across rounds: unmounting it drops focus, and Android
+          // will not reopen the keyboard without a fresh tap.
           mobileInput={
-            mobile.isMobile && phase === 'playing' ? (
+            mobile.isMobile ? (
               <input
+                {...keyboard.inputProps}
                 ref={mobileInputRef}
-                type="tel"
                 inputMode="numeric"
-                pattern="[0-9]*"
-                autoComplete="off"
-                className="opacity-0"
-                style={{
-                  position: 'fixed',
-                  top: 0,
-                  left: 0,
-                  width: '1px',
-                  height: '1px',
-                  background: 'transparent',
-                }}
-                onInput={handleMobileInput}
-                onKeyDown={handleMobileKeyDown}
-                onFocus={() => mobile.focusInput()}
-                onBlur={(e) => {
-                  if (phase === 'playing') {
-                    e.preventDefault();
-                    e.target.focus({ preventScroll: true });
-                  }
-                }}
+                enterKeyHint="go"
+                className="absolute inset-0 z-10 h-full w-full bg-transparent opacity-0"
+                // 16px keeps iOS from zooming the page when the field takes focus.
+                style={{ fontSize: '16px' }}
                 aria-label="Enter PIN digits"
               />
             ) : null
