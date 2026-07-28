@@ -10,6 +10,7 @@ import { orbitron } from '@/app/fonts';
 import { generateLobbyCode, isValidLobbyCode } from '@/lib/lobby/code';
 import { trackLobbyCreated, trackLobbyJoined } from '@/app/utils/gtm';
 import PlayerAvatar from '@/app/components/PlayerAvatar';
+import SideAdRail from '@/app/components/SideAdRail';
 import { getRacedGhostIds } from '@/app/lobby/ghostHistory';
 import { GHOST_ENABLED_GAMES, isGhostEnabled } from '@/lib/lobby/ghostGames';
 import type { GameType } from '@/interfaces/user';
@@ -173,6 +174,9 @@ export default function LobbyLanding() {
   return (
     <main className="relative flex min-h-screen flex-col items-center bg-gradient-to-br from-mirage-950 via-mirage-900 to-mirage-950">
       <LobbyBackdrop />
+      {/* Desktop gutter ad rail — landing page only (never on live matches);
+          fit-gated so it renders only when the gutter is genuinely empty. */}
+      <SideAdRail contentHalfWidth={512} />
 
       <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Top utility row */}

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import DailyChallengeClient from './DailyChallengeClient';
+import SideAdRail from '@/app/components/SideAdRail';
 import { Calendar, Trophy, Zap, Target, Clock, Flame } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -30,11 +31,16 @@ export default function DailyChallengePage() {
         </div>
       </div>
 
-      {/* SSR SEO Footer Content - Below the fold */}
-      <div className="max-w-4xl mx-auto px-4 py-12">
+      {/* Desktop gutter ad rail — fit-gated, renders only when the space is
+          genuinely empty (viewport wide enough for content + rail). */}
+      <SideAdRail contentHalfWidth={448} />
+
+      {/* SSR SEO Footer Content - Below the fold. single-post > entry-content
+          lets Journey place in-content units between these paragraphs. */}
+      <div className="single-post max-w-4xl mx-auto px-4 py-12">
         <div className="bg-[#1a2930]/60 border border-white/10 rounded-2xl p-6 md:p-8">
           <h2 className="text-2xl font-bold text-white mb-4">How Daily Challenges Work</h2>
-          <div className="space-y-4 text-gray-300">
+          <div className="entry-content space-y-4 text-gray-300">
             <p>
               Every day at midnight UTC, a new challenge is automatically generated featuring one of the 7 NoPixel minigames.
               The system uses the current date as a seed to deterministically select a random minigame and generate unique
