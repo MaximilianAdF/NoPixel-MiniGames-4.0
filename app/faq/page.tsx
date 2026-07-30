@@ -1,5 +1,7 @@
 import { HelpCircle, Gamepad2, Trophy, Shield, Zap, Users } from 'lucide-react';
 import type { Metadata } from 'next';
+import JsonLd from '@/app/components/JsonLd';
+import { faqPage, breadcrumbList } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
   title: 'FAQ - NoPixel 4.0 Minigames Trainer',
@@ -71,6 +73,13 @@ export default function FAQPage() {
   return (
     <div className="single-post min-h-screen bg-gradient-to-br from-[#0F1B21] via-[#1a2930] to-[#0F1B21] p-4 md:p-8">
       <div className="entry-content max-w-4xl mx-auto">
+        <JsonLd data={faqPage(faqs.map((f) => ({ q: f.question, a: f.answer })))} />
+        <JsonLd
+          data={breadcrumbList([
+            { name: 'Home', path: '/' },
+            { name: 'FAQ', path: '/faq' },
+          ])}
+        />
         {/* Header */}
         <div className="text-center mb-12 pt-16">
           <div className="flex items-center justify-center gap-4 mb-4">
