@@ -20,6 +20,10 @@ import GoogleTagManager, { GoogleTagManagerNoScript } from './components/GoogleT
 import GoogleAnalytics from './components/GoogleAnalytics';
 import Footer from './components/Footer';
 
+// Master switch for Journey/Mediavine ads. Off while the site serves as a
+// job-application portfolio piece (Aug 2026); set true and deploy to restore.
+const ADS_ENABLED = false;
+
 function Background() {
   return (
     <div
@@ -239,14 +243,20 @@ export default function RootLayout({
 
         {/* Journey by Mediavine (ads) — site-unique script wrapper, must live in
             <head>. async so it never blocks paint; data-cfasync/data-noptimize
-            keep Cloudflare and optimizers from deferring or rewriting it. */}
-        <script
-          type="text/javascript"
-          async
-          data-noptimize="1"
-          data-cfasync="false"
-          src="//scripts.scriptwrapper.com/tags/09211bfe-a82d-4882-9012-edfd3fb877f2.js"
-        />
+            keep Cloudflare and optimizers from deferring or rewriting it.
+            ADS_ENABLED is the master switch (owner is job-hunting with the site
+            as a portfolio piece — ads off Aug 2026, one-line flip to restore).
+            The NODE_ENV guard stays: dev servers must never fire real ad
+            requests (invalid-traffic risk + console noise). */}
+        {ADS_ENABLED && process.env.NODE_ENV === 'production' && (
+          <script
+            type="text/javascript"
+            async
+            data-noptimize="1"
+            data-cfasync="false"
+            src="//scripts.scriptwrapper.com/tags/09211bfe-a82d-4882-9012-edfd3fb877f2.js"
+          />
+        )}
       </head>
       <body
         className={`${gilroy.className} overscroll-y-none`}
