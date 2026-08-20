@@ -6,8 +6,8 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'NoPixel 4.0 Minigame Guides - Master Every Hack | Expert Tips & Strategies',
-  description: 'Complete guides for all NoPixel 4.0 minigames. Learn expert strategies, tips, and techniques for Thermite, Lockpick, PinCracker, Laundromat, Roof Running, Word Memory, Chopping, and Repair Kit hacks.',
+  title: { absolute: 'NoPixel 4.0 Minigame Guides – Tips & Strategies' },
+  description: 'Free NoPixel 4.0 minigame guides — expert tips and strategies for Thermite, Lockpick, PinCracker, Laundromat, Roof Running and every hack, plus heist prep.',
   keywords: ['NoPixel guides', 'thermite tutorial', 'lockpick guide', 'GTA RP hacking tips', 'NoPixel 4.0 strategies', 'repair kit guide'],
   alternates: {
     canonical: 'https://nphacks.net/guides',

@@ -82,7 +82,7 @@ export default async function Image() {
             marginBottom: '30px',
           }}
         >
-          Parkour • Path Memory • Speed Challenge
+          Same-Game Tile Clearing • Puzzle
         </div>
         <div
           style={{
@@ -100,7 +100,7 @@ export default async function Image() {
               textAlign: 'center',
             }}
           >
-            Train your memory for the rooftop parkour sequence
+            Clear groups of matching blocks before the timer runs out
           </div>
           <div
             style={{
@@ -110,7 +110,7 @@ export default async function Image() {
               textAlign: 'center',
             }}
           >
-            Fast reflexes • Pattern recall
+            Pattern spotting • Board clearing
           </div>
         </div>
         <div
