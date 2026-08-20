@@ -84,9 +84,9 @@ export default function ReactionTimeGuidePage() {
                             <p>
                                 In the context of NoPixel minigames, faster reaction time benefits you in multiple ways: you have more
                                 time to consider your response in timed games, you can recognize and react to patterns more quickly,
-                                and you experience less cognitive load because basic responses become automatic. Games like Lockpick,
-                                Roof Running, and Chopping are particularly dependent on raw reaction speed, while memory-based games
-                                like Thermite benefit from the faster information processing that reaction training provides.
+                                and you experience less cognitive load because basic responses become automatic. Games like Chopping
+                                and Repair Kit are particularly dependent on raw reaction speed, while logic-and-planning games
+                                like Thermite and PinCracker benefit from the faster information processing that reaction training provides.
                             </p>
                         </div>
                     </section>
@@ -107,9 +107,9 @@ export default function ReactionTimeGuidePage() {
                             <p>
                                 Your eyes detect a change, and your brain must process what it means before you can respond. To improve
                                 this phase, practice identifying visual changes rapidly. Our minigames themselves are excellent training
-                                tools — playing Thermite trains you to quickly detect which tile lit up, while Laundromat trains pattern
-                                matching speed. Start with lower difficulty settings and gradually increase speed as your visual processing
-                                improves.
+                                tools — playing Chopping trains you to spot each prompt and hit the right key instantly, while Repair Kit
+                                trains you to stop a moving indicator in a narrow target zone. Start with lower difficulty settings and
+                                gradually increase speed as your visual processing improves.
                             </p>
 
                             <h3 className="text-xl font-semibold text-white pt-2">2. Decision-Making Speed</h3>

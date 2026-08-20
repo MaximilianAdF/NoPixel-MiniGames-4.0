@@ -52,6 +52,11 @@ export const metadata: Metadata = {
 // first; each entry is a confirmed, sourced development. Update as news breaks.
 const updates = [
   {
+    date: 'August 2026',
+    title: 'NoPixel V dated: closed beta September 8, 2026 on the Rockstar Games Launcher',
+    body: 'NoPixel V will open as a closed beta on September 8, 2026 through the Rockstar Games Launcher - the first RP server to ship on Rockstar\'s own launcher - with a launch trailer premiering September 1, 2026 (5PM BST). Initial access is invite-only: an allowlist of roughly 450 content creators and established roleplayers, rolled out in phases, while NoPixel 4.0 and the Public server stay online. The new 5.0 hacking minigames have not been revealed yet.',
+  },
+  {
     date: 'June 22, 2026',
     title: 'NoPixel V spotted in the Rockstar Games Launcher backend',
     body: 'Dataminers found "NoPixel V" added to the Rockstar Games Launcher backend as a listed title - alongside entries like Red Dead Redemption 2 - with fresh artwork and logos. It is not yet playable, but the groundwork for an official launcher release is now in place. No release date was attached.',
@@ -79,7 +84,7 @@ const currentTrainers = [
 const faqs = [
   {
     q: 'When is NoPixel 5.0 (NoPixel V) coming out?',
-    a: 'There is no officially confirmed release date yet. NoPixel V was announced on September 23, 2025 in collaboration with Rockstar Games, and in June 2026 it was spotted added to the Rockstar Games Launcher backend - a strong sign it is nearing an official PC release. Rockstar or the NoPixel team could announce a date at any time. Sign up on this page and we will email you when the new hacking trainers launch.',
+    a: 'NoPixel V opens as a closed beta on September 8, 2026 on the Rockstar Games Launcher, with a launch trailer on September 1, 2026. Access starts invite-only - an allowlist of roughly 450 creators and established roleplayers, rolled out in phases - so a full public release date has not been confirmed, and NoPixel 4.0 and the Public server stay online in the meantime. Sign up on this page and we will email you when the new hacking trainers launch.',
   },
   {
     q: 'What is NoPixel V?',
@@ -127,7 +132,7 @@ export default function NoPixel5Page() {
         <div className="text-center mb-12 pt-16">
           <span className="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full bg-[#54FFA4]/10 border border-[#54FFA4]/30 text-[#54FFA4] text-xs font-semibold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />
-            In development - spotted on the Rockstar Launcher
+            Closed beta September 8, 2026 - Rockstar Games Launcher
           </span>
           <div className="flex items-center justify-center gap-4 mb-4">
             <Rocket className="w-12 h-12 text-[#54FFA4]" />
@@ -188,8 +193,8 @@ export default function NoPixel5Page() {
             </p>
             <p>
               <span className="text-white font-semibold">The minigames are still unknown.</span>{' '}
-              There is no confirmed release date, and the specific 5.0 hacking mechanics have not been
-              revealed. Rather than guess, we keep this page honest and update it as concrete
+              A closed beta is now dated (September 8, 2026), but a full public release date and the
+              specific 5.0 hacking mechanics have not been revealed. Rather than guess, we keep this page honest and update it as concrete
               information lands. What we can promise: the moment the new hacks are known, the trainers
               go live.
             </p>
