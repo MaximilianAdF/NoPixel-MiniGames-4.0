@@ -9,6 +9,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // constantly and told crawlers nothing about actual freshness.
   const UPDATED = new Date("2026-07-09");
 
+  // /nopixel-5 got a real content refresh on 2026-08-31 (confirmed NoPixel V
+  // closed-beta dates) — its own lastmod signals that freshness without
+  // churning <lastmod> on every other URL.
+  const NP5_UPDATED = new Date("2026-08-31");
+
   // Define all minigame routes
   const minigames = [
     "thermite",
@@ -132,7 +137,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/nopixel-5`,
-      lastModified: UPDATED,
+      lastModified: NP5_UPDATED,
       changeFrequency: "weekly",
       priority: 0.9,
     },
