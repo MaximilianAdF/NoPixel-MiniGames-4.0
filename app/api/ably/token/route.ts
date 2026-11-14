@@ -1,51 +1,56 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import * as Ably from 'ably';
+import { SignJWT, jwtVerify } from 'jose';
 import { getSession } from '@/lib/auth/session';
+import { getSessionSecret } from '@/lib/auth/config';
+import { isValidLobbyCode } from '@/lib/lobby/code';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
+const GUEST_COOKIE = 'nphacks_lobby_guest';
 
-const GUEST_ID_PATTERN = /^guest-[a-zA-Z0-9-]{4,40}$/;
-
-/**
- * GET /api/ably/token
- *
- * Mints a capability-scoped Ably token request for the calling session.
- * The client uses this token (not the root API key) to connect to Ably,
- * scoped to the lobby:* channel namespace used by 1v1.
- *
- * Logged-in users get their session.user.id as clientId. Anonymous
- * visitors send their own browser-generated guest id (?clientId=guest-…)
- * which we validate before signing — that prevents anonymous tokens from
- * impersonating real users (whose ids never carry the `guest-` prefix).
- */
 export async function GET(req: NextRequest) {
   try {
-    const apiKey = process.env.ABLY_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: 'Ably is not configured' }, { status: 500 });
+    const channel = req.nextUrl.searchParams.get('channel') || '';
+    if (!channel.startsWith('lobby:') || !isValidLobbyCode(channel.slice(6))) {
+      return NextResponse.json({ error: 'Invalid lobby channel' }, { status: 400 });
     }
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    if (!checkRateLimit(`ably:${ip}`, { maxRequests: 60, windowSeconds: 60 }).success) {
+      return NextResponse.json({ error: 'Too many connection attempts' }, { status: 429 });
+    }
+    const apiKey = process.env.ABLY_API_KEY;
+    if (!apiKey) return NextResponse.json({ error: 'Multiplayer is not configured on the server' }, { status: 503 });
 
     const session = await getSession();
-    let clientId: string;
-    if (session?.user?.id) {
-      clientId = session.user.id;
-    } else {
-      const requested = req.nextUrl.searchParams.get('clientId');
-      clientId = requested && GUEST_ID_PATTERN.test(requested)
-        ? requested
-        : `guest-${crypto.randomUUID().slice(0, 8)}`;
+    let clientId = session?.user?.id;
+    let guestToken: string | undefined;
+    if (!clientId) {
+      const secret = getSessionSecret();
+      const cookie = req.cookies.get(GUEST_COOKIE)?.value;
+      if (cookie) {
+        try {
+          const { payload } = await jwtVerify(cookie, secret, { audience: 'lobby-guest', algorithms: ['HS256'] });
+          if (typeof payload.sub === 'string' && /^guest-[a-f0-9-]{36}$/.test(payload.sub)) clientId = payload.sub;
+        } catch { /* Issue a new server-authenticated guest identity. */ }
+      }
+      if (!clientId) {
+        clientId = `guest-${crypto.randomUUID()}`;
+        guestToken = await new SignJWT({}).setProtectedHeader({ alg: 'HS256' }).setSubject(clientId)
+          .setAudience('lobby-guest').setIssuedAt().setExpirationTime('7d').sign(secret);
+      }
     }
-
     const rest = new Ably.Rest({ key: apiKey });
     const tokenRequest = await rest.auth.createTokenRequest({
-      clientId,
-      capability: { 'lobby:*': ['subscribe', 'publish', 'presence'] },
-      ttl: 60 * 60 * 1000,
+      clientId, capability: { [channel]: ['subscribe', 'publish', 'presence'] }, ttl: 60 * 60 * 1000,
     });
-
-    return NextResponse.json(tokenRequest);
+    const response = NextResponse.json(tokenRequest, { headers: { 'Cache-Control': 'private, no-store' } });
+    if (guestToken) response.cookies.set(GUEST_COOKIE, guestToken, {
+      httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 7 * 86400, path: '/',
+    });
+    return response;
   } catch (error) {
     console.error('Failed to create Ably token request:', error);
-    return NextResponse.json({ error: 'Failed to create token' }, { status: 500 });
+    return NextResponse.json({ error: 'Unable to authenticate the multiplayer connection' }, { status: 503 });
   }
 }

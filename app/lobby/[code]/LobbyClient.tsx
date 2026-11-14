@@ -47,6 +47,7 @@ import { generateMatchSeed } from '@/lib/lobby/seededRandom';
 import { determineHost } from '@/lib/lobby/host';
 import { isGhostEnabled } from '@/lib/lobby/ghostGames';
 import type { LobbyMessage } from '@/lib/lobby/messages';
+import { isAuthorizedLobbyMessage, isLobbyGameInput, lobbyPlayers } from '@/lib/lobby/messageValidation';
 import type { GameType } from '@/interfaces/user';
 import type { GameResult } from '@/app/game/types';
 import { orbitron } from '@/app/fonts';
@@ -94,29 +95,10 @@ interface LobbyClientProps {
 }
 
 export default function LobbyClient({ code }: LobbyClientProps) {
-  const { user } = useUser();
+  const { user, hasInitialized } = useUser();
   const router = useRouter();
-  // Anonymous play: guests get a stable per-tab identity stored in
-  // sessionStorage so a reload keeps them in the same lobby slot.
-  const [guestId, setGuestId] = useState<string | null>(null);
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const stored = sessionStorage.getItem('lobbyGuestId');
-    if (stored) {
-      setGuestId(stored);
-      return;
-    }
-    const fresh = `guest-${(typeof crypto !== 'undefined' && crypto.randomUUID
-      ? crypto.randomUUID()
-      : Math.random().toString(36).slice(2)
-    ).slice(0, 8)}`;
-    sessionStorage.setItem('lobbyGuestId', fresh);
-    setGuestId(fresh);
-  }, []);
-  const effectiveClientId = user?.id ?? guestId;
-  const effectiveDisplayName = user?.displayName
-    ?? user?.username
-    ?? (guestId ? `Guest ${guestId.slice(-4).toUpperCase()}` : 'Player');
+  const authenticatedIdRef = useRef<string | null>(null);
+  const effectiveDisplayName = user?.displayName ?? user?.username ?? 'Guest';
   const [copied, setCopied] = useState(false);
   const [match, setMatch] = useState<{ game: GameType; seed: number } | null>(null);
   const [myResult, setMyResult] = useState<GameResult | null>(null);
@@ -203,7 +185,9 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     }, def.loopMs);
   }, []);
 
-  const handleMessage = useCallback((msg: LobbyMessage) => {
+  const handleMessage = useCallback((data: unknown, senderId: string | undefined, members: PresenceMember[]) => {
+    if (!isAuthorizedLobbyMessage(data, senderId, members, authenticatedIdRef.current)) return;
+    const msg = data;
     if (msg.type === 'match:start') {
       setMatch({ game: msg.game, seed: msg.seed });
       setMyResult(null);
@@ -227,12 +211,16 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       // Match timer starts counting from GO, not from when match:start arrived.
       setMatchStartTime(cappedGoAt);
     } else if (msg.type === 'match:result') {
+      if (!match) return;
       setOpponentResult({ won: msg.won, score: msg.score, elapsedMs: msg.elapsedMs });
     } else if (msg.type === 'match:input') {
+      if (!match || opponentInputs.length >= 10000 || !isLobbyGameInput(match.game, msg.input)) return;
       setOpponentInputs((prev) => [...prev, msg.input]);
     } else if (msg.type === 'match:timeout') {
+      if (!match || matchStartTime === null || Date.now() < matchStartTime + MATCH_MAX_MS - 1000) return;
       setMatchExpired(true);
     } else if (msg.type === 'match:outcome') {
+      if (!match) return;
       setOutcome({ winnerClientId: msg.winnerClientId, reason: msg.reason });
     } else if (msg.type === 'emote') {
       showEmote(msg.emote, msg.fromClientId);
@@ -240,9 +228,9 @@ export default function LobbyClient({ code }: LobbyClientProps) {
     // 'suggest' messages from older clients are ignored — the guest no
     // longer has a suggest picker. Host's game pick is the single source
     // of truth.
-  }, [showEmote]);
+  }, [showEmote, match, matchStartTime, opponentInputs.length]);
 
-  const { status, presence, publish } = useAblyChannel<LobbyMessage>({
+  const { status, presence, publish, clientId: effectiveClientId, error: connectionError } = useAblyChannel<LobbyMessage>({
     channelName: `lobby:${code}`,
     presenceData: {
       displayName: effectiveDisplayName,
@@ -250,14 +238,16 @@ export default function LobbyClient({ code }: LobbyClientProps) {
       avatarHash: user?.avatar,
     },
     onMessage: handleMessage,
-    enabled: !!effectiveClientId,
-    clientId: effectiveClientId ?? undefined,
+    enabled: hasInitialized,
+    clientId: user?.id,
   });
 
-  const hostClientId = determineHost(presence);
+  authenticatedIdRef.current = effectiveClientId;
+  const players = lobbyPlayers(presence);
+  const hostClientId = determineHost(players);
   const isHost = hostClientId !== undefined && hostClientId === effectiveClientId;
   const me = presence.find((p) => p.clientId === effectiveClientId) ?? null;
-  const opponent = presence.find((p) => p.clientId !== effectiveClientId) ?? null;
+  const opponent = players.find((p) => p.clientId !== effectiveClientId) ?? null;
   const opponentClientId = opponent?.clientId ?? null;
 
   // 1Hz ticker — drives all the countdown displays + expiry checks below.
@@ -646,6 +636,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
 
 
   const handleStart = async (game: GameType) => {
+    if (!isHost || status !== 'connected' || players.length !== 2) return;
     const seed = generateMatchSeed();
     const startNow = Date.now();
     const newGoAt = startNow + COUNTDOWN_MS;
@@ -840,7 +831,7 @@ export default function LobbyClient({ code }: LobbyClientProps) {
                 Couldn&apos;t connect to the lobby
               </p>
               <p className="text-gray-400 text-xs mb-4">
-                The realtime connection failed. Check your network and try again.
+                {connectionError || 'The realtime connection failed. Please try again.'}
               </p>
               <button
                 type="button"

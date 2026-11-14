@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { UserSession } from '@/interfaces/user';
+import { getSessionSecret } from './config';
 
 const SESSION_COOKIE_NAME = 'nopixel_session';
 const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -9,10 +10,11 @@ const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
  * Create JWT session token
  */
 export async function createSessionToken(payload: UserSession): Promise<string> {
-  const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET!);
+  const secret = getSessionSecret();
   
   const token = await new SignJWT(payload as any)
     .setProtectedHeader({ alg: 'HS256' })
+    .setAudience('nphacks-session')
     .setIssuedAt()
     .setExpirationTime('7d')
     .sign(secret);
@@ -25,10 +27,14 @@ export async function createSessionToken(payload: UserSession): Promise<string> 
  */
 export async function verifySessionToken(token: string): Promise<UserSession | null> {
   try {
-    const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET!);
-    const { payload } = await jwtVerify(token, secret);
+    const secret = getSessionSecret();
+    const { payload } = await jwtVerify(token, secret, { algorithms: ['HS256'] });
     
-    return payload as unknown as UserSession;
+    // Keep existing sessions valid, but reject tokens issued for other purposes.
+    const session = payload as unknown as UserSession;
+    if ((payload.aud && payload.aud !== 'nphacks-session') || !session.user ||
+        typeof session.user.id !== 'string' || !Number.isFinite(session.expiresAt)) return null;
+    return session;
   } catch (error) {
     return null;
   }

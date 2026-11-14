@@ -34,16 +34,15 @@ export async function DELETE() {
         { session: mongoSession }
       );
 
-      if (!deleteUserResult || !deleteUserResult.value) {
+      if (!deleteUserResult) {
         throw new Error('USER_NOT_FOUND');
       }
 
       userDeleted = true;
 
-      await Promise.all([
-        db.collection('userChallengeProgress').deleteMany({ userId }, { session: mongoSession }),
-        db.collection('analyticsEvents').deleteMany({ userId }, { session: mongoSession }),
-      ]);
+      // The MongoDB driver does not support parallel operations in a transaction.
+      await db.collection('userChallengeProgress').deleteMany({ userId }, { session: mongoSession });
+      await db.collection('analyticsEvents').deleteMany({ userId }, { session: mongoSession });
     });
 
     if (!userDeleted) {

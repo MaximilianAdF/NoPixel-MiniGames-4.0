@@ -19,6 +19,11 @@ export async function DELETE() {
       );
     }
 
+    const admins = (process.env.ADMIN_DISCORD_IDS || '').split(',').map(id => id.trim()).filter(Boolean);
+    if (!session.user.discordId || !admins.includes(session.user.discordId)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     
     const client = await clientPromise;

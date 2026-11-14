@@ -129,6 +129,7 @@ export default function GameStatsTracker({
           },
           body: JSON.stringify({
             challengeId,
+            won,
             score,
             timeMs: elapsedMs,
             mistakes: 0,

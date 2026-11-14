@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "node --test scripts/security-regression.test.cjs",
     "serve": "npm run build && npm run start",
     "thumbnails": "node scripts/capture-thumbnails.mjs"
   },

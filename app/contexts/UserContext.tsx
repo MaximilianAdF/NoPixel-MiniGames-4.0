@@ -47,7 +47,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
-  const fetchSession = async () => {
+  const fetchSession = async (force = false) => {
     try {
       // Prevent concurrent fetches
       if (sessionFetchingRef.current) {
@@ -56,7 +56,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       
       // Check if we fetched recently (within cache duration)
       const now = Date.now();
-      if (now - lastSessionFetchRef.current < SESSION_CACHE_DURATION) {
+      if (!force && now - lastSessionFetchRef.current < SESSION_CACHE_DURATION) {
         // Use cached data, just update loading state
         setIsLoading(false);
         setHasInitialized(true);
@@ -67,17 +67,21 @@ export function UserProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
 
       // Get or generate guest device ID
-      let guestId = localStorage.getItem('guest_device_id');
-      if (!guestId) {
-        guestId = crypto.randomUUID();
-        localStorage.setItem('guest_device_id', guestId);
-      }
-
-      const response = await fetch('/api/auth/session', {
-        headers: {
-          'x-guest-device-id': guestId
+      let guestId: string | null = null;
+      try {
+        guestId = localStorage.getItem('guest_device_id');
+        if (!guestId) {
+          guestId = crypto.randomUUID();
+          localStorage.setItem('guest_device_id', guestId);
         }
+      } catch {
+        // Discord cookie sessions still work when browser storage is blocked.
+      }
+      const response = await fetch('/api/auth/session', {
+        cache: 'no-store',
+        headers: guestId ? { 'x-guest-device-id': guestId } : {},
       });
+      if (!response.ok) throw new Error('Unable to load your session');
       const data = await response.json();
       
       const wasLoggedOut = !user;
@@ -152,7 +156,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshSession = async () => {
-    await fetchSession();
+    await fetchSession(true);
   };
 
   const refreshDailyChallengeStatus = async () => {

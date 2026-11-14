@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import * as Ably from 'ably';
 
 export type ChannelStatus = 'connecting' | 'connected' | 'disconnected' | 'failed';
@@ -24,17 +24,17 @@ export interface PresenceMember {
 interface UseAblyChannelArgs<TMsg> {
   channelName: string;
   presenceData: PresenceData;
-  onMessage?: (msg: TMsg) => void;
+  onMessage?: (msg: TMsg, senderId: string | undefined, members: PresenceMember[]) => void;
   enabled?: boolean;
-  // Optional clientId to forward as `?clientId=…` on the token request.
-  // Used to give anonymous visitors a stable guest identity per browser
-  // tab — logged-in users can omit this (the server uses their session id).
+  // Reconnect when the site account changes. The server chooses the actual identity.
   clientId?: string;
 }
 
 interface UseAblyChannelReturn<TMsg> {
   status: ChannelStatus;
   presence: PresenceMember[];
+  clientId: string | null;
+  error: string | null;
   publish: (msg: TMsg) => Promise<void>;
 }
 
@@ -48,6 +48,8 @@ export function useAblyChannel<TMsg>({
   clientId,
 }: UseAblyChannelArgs<TMsg>): UseAblyChannelReturn<TMsg> {
   const [status, setStatus] = useState<ChannelStatus>('connecting');
+  const [authenticatedId, setAuthenticatedId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [presence, setPresence] = useState<PresenceMember[]>([]);
   const channelRef = useRef<Ably.RealtimeChannel | null>(null);
 
@@ -67,12 +69,31 @@ export function useAblyChannel<TMsg>({
     }
 
     let cancelled = false;
+    let currentMembers: PresenceMember[] = [];
+    setStatus('connecting');
+    setError(null);
+    setPresence([]);
+    setAuthenticatedId(null);
     // echoMessages: false — we apply our own actions locally before publishing,
     // so we don't want them echoed back and double-applied (especially the
     // match:input stream that drives the spectator view).
     const client = new Ably.Realtime({
-      authUrl: '/api/ably/token',
-      authParams: clientId ? { clientId } : undefined,
+      authCallback: async (_params, callback) => {
+        try {
+          const response = await fetch(`/api/ably/token?${new URLSearchParams({ channel: channelName })}`, { cache: 'no-store' });
+          const token = await response.json();
+          if (!response.ok) throw new Error(token.error || 'Unable to authenticate multiplayer');
+          if (cancelled) return;
+          setAuthenticatedId(token.clientId);
+          callback(null, token);
+        } catch (err) {
+          if (cancelled) return;
+          const message = err instanceof Error ? err.message : 'Unable to connect to multiplayer';
+          setError(message);
+          setStatus('failed');
+          callback(message, null);
+        }
+      },
       echoMessages: false,
     });
 
@@ -85,7 +106,9 @@ export function useAblyChannel<TMsg>({
         case 'connected':
           setStatus('connected');
           break;
+        case 'suspended':
         case 'failed':
+          setError(change.reason?.message || 'The realtime connection was interrupted');
           setStatus('failed');
           break;
         default:
@@ -106,11 +129,16 @@ export function useAblyChannel<TMsg>({
           if (!m.clientId) continue;
           byClientId.set(m.clientId, {
             clientId: m.clientId,
-            data: (m.data ?? { displayName: '' }) as PresenceData,
+            data: {
+              displayName: typeof m.data?.displayName === 'string' ? m.data.displayName.slice(0, 40) : 'Player',
+              discordId: typeof m.data?.discordId === 'string' ? m.data.discordId.slice(0, 30) : undefined,
+              avatarHash: typeof m.data?.avatarHash === 'string' ? m.data.avatarHash.slice(0, 300) : undefined,
+            },
             timestamp: m.timestamp ?? 0,
           });
         }
-        setPresence(Array.from(byClientId.values()));
+        currentMembers = Array.from(byClientId.values());
+        setPresence(currentMembers);
       } catch (err) {
         console.error('Failed to fetch presence:', err);
       }
@@ -126,12 +154,16 @@ export function useAblyChannel<TMsg>({
         });
         await channel.subscribe((msg) => {
           if (cancelled) return;
-          onMessageRef.current?.(msg.data as TMsg);
+          onMessageRef.current?.(msg.data as TMsg, msg.clientId, currentMembers);
         });
         await channel.presence.enter(JSON.parse(presenceDataKey));
         await refreshPresence();
       } catch (err) {
-        if (!cancelled) console.error('Failed to set up Ably channel:', err);
+        if (!cancelled) {
+          console.error('Failed to set up Ably channel:', err);
+          setError(err instanceof Error ? err.message : 'Unable to join this lobby');
+          setStatus('failed');
+        }
       }
     };
     void setup();
@@ -149,12 +181,12 @@ export function useAblyChannel<TMsg>({
     };
   }, [enabled, channelName, presenceDataKey, clientId]);
 
-  const publish = async (msg: TMsg) => {
+  const publish = useCallback(async (msg: TMsg) => {
     if (!channelRef.current) {
       throw new Error('Cannot publish: channel not connected');
     }
     await channelRef.current.publish('msg', msg);
-  };
+  }, []);
 
-  return { status, presence, publish };
+  return { status, presence, clientId: authenticatedId, error, publish };
 }

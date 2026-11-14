@@ -19,7 +19,7 @@ const DiscordIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export default function LoginButton() {
+function LoginMenu() {
   const { user, isLoggedIn, isLoading, login, logout } = useUser();
   const { isOpen: guideIsOpen, width: guideWidth } = useGuide();
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -316,5 +316,35 @@ export default function LoginButton() {
       <span className="hidden sm:inline">Login with Discord</span>
       <span className="sm:hidden">Login</span>
     </button>
+  );
+}
+
+
+export default function LoginButton() {
+  const [loginError, setLoginError] = useState<string | null>(null);
+  useEffect(() => {
+    const error = new URLSearchParams(window.location.search).get('error');
+    const messages: Record<string, string> = {
+      auth_configuration: 'Discord login is temporarily unavailable. Please try again later.',
+      invalid_state: 'Your login attempt expired or started in another browser. Please try logging in again.',
+      auth_failed: 'Discord login was cancelled or denied. You can try again.',
+      no_code: 'Discord did not complete the login. Please try again.',
+      callback_failed: 'We could not finish your Discord login. Please try again.',
+    };
+    if (error && messages[error]) setLoginError(messages[error]);
+  }, []);
+  return (
+    <>
+      <LoginMenu />
+      {loginError && (
+        <div role="alert" className="fixed bottom-4 left-4 right-4 sm:right-auto sm:max-w-md z-[10000] flex items-start gap-3 rounded-xl border border-red-400/40 bg-slate-900 p-4 text-sm text-white shadow-xl">
+          <AlertTriangle className="h-5 w-5 shrink-0 text-red-400" />
+          <p>{loginError}</p>
+          <button type="button" aria-label="Dismiss login error" onClick={() => setLoginError(null)} className="ml-auto p-1">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+    </>
   );
 }

@@ -1,5 +1,5 @@
 import { DiscordUser, DiscordTokenResponse } from '@/interfaces/user';
-import { SITE_URL } from '@/lib/siteConfig';
+import { getDiscordRedirectUri } from './config';
 
 // Discord OAuth endpoints
 const DISCORD_API_URL = 'https://discord.com/api/v10';
@@ -8,9 +8,10 @@ const DISCORD_OAUTH_URL = 'https://discord.com/api/oauth2';
 /**
  * Get Discord OAuth authorization URL
  */
-export function getDiscordAuthUrl(): string {
+export function getDiscordAuthUrl(state: string): string {
   const clientId = process.env.DISCORD_CLIENT_ID;
-  const redirectUri = process.env.DISCORD_REDIRECT_URI || `${process.env.NEXTAUTH_URL || SITE_URL}/api/auth/discord/callback`;
+  const redirectUri = getDiscordRedirectUri();
+  if (!clientId || !process.env.DISCORD_CLIENT_SECRET) throw new Error('Discord OAuth is not configured');
   const scope = 'identify email';
 
   const params = new URLSearchParams({
@@ -18,6 +19,7 @@ export function getDiscordAuthUrl(): string {
     redirect_uri: redirectUri,
     response_type: 'code',
     scope: scope,
+    state,
   });
 
   return `${DISCORD_OAUTH_URL}/authorize?${params.toString()}`;
@@ -29,7 +31,7 @@ export function getDiscordAuthUrl(): string {
 export async function exchangeCodeForToken(code: string): Promise<DiscordTokenResponse> {
   const clientId = process.env.DISCORD_CLIENT_ID!;
   const clientSecret = process.env.DISCORD_CLIENT_SECRET!;
-  const redirectUri = process.env.DISCORD_REDIRECT_URI || `${process.env.NEXTAUTH_URL || SITE_URL}/api/auth/discord/callback`;
+  const redirectUri = getDiscordRedirectUri();
 
   const params = new URLSearchParams({
     client_id: clientId,
@@ -48,8 +50,7 @@ export async function exchangeCodeForToken(code: string): Promise<DiscordTokenRe
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to exchange code for token: ${error}`);
+    throw new Error(`Discord token exchange failed (${response.status})`);
   }
 
   return response.json();

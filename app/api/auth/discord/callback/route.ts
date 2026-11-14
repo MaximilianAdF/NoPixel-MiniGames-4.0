@@ -1,17 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { exchangeCodeForToken, getDiscordUser, getDiscordAvatarUrl } from '@/lib/auth/discord';
-import { createSessionToken, setSessionCookie, getSession } from '@/lib/auth/session';
+import { createSessionToken, getSession } from '@/lib/auth/session';
 import { UserSession } from '@/interfaces/user';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
-import { SITE_URL } from '@/lib/siteConfig';
+import { getAuthBaseUrl, safeReturnTo } from '@/lib/auth/config';
+import { cookies } from 'next/headers';
+import { timingSafeEqual } from 'node:crypto';
 
 // Force this route to be dynamic
 export const dynamic = 'force-dynamic';
 
 // Redirect base — falls back to the canonical site URL so a missing
 // NEXTAUTH_URL env can never turn auth redirects into 500s.
-const BASE_URL = process.env.NEXTAUTH_URL || SITE_URL;
+const BASE_URL = getAuthBaseUrl();
 
 /**
  * Discord OAuth Callback Route
@@ -23,6 +25,15 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const code = searchParams.get('code');
     const error = searchParams.get('error');
+    const state = searchParams.get('state');
+    const expectedState = request.cookies.get('discord_oauth_state')?.value;
+    const returnTo = safeReturnTo(request.cookies.get('auth_return_to')?.value);
+    cookies().delete('discord_oauth_state');
+    cookies().delete('auth_return_to');
+    if (!state || !expectedState || !/^[a-f0-9]{64}$/.test(state) || !/^[a-f0-9]{64}$/.test(expectedState) ||
+        !timingSafeEqual(Buffer.from(state), Buffer.from(expectedState))) {
+      return NextResponse.redirect(`${BASE_URL}/?error=invalid_state`);
+    }
 
     // Check for OAuth errors
     if (error) {
@@ -47,7 +58,9 @@ export async function GET(request: NextRequest) {
 
     // Check for existing guest session
     const currentSession = await getSession();
-    const isGuest = currentSession && !currentSession.user.discordId;
+    const isGuest = currentSession && !currentSession.user.discordId &&
+      ObjectId.isValid(currentSession.user.id) &&
+      await usersCollection.findOne({ _id: new ObjectId(currentSession.user.id), discordId: { $exists: false } });
 
     // Find existing Discord user
     let user = await usersCollection.findOne({ discordId: discordUser.id });
@@ -75,6 +88,8 @@ export async function GET(request: NextRequest) {
             discriminator: discordUser.discriminator,
             avatar: getDiscordAvatarUrl(discordUser.id, discordUser.avatar),
             email: discordUser.email,
+            verified: true,
+            isGuest: false,
             lastSeenAt: now,
             updatedAt: now,
           },
@@ -96,6 +111,7 @@ export async function GET(request: NextRequest) {
             email: discordUser.email,
             displayName: discordUser.username, // Set default display name
             verified: true, // Now verified
+            isGuest: false,
             updatedAt: now,
             lastSeenAt: now,
           },
@@ -118,6 +134,8 @@ export async function GET(request: NextRequest) {
         email: discordUser.email,
         
         displayName: discordUser.username,
+        verified: true,
+        isGuest: false,
         bio: '',
         joinedAt: now,
         lastSeenAt: now,
@@ -147,6 +165,9 @@ export async function GET(request: NextRequest) {
       user = { ...newUser, _id: result.insertedId };
     }
 
+    // Use fresh Discord details in the new session, including existing accounts.
+    user = await usersCollection.findOne({ discordId: discordUser.id });
+
     // Ensure user is not null (should satisfy TypeScript)
     if (!user) {
       throw new Error("Failed to find or create user");
@@ -168,15 +189,12 @@ export async function GET(request: NextRequest) {
       },
       accessToken: tokenResponse.access_token,
       refreshToken: tokenResponse.refresh_token,
-      expiresAt: Date.now() + tokenResponse.expires_in * 1000,
+      expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
     };
 
     // Create and set session cookie
     const token = await createSessionToken(session);
     
-    // Get return URL from cookie
-    const returnTo = request.cookies.get('auth_return_to')?.value || '/';
-
     const response = NextResponse.redirect(`${BASE_URL}${returnTo}`);
     
     // Set session cookie manually (since we're in a route handler)
@@ -190,6 +208,8 @@ export async function GET(request: NextRequest) {
 
     // Clear the return URL cookie
     response.cookies.delete('auth_return_to');
+    response.cookies.delete('discord_oauth_state');
+    response.headers.set('Cache-Control', 'no-store');
 
     return response;
   } catch (error) {
