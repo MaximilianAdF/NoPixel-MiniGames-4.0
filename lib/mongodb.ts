@@ -15,7 +15,15 @@ function getClientPromise(): Promise<MongoClient> {
     throw new Error('Please add your Mongo URI to .env.local');
   }
   if (!global._mongoClientPromise) {
-    global._mongoClientPromise = new MongoClient(process.env.MONGODB_URI, options).connect();
+    const client = new MongoClient(process.env.MONGODB_URI, options);
+    const pending = client.connect().catch(async (error: unknown) => {
+      // A paused cluster or DNS outage must not poison this process forever.
+      // Only evict this attempt; concurrent callers still share one connection.
+      if (global._mongoClientPromise === pending) global._mongoClientPromise = undefined;
+      await client.close().catch(() => {});
+      throw error;
+    });
+    global._mongoClientPromise = pending;
   }
   return global._mongoClientPromise;
 }

@@ -277,3 +277,42 @@ test('security and account regressions', async t => {
     assert.ok(isLobbyGameInput('thermite', { type: 'click', coord: [0, 0], timestamp: 1 }));
   });
 });
+
+
+test('database connection recovers after an outage and concurrent requests share retries', async () => {
+  const previousPromise = global._mongoClientPromise;
+  const previousUri = process.env.MONGODB_URI;
+  global._mongoClientPromise = undefined;
+  process.env.MONGODB_URI = 'mongodb://database.invalid/test';
+  let attempts = 0;
+  let closed = 0;
+  let rejectFirst;
+  class FakeMongoClient {
+    connect() {
+      attempts++;
+      if (attempts === 1) return new Promise((_resolve, reject) => { rejectFirst = reject; });
+      return Promise.resolve(this);
+    }
+    async close() { closed++; }
+  }
+  try {
+    const database = load('lib/mongodb.ts', { mongodb: { MongoClient: FakeMongoClient } }).default;
+    assert.equal(attempts, 0); // Imports/builds must stay lazy.
+    const first = Promise.allSettled([Promise.resolve(database), Promise.resolve(database)]);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(attempts, 1);
+    rejectFirst(new Error('cluster paused'));
+    const failed = await first;
+    assert.ok(failed.every(result => result.status === 'rejected' && result.reason.message === 'cluster paused'));
+    assert.equal(closed, 1);
+    const recovered = await Promise.all([Promise.resolve(database), Promise.resolve(database)]);
+    assert.equal(attempts, 2);
+    assert.equal(recovered[0], recovered[1]);
+    assert.equal(await database, recovered[0]);
+    assert.equal(attempts, 2); // Successful connections remain cached.
+  } finally {
+    global._mongoClientPromise = previousPromise;
+    if (previousUri === undefined) delete process.env.MONGODB_URI;
+    else process.env.MONGODB_URI = previousUri;
+  }
+});
