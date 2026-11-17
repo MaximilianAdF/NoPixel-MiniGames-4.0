@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import type { Metadata } from 'next';
 import DailyChallengeClient from './DailyChallengeClient';
 import SideAdRail from '@/app/components/SideAdRail';
@@ -8,6 +9,7 @@ export const metadata: Metadata = {
   description: "Complete the daily challenge to earn bonus XP and climb the streak leaderboards! A new NoPixel minigame challenge every day with unique settings and rewards. Build your streak and compete globally.",
   keywords: ["daily challenge", "NoPixel daily", "minigame challenge", "daily streak", "NoPixel 4.0 daily", "GTA RP daily challenge"],
   openGraph: {
+    images: [shareCards.spotThePattern],
     title: "Daily Challenge - Earn Bonus XP Today",
     description: "Complete today's NoPixel minigame challenge for bonus XP. New challenge every day - build your streak!",
     url: "https://nphacks.net/daily-challenge",

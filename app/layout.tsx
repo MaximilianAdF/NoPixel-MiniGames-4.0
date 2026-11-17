@@ -131,13 +131,9 @@ export const metadata: Metadata = {
     title: 'NoPixel 4.0 Minigames & Hacks - Free GTA RP Hacking Practice',
     description: 'Free practice trainers for NoPixel 4.0 GTA RP hacking minigames. Authentic mechanics, daily challenges, and in-depth guides.',
     siteName: 'NoPixel 4.0 Minigames',
-    // Next.js will automatically use /app/opengraph-image.tsx
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NoPixel 4.0 Minigames & Hacks - Free GTA RP Hacking Practice',
-    description: 'Free practice trainers for NoPixel 4.0 GTA RP hacking minigames. Authentic mechanics, daily challenges, and in-depth guides.',
-    // Next.js will automatically use /app/opengraph-image.tsx
   },
   robots: {
     index: true,

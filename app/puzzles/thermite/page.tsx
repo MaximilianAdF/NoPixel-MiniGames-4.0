@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import type { Metadata, Viewport } from "next";
 import Thermite from "@/app/puzzles/thermite/Thermite";
 import PuzzleBackButton from "@/app/components/PuzzleBackButton";
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
   description: "Practice the NoPixel 4.0 & FiveM thermite hack free in your browser — keep the chain reaction alive on the 6×6 grid until you hit the target score. No download required.",
   keywords: ["thermite hack", "NoPixel thermite", "maze bank hack", "GTA RP thermite", "thermite practice", "NoPixel 4.0 thermite", "laser disable minigame", "how to do thermite", "thermite tutorial"],
   openGraph: {
+    images: [shareCards.spotThePattern],
     title: "Thermite Minigame - NoPixel 4.0 Practice",
     description: "Practice the Thermite minigame from NoPixel 4.0 GTA RP. Keep the chain reaction alive on the 6×6 grid until you hit the target score. Free browser trainer, no download required.",
     url: "https://nphacks.net/puzzles/thermite",

@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import type { Metadata, Viewport } from "next";
 import Lockpick from "@/app/puzzles/lockpick/Lockpick";
 import PuzzleBackButton from "@/app/components/PuzzleBackButton";
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
   description: "Free NoPixel 4.0 & FiveM lockpick minigame practice — rotate each ring to line its coloured pins up with the slots before time runs out. Unlimited attempts, instant restart, no download. The exact GTA RP car & door lockpick, in your browser.",
   keywords: ["lockpick minigame", "NoPixel lockpick", "GTA RP lockpick", "vehicle lockpick practice", "NoPixel 4.0 lockpick", "lockpicking trainer"],
   openGraph: {
+    images: [shareCards.lockIn],
     title: "Lockpick Minigame - NoPixel 4.0 Practice",
     description: "Practice the Lockpick minigame from NoPixel 4.0 GTA RP. Rotate each ring to line its coloured pins up with matching slots before the timer ends. Free browser trainer, no download required.",
     url: "https://nphacks.net/puzzles/lockpick",

@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import type { Metadata, Viewport } from "next";
 import RoofRunning from "@/app/puzzles/roof-running/RoofRunning";
 import PuzzleBackButton from "@/app/components/PuzzleBackButton";
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
   description: "Practice the NoPixel 4.0 & FiveM roof running minigame free in your browser — clear the board by removing groups of matching coloured blocks. No download required.",
   keywords: ["roof running", "NoPixel roof running", "GTA RP roof running", "AC unit hack", "NoPixel 4.0 roof running", "parkour minigame", "house robbery", "same game puzzle"],
   openGraph: {
+    images: [shareCards.oneMoreRun],
     title: "Roof Running Minigame - NoPixel 4.0 Practice",
     description: "Practice the Roof Running minigame from NoPixel 4.0 GTA RP. Clear the board by removing groups of matching coloured blocks. Free browser trainer, no download required.",
     url: "https://nphacks.net/puzzles/roof-running",

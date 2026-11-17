@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import MediavineGameSettings from '@/app/components/MediavineGameSettings';
@@ -17,7 +18,9 @@ export const metadata: Metadata = {
     '1v1 hacking minigame',
     'nopixel versus',
   ],
+  alternates: { canonical: '/lobby' },
   openGraph: {
+    images: [shareCards.yourMove],
     title: '1v1 NoPixel 4.0 Minigames — Race a Friend Head-to-Head',
     description:
       'Challenge a friend to a 1v1 on any NoPixel 4.0 / FiveM hacking minigame — same puzzle, fastest finish wins.',
