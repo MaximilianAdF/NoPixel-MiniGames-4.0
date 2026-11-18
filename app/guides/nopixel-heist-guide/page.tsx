@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Target, ArrowLeft, Shield, Gamepad2, AlertTriangle, Map, Users, DollarSign } from 'lucide-react';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
         canonical: 'https://nphacks.net/guides/nopixel-heist-guide',
     },
     openGraph: {
+        images: [shareCards.arcade],
         title: 'Complete Guide to NoPixel 4.0 Heists - Planning, Hacks & Execution',
         description: 'Everything you need to plan and execute successful heists in NoPixel 4.0, from Fleeca Banks to the Pacific Standard vault.',
         url: 'https://nphacks.net/guides/nopixel-heist-guide',

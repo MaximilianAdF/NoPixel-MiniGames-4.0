@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { Server, ArrowRight, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
     canonical: 'https://nphacks.net/servers',
   },
   openGraph: {
+    images: [shareCards.arcade],
     title: 'NoPixel-Style FiveM Server Minigames - Free Lockpick & Hacking Practice',
     description:
       'Free, unlimited browser trainers for the lockpick, thermite and hacking minigames used by popular FiveM GTA RP servers like Prodigy RP and New Day RP.',

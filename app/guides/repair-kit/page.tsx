@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Wrench, Zap, Brain, Trophy, Gauge, Keyboard, Hand } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
     canonical: 'https://nphacks.net/guides/repair-kit',
   },
   openGraph: {
+    images: [shareCards.repairKit],
     title: 'Repair Kit Guide - Master NoPixel 4.0 Precision Timing | Expert Tips',
     description: 'Complete guide to mastering the Repair Kit minigame in NoPixel 4.0. Learn indicator timing, sweet spot targeting, and pro tips for equipment repairs.',
     url: 'https://nphacks.net/guides/repair-kit',

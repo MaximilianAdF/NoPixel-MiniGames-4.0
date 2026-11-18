@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { FileText, AlertTriangle, Scale, UserX, Shield } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -6,6 +7,7 @@ export const metadata: Metadata = {
   title: 'Terms of Service - NoPixel 4.0 Minigames Trainer',
   description: 'Terms of Service for NoPixel 4.0 Minigames - Read our terms and conditions for using the site.',
   openGraph: {
+    images: [shareCards.arcade],
     title: 'Terms of Service - NoPixel 4.0 Minigames Trainer',
     description: 'Terms and conditions for using the NoPixel 4.0 minigame trainers.',
     url: 'https://nphacks.net/terms',

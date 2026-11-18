@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import type { Metadata, Viewport } from "next";
 import Pincracker from "@/app/puzzles/pincracker/Pincracker";
 import PuzzleBackButton from "@/app/components/PuzzleBackButton";
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
   description: "Practice the NoPixel 4.0 & FiveM PinCracker minigame free in your browser — deduce the PIN from colour feedback, Mastermind-style. No download required.",
   keywords: ["pin cracker", "NoPixel pin cracker", "maze bank pin cracker", "GTA RP pin hack", "NoPixel 4.0 pin cracker", "security hack practice"],
   openGraph: {
+    images: [shareCards.pincracker],
     title: "PinCracker Minigame - NoPixel 4.0 Practice",
     description: "Practice the PinCracker minigame from NoPixel 4.0 GTA RP. Deduce the PIN from colour feedback, Mastermind-style. Free browser trainer, no download required.",
     url: "https://nphacks.net/puzzles/pincracker",

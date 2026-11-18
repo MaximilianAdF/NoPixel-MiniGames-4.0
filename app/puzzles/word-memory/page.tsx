@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import type { Metadata, Viewport } from "next";
 import WordMemory from "@/app/puzzles/word-memory/WordMemory";
 import PuzzleBackButton from "@/app/components/PuzzleBackButton";
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
   description: "Practice the NoPixel 4.0 & FiveM word memory minigame free in your browser — recall which words you've already seen as the sequence grows. No download required.",
   keywords: ["word memory", "NoPixel word memory", "maze bank word memory", "GTA RP memory game", "NoPixel 4.0 word memory", "memory hack practice"],
   openGraph: {
+    images: [shareCards.wordMemory],
     title: "Word Memory Minigame - NoPixel 4.0 Practice",
     description: "Practice the Word Memory minigame from NoPixel 4.0 GTA RP. Recall which words you've already seen as the sequence grows. Free browser trainer, no download required.",
     url: "https://nphacks.net/puzzles/word-memory",

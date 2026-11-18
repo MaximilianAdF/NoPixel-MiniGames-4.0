@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import {
   Rocket,
   Clock,
@@ -41,6 +42,7 @@ export const metadata: Metadata = {
     canonical: 'https://nphacks.net/nopixel-5',
   },
   openGraph: {
+    images: [shareCards.arcade],
     title: 'NoPixel 5.0 (NoPixel V) - Release News, Minigames & Free Trainers',
     description:
       'Official Rockstar partnership, spotted on the Rockstar Games Launcher. Track the news and practise the current NoPixel 4.0 hacks free now.',

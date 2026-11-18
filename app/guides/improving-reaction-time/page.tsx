@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Zap, ArrowLeft, Brain, Timer, Eye, Heart, Dumbbell, Coffee } from 'lucide-react';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
         canonical: 'https://nphacks.net/guides/improving-reaction-time',
     },
     openGraph: {
+        images: [shareCards.oneMoreRun],
         title: 'How to Improve Reaction Time for GTA RP Minigames',
         description: 'Science-backed techniques to boost your reaction speed and cognitive performance for NoPixel minigames.',
         url: 'https://nphacks.net/guides/improving-reaction-time',

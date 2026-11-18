@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { ArrowLeft, Key, Wrench, Server, Target, BookOpen, ArrowRight, ShieldQuestion } from 'lucide-react';
 import Icon from '@mdi/react';
 import { mdiFuse, mdiWashingMachine } from '@mdi/js';
@@ -22,6 +23,7 @@ export const metadata: Metadata = {
     canonical: 'https://nphacks.net/servers/new-day-rp',
   },
   openGraph: {
+    images: [shareCards.arcade],
     title: 'New Day RP Hacks & Minigame Practice - Lockpick, Thermite & More | NPHacks',
     description:
       'Free, unlimited practice trainers for the hacking minigames used on New Day RP (NDRP) — lockpick, thermite, laundromat and repair kit. Build muscle memory before your next job.',

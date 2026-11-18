@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import type { Metadata, Viewport } from "next";
 import RepairKit from "./RepairKit";
 import PuzzleBackButton from "@/app/components/PuzzleBackButton";
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
   description: "Practice the NoPixel 4.0 & FiveM repair kit minigame free in your browser — stop the moving indicator inside the target zone. No download required.",
   keywords: ["repair kit", "NoPixel repair kit", "GTA RP repair", "vehicle repair minigame", "NoPixel 4.0 repair kit", "repair practice"],
   openGraph: {
+    images: [shareCards.repairKit],
     title: "Repair Kit Minigame - NoPixel 4.0 Practice",
     description: "Practice the Repair Kit minigame from NoPixel 4.0 GTA RP. Stop the moving indicator inside the target zone. Free browser trainer, no download required.",
     url: "https://nphacks.net/puzzles/repair-kit",

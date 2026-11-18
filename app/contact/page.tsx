@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { Mail, Github, MessageSquare, Bug, Lightbulb, Shield, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -6,6 +7,7 @@ export const metadata: Metadata = {
   title: 'Contact Us - NoPixel 4.0 Minigames Trainer',
   description: 'Get in touch with NoPixel 4.0 Minigames - Report bugs, suggest features, or ask questions.',
   openGraph: {
+    images: [shareCards.arcade],
     title: 'Contact - NoPixel 4.0 Minigames Trainer',
     description: 'Report bugs, suggest features, or ask questions about the NoPixel 4.0 minigame trainers.',
     url: 'https://nphacks.net/contact',

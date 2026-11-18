@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Keyboard, Zap, Brain, Trophy, Timer, Gauge } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
     canonical: 'https://nphacks.net/guides/chopping',
   },
   openGraph: {
+    images: [shareCards.chopping],
     title: 'Chopping Guide - Master NoPixel 4.0 Typing Challenge | Expert Tips',
     description: 'Complete guide to the NoPixel 4.0 Chopping minigame. Type the letter sequence in order before the timer runs out — one wrong key ends the run.',
     url: 'https://nphacks.net/guides/chopping',

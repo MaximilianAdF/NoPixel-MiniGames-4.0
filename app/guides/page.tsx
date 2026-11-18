@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { BookOpen, Gamepad2, Target, Clock, Trophy, Zap, Brain, ArrowRight } from 'lucide-react';
 import { Blocks, Key, Wrench, Keyboard, Fingerprint } from 'lucide-react';
 import Icon from '@mdi/react';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
     canonical: 'https://nphacks.net/guides',
   },
   openGraph: {
+    images: [shareCards.arcade],
     title: 'NoPixel 4.0 Minigame Guides - Master Every Hack | Expert Tips & Strategies',
     description: 'Complete guides for all NoPixel 4.0 minigames — Thermite, Lockpick, PinCracker, Laundromat, Roof Running, Word Memory, Chopping, and Repair Kit — plus heist prep and reaction-time training.',
     url: 'https://nphacks.net/guides',

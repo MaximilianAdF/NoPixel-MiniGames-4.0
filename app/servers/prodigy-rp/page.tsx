@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { ArrowLeft, ArrowRight, Key, Zap, Wrench, Keyboard, Blocks, Server, Car, ShieldCheck, Gamepad2, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
     canonical: 'https://nphacks.net/servers/prodigy-rp',
   },
   openGraph: {
+    images: [shareCards.arcade],
     title: 'Prodigy RP Hacks & Minigame Practice - Free Lockpick & Hacking Trainers',
     description:
       'Practise the Prodigy RP hacking minigames for free in your browser — the timing lockpick, thermite-style heist grid, safe-cracking, repair and chop-shop hacks.',

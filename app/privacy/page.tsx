@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { Shield, Eye, Cookie, Database, Mail, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -6,6 +7,7 @@ export const metadata: Metadata = {
   title: 'Privacy Policy - NoPixel 4.0 Minigames Trainer',
   description: 'Privacy Policy for NoPixel 4.0 Minigames - Learn how we protect your data and respect your privacy.',
   openGraph: {
+    images: [shareCards.arcade],
     title: 'Privacy Policy - NoPixel 4.0 Minigames Trainer',
     description: 'How NoPixel 4.0 Minigames protects your data and respects your privacy.',
     url: 'https://nphacks.net/privacy',

@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Zap, Brain, Trophy } from 'lucide-react';
 import Icon from '@mdi/react';
 import { mdiFuse } from '@mdi/js';
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
     canonical: 'https://nphacks.net/guides/thermite',
   },
   openGraph: {
+    images: [shareCards.spotThePattern],
     title: 'Thermite Hack Guide - Master the NoPixel 4.0 Chain-Reaction Grid | Expert Tips',
     description: 'Complete guide to the NoPixel 4.0 Thermite hack — the 6x6 chain-reaction grid. Learn piece ranges, planning moves ahead, combos, and pro tips for the Maze Bank sewers and vault.',
     url: 'https://nphacks.net/guides/thermite',

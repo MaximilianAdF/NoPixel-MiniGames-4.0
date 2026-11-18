@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, RotateCcw, RotateCw, Palette, Trophy } from 'lucide-react';
 import Icon from '@mdi/react';
 import { mdiWashingMachine } from '@mdi/js';
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
     canonical: 'https://nphacks.net/guides/laundromat',
   },
   openGraph: {
+    images: [shareCards.laundromat],
     title: 'Laundromat Hack Guide - Crack the NoPixel 4.0 Rotating-Lock Safe | Tips',
     description: 'Master the NoPixel 4.0 Laundromat safe. Learn the colour-match rotating lock, align every gate across all 5 rings, and beat the 12-second timer.',
     url: 'https://nphacks.net/guides/laundromat',

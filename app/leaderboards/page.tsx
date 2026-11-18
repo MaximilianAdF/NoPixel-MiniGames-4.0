@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import type { Metadata } from 'next';
 import LeaderboardsClient from './LeaderboardsClient';
 import { Trophy, Medal, Users, TrendingUp } from 'lucide-react';
@@ -7,6 +8,7 @@ export const metadata: Metadata = {
   description: "Compete on the NoPixel 4.0 global leaderboards. Climb the Player Level rankings by earning XP, and build the longest Daily Challenge streak. Log in with Discord and track your progress.",
   keywords: ["NoPixel leaderboard", "GTA RP rankings", "NoPixel player level", "daily streak leaderboard", "NoPixel 4.0 leaderboard"],
   openGraph: {
+    images: [shareCards.leaderboards],
     title: "NoPixel 4.0 Leaderboards - Compete Globally",
     description: "View the global Player Level and Daily Streak rankings. Earn XP, build your streak, and climb to the top.",
     url: "https://nphacks.net/leaderboards",

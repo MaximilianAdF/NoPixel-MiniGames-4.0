@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import type { Metadata, Viewport } from "next";
 import Laundromat from "@/app/puzzles/laundromat/Laundromat";
 import PuzzleBackButton from "@/app/components/PuzzleBackButton";
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
   description: "Practice the NoPixel 4.0 & FiveM laundromat safe minigame free in your browser — crack the rotating locks against a tight timer. No download required.",
   keywords: ["laundromat hack", "NoPixel laundromat", "GTA RP laundromat", "safe hack practice", "NoPixel 4.0 laundromat", "laundromat puzzle"],
   openGraph: {
+    images: [shareCards.laundromat],
     title: "Laundromat Minigame - NoPixel 4.0 Practice",
     description: "Practice the Laundromat minigame from NoPixel 4.0 GTA RP. Crack all five rotating locks against a tight timer. Free browser trainer, no download required.",
     url: "https://nphacks.net/puzzles/laundromat",

@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Zap, Brain, Trophy, Eye, Layers, MousePointerClick } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
     canonical: 'https://nphacks.net/guides/word-memory',
   },
   openGraph: {
+    images: [shareCards.wordMemory],
     title: 'Word Memory Guide - Master NoPixel 4.0 Recognition Challenge | Expert Tips',
     description: 'Complete guide to mastering the Word Memory minigame in NoPixel 4.0. Learn NEW vs SEEN recognition techniques, memory tracking strategies, and pro tips.',
     url: 'https://nphacks.net/guides/word-memory',

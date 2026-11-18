@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Brain, Trophy, Key, RotateCcw, RotateCw, Palette, Unlock } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
     canonical: 'https://nphacks.net/guides/lockpick',
   },
   openGraph: {
+    images: [shareCards.lockIn],
     title: 'Lockpick Guide - Master NoPixel 4.0 Rotating-Ring Lock | Pro Tips',
     description: 'Complete guide to the NoPixel 4.0 lockpick minigame. Rotate each ring so its coloured pins line up with matching slots, then unlock before the timer ends.',
     url: 'https://nphacks.net/guides/lockpick',

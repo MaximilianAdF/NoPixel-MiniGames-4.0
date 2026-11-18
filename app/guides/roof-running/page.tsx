@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Blocks, Zap, Brain, Trophy, Timer, MousePointerClick } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
     canonical: 'https://nphacks.net/guides/roof-running',
   },
   openGraph: {
+    images: [shareCards.oneMoreRun],
     title: 'Roof Running Guide - Master NoPixel 4.0 Tile Clearing Puzzle | Expert Tips',
     description: 'Complete guide to mastering the Roof Running minigame in NoPixel 4.0. Learn tile group clearing, gravity mechanics, and strategic color matching techniques.',
     url: 'https://nphacks.net/guides/roof-running',

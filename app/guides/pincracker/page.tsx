@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { ArrowLeft, Clock, Target, AlertTriangle, CheckCircle, Lightbulb, Brain, Trophy, Zap, Fingerprint } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
     canonical: 'https://nphacks.net/guides/pincracker',
   },
   openGraph: {
+    images: [shareCards.pincracker],
     title: 'PinCracker Guide - Master NoPixel 4.0 Logic Puzzle | Expert Tips',
     description: 'Complete guide to mastering the PinCracker minigame in NoPixel 4.0. Learn Mastermind-style deduction, color feedback interpretation, and pro tips for cracking codes.',
     url: 'https://nphacks.net/guides/pincracker',

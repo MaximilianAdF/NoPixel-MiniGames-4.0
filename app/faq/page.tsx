@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import { HelpCircle, Gamepad2, Trophy, Shield, Zap, Users } from 'lucide-react';
 import type { Metadata } from 'next';
 import JsonLd from '@/app/components/JsonLd';
@@ -7,6 +8,7 @@ export const metadata: Metadata = {
   title: 'FAQ - NoPixel 4.0 Minigames Trainer',
   description: 'Frequently asked questions about NoPixel 4.0 Minigames Trainer. Learn how to practice Thermite, Lockpick, PinCracker and other GTA RP heist minigames.',
   openGraph: {
+    images: [shareCards.arcade],
     title: 'FAQ - NoPixel 4.0 Minigames Trainer',
     description: 'Get answers to common questions about our free NoPixel minigame practice tools.',
     url: 'https://nphacks.net/faq',

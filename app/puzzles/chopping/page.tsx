@@ -1,3 +1,4 @@
+import { shareCards } from '@/lib/share-cards';
 import type { Metadata, Viewport } from "next";
 import Chopping from "@/app/puzzles/chopping/Chopping";
 import PuzzleBackButton from "@/app/components/PuzzleBackButton";
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
   description: "Practice the NoPixel 4.0 & FiveM chopping minigame free in your browser — type the on-screen letter sequence quickly and accurately. No download required.",
   keywords: ["chopping minigame", "NoPixel chopping", "GTA RP chopping", "vehicle chopping practice", "NoPixel 4.0 chopping", "chopping trainer"],
   openGraph: {
+    images: [shareCards.chopping],
     title: "Chopping Minigame - NoPixel 4.0 Practice",
     description: "Practice the Chopping minigame from NoPixel 4.0 GTA RP. Type the on-screen letter sequence quickly and accurately. Free browser trainer, no download required.",
     url: "https://nphacks.net/puzzles/chopping",
