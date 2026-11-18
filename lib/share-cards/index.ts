@@ -1,5 +1,5 @@
 import type { StaticImageData } from 'next/image';
-import arcade from '@/app/opengraph-image.jpg';
+import arcade from './arcade.jpg';
 import chopping from './chopping.jpg';
 import laundromat from './laundromat.jpg';
 import leaderboards from './leaderboards.jpg';
